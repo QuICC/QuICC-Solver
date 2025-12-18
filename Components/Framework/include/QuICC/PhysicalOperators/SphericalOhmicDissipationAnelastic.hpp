@@ -200,14 +200,14 @@ namespace Physical {
       {
          using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
          using grid_t = View::ViewBase<double>;
-         using fct_t = SetFunctor<scalar_t>;
+         using fct_t = details::AddTmplFunctor<scalar_t, SetFunctor>;
          fct_t f(c);
          grid_t vEta(const_cast<scalar_t *>(eta.data()), eta.size());
-         Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 1, 0, 0, grid_t, view_t, view_t, view_t> op(f);
+         Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 1, 0, 0, grid_t, view_t, view_t, view_t, view_t> op(f);
          auto vR = w.comp(FieldComponents::Physical::R).dataView();
          auto vT = w.comp(FieldComponents::Physical::THETA).dataView();
          auto vP = w.comp(FieldComponents::Physical::PHI).dataView();
-         op.apply(rS.rGlobalView(), vEta, vR, vT, vP);
+         op.apply(rS.rGlobalView(), vEta, vR, vT, vP, rS.dataView());
       }
       else
       {

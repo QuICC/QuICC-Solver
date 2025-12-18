@@ -45,7 +45,7 @@ TEST_CASE("SphericalOhmicDissipationAnelastic product validation FlatScalarField
       QuICC::Array eta(dim3D);
       for(std::uint32_t i = 0; i < dim3D; i++)
       {
-         eta(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         eta(i) = static_cast<double>(i+3)/static_cast<double>(dim3D + 1);
       }
 
       QuICC::Array tGrid(dim2D);
@@ -150,7 +150,7 @@ TEST_CASE("SphericalOhmicDissipationAnelastic product timing", "[SphericalOhmicD
       QuICC::Array eta(dim3D);
       for(std::uint32_t i = 0; i < dim3D; i++)
       {
-         eta(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         eta(i) = static_cast<double>(i+3)/static_cast<double>(dim3D + 1);
       }
 
       QuICC::Array tGrid(dim2D);

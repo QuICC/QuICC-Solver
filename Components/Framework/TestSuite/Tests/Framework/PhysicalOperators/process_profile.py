@@ -21,7 +21,7 @@ except getopt.error as err:
 h5file = h5py.File(fname, 'r')
 
 refImpl = 'Flat'
-variants = [20]
+variants = [30]
 impls = [refImpl, 'View']
 ops = ['Set', 'Add', 'Sub', 'CSet', 'CAdd', 'CSub']
 ds = [

@@ -22,12 +22,29 @@ namespace Physical {
 
 namespace details {
 
+template <bool Enable, typename T, typename... Tcache>
+   struct CachedFunctor
+   {
+      /// Enable caching
+      static constexpr bool enableCaching(){return Enable;};
+
+      /// Cache variables
+      std::tuple<Tcache...> _s;
+
+      /// @brief ctor
+      CachedFunctor(): _s(Tcache{0}...) {};
+
+      /// @brief dtor
+      ~CachedFunctor() = default;
+   };
+
 template <typename T, template <typename> class TFunctor>
-struct AddTmplFunctor : private TFunctor<T>
+struct AddTmplFunctor : public TFunctor<T>
 {
    /// @brief ctor
    /// @param scaling
-   AddTmplFunctor(T scaling) : TFunctor<T>(scaling) {};
+   template <typename... Ts>
+   AddTmplFunctor(Ts... s) : TFunctor<T>(s...) {};
 
    /// @brief deleted default constructor
    AddTmplFunctor() = delete;
@@ -42,28 +59,32 @@ struct AddTmplFunctor : private TFunctor<T>
          std::make_integer_sequence<std::size_t, sizeof...(Args) - 1>());
    }
 
-   /// @brief Create tuple of arguments
-   template <typename... Args> decltype(auto) args_to_tuple(Args... args)
-   {
-      return std::tuple<Args...>(args...);
-   }
+   private:
+      using TFunctor<T>::operator();
 
-   /// @brief Call functor tuple of arguments
-   template <std::size_t... Is, typename... Args>
-   T call_with_tuple(const std::tuple<Args...>& tuple,
-      std::index_sequence<Is...>)
-   {
-      return std::get<sizeof...(Args) - 1>(tuple) +
-             TFunctor<T>::operator()(std::get<Is>(tuple)...);
-   }
+      /// @brief Create tuple of arguments
+      template <typename... Args> decltype(auto) args_to_tuple(Args... args)
+      {
+         return std::tuple<Args...>(args...);
+      }
+
+      /// @brief Call functor tuple of arguments
+      template <std::size_t... Is, typename... Args>
+      T call_with_tuple(const std::tuple<Args...>& tuple,
+         std::index_sequence<Is...>)
+      {
+         return std::get<sizeof...(Args) - 1>(tuple) +
+                TFunctor<T>::operator()(std::get<Is>(tuple)...);
+      }
 };
 
 template <typename T, template <typename> class TFunctor>
-struct SubTmplFunctor : private TFunctor<T>
+struct SubTmplFunctor : public TFunctor<T>
 {
    /// @brief ctor
    /// @param scaling
-   SubTmplFunctor(T scaling) : TFunctor<T>(scaling) {};
+   template <typename... Ts>
+   SubTmplFunctor(Ts... s) : TFunctor<T>(-s...) {};
 
    /// @brief deleted default constructor
    SubTmplFunctor() = delete;
@@ -78,20 +99,23 @@ struct SubTmplFunctor : private TFunctor<T>
          std::make_integer_sequence<std::size_t, sizeof...(Args) - 1>());
    }
 
-   /// @brief Create tuple of arguments
-   template <typename... Args> decltype(auto) args_to_tuple(Args... args)
-   {
-      return std::tuple<Args...>(args...);
-   }
+   private:
+      using TFunctor<T>::operator();
 
-   /// @brief Call functor tuple of arguments
-   template <std::size_t... Is, typename... Args>
-   T call_with_tuple(const std::tuple<Args...>& tuple,
-      std::index_sequence<Is...>)
-   {
-      return std::get<sizeof...(Args) - 1>(tuple) -
-             TFunctor<T>::operator()(std::get<Is>(tuple)...);
-   }
+      /// @brief Create tuple of arguments
+      template <typename... Args> decltype(auto) args_to_tuple(Args... args)
+      {
+         return std::tuple<Args...>(args...);
+      }
+
+      /// @brief Call functor tuple of arguments
+      template <std::size_t... Is, typename... Args>
+      T call_with_tuple(const std::tuple<Args...>& tuple,
+         std::index_sequence<Is...>)
+      {
+         return std::get<sizeof...(Args) - 1>(tuple) +
+                TFunctor<T>::operator()(std::get<Is>(tuple)...);
+      }
 };
 
 } // namespace details

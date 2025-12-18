@@ -109,7 +109,7 @@ namespace Physical {
          };
 
          /// @tparam T scalar
-         template <class T = double> struct SetRTFunctor
+         template <class T = double> struct SetRTFunctor: public details::CachedFunctor<true, T, T>
          {
             /// @brief non dimensional scaling for transport term
             T _scaling;
@@ -130,12 +130,25 @@ namespace Physical {
             /// @return
             QUICC_CUDA_HOSTDEV T operator()(T g, T ui)
             {
-               return -_scaling * (g * ui);
+               if constexpr(this->enableCaching())
+               {
+                  return std::get<0>(this->_s) * ui;
+               }
+               else
+               {
+                  return -_scaling * g * ui;
+               }
             }
+
+            /// Grid caching function
+            void cacheScaling(T g)
+            {
+               std::get<0>(this->_s) = -_scaling * g;
+            };
          };
 
          /// @tparam T scalar
-         template <class T = double> struct SetPFunctor
+         template <class T = double> struct SetPFunctor: public details::CachedFunctor<true, T, T, T>
          {
             /// @brief non dimensional scaling for transport term
             T _scaling;
@@ -158,8 +171,22 @@ namespace Physical {
             /// @return
             QUICC_CUDA_HOSTDEV T operator()(T gc, T gs, T ui, T uj)
             {
-               return _scaling * (gc * ui + gs * uj);
+               if constexpr(this->enableCaching())
+               {
+                  return std::get<0>(this->_s) * ui + std::get<1>(this->_s) * uj;
+               }
+               else
+               {
+                  return _scaling * (gc * ui + gs * uj);
+               }
             }
+
+            /// Grid caching function
+            void cacheScaling(T gc, T gs)
+            {
+               std::get<0>(this->_s) = _scaling * gc;
+               std::get<1>(this->_s) = _scaling * gs;
+            };
          };
    };
 

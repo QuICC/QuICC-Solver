@@ -16,6 +16,8 @@
 #include "QuICC/VectorFields/VectorField.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
+#include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
+#include "ViewOps/Slicewise/Cpu/NoGridOp.hpp"
 
 namespace QuICC {
 
@@ -105,6 +107,87 @@ namespace Physical {
                return _res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(j, k);
             }
          };
+
+         /// @tparam T scalar
+         template <class T = double> struct SetRFunctor
+         {
+            /// @brief non dimensional scaling for transport term
+            T _sA;
+            T _sB;
+
+            /// @brief ctor
+            /// @param scaling
+            SetRFunctor(T sA, T sB) : _sA(sA), _sB(sB) {};
+
+            /// @brief deleted default constructor
+            SetRFunctor() = delete;
+
+            /// @brief dtor
+            ~SetRFunctor() = default;
+
+            /// @brief Dot product
+            /// @param g
+            /// @param ui
+            /// @return
+            QUICC_CUDA_HOSTDEV T operator()(T gcT, T gsT, T gcP, T gsP, T ui, T uj)
+            {
+               return _sA * (gsP * ui + gcT * gcP * uj) - _sB * gsT * uj;
+            }
+         };
+
+         /// @tparam T scalar
+         template <class T = double> struct SetTFunctor
+         {
+            /// @brief non dimensional scaling for transport term
+            T _sA;
+            T _sB;
+
+            /// @brief ctor
+            /// @param scaling
+            SetTFunctor(T sA, T sB) : _sA(sA), _sB(sB) {};
+
+            /// @brief deleted default constructor
+            SetTFunctor() = delete;
+
+            /// @brief dtor
+            ~SetTFunctor() = default;
+
+            /// @brief Dot product
+            /// @param g
+            /// @param ui
+            /// @return
+            QUICC_CUDA_HOSTDEV T operator()(T gcT, T gsT, T gcP, T gsP, T ui, T uj)
+            {
+               return -_sA * (gsP * ui + gsT * gcP * uj) - _sB * gcT * uj;
+            }
+         };
+
+         /// @tparam T scalar
+         template <class T = double> struct SetPFunctor
+         {
+            /// @brief non dimensional scaling for transport term
+            T _sA;
+            T _sB;
+
+            /// @brief ctor
+            /// @param scaling
+            SetPFunctor(T sA, T sB) : _sA(sA), _sB(sB) {};
+
+            /// @brief deleted default constructor
+            SetPFunctor() = delete;
+
+            /// @brief dtor
+            ~SetPFunctor() = default;
+
+            /// @brief Dot product
+            /// @param g
+            /// @param ui
+            /// @return
+            QUICC_CUDA_HOSTDEV T operator()(T gcT, T gsT, T gcP, T gsP, T ui, T uj)
+            {
+               return _sA * gcP * (-gcT * ui + gsT * uj) + _sB * (gsT * ui + gcT * uj);
+            }
+         };
    };
 
    template <typename TFIELD>
@@ -140,59 +223,128 @@ namespace Physical {
       MHDFloat coeff;
       if(compId == FieldComponents::Physical::R)
       {
-         for(int iR = 0; iR < nR; ++iR)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            nTh = idxFunc.dim2D(iR);
-            for(int iTh = 0; iTh < nTh; ++iTh)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = SetRFunctor<scalar_t>;
+            fct_t f(cA, cB);
+            Array cos_T = thGrid.array().array().cos();
+            Array sin_T = thGrid.array().array().sin();
+            Array cos_pt = (phGrid.array() + t).array().cos();
+            Array sin_pt = (phGrid.array() + t).array().sin();
+            grid_t vCosPt(const_cast<scalar_t *>(cos_pt.data()), cos_pt.size());
+            grid_t vSinPt(const_cast<scalar_t *>(sin_pt.data()), sin_pt.size());
+            grid_t vCosT(const_cast<scalar_t *>(cos_T.data()), cos_T.size());
+            grid_t vSinT(const_cast<scalar_t *>(sin_T.data()), sin_T.size());
+            Slicewise::Cpu::NoGridOp<4, fct_t, view_t, 2, 2, 0, grid_t, grid_t, grid_t, grid_t, view_t, view_t> op(f);
+            auto vT = v.comp(FieldComponents::Physical::THETA).dataView();
+            auto vP = v.comp(FieldComponents::Physical::PHI).dataView();
+            op.apply(rS.rGlobalView(), vCosT, vSinT, vCosPt, vSinPt, vT, vP);
+         }
+         else
+         {
+            for(int iR = 0; iR < nR; ++iR)
             {
-               theta = thGrid(idxFunc.idx2D(iTh, iR));
+               nTh = idxFunc.dim2D(iR);
+               for(int iTh = 0; iTh < nTh; ++iTh)
+               {
+                  theta = thGrid(idxFunc.idx2D(iTh, iR));
 
-               // Theta component
-               rS.setProfile((cA*(phGrid.array() + t).array().sin()*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR).array()).matrix(), iTh, iR);
-               // Phi components
-               coeff = cA*std::cos(theta);
-               rS.addProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()).matrix(), iTh, iR);
-               coeff = cB*std::sin(theta);
-               rS.subProfile(coeff*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR), iTh, iR);
+                  // Theta component
+                  rS.setProfile((cA*(phGrid.array() + t).array().sin()*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  // Phi components
+                  coeff = cA*std::cos(theta);
+                  rS.addProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  coeff = cB*std::sin(theta);
+                  rS.subProfile(coeff*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR), iTh, iR);
+               }
             }
          }
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         for(int iR = 0; iR < nR; ++iR)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            nTh = idxFunc.dim2D(iR);
-            for(int iTh = 0; iTh < nTh; ++iTh)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = SetTFunctor<scalar_t>;
+            fct_t f(cA, cB);
+            Array cos_T = thGrid.array().array().cos();
+            Array sin_T = thGrid.array().array().sin();
+            Array cos_pt = (phGrid.array() + t).array().cos();
+            Array sin_pt = (phGrid.array() + t).array().sin();
+            grid_t vCosPt(const_cast<scalar_t *>(cos_pt.data()), cos_pt.size());
+            grid_t vSinPt(const_cast<scalar_t *>(sin_pt.data()), sin_pt.size());
+            grid_t vCosT(const_cast<scalar_t *>(cos_T.data()), cos_T.size());
+            grid_t vSinT(const_cast<scalar_t *>(sin_T.data()), sin_T.size());
+            Slicewise::Cpu::NoGridOp<4, fct_t, view_t, 2, 2, 0, grid_t, grid_t, grid_t, grid_t, view_t, view_t> op(f);
+            auto vT = v.comp(FieldComponents::Physical::R).dataView();
+            auto vP = v.comp(FieldComponents::Physical::PHI).dataView();
+            op.apply(rS.rGlobalView(), vCosT, vSinT, vCosPt, vSinPt, vT, vP);
+         }
+         else
+         {
+            for(int iR = 0; iR < nR; ++iR)
             {
-               theta = thGrid(idxFunc.idx2D(iTh, iR));
+               nTh = idxFunc.dim2D(iR);
+               for(int iTh = 0; iTh < nTh; ++iTh)
+               {
+                  theta = thGrid(idxFunc.idx2D(iTh, iR));
 
-               // R component
-               rS.setProfile((-cA*(phGrid.array() + t).array().sin()*v.comp(FieldComponents::Physical::R).profile(iTh,iR).array()).matrix(), iTh, iR);
-               // Phi components
-               coeff = cA*std::sin(theta);
-               rS.subProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()).matrix(), iTh, iR);
-               coeff = cB*std::cos(theta);
-               rS.subProfile(coeff*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR), iTh, iR);
+                  // R component
+                  rS.setProfile((-cA*(phGrid.array() + t).array().sin()*v.comp(FieldComponents::Physical::R).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  // Phi components
+                  coeff = cA*std::sin(theta);
+                  rS.subProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  coeff = cB*std::cos(theta);
+                  rS.subProfile(coeff*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR), iTh, iR);
+               }
             }
          }
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         for(int iR = 0; iR < nR; ++iR)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            nTh = idxFunc.dim2D(iR);
-            for(int iTh = 0; iTh < nTh; ++iTh)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = SetPFunctor<scalar_t>;
+            fct_t f(cA, cB);
+            Array cos_T = thGrid.array().array().cos();
+            Array sin_T = thGrid.array().array().sin();
+            Array cos_pt = (phGrid.array() + t).array().cos();
+            Array sin_pt = (phGrid.array() + t).array().sin();
+            grid_t vCosPt(const_cast<scalar_t *>(cos_pt.data()), cos_pt.size());
+            grid_t vSinPt(const_cast<scalar_t *>(sin_pt.data()), sin_pt.size());
+            grid_t vCosT(const_cast<scalar_t *>(cos_T.data()), cos_T.size());
+            grid_t vSinT(const_cast<scalar_t *>(sin_T.data()), sin_T.size());
+            Slicewise::Cpu::NoGridOp<4, fct_t, view_t, 2, 2, 0, grid_t, grid_t, grid_t, grid_t, view_t, view_t> op(f);
+            auto vT = v.comp(FieldComponents::Physical::R).dataView();
+            auto vP = v.comp(FieldComponents::Physical::THETA).dataView();
+            op.apply(rS.rGlobalView(), vCosT, vSinT, vCosPt, vSinPt, vT, vP);
+         }
+         else
+         {
+            for(int iR = 0; iR < nR; ++iR)
             {
-               theta = thGrid(idxFunc.idx2D(iTh, iR));
+               nTh = idxFunc.dim2D(iR);
+               for(int iTh = 0; iTh < nTh; ++iTh)
+               {
+                  theta = thGrid(idxFunc.idx2D(iTh, iR));
 
-               // R components
-               coeff = -cA*std::cos(theta);
-               rS.setProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::R).profile(iTh,iR).array()).matrix(), iTh, iR);
-               coeff = cB*std::sin(theta);
-               rS.addProfile(coeff*v.comp(FieldComponents::Physical::R).profile(iTh,iR), iTh, iR);
-               // Theta components
-               coeff = cA*std::sin(theta);
-               rS.addProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR).array()).matrix(), iTh, iR);
-               coeff = cB*std::cos(theta);
-               rS.addProfile(coeff*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR), iTh, iR);
+                  // R components
+                  coeff = -cA*std::cos(theta);
+                  rS.setProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::R).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  coeff = cB*std::sin(theta);
+                  rS.addProfile(coeff*v.comp(FieldComponents::Physical::R).profile(iTh,iR), iTh, iR);
+                  // Theta components
+                  coeff = cA*std::sin(theta);
+                  rS.addProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  coeff = cB*std::cos(theta);
+                  rS.addProfile(coeff*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR), iTh, iR);
+               }
             }
          }
       }
@@ -210,61 +362,130 @@ namespace Physical {
       MHDFloat coeff;
       if(compId == FieldComponents::Physical::R)
       {
-         for(int iR = 0; iR < nR; ++iR)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            nTh = idxFunc.dim2D(iR);
-            for(int iTh = 0; iTh < nTh; ++iTh)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::AddTmplFunctor<scalar_t, SetRFunctor>;
+            fct_t f(cA, cB);
+            Array cos_T = thGrid.array().array().cos();
+            Array sin_T = thGrid.array().array().sin();
+            Array cos_pt = (phGrid.array() + t).array().cos();
+            Array sin_pt = (phGrid.array() + t).array().sin();
+            grid_t vCosPt(const_cast<scalar_t *>(cos_pt.data()), cos_pt.size());
+            grid_t vSinPt(const_cast<scalar_t *>(sin_pt.data()), sin_pt.size());
+            grid_t vCosT(const_cast<scalar_t *>(cos_T.data()), cos_T.size());
+            grid_t vSinT(const_cast<scalar_t *>(sin_T.data()), sin_T.size());
+            Slicewise::Cpu::NoGridOp<4, fct_t, view_t, 2, 2, 0, grid_t, grid_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
+            auto vT = v.comp(FieldComponents::Physical::THETA).dataView();
+            auto vP = v.comp(FieldComponents::Physical::PHI).dataView();
+            op.apply(rS.rGlobalView(), vCosT, vSinT, vCosPt, vSinPt, vT, vP, rS.dataView());
+         }
+         else
+         {
+            for(int iR = 0; iR < nR; ++iR)
             {
-               theta = thGrid(idxFunc.idx2D(iTh, iR));
+               nTh = idxFunc.dim2D(iR);
+               for(int iTh = 0; iTh < nTh; ++iTh)
+               {
+                  theta = thGrid(idxFunc.idx2D(iTh, iR));
 
-               // Theta component
-               rS.addProfile((cA*(phGrid.array() + t).array().sin()*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR).array()).matrix(), iTh, iR);
-               // Phi components
-               coeff = cA*std::cos(theta);
-               rS.addProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()).matrix(), iTh, iR);
-               coeff = cB*std::sin(theta);
-               rS.subProfile(coeff*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR), iTh, iR);
+                  // Theta component
+                  rS.addProfile((cA*(phGrid.array() + t).array().sin()*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  // Phi components
+                  coeff = cA*std::cos(theta);
+                  rS.addProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  coeff = cB*std::sin(theta);
+                  rS.subProfile(coeff*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR), iTh, iR);
 
+               }
             }
          }
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         for(int iR = 0; iR < nR; ++iR)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            nTh = idxFunc.dim2D(iR);
-            for(int iTh = 0; iTh < nTh; ++iTh)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::AddTmplFunctor<scalar_t, SetTFunctor>;
+            fct_t f(cA, cB);
+            Array cos_T = thGrid.array().array().cos();
+            Array sin_T = thGrid.array().array().sin();
+            Array cos_pt = (phGrid.array() + t).array().cos();
+            Array sin_pt = (phGrid.array() + t).array().sin();
+            grid_t vCosPt(const_cast<scalar_t *>(cos_pt.data()), cos_pt.size());
+            grid_t vSinPt(const_cast<scalar_t *>(sin_pt.data()), sin_pt.size());
+            grid_t vCosT(const_cast<scalar_t *>(cos_T.data()), cos_T.size());
+            grid_t vSinT(const_cast<scalar_t *>(sin_T.data()), sin_T.size());
+            Slicewise::Cpu::NoGridOp<4, fct_t, view_t, 2, 2, 0, grid_t, grid_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
+            auto vT = v.comp(FieldComponents::Physical::R).dataView();
+            auto vP = v.comp(FieldComponents::Physical::PHI).dataView();
+            op.apply(rS.rGlobalView(), vCosT, vSinT, vCosPt, vSinPt, vT, vP, rS.dataView());
+         }
+         else
+         {
+            for(int iR = 0; iR < nR; ++iR)
             {
-               theta = thGrid(idxFunc.idx2D(iTh, iR));
+               nTh = idxFunc.dim2D(iR);
+               for(int iTh = 0; iTh < nTh; ++iTh)
+               {
+                  theta = thGrid(idxFunc.idx2D(iTh, iR));
 
-               // R component
-               rS.subProfile((cA*(phGrid.array() + t).array().sin()*v.comp(FieldComponents::Physical::R).profile(iTh,iR).array()).matrix(), iTh, iR);
-               // Phi components
-               coeff = cA*std::sin(theta);
-               rS.subProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()).matrix(), iTh, iR);
-               coeff = cB*std::cos(theta);
-               rS.subProfile(coeff*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR), iTh, iR);
+                  // R component
+                  rS.subProfile((cA*(phGrid.array() + t).array().sin()*v.comp(FieldComponents::Physical::R).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  // Phi components
+                  coeff = cA*std::sin(theta);
+                  rS.subProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  coeff = cB*std::cos(theta);
+                  rS.subProfile(coeff*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR), iTh, iR);
+               }
             }
          }
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         for(int iR = 0; iR < nR; ++iR)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            nTh = idxFunc.dim2D(iR);
-            for(int iTh = 0; iTh < nTh; ++iTh)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::AddTmplFunctor<scalar_t, SetPFunctor>;
+            fct_t f(cA, cB);
+            Array cos_T = thGrid.array().array().cos();
+            Array sin_T = thGrid.array().array().sin();
+            Array cos_pt = (phGrid.array() + t).array().cos();
+            Array sin_pt = (phGrid.array() + t).array().sin();
+            grid_t vCosPt(const_cast<scalar_t *>(cos_pt.data()), cos_pt.size());
+            grid_t vSinPt(const_cast<scalar_t *>(sin_pt.data()), sin_pt.size());
+            grid_t vCosT(const_cast<scalar_t *>(cos_T.data()), cos_T.size());
+            grid_t vSinT(const_cast<scalar_t *>(sin_T.data()), sin_T.size());
+            Slicewise::Cpu::NoGridOp<4, fct_t, view_t, 2, 2, 0, grid_t, grid_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
+            auto vT = v.comp(FieldComponents::Physical::R).dataView();
+            auto vP = v.comp(FieldComponents::Physical::THETA).dataView();
+            op.apply(rS.rGlobalView(), vCosT, vSinT, vCosPt, vSinPt, vT, vP, rS.dataView());
+         }
+         else
+         {
+            for(int iR = 0; iR < nR; ++iR)
             {
-               theta = thGrid(idxFunc.idx2D(iTh, iR));
+               nTh = idxFunc.dim2D(iR);
+               for(int iTh = 0; iTh < nTh; ++iTh)
+               {
+                  theta = thGrid(idxFunc.idx2D(iTh, iR));
 
-               // R components
-               coeff = cA*std::cos(theta);
-               rS.subProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::R).profile(iTh,iR).array()).matrix(), iTh, iR);
-               coeff = cB*std::sin(theta);
-               rS.addProfile(coeff*v.comp(FieldComponents::Physical::R).profile(iTh,iR), iTh, iR);
-               // Theta components
-               coeff = cA*std::sin(theta);
-               rS.addProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR).array()).matrix(), iTh, iR);
-               coeff = cB*std::cos(theta);
-               rS.addProfile(coeff*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR), iTh, iR);
+                  // R components
+                  coeff = cA*std::cos(theta);
+                  rS.subProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::R).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  coeff = cB*std::sin(theta);
+                  rS.addProfile(coeff*v.comp(FieldComponents::Physical::R).profile(iTh,iR), iTh, iR);
+                  // Theta components
+                  coeff = cA*std::sin(theta);
+                  rS.addProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  coeff = cB*std::cos(theta);
+                  rS.addProfile(coeff*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR), iTh, iR);
 
+               }
             }
          }
       }
@@ -282,59 +503,128 @@ namespace Physical {
       MHDFloat coeff;
       if(compId == FieldComponents::Physical::R)
       {
-         for(int iR = 0; iR < nR; ++iR)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            nTh = idxFunc.dim2D(iR);
-            for(int iTh = 0; iTh < nTh; ++iTh)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::SubTmplFunctor<scalar_t, SetRFunctor>;
+            fct_t f(cA, cB);
+            Array cos_T = thGrid.array().array().cos();
+            Array sin_T = thGrid.array().array().sin();
+            Array cos_pt = (phGrid.array() + t).array().cos();
+            Array sin_pt = (phGrid.array() + t).array().sin();
+            grid_t vCosPt(const_cast<scalar_t *>(cos_pt.data()), cos_pt.size());
+            grid_t vSinPt(const_cast<scalar_t *>(sin_pt.data()), sin_pt.size());
+            grid_t vCosT(const_cast<scalar_t *>(cos_T.data()), cos_T.size());
+            grid_t vSinT(const_cast<scalar_t *>(sin_T.data()), sin_T.size());
+            Slicewise::Cpu::NoGridOp<4, fct_t, view_t, 2, 2, 0, grid_t, grid_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
+            auto vT = v.comp(FieldComponents::Physical::THETA).dataView();
+            auto vP = v.comp(FieldComponents::Physical::PHI).dataView();
+            op.apply(rS.rGlobalView(), vCosT, vSinT, vCosPt, vSinPt, vT, vP, rS.dataView());
+         }
+         else
+         {
+            for(int iR = 0; iR < nR; ++iR)
             {
-               theta = thGrid(idxFunc.idx2D(iTh, iR));
+               nTh = idxFunc.dim2D(iR);
+               for(int iTh = 0; iTh < nTh; ++iTh)
+               {
+                  theta = thGrid(idxFunc.idx2D(iTh, iR));
 
-               // Theta component
-               rS.subProfile((cA*(phGrid.array() + t).array().sin()*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR).array()).matrix(), iTh, iR);
-               // Phi components
-               coeff = cA*std::cos(theta);
-               rS.subProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()).matrix(), iTh, iR);
-               coeff = cB*std::sin(theta);
-               rS.addProfile(coeff*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR), iTh, iR);
+                  // Theta component
+                  rS.subProfile((cA*(phGrid.array() + t).array().sin()*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  // Phi components
+                  coeff = cA*std::cos(theta);
+                  rS.subProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  coeff = cB*std::sin(theta);
+                  rS.addProfile(coeff*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR), iTh, iR);
+               }
             }
          }
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         for(int iR = 0; iR < nR; ++iR)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            nTh = idxFunc.dim2D(iR);
-            for(int iTh = 0; iTh < nTh; ++iTh)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::SubTmplFunctor<scalar_t, SetTFunctor>;
+            fct_t f(cA, cB);
+            Array cos_T = thGrid.array().array().cos();
+            Array sin_T = thGrid.array().array().sin();
+            Array cos_pt = (phGrid.array() + t).array().cos();
+            Array sin_pt = (phGrid.array() + t).array().sin();
+            grid_t vCosPt(const_cast<scalar_t *>(cos_pt.data()), cos_pt.size());
+            grid_t vSinPt(const_cast<scalar_t *>(sin_pt.data()), sin_pt.size());
+            grid_t vCosT(const_cast<scalar_t *>(cos_T.data()), cos_T.size());
+            grid_t vSinT(const_cast<scalar_t *>(sin_T.data()), sin_T.size());
+            Slicewise::Cpu::NoGridOp<4, fct_t, view_t, 2, 2, 0, grid_t, grid_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
+            auto vT = v.comp(FieldComponents::Physical::R).dataView();
+            auto vP = v.comp(FieldComponents::Physical::PHI).dataView();
+            op.apply(rS.rGlobalView(), vCosT, vSinT, vCosPt, vSinPt, vT, vP, rS.dataView());
+         }
+         else
+         {
+            for(int iR = 0; iR < nR; ++iR)
             {
-               theta = thGrid(idxFunc.idx2D(iTh, iR));
+               nTh = idxFunc.dim2D(iR);
+               for(int iTh = 0; iTh < nTh; ++iTh)
+               {
+                  theta = thGrid(idxFunc.idx2D(iTh, iR));
 
-               // R component
-               rS.addProfile((cA*(phGrid.array() + t).array().sin()*v.comp(FieldComponents::Physical::R).profile(iTh,iR).array()).matrix(), iTh, iR);
-               // Phi components
-               coeff = cA*std::sin(theta);
-               rS.addProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()).matrix(), iTh, iR);
-               coeff = cB*std::cos(theta);
-               rS.addProfile(coeff*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR), iTh, iR);
+                  // R component
+                  rS.addProfile((cA*(phGrid.array() + t).array().sin()*v.comp(FieldComponents::Physical::R).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  // Phi components
+                  coeff = cA*std::sin(theta);
+                  rS.addProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  coeff = cB*std::cos(theta);
+                  rS.addProfile(coeff*v.comp(FieldComponents::Physical::PHI).profile(iTh,iR), iTh, iR);
+               }
             }
          }
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         for(int iR = 0; iR < nR; ++iR)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            nTh = idxFunc.dim2D(iR);
-            for(int iTh = 0; iTh < nTh; ++iTh)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::SubTmplFunctor<scalar_t, SetPFunctor>;
+            fct_t f(cA, cB);
+            Array cos_T = thGrid.array().array().cos();
+            Array sin_T = thGrid.array().array().sin();
+            Array cos_pt = (phGrid.array() + t).array().cos();
+            Array sin_pt = (phGrid.array() + t).array().sin();
+            grid_t vCosPt(const_cast<scalar_t *>(cos_pt.data()), cos_pt.size());
+            grid_t vSinPt(const_cast<scalar_t *>(sin_pt.data()), sin_pt.size());
+            grid_t vCosT(const_cast<scalar_t *>(cos_T.data()), cos_T.size());
+            grid_t vSinT(const_cast<scalar_t *>(sin_T.data()), sin_T.size());
+            Slicewise::Cpu::NoGridOp<4, fct_t, view_t, 2, 2, 0, grid_t, grid_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
+            auto vT = v.comp(FieldComponents::Physical::R).dataView();
+            auto vP = v.comp(FieldComponents::Physical::THETA).dataView();
+            op.apply(rS.rGlobalView(), vCosT, vSinT, vCosPt, vSinPt, vT, vP, rS.dataView());
+         }
+         else
+         {
+            for(int iR = 0; iR < nR; ++iR)
             {
-               theta = thGrid(idxFunc.idx2D(iTh, iR));
+               nTh = idxFunc.dim2D(iR);
+               for(int iTh = 0; iTh < nTh; ++iTh)
+               {
+                  theta = thGrid(idxFunc.idx2D(iTh, iR));
 
-               // R components
-               coeff = cA*std::cos(theta);
-               rS.addProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::R).profile(iTh,iR).array()).matrix(), iTh, iR);
-               coeff = cB*std::sin(theta);
-               rS.subProfile(coeff*v.comp(FieldComponents::Physical::R).profile(iTh,iR), iTh, iR);
-               // Theta components
-               coeff = cA*std::sin(theta);
-               rS.subProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR).array()).matrix(), iTh, iR);
-               coeff = cB*std::cos(theta);
-               rS.subProfile(coeff*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR), iTh, iR);
+                  // R components
+                  coeff = cA*std::cos(theta);
+                  rS.addProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::R).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  coeff = cB*std::sin(theta);
+                  rS.subProfile(coeff*v.comp(FieldComponents::Physical::R).profile(iTh,iR), iTh, iR);
+                  // Theta components
+                  coeff = cA*std::sin(theta);
+                  rS.subProfile((coeff*(phGrid.array() + t).array().cos()*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR).array()).matrix(), iTh, iR);
+                  coeff = cB*std::cos(theta);
+                  rS.subProfile(coeff*v.comp(FieldComponents::Physical::THETA).profile(iTh,iR), iTh, iR);
+               }
             }
          }
       }

@@ -55,6 +55,7 @@ TEST_CASE("SphericalPoincare product validation FlatScalarField vs ViewScalarFie
       }
 
       const double t = 0.13;
+      const double alpha = 0.47;
 
       details::IdxFunctor idxFunc(idx2D, idx3D);
 
@@ -73,60 +74,78 @@ TEST_CASE("SphericalPoincare product validation FlatScalarField vs ViewScalarFie
          {
             INFO( "Set operation" );
 
-            INFO( "R component" );
-            TestOp::set(*spSFlatA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
-            TestOp::set(*spSViewA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "R component" );
+               TestOp::set(*spSFlatA, R, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::set(*spSViewA, R, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "T component" );
-            TestOp::set(*spSFlatA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
-            TestOp::set(*spSViewA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "T component" );
+               TestOp::set(*spSFlatA, T, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::set(*spSViewA, T, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "P component" );
-            TestOp::set(*spSFlatA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
-            TestOp::set(*spSViewA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "P component" );
+               TestOp::set(*spSFlatA, P, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::set(*spSViewA, P, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
          }
 
          // Check add operation
          {
             INFO( "Add operation" );
 
-            INFO( "R component" );
-            TestOp::add(*spSFlatA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
-            TestOp::add(*spSViewA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "R component" );
+               TestOp::add(*spSFlatA, R, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::add(*spSViewA, R, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "T component" );
-            TestOp::add(*spSFlatA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
-            TestOp::add(*spSViewA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "T component" );
+               TestOp::add(*spSFlatA, T, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::add(*spSViewA, T, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "P component" );
-            TestOp::add(*spSFlatA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
-            TestOp::add(*spSViewA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "P component" );
+               TestOp::add(*spSFlatA, P, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::add(*spSViewA, P, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
          }
 
          // Check sub operation
          {
             INFO( "Sub operation" );
 
-            INFO( "R component" );
-            TestOp::sub(*spSFlatA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
-            TestOp::sub(*spSViewA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "R component" );
+               TestOp::sub(*spSFlatA, R, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::sub(*spSViewA, R, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "T component" );
-            TestOp::sub(*spSFlatA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
-            TestOp::sub(*spSViewA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "T component" );
+               TestOp::sub(*spSFlatA, T, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::sub(*spSViewA, T, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "P component" );
-            TestOp::sub(*spSFlatA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
-            TestOp::sub(*spSViewA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "P component" );
+               TestOp::sub(*spSFlatA, P, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::sub(*spSViewA, P, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
          }
       }
    }
@@ -177,6 +196,7 @@ TEST_CASE("SphericalPoincare product timing", "[SphericalPoincareTiming]")
       }
 
       const double t = 0.13;
+      const double alpha = 0.47;
 
       for(auto&& c: cs)
       {
@@ -196,21 +216,21 @@ TEST_CASE("SphericalPoincare product timing", "[SphericalPoincareTiming]")
             for(std::uint32_t it = 0; it < itMax; it++)
             {
                QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Set_" + std::to_string(varBase));
-               TestOp::set(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
-               TestOp::set(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
-               TestOp::set(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::set(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::set(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::set(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
                QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Set_" + std::to_string(varBase));
 
                QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Add_" + std::to_string(varBase));
-               TestOp::add(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
-               TestOp::add(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
-               TestOp::add(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::add(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::add(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::add(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
                QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Add_" + std::to_string(varBase));
 
                QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Sub_" + std::to_string(varBase));
-               TestOp::sub(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
-               TestOp::sub(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
-               TestOp::sub(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::sub(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::sub(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::sub(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
                QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Sub_" + std::to_string(varBase));
             }
          }
@@ -222,21 +242,21 @@ TEST_CASE("SphericalPoincare product timing", "[SphericalPoincareTiming]")
             for(std::uint32_t it = 0; it < itMax; it++)
             {
                QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Set_" + std::to_string(varBase));
-               TestOp::set(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
-               TestOp::set(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
-               TestOp::set(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::set(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::set(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::set(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
                QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Set_" + std::to_string(varBase));
 
                QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Add_" + std::to_string(varBase));
-               TestOp::add(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
-               TestOp::add(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
-               TestOp::add(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::add(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::add(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::add(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
                QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Add_" + std::to_string(varBase));
 
                QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Sub_" + std::to_string(varBase));
-               TestOp::sub(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
-               TestOp::sub(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
-               TestOp::sub(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::sub(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::sub(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
+               TestOp::sub(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, alpha, c);
                QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Sub_" + std::to_string(varBase));
             }
          }

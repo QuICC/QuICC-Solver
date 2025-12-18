@@ -28,6 +28,10 @@ namespace details {
    std::vector<std::uint32_t> validationVariants();
    std::vector<std::uint32_t> performanceVariants();
 
+   std::tuple<bool, double, double> computeUlp(const double data, const double ref, const double refMod, const double maxUlp, const double eps);
+   template <typename TRef, typename TOther>
+      void checkComputation(std::shared_ptr<QuICC::Datatypes::ScalarFieldSetup> spSetup, const TRef& ref, const TOther& other, const double maxUlp = 500000);
+
    template <typename T> T fieldValueGeneric(const int i, const int j, const int k, const T offset, const T base, const T c);
    template <typename T> T fieldValueA(const int i, const int j, const int k);
    template <typename T> T fieldValueB(const int i, const int j, const int k);
@@ -268,7 +272,7 @@ namespace details {
    }
 
 template <typename TRef, typename TOther>
-void checkComputation(std::shared_ptr<QuICC::Datatypes::ScalarFieldSetup> spSetup, const TRef& ref, const TOther& other)
+void checkComputation(std::shared_ptr<QuICC::Datatypes::ScalarFieldSetup> spSetup, const TRef& ref, const TOther& other, const double maxUlp)
 {
    for(int j = 0; j < spSetup->dataCols(); j++)
    {
@@ -278,8 +282,15 @@ void checkComputation(std::shared_ptr<QuICC::Datatypes::ScalarFieldSetup> spSetu
          INFO( " i = " << i );
          double r = ref.data()(i,j);
          double o = other.data()(i,j);
-         REQUIRE_THAT( o, Catch::Matchers::WithinULP(r, 10000) );
+         auto err = computeUlp(o, r, r, maxUlp, std::numeric_limits<double>::epsilon());
+         INFO( "data: " << o );
+         INFO( "ref: " << r );
+         INFO( "measured ulp: " << std::get<1>(err) );
+         INFO( "max ulp: " << maxUlp );
+         CHECK( std::get<0>(err) );
       }
    }
 }
+
+
 }

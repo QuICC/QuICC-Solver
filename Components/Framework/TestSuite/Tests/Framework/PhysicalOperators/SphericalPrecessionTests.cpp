@@ -72,60 +72,78 @@ TEST_CASE("SphericalPrecession product validation FlatScalarField vs ViewScalarF
          {
             INFO( "Set operation" );
 
-            INFO( "R component" );
-            TestOp::set(*spSFlatA, R, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
-            TestOp::set(*spSViewA, R, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "R component" );
+               TestOp::set(*spSFlatA, R, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
+               TestOp::set(*spSViewA, R, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "T component" );
-            TestOp::set(*spSFlatA, T, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
-            TestOp::set(*spSViewA, T, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "T component" );
+               TestOp::set(*spSFlatA, T, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
+               TestOp::set(*spSViewA, T, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "P component" );
-            TestOp::set(*spSFlatA, P, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
-            TestOp::set(*spSViewA, P, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "P component" );
+               TestOp::set(*spSFlatA, P, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
+               TestOp::set(*spSViewA, P, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
          }
 
          // Check add operation
          {
             INFO( "Add operation" );
 
-            INFO( "R component" );
-            TestOp::add(*spSFlatA, R, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
-            TestOp::add(*spSViewA, R, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "R component" );
+               TestOp::add(*spSFlatA, R, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
+               TestOp::add(*spSViewA, R, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "T component" );
-            TestOp::add(*spSFlatA, T, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
-            TestOp::add(*spSViewA, T, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "T component" );
+               TestOp::add(*spSFlatA, T, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
+               TestOp::add(*spSViewA, T, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "P component" );
-            TestOp::add(*spSFlatA, P, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
-            TestOp::add(*spSViewA, P, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "P component" );
+               TestOp::add(*spSFlatA, P, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
+               TestOp::add(*spSViewA, P, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
          }
 
          // Check sub operation
          {
             INFO( "Sub operation" );
 
-            INFO( "R component" );
-            TestOp::sub(*spSFlatA, R, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
-            TestOp::sub(*spSViewA, R, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "R component" );
+               TestOp::sub(*spSFlatA, R, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
+               TestOp::sub(*spSViewA, R, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "T component" );
-            TestOp::sub(*spSFlatA, T, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
-            TestOp::sub(*spSViewA, T, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "T component" );
+               TestOp::sub(*spSFlatA, T, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
+               TestOp::sub(*spSViewA, T, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "P component" );
-            TestOp::sub(*spSFlatA, P, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
-            TestOp::sub(*spSViewA, P, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "P component" );
+               TestOp::sub(*spSFlatA, P, idxFunc, tGrid, pGrid, *spVFlatA, t, alpha, corC, preC, c);
+               TestOp::sub(*spSViewA, P, idxFunc, tGrid, pGrid, *spVViewA, t, alpha, corC, preC, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
          }
       }
    }

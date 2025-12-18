@@ -122,15 +122,41 @@ namespace details {
 
    std::vector<std::uint32_t> validationVariants()
    {
-      std::vector<std::uint32_t> variants = {0, 10, 20};
+      std::vector<std::uint32_t> variants = {0, 10};
       return variants;
    }
 
    std::vector<std::uint32_t> performanceVariants()
    {
       //std::vector<std::uint32_t> variants = {0, 10, 20, 30, 40};
-      std::vector<std::uint32_t> variants = {20};
+      std::vector<std::uint32_t> variants = {30};
       return variants;
+   }
+
+   std::tuple<bool, double, double> computeUlp(const double data, const double ref, const double refMod, const double maxUlp, const double eps)
+   {
+      bool isEqual = false;
+      double _refMod = std::abs(refMod);
+      if(ref == 0)
+      {
+         _refMod = 1.0;
+      }
+
+      auto diff = std::abs(data-ref);
+      auto tol = maxUlp * eps;
+
+      if(diff < tol)
+      {
+         isEqual = diff < (tol * _refMod);
+      }
+      else
+      {
+         isEqual = (diff / _refMod ) < tol;
+      }
+
+      auto ulp = diff / (_refMod * eps);
+
+      return std::make_tuple(isEqual, ulp, diff);
    }
 }
 

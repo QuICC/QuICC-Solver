@@ -11,6 +11,7 @@
 
 // Project includes
 //
+#include <type_traits>
 #include "Types/Typedefs.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/VectorFields/VectorField.hpp"
@@ -104,7 +105,7 @@ namespace Physical {
          };
 
          /// @tparam T scalar
-         template <class T = double> struct SetFunctor
+         template <class T = double> struct SetFunctor: public details::CachedFunctor<true, T, T>
          {
             /// @brief non dimensional scaling for transport term
             T _scaling;
@@ -119,13 +120,26 @@ namespace Physical {
             /// @brief dtor
             ~SetFunctor() = default;
 
+            /// Cache scaling
+            void cacheScaling(T g)
+            {
+               std::get<0>(this->_s) = _scaling * g;
+            };
+
             /// @brief Dot product
             /// @param g
             /// @param ui
             /// @return
             QUICC_CUDA_HOSTDEV T operator()(T g, T ui)
             {
-               return _scaling * g * ui;
+               if constexpr(this->enableCaching())
+               {
+                  return std::get<0>(this->_s) * ui;
+               }
+               else
+               {
+                  return _scaling * g * ui;
+               }
             }
          };
    };
