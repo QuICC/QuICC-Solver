@@ -22,7 +22,7 @@ namespace Physical {
 
 namespace details {
 
-template <bool Enable, typename T, typename... Tcache>
+template <bool Enable, typename... Tcache>
    struct CachedFunctor
    {
       /// Enable caching

@@ -115,7 +115,7 @@ namespace Physical {
          };
 
          /// @tparam T scalar
-         template <class T = double> struct SetFunctor
+         template <class T = double> struct SetFunctor: details::CachedFunctor<true, T>
          {
             /// @brief non dimensional scaling for transport term
             T _scaling;
@@ -141,8 +141,21 @@ namespace Physical {
             /// @return
             QUICC_CUDA_HOSTDEV T operator()(T g, T ui, T uj, T uk, T vi, T vj, T vk)
             {
-               return _scaling * (ui * vi + uj * vj + uk * vk - g * ui);
+               if constexpr(this->enableCaching())
+               {
+                  return _scaling * (ui * vi + uj * vj + uk * vk) + std::get<0>(this->_s) * ui;
+               }
+               else
+               {
+                  return _scaling * (ui * vi + uj * vj + uk * vk - g * ui);
+               }
             }
+
+            /// Grid caching function
+            void cacheScaling(T g)
+            {
+               std::get<0>(this->_s) = -_scaling * g;
+            };
          };
 
          template <typename TFIELD>
@@ -163,7 +176,7 @@ namespace Physical {
    void SphericalHeatAdvection<TONE,TTWO,TTHREE>::set(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
       IdxResFunctor f(res);
-      set<TONE,TTWO,TTHREE>(rS, f, r, u, gradQ, c);
+      set(rS, f, r, u, gradQ, c);
    }
 
    template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
@@ -171,7 +184,7 @@ namespace Physical {
    void SphericalHeatAdvection<TONE,TTWO,TTHREE>::add(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
       IdxResFunctor f(res);
-      add<TONE,TTWO,TTHREE>(rS, f, r, u, gradQ, c);
+      add(rS, f, r, u, gradQ, c);
    }
 
    template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
@@ -179,7 +192,7 @@ namespace Physical {
    void SphericalHeatAdvection<TONE,TTWO,TTHREE>::sub(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
       IdxResFunctor f(res);
-      sub<TONE,TTWO,TTHREE>(rS, f, r, u, gradQ, c);
+      sub(rS, f, r, u, gradQ, c);
    }
 
    template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>

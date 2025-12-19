@@ -105,7 +105,7 @@ namespace Physical {
          };
 
          /// @tparam T scalar
-         template <class T = double> struct SetFunctor: public details::CachedFunctor<true, T, T>
+         template <class T = double> struct SetFunctor: public details::CachedFunctor<true, T>
          {
             /// @brief non dimensional scaling for transport term
             T _scaling;
