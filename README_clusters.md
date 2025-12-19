@@ -1,83 +1,24 @@
-# Piz-Daint on GPU nodes
+# CSCS daint@alps
+
+A QuICC specific uenv is provided.
 
 ```bash
-module load daint-gpu
-module switch PrgEnv-cray PrgEnv-gnu
-module load cray-fftw cray-hdf5-parallel cray-python cray-tpsl Boost CMake
+uenv image pull service::quiccenv-gnu/v1:2223802217
+uenv start quiccenv-gnu/v1:2223802217 --view=default
 
-cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
+cmake -GNinja \
+-DCMAKE_CUDA_ARCHITECTURES=90 \
+-DCMAKE_CXX_COMPILER=g++ \
+-DCMAKE_C_COMPILER=gcc \
+-DCMAKE_CXX_FLAGS="-march=native" \
 -DQUICC_USE_MPI=ON \
--DQUICC_MULTPRECISION=ON \
--DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
--DQUICC_MODEL=<GreatSimulation>
+-DQUICC_USE_CUFFT=ON \
+-DQUICC_USE_MLIR_GRAPH=ON \
+-DQUICC_USE_THREADPOOL=ON \
+-DQUICC_MODEL=BoussinesqSphereRTC \
+</path/to/QuICC>
 
-make
-```
-
-## Kokkos CUDA
-
-```bash
-. /apps/daint/UES/anfink/gpu/environment
-module load cray-fftw Boost
-cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
--DQUICC_USE_MPI=ON \
--DQUICC_MULTPRECISION=ON \
--DCMAKE_CUDA_COMPILER=nvcc \
--DKokkos_DIR=$TRILINOS_DIR/lib/cmake/Kokkos \
--DQUICC_USE_KOKKOS=ON -DQUICC_USE_KOKKOS_CUDA=ON \
--DQUICC_MODEL=<GreatSimulation> \
--DCMAKE_VERBOSE_MAKEFILE=ON
-
-make
-```
-
-## Kokkos CUDA
-
-```bash
-. /apps/daint/UES/anfink/gpu/environment
-module load cray-fftw Boost
-cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
--DQUICC_USE_MPI=ON \
--DQUICC_MULTPRECISION=ON \
--DCMAKE_CUDA_COMPILER=nvcc \
--DKokkos_DIR=$TRILINOS_DIR/lib/cmake/Kokkos \
--DQUICC_USE_KOKKOS=ON -DQUICC_USE_KOKKOS_CUDA=ON \
--DQUICC_MODEL=<GreatSimulation> \
--DCMAKE_VERBOSE_MAKEFILE=ON
-
-make
-```
-
-# Piz-Daint on MC nodes
-
-```bash
-module load daint-mc
-module switch PrgEnv-cray PrgEnv-gnu
-module load cray-fftw cray-hdf5-parallel cray-python cray-tpsl Boost CMake
-
-cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
--DQUICC_USE_MPI=ON \
--DQUICC_MULTPRECISION=ON \
--DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
--DQUICC_MODEL=<GreatSimulation>
-
-make
-```
-
-## Kokkos OpenMP
-
-```bash
-. /apps/daint/UES/anfink/cpu/environment
-module load cray-fftw Boost
-cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
--DQUICC_USE_MPI=ON \
--DQUICC_MULTPRECISION=ON \
--DKokkos_DIR=$TRILINOS_DIR/lib/cmake/Kokkos \
--DQUICC_USE_KOKKOS=ON \
--DQUICC_MODEL=<GreatSimulation> \
--DCMAKE_VERBOSE_MAKEFILE=ON
-
-make
+ninja -j 32
 ```
 
 # Euler
@@ -138,4 +79,88 @@ srun --ntasks=1 cmake .. -GNinja \
 -DCMAKE_CXX_FLAGS=-noopenmp
 
 srun --ntasks=1 --cpus-per-task=64 ninja
+```
+
+# Legacy clusters
+
+## Piz-Daint on GPU nodes
+
+```bash
+module load daint-gpu
+module switch PrgEnv-cray PrgEnv-gnu
+module load cray-fftw cray-hdf5-parallel cray-python cray-tpsl Boost CMake
+
+cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
+-DQUICC_USE_MPI=ON \
+-DQUICC_MULTPRECISION=ON \
+-DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
+-DQUICC_MODEL=<GreatSimulation>
+
+make
+```
+
+### Kokkos CUDA
+
+```bash
+. /apps/daint/UES/anfink/gpu/environment
+module load cray-fftw Boost
+cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
+-DQUICC_USE_MPI=ON \
+-DQUICC_MULTPRECISION=ON \
+-DCMAKE_CUDA_COMPILER=nvcc \
+-DKokkos_DIR=$TRILINOS_DIR/lib/cmake/Kokkos \
+-DQUICC_USE_KOKKOS=ON -DQUICC_USE_KOKKOS_CUDA=ON \
+-DQUICC_MODEL=<GreatSimulation> \
+-DCMAKE_VERBOSE_MAKEFILE=ON
+
+make
+```
+
+### Kokkos CUDA
+
+```bash
+. /apps/daint/UES/anfink/gpu/environment
+module load cray-fftw Boost
+cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
+-DQUICC_USE_MPI=ON \
+-DQUICC_MULTPRECISION=ON \
+-DCMAKE_CUDA_COMPILER=nvcc \
+-DKokkos_DIR=$TRILINOS_DIR/lib/cmake/Kokkos \
+-DQUICC_USE_KOKKOS=ON -DQUICC_USE_KOKKOS_CUDA=ON \
+-DQUICC_MODEL=<GreatSimulation> \
+-DCMAKE_VERBOSE_MAKEFILE=ON
+
+make
+```
+
+## Piz-Daint on MC nodes
+
+```bash
+module load daint-mc
+module switch PrgEnv-cray PrgEnv-gnu
+module load cray-fftw cray-hdf5-parallel cray-python cray-tpsl Boost CMake
+
+cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
+-DQUICC_USE_MPI=ON \
+-DQUICC_MULTPRECISION=ON \
+-DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
+-DQUICC_MODEL=<GreatSimulation>
+
+make
+```
+
+### Kokkos OpenMP
+
+```bash
+. /apps/daint/UES/anfink/cpu/environment
+module load cray-fftw Boost
+cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
+-DQUICC_USE_MPI=ON \
+-DQUICC_MULTPRECISION=ON \
+-DKokkos_DIR=$TRILINOS_DIR/lib/cmake/Kokkos \
+-DQUICC_USE_KOKKOS=ON \
+-DQUICC_MODEL=<GreatSimulation> \
+-DCMAKE_VERBOSE_MAKEFILE=ON
+
+make
 ```
