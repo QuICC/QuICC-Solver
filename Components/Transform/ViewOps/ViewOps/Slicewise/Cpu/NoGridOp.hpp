@@ -204,6 +204,7 @@ void NoGridOp<Dir, Functor, Tout, Ng1, Ng2, Ng3, Targs...>::phiRImpl(Tout& out,
       const std::tuple<Targs...>& args, std::index_sequence<Is...>, std::index_sequence<Js...>)
 {
    assert(Dir == 1);
+   assert(Ng1 > 0);
    assert(Ng2 == 0);
    assert(Ng3 == 0);
 
@@ -239,6 +240,9 @@ void NoGridOp<Dir, Functor, Tout, Ng1, Ng2, Ng3, Targs...>::phiThetaImpl(Tout& o
    const std::tuple<Targs...>& args, std::index_sequence<Is...>, std::index_sequence<Js...>)
 {
    assert(Dir == 2);
+   assert(Ng1 > 0);
+   assert(Ng2 == 0);
+   assert(Ng3 == 0);
 
    // cache populated layers
    auto pointers = out.pointers()[1];
@@ -459,6 +463,7 @@ void NoGridOp<Dir, Functor, Tout, Ng1, Ng2, Ng3, Targs...>::allImpl(Tout& out,
 {
    assert(Dir == 10);
    assert(Ng1 > 0);
+   assert(Ng2 > 0);
    assert(Ng3 > 0);
 
    // cache populated layers
