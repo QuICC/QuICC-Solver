@@ -34,6 +34,7 @@ set(tags
   Lower1d
   Lower2d
   Lower3d
+  BoundaryHeatFlux
   Lundquist
   MagDiffType
   MagneticEkman
@@ -72,6 +73,7 @@ set(tags
   Upper3d
   Upsilon
   ViscType
+  VolumeHeating
   Xi
   Zeta
 )

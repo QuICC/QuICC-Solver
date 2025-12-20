@@ -8,4 +8,5 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   StressFreeTorAnelastic.cpp
   StressFreePolAnelastic.cpp
   Value.cpp
+  Int.cpp
 )
