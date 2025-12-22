@@ -21,7 +21,6 @@
 #include "Types/Math.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
-#include "QuICC/NonDimensional/Heating.hpp"
 #include "QuICC/NonDimensional/Beta.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/Luminosity.hpp"
@@ -73,26 +72,10 @@ namespace Variable {
 
 
          this->mBackground.resize(2);
-         int flag = this->mPhysical.find(NonDimensional::Heating::id())->second->value();
-         // Internal heating
-         if(flag == 0)
-         {
-            Array bgArray = -(this->mpRhoTempKappa->evaluateLP(rbArr,0,0).array()) * (this->mpD1Sc->evaluateLP(rbArr,0,0).array());
-            this->mBackground(0) = bgArray(0) * (4.0*Math::PI)*ro*ro;
-            this->mBackground(1) = bgArray(1) * (4.0*Math::PI)*ri*ri;    
-         }
-         else if(flag == 1)
-         {
-            throw std::logic_error("Unknown background profile for spherical shell Luminosity writer. Potentially outdated option");
-         }
-         else if(flag == 2 || flag ==3)
-         {            
-            throw std::logic_error("Unknown background profile for spherical shell Luminosity writer. Potentially outdated option");
-         }
-         else
-         {
-            throw std::logic_error("Unknown background profile for spherical shell Luminosity writer");
-         }
+
+         Array bgArray = -(this->mpRhoTempKappa->evaluateLP(rbArr,0,0).array()) * (this->mpD1Sc->evaluateLP(rbArr,0,0).array());
+         this->mBackground(0) = bgArray(0) * (4.0*Math::PI)*ro*ro;
+         this->mBackground(1) = bgArray(1) * (4.0*Math::PI)*ri*ri;    
 
          int nN = this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
          this->mBoundary.resize(nN, 2);
