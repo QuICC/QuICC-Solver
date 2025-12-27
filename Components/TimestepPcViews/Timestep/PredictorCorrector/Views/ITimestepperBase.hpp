@@ -338,7 +338,11 @@ namespace Views {
 
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::initSolver()
    {
+      
       this->initSolver(Tag::Operator::Lhs::id());
+      if (this->mOperators.count(Tag::Operator::Influence::id()) > 0)
+        this->initSolver(Tag::Operator::Influence::id());
+      this->updateSolver();
    }
 
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::initSolver(const std::size_t opId)
@@ -363,12 +367,17 @@ namespace Views {
       }
 
       // Compute pattern and factorisation
-      this->updateSolver(opId);
+      //this->updateSolver(opId);
    }
 
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::updateSolver()
    {
       this->updateSolver(Tag::Operator::Lhs::id());
+      if (this->mOperators.count(Tag::Operator::Influence::id()) > 0)
+        this->updateSolver(Tag::Operator::Influence::id());
+
+      // Provide call site for additional updates
+      this->postSolverUpdate();
    }
 
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::updateSolver(const std::size_t opId)
@@ -379,23 +388,30 @@ namespace Views {
       auto&& lhsMatrix = this->mOperators.at(opId);
       for(auto it = lhsMatrix.begin(); it != lhsMatrix.end(); ++it)
       {
-         // Compute factorisation
-         auto&& solver = this->mSolver.at(opId);
-         typename std::map<MHDFloat, SharedSolverType>::iterator sIt = solver.find(it->first);
-         // Safety assert to make sur matrix is compressed
-         assert(it->second.isCompressed());
+         //for (std::size_t i = 0; i < it->second.size(); i++)
+         //{
+            //if (i % this->nSystem() >= static_cast<std::size_t>(this->mZeroIdx))
+            //{
+               // Compute factorisation
+               auto&& solver = this->mSolver.at(opId);
+               typename std::map<MHDFloat, SharedSolverType>::iterator sIt =
+                  solver.find(it->first);
+               // Safety assert to make sur matrix is compressed
+               assert(it->second.isCompressed());
 
-         sIt->second->compute(it->second);
+               sIt->second->compute(it->second);
 
-         // Stop simulation if factorization failed
-         if(sIt->second->info() != Eigen::Success)
-         {
-            throw std::logic_error("Matrix factorization failed!");
-         }
+               // Stop simulation if factorization failed
+               if (sIt->second->info() != Eigen::Success)
+               {
+                  throw std::logic_error("Matrix factorization failed!");
+               }
+            //}
+         //}
       }
 
       // Provide call site for additional updates
-      this->postSolverUpdate();
+      //this->postSolverUpdate();
    }
 
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::postSolverUpdate()
@@ -433,6 +449,10 @@ namespace Views {
    template <typename TOperator,typename TData,typename TImpl> bool ITimestepperBase<TOperator,TData,TImpl>::hasLinearOperator(const std::size_t opId) const
    {
       bool res = (this->mOperators.count(opId) > 0);
+      if (res)
+      {
+         int a = 1;
+      }
       return res;
    }
 

@@ -261,7 +261,7 @@ void ITimestepper<TOperator, TData, TImpl>::postSolverUpdate()
    {
       // Solver for both stages
       auto&& sIt1 = this->mSolver.at(opId).find(0.0)->second;
-      auto&& sIt2 = this->mSolver.at(lhsId).find(0.0)->second;
+      auto&& sIt2 = this->mSolver.at(lhsId).begin()->second;
 
       // Compute green's functions
       auto&& infKernel = this->reg(Register::Influence::id());
