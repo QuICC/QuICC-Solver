@@ -258,7 +258,7 @@ void ImExPCTimestepper<TOperator, TData, TImpl>::buildOperators(
          MHDFloat aInf = 0.0;
          this->initMatrices(Tag::Operator::Influence::id(), aInf);
 
-         // Set other LHS matrix
+         // Set influence LHS matrix
          auto&& infMatrix =
             this->linearOperator(Tag::Operator::Influence::id(), aInf);
          infMatrix.resize(size, size);
