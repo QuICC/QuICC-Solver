@@ -13,6 +13,7 @@
 
 // Project includes
 //
+#include "QuICC/Tag/Operator/Influence.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/ModelOperator/ImplicitLinear.hpp"
 #include "QuICC/ModelOperator/Boundary.hpp"
@@ -339,6 +340,10 @@ namespace Views {
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::initSolver()
    {
       this->initSolver(Tag::Operator::Lhs::id());
+      if(this->hasLinearOperator(Tag::Operator::Influence::id()))
+      {
+         this->initSolver(Tag::Operator::Influence::id());
+      }
    }
 
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::initSolver(const std::size_t opId)
