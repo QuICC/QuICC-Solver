@@ -62,13 +62,60 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
     PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
     double* gpuIn = (double*)mPhysFlat_d.data();
     void* in_cpu = (void*)in.data();
-  resPfSolve = PfSolve::transferDataFromCPU(&VkGPU, &in_cpu, &gpuIn, bufferSize);
+  resPfSolve = PfSolve::transferDataFromCPU(&VkGPU, in_cpu, &gpuIn, bufferSize);
     //if (resPfSolve != PfSolve::PFSOLVE_SUCCESS) return resPfSolve;
   cudaDeviceSynchronize();
  
   Profiler::RegionStart<2>("applyImpl");
 
-  mOp->apply(mModsView, mPhysView);
+  const char* proj_operator = "@Op@";
+    if (!strcmp(proj_operator, "P"))
+        mOp->setType(PFSOLVE_RADIAL, 0);
+    if (!strcmp(proj_operator, "P_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_ZERO, 0);
+    if (!strcmp(proj_operator, "DivR1"))
+        mOp->setType(PFSOLVE_RADIAL_DIVR, 0);
+    if (!strcmp(proj_operator, "DivR1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_DIVR_ZERO, 0);
+    if (!strcmp(proj_operator, "D1"))
+        mOp->setType(PFSOLVE_RADIAL_DR, 0);
+    if (!strcmp(proj_operator, "R1"))
+        mOp->setType(PFSOLVE_RADIAL_R, 0);
+    if (!strcmp(proj_operator, "R1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_R_ZERO, 0);
+    if (!strcmp(proj_operator, "DivR1D1R1"))
+        mOp->setType(PFSOLVE_RADIAL_DIVR_DR_R, 0);
+    if (!strcmp(proj_operator, "DivR1D1R1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_DIVR_DR_R_ZERO, 0);
+    if (!strcmp(proj_operator, "SphLapl"))
+        mOp->setType(PFSOLVE_RADIAL_SPHLAPL, 0);
+
+    if (!strcmp(proj_operator, "I2"))
+        mOp->setType(PFSOLVE_RADIAL_I2, 0);
+    if (!strcmp(proj_operator, "I2_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_I2_ZERO, 0);
+    if (!strcmp(proj_operator, "I2DivR1"))
+        mOp->setType(PFSOLVE_RADIAL_I2_DIVR, 0);
+    if (!strcmp(proj_operator, "I2DivR1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_I2_DIVR_ZERO, 0);
+    if (!strcmp(proj_operator, "I2DivR1D1R1"))
+        mOp->setType(PFSOLVE_RADIAL_I2_DIVR_DR_R, 0);
+    if (!strcmp(proj_operator, "I2DivR1D1R1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_I2_DIVR_DR_R_ZERO, 0);
+    if (!strcmp(proj_operator, "I4"))
+        mOp->setType(PFSOLVE_RADIAL_I4, 0);    
+    if (!strcmp(proj_operator, "I4_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_I4_ZERO, 0);
+    if (!strcmp(proj_operator, "I4DivR1"))
+        mOp->setType(PFSOLVE_RADIAL_I4_DIVR, 0);
+    if (!strcmp(proj_operator, "I4DivR1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_I4_DIVR_ZERO, 0);
+    if (!strcmp(proj_operator, "I4DivR1D1R1"))
+        mOp->setType(PFSOLVE_RADIAL_I4_DIVR_DR_R, 0);
+    if (!strcmp(proj_operator, "I4DivR1D1R1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_I4_DIVR_DR_R_ZERO, 0);
+
+    mOp->apply(mModsView, mPhysView);
   return;
   /*std::uint32_t Ntheta = this->mspSetup->fwdSize();
 
@@ -353,52 +400,8 @@ void @Op@<@Tag@>::initBackend() const
 
     // Make view operator
     auto mem = std::make_shared<QuICC::Memory::Cuda::Malloc>();
-    const char* proj_operator = "@Op@";
-    if (!strcmp(proj_operator, "P"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL>>(mem);
-    if (!strcmp(proj_operator, "P_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_ZERO>>(mem);
-    if (!strcmp(proj_operator, "DivR1"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_DIVR>>(mem);
-    if (!strcmp(proj_operator, "DivR1_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_DIVR_ZERO>>(mem);
-    if (!strcmp(proj_operator, "D1"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_DR>>(mem);
-    if (!strcmp(proj_operator, "R1"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_R>>(mem);
-    if (!strcmp(proj_operator, "R1_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_R_ZERO>>(mem);
-    if (!strcmp(proj_operator, "DivR1D1R1"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_DIVR_DR_R>>(mem);
-    if (!strcmp(proj_operator, "DivR1D1R1_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_DIVR_DR_R_ZERO>>(mem);
-    if (!strcmp(proj_operator, "SphLapl"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_SPHLAPL>>(mem);
-
-    if (!strcmp(proj_operator, "I2"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I2>>(mem);
-    if (!strcmp(proj_operator, "I2_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I2_ZERO>>(mem);
-    if (!strcmp(proj_operator, "I2DivR1"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I2_DIVR>>(mem);
-    if (!strcmp(proj_operator, "I2DivR1_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I2_DIVR_ZERO>>(mem);
-    if (!strcmp(proj_operator, "I2DivR1D1R1"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I2_DIVR_DR_R>>(mem);
-    if (!strcmp(proj_operator, "I2DivR1D1R1_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I2_DIVR_DR_R_ZERO>>(mem);
-    if (!strcmp(proj_operator, "I4"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I4>>(mem);    
-    if (!strcmp(proj_operator, "I4_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I4_ZERO>>(mem);
-    if (!strcmp(proj_operator, "I4DivR1"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I4_DIVR>>(mem);
-    if (!strcmp(proj_operator, "I4DivR1_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I4_DIVR_ZERO>>(mem);
-    if (!strcmp(proj_operator, "I4DivR1D1R1"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I4_DIVR_DR_R>>(mem);
-    if (!strcmp(proj_operator, "I4DivR1D1R1_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I4_DIVR_DR_R_ZERO>>(mem);
+    mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t>>(mem);
+    
     //using op_t = QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, opType>;
     //mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, opType>>(mem);
 

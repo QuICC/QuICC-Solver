@@ -37,7 +37,7 @@ void MapOps::setFourierPrj(mlir::quiccir::FrPOp op)
 #ifdef QUICC_HAS_CUDA_BACKEND
       else
       {
-         using backend_t = viewGpu_t;
+         using backend_t = viewGpuVkFFT_t;
          using op_t = Mixed::OpsType<Tout, Tin, P_t, bwd_t, backend_t>;
          _ops.push_back(std::make_unique<op_t>(_mem));
          auto* ptr =
@@ -82,7 +82,7 @@ void MapOps::setFourierInt(mlir::quiccir::FrIOp op)
 #ifdef QUICC_HAS_CUDA_BACKEND
       else
       {
-         using backend_t = viewGpu_t;
+         using backend_t = viewGpuVkFFT_t;
          using op_t = Mixed::OpsType<Tout, Tin, P_t, fwd_t, backend_t>;
          _ops.push_back(std::make_unique<op_t>());
          auto* ptr =

@@ -68,6 +68,28 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
  
   Profiler::RegionStart<2>("applyImpl");
 
+  const char* proj_operator = "@Op@";
+    if (!strcmp(proj_operator, "P"))
+        mOp->setType(PFSOLVE_RADIAL, 1);
+    if (!strcmp(proj_operator, "P_Zero"))
+       mOp->setType(PFSOLVE_RADIAL_ZERO, 1);
+    if (!strcmp(proj_operator, "DivR1"))
+       mOp->setType(PFSOLVE_RADIAL_DIVR, 1);
+    if (!strcmp(proj_operator, "DivR1_Zero"))
+       mOp->setType(PFSOLVE_RADIAL_DIVR_ZERO, 1);
+    if (!strcmp(proj_operator, "D1"))
+       mOp->setType(PFSOLVE_RADIAL_DR, 1);
+    if (!strcmp(proj_operator, "R1"))
+       mOp->setType(PFSOLVE_RADIAL_R, 1);
+    if (!strcmp(proj_operator, "R1_Zero"))
+       mOp->setType(PFSOLVE_RADIAL_R_ZERO, 1);
+    if (!strcmp(proj_operator, "DivR1D1R1"))
+       mOp->setType(PFSOLVE_RADIAL_DIVR_DR_R, 1);
+    if (!strcmp(proj_operator, "DivR1D1R1_Zero"))
+       mOp->setType(PFSOLVE_RADIAL_DIVR_DR_R_ZERO, 1);
+    if (!strcmp(proj_operator, "SphLapl"))
+       mOp->setType(PFSOLVE_RADIAL_SPHLAPL, 1);
+
   mOp->apply(mPhysView, mModsView);
   return;
  /*   //std::uint32_t Ntheta = this->mspSetup->bwdSize();
@@ -287,37 +309,7 @@ void @Op@<@Tag@>::initBackend() const
     std::uint32_t M = static_cast<std::uint32_t>(this->mspSetup->slow(nLayers-1)) + 1;
     std::uint32_t L = this->mspSetup->specSize();
     PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
-    /*config_backward = {};
-	config_backward.Ntheta = Ntheta;//this->mspSetup->bwdSize();
-    const char* proj_operator = "@Op@";
-    if (!strcmp(proj_operator, "P"))
-        config_backward.radialTransform = PFSOLVE_RADIAL;
-    if (!strcmp(proj_operator, "DivR"))
-        config_backward.radialTransform = PFSOLVE_RADIAL_DIVR;
-    if (!strcmp(proj_operator, "D1"))
-        config_backward.radialTransform = PFSOLVE_RADIAL_DR;
-    if (!strcmp(proj_operator, "SphLapl"))
-        config_backward.radialTransform = PFSOLVE_RADIAL_SPHLAPL;
-    config_backward.useGraphs = 1;
-	config_backward.testMerge = 0;
-	config_backward.testAccuracy = 1;
-	config_backward.doALTOnly = 1;
-	config_backward.useMatMulConnection = 1;
-	config_backward.use_tc = 2;
-	config_backward.mergeType = 1;
-	config_backward.numMergedIterMatMul = 8;
-	config_backward.numMergedIterMax = 1;
-	config_backward.numMergedIterMin = 1;
-	config_backward.disableCaching = 1;
-	config_backward.fixAccuracy = 1;
-	config_backward.numRadialBatches = 1;
-	config_backward.profile_iter = 1;
-	config_backward.profile_iter_combined = 1;
-	config_backward.WMMA_M = 8;
-	config_backward.WMMA_N = 8;
-	config_backward.WMMA_K = 4;
-	appContainer_backward = {};
-    config_backward.projector = 1;*/
+
     num_m_even = 0;
     num_m_odd = 0;
     for (std::uint32_t i = 0; i < nLayers; ++i)
@@ -387,27 +379,8 @@ void @Op@<@Tag@>::initBackend() const
 
     // Make view operator
     auto mem = std::make_shared<QuICC::Memory::Cuda::Malloc>();
-    const char* proj_operator = "@Op@";
-    if (!strcmp(proj_operator, "P"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL>>(mem);
-    if (!strcmp(proj_operator, "P_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL_ZERO>>(mem);
-    if (!strcmp(proj_operator, "DivR1"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL_DIVR>>(mem);
-    if (!strcmp(proj_operator, "DivR1_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL_DIVR_ZERO>>(mem);
-    if (!strcmp(proj_operator, "D1"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL_DR>>(mem);
-    if (!strcmp(proj_operator, "R1"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL_R>>(mem);
-    if (!strcmp(proj_operator, "R1_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL_R_ZERO>>(mem);
-    if (!strcmp(proj_operator, "DivR1D1R1"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL_DIVR_DR_R>>(mem);
-    if (!strcmp(proj_operator, "DivR1D1R1_Zero"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL_DIVR_DR_R_ZERO>>(mem);
-    if (!strcmp(proj_operator, "SphLapl"))
-        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL_SPHLAPL>>(mem);
+
+    mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t>>(mem);
 
     //using op_t = QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, opType>;
     //mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, opType>>(mem);

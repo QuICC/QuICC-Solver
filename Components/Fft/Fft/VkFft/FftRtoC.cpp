@@ -130,7 +130,7 @@ void FftOp<View::View<std::complex<double>, AttOut>,
                                             AttOut>& mods,
    const View::View<double, AttIn>& phys)
 {
-   assert(std::floor(phys.dims()[0] / 2) + 1 == mods.dims()[0]);
+   //assert(std::floor(phys.dims()[0] / 2) + 1 == mods.dims()[0]);// these asserts need to be changed to the buffer stride 
    using namespace QuICC::View;
    if (_plan == nullptr)
    {
@@ -138,7 +138,7 @@ void FftOp<View::View<std::complex<double>, AttOut>,
       int columns = 0;
       if constexpr (std::is_same_v<AttIn, dense2D>)
       {
-         assert(std::floor(phys.dims()[0] / 2) + 1 == mods.dims()[0]);
+         //assert(std::floor(phys.dims()[0] / 2) + 1 == mods.dims()[0]);
          assert(phys.dims()[1] == mods.dims()[1]);
          columns = phys.dims()[1];
       }

@@ -26,7 +26,7 @@ namespace Quadrature {
       for(int k = 0; k < size/2; k++)
       {
          Internal::MHDFloat theta = Internal::Math::PI_long*(Internal::MHDFloat(2*k + 1))/Internal::MHDFloat(4*size);
-         igrid(k) = Internal::Math::sin(theta);
+         igrid(k) = Internal::Math::cos(theta);
       }
 
       for(int k = size/2; k < size; k++)
@@ -35,7 +35,7 @@ namespace Quadrature {
          int k_ = size-k;
 
          Internal::MHDFloat theta = Internal::Math::PI_long*(Internal::MHDFloat(2*k_ - 1))/Internal::MHDFloat(4*size);
-         igrid(k) = Internal::Math::cos(theta);
+         igrid(k) = Internal::Math::sin(theta);
       }
 
       iweights.setConstant(Internal::Math::PI/(MHD_MP(2.0)*Internal::MHDFloat(size)));

@@ -4,7 +4,14 @@
 
 #include "Graph/Shims/MlirShims.hpp"
 #include "Graph/Types.hpp"
-
+#ifdef QUICC_USE_PFSOLVE
+#include "View/ViewSparse.hpp"
+#include "Memory/Cpu/NewDelete.hpp"
+#include "ViewOps/Worland_parallALT/Tags.hpp"
+#include "ViewOps/Worland_parallALT/Builder.hpp"
+#include <stdio.h>
+#include <string.h> 
+#endif
 #include "ViewOps/Quadrature/Op.hpp"
 #include "ViewOps/Quadrature/Impl.hpp"
 #include "ViewOps/Worland/OpsBuilder.hpp"
@@ -99,6 +106,91 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_
     assert(obj != nullptr);
     assert(pUval != nullptr);
     assert(pUmod != nullptr);
+
+#ifdef QUICC_USE_PFSOLVE
+    // op
+    //using namespace QuICC::Transform::Quadrature;
+    using Tin = C_DCCSC3DJIK_t;
+    using Tout = C_DCCSC3DJIK_t;
+    // QUICC_USE_IBLOCKED_CUDA_MATMUL_WARP_TILE
+    using Top = QuICC::View::View<double, QuICC::View::CSL3DJIK>;
+    //using backend_t = Cuda::ImplOp<Tout, Tin, Top>;
+
+    //using op_t = Op<Tout, Tin, Top, backend_t>;
+    // views
+    using namespace QuICC::View;
+    constexpr std::uint32_t rank = 3;
+    ViewBase<std::uint32_t> pointers[rank];
+    pointers[1] = ViewBase<std::uint32_t>(pUmod->pos, pUmod->posSize);
+    ViewBase<std::uint32_t> indices[rank];
+    indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
+    assert(pUmod->pos == pUval->pos);
+    assert(pUmod->coo == pUval->coo);
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->data));
+    Tin viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
+    Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
+
+    // Check that op was set up
+    //auto cl = reinterpret_cast<QuICC::Operator::UnaryOp<Tout, Tin>*>(obj);
+    using mods_t = QuICC::View::View<std::complex<double>, QuICC::View::DCCSC3DJIK>;
+    using phys_t = QuICC::View::View<std::complex<double>, QuICC::View::DCCSC3DJIK>;
+   
+    QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t>* cl = (QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t>*)obj;
+    
+     const char* proj_operator = "@Kind@";
+    printf("%s\n", proj_operator);
+    if (!strcmp(proj_operator, "P"))
+        cl->setType(PFSOLVE_RADIAL, 0);
+    if (!strcmp(proj_operator, "P_Zero"))
+        cl->setType(PFSOLVE_RADIAL_ZERO, 0);
+    if (!strcmp(proj_operator, "DivR1"))
+        cl->setType(PFSOLVE_RADIAL_DIVR, 0);
+    if (!strcmp(proj_operator, "DivR1_Zero"))
+        cl->setType(PFSOLVE_RADIAL_DIVR_ZERO, 0);
+    if (!strcmp(proj_operator, "D1"))
+        cl->setType(PFSOLVE_RADIAL_DR, 0);
+    if (!strcmp(proj_operator, "R1"))
+        cl->setType(PFSOLVE_RADIAL_R, 0);
+    if (!strcmp(proj_operator, "R1_Zero"))
+        cl->setType(PFSOLVE_RADIAL_R_ZERO, 0);
+    if (!strcmp(proj_operator, "DivR1D1R1"))
+        cl->setType(PFSOLVE_RADIAL_DIVR_DR_R, 0);
+    if (!strcmp(proj_operator, "DivR1D1R1_Zero"))
+        cl->setType(PFSOLVE_RADIAL_DIVR_DR_R_ZERO, 0);
+    if (!strcmp(proj_operator, "SphLapl"))
+        cl->setType(PFSOLVE_RADIAL_SPHLAPL, 0);
+
+    if (!strcmp(proj_operator, "I2"))
+        cl->setType(PFSOLVE_RADIAL_I2, 0);
+    if (!strcmp(proj_operator, "I2_Zero"))
+        cl->setType(PFSOLVE_RADIAL_I2_ZERO, 0);
+    if (!strcmp(proj_operator, "I2DivR1"))
+        cl->setType(PFSOLVE_RADIAL_I2_DIVR, 0);
+    if (!strcmp(proj_operator, "I2DivR1_Zero"))
+        cl->setType(PFSOLVE_RADIAL_I2_DIVR_ZERO, 0);
+    if (!strcmp(proj_operator, "I2DivR1D1R1"))
+        cl->setType(PFSOLVE_RADIAL_I2_DIVR_DR_R, 0);
+    if (!strcmp(proj_operator, "I2DivR1D1R1_Zero"))
+        cl->setType(PFSOLVE_RADIAL_I2_DIVR_DR_R_ZERO, 0);
+    if (!strcmp(proj_operator, "I4"))
+        cl->setType(PFSOLVE_RADIAL_I4, 0);    
+    if (!strcmp(proj_operator, "I4_Zero"))
+        cl->setType(PFSOLVE_RADIAL_I4_ZERO, 0);
+    if (!strcmp(proj_operator, "I4DivR1"))
+        cl->setType(PFSOLVE_RADIAL_I4_DIVR, 0);
+    if (!strcmp(proj_operator, "I4DivR1_Zero"))
+        cl->setType(PFSOLVE_RADIAL_I4_DIVR_ZERO, 0);
+    if (!strcmp(proj_operator, "I4DivR1D1R1"))
+        cl->setType(PFSOLVE_RADIAL_I4_DIVR_DR_R, 0);
+    if (!strcmp(proj_operator, "I4DivR1D1R1_Zero"))
+        cl->setType(PFSOLVE_RADIAL_I4_DIVR_DR_R_ZERO, 0);
+     
+     cl->apply(viewMod, viewVal);
+#else
+
     // op
     using namespace QuICC::Transform::Quadrature;
     using Tin = C_DCCSC3DJIK_t;
@@ -159,5 +251,8 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewMod, viewVal);
+
+#endif
+    
 };
 #endif

@@ -35,7 +35,18 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   Polynomial::Bessel
   Polynomial::SphericalBessel
 )
-
+# PfSolve
+if(TARGET PfSolve AND QUICC_USE_PFSOLVE)
+  target_compile_definitions("${QUICC_CURRENT_COMPONENT_LIB}"
+    INTERFACE QUICC_USE_PFSOLVE)
+  target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE
+    PfSolve
+  )
+  target_compile_definitions("${QUICC_CURRENT_COMPONENT_LIB}"
+      INTERFACE "QUICC_HAS_CUDA_BACKEND")
+else()
+  message(VERBOSE "PfSolve backend not available")
+endif()
 # Additional configuration
 include(setup/Worland_configure)
 

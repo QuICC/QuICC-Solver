@@ -18,6 +18,8 @@
 #include "QuICC/Transform/Fft/Worland/Tags.hpp"
 #include "View/View.hpp"
 #include "Operator/Unary.hpp"
+#include "ViewOps/Worland_parallALT/Tags.hpp"
+#include "ViewOps/Worland_parallALT/Builder.hpp"
 
 #include <cuComplex.h>
 #include <cuda.h>
@@ -136,7 +138,7 @@ private:
     #endif
 
     /// @brief Operator backend class pointer
-    mutable std::unique_ptr<QuICC::Operator::UnaryOp<@OpInOut@>> mOp;
+    mutable std::unique_ptr<QuICC::Transform::Worland_parallALT::ParallaltOp<@OpInOut@>> mOp;
 
     /// @brief Output View
     mutable mods_t mModsView;

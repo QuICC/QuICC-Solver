@@ -12,8 +12,15 @@ endif()
 # These 3 lists will be iterated over together
 set(LayoutOutsCpu "DCCSC3D;DCCSC3D;DCCSC3D;S1CLCSC3D")
 set(LayoutInsCpu "DCCSC3D;DCCSC3D;S1CLCSC3D;DCCSC3D")
+if(QUICC_USE_PFSOLVE)
+#set(LayoutOutsCuda "DCCSC3D;DCCSC3D;DCCSC3D;S1CLCSC3D")
+#set(LayoutInsCuda "DCCSC3D;DCCSC3D;S1CLCSC3D;DCCSC3D")
 set(LayoutOutsCuda "DCCSC3DJIK;DCCSC3D;DCCSC3DJIK;S1CLCSC3DJIK")
 set(LayoutInsCuda "DCCSC3D;DCCSC3DJIK;S1CLCSC3DJIK;DCCSC3DJIK")
+else()
+set(LayoutOutsCuda "DCCSC3DJIK;DCCSC3D;DCCSC3DJIK;S1CLCSC3DJIK")
+set(LayoutInsCuda "DCCSC3D;DCCSC3DJIK;S1CLCSC3DJIK;DCCSC3DJIK")
+endif()
 set(Perms "201;120;201;120")
 
 # These 3 lists will be iterated over independently

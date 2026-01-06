@@ -35,8 +35,8 @@ using type = QuICC::Memory::Cuda::Malloc;
 /// @tparam Order of differentiation
 /// @tparam Direction Fft direction tag
 /// @tparam Treatment special treatment mask, typically of mode zero or dealiasing
-template<class Tout, class Tin, std::int64_t Direction, std::int64_t Type>
-class ParallaltOp : public UnaryBaseOp<ParallaltOp<Tout, Tin, Direction, Type>, Tout, Tin> {
+template<class Tout, class Tin>
+class ParallaltOp : public UnaryBaseOp<ParallaltOp<Tout, Tin>, Tout, Tin> {
 public:
     /// @brief Default constructor
    ParallaltOp(std::shared_ptr<Memory::memory_resource> mem) : _mem(mem) {
@@ -48,17 +48,22 @@ public:
             deleteParallALT(&VkGPU, &appContainer);
 
        if (temp_buffer != 0)
-      {
-         cudaFree(temp_buffer);
-         temp_buffer = 0;
-      }
+        {
+           cudaFree(temp_buffer);
+           temp_buffer = 0;
+        };
+        if (temp_buffer2 != 0)
+        {
+           cudaFree(temp_buffer2);
+           temp_buffer2 = 0;
+        };
     };
 
     /// @brief Action implementation
     /// @param out differentiatied modes
     /// @param in input modes
     void initImpl(Tout& out, const Tin& in){
-        std::uint32_t Ntheta = (Direction) ? out.dims()[0] : in.dims()[0];//igrid.size();
+        std::uint32_t Ntheta = (transformDirection) ? out.dims()[0] : in.dims()[0];//igrid.size();
         
         //std::uint32_t nLayers = static_cast<std::uint32_t>(this->mspSetup->slowSize());
 
@@ -68,7 +73,7 @@ public:
         PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
         config = {};
 	    config.Ntheta = Ntheta;//this->mspSetup->bwdSize();
-        config.radialTransform = Type;
+        config.radialTransform = transformType;
         config.useGraphs = 0;
         config.initializeGraph = 0;
         config.useUberKernel = 1;
@@ -87,12 +92,12 @@ public:
 	    config.profile_iter = 1;
 	    config.profile_iter_combined = 1;
         config.specifyBuffersAtLaunch = 1;
-        config.convertPackedStrided = 1;
+        config.convertPackedStrided = 2;
 	    config.WMMA_M = 8;
 	    config.WMMA_N = 8;
 	    config.WMMA_K = 4;
 	    appContainer = {};
-        config.projector = Direction;
+        config.projector = transformDirection;
         
          std::uint32_t* temp_pointers =
            (std::uint32_t*)calloc(out.pointers()[1].size(), sizeof(std::uint32_t));
@@ -129,6 +134,7 @@ public:
               start += numRHS;
               m_endBatch[iter] = 2 * start;
               m_list[iter] = i - 1;
+              //printf("%d %d %d \n", m_list[iter], m_endBatch[iter], iter);
               iter++;
            }
         }
@@ -149,7 +155,7 @@ public:
                 start += numRHS;
                 m_even[iter] = i-1;
                 m_even_endBatch[iter] = 2*start;
-                printf("%d %d %d \n", m_even[iter], m_even_endBatch[iter], iter);
+                //printf("%d %d %d \n", m_even[iter], m_even_endBatch[iter], iter);
                 iter++;
             }
         }
@@ -165,14 +171,14 @@ public:
                 start += numRHS;
                 m_odd[iter] = i-1;
                 m_odd_endBatch[iter] = 2*start;
-                printf("%d %d %d \n", m_odd[iter], m_odd_endBatch[iter], iter);
+                //printf("%d %d %d \n", m_odd[iter], m_odd_endBatch[iter], iter);
                 iter++;
             }
 
         }
         free(temp_pointers);
         config.M = (m_even[config.num_m_even - 1] > m_odd[config.num_m_odd - 1]) ? ((m_even[config.num_m_even - 1]) / 2 + 1) * 2 : ((m_odd[config.num_m_odd - 1]) / 2 + 1) * 2;// M;
-        config.L = (Direction) ? in.dims()[0] : out.dims()[0];// 3 * M / 2;
+        config.L = (transformDirection) ? in.dims()[0] : out.dims()[0];// 3 * M / 2;
         if (config.projector) {
 		    config.inputBufferStride = config.L;
 		    config.outputBufferStride = Ntheta;
@@ -203,7 +209,7 @@ public:
         }
       Profiler::RegionFixture<5> fix("ParallaltOp::applyImpl");
 
-      assert(out.size() == in.size());
+      //assert(out.size() == in.size());
       //assert(out.dims()[0] == in.dims()[0]);
       assert(out.dims()[1] == in.dims()[1]);
       assert(out.dims()[2] == in.dims()[2]);
@@ -216,43 +222,35 @@ public:
             appContainer.config.Ntheta * (appContainer.config.sizeEvenBlock + appContainer.config.sizeOddBlock) *
                sizeof(double));
       }
+      if (temp_buffer2 == 0)
+      {
+         cudaMalloc((void**)&temp_buffer2,
+            appContainer.config.Ntheta * (appContainer.config.sizeEvenBlock + appContainer.config.sizeOddBlock) *
+               sizeof(double));
+      }
       /* double* xx = (double*)calloc(2 * appContainer.config.Ntheta *
                                          (appContainer.config.sizeEvenBlock +
                                             appContainer.config.sizeOddBlock),
             sizeof(double));
-         double* xx2 = (double*)calloc(2*appContainer.config.Ntheta *
-                                          (appContainer.config.sizeEvenBlock +
-                                             appContainer.config.sizeOddBlock),
-            sizeof(double));
-       std::vector<int> Mseq(
-            appContainer.config.num_m_even + appContainer.config.num_m_odd);
-         for (int i = 0; i < appContainer.config.num_m_even; i++)
-         {
-            Mseq[i] = appContainer.config.m_even_list[i];
-         }
-         for (int i = 0; i < appContainer.config.num_m_odd; i++)
-         {
-            Mseq[appContainer.config.num_m_even + i] = appContainer.config.m_odd_list[i];
-         }
-         std::sort(Mseq.begin(), Mseq.end());
+        
+
           cudaMemcpy(xx, in.data(),
-            appContainer.config.Ntheta *
-               (appContainer.config.sizeEvenBlock +
-                  appContainer.config.sizeOddBlock) *
+            in.dims()[0] *
+               2*50 *
                sizeof(double),
             cudaMemcpyDeviceToHost);
          if (appContainer.config.projector)
          {
-            for (int j = 0; j < 64; j++)
+            for (int j = 0; j < 20; j++)
             {
-               for (int i = 0; i < appContainer.config.Ntheta; i++)
+               for (int i = 0; i < 5+0*in.dims()[0]; i++)
                {
-                  printf("%.3e %.3e | ", xx[2 * i+ 2*j * appContainer.config.Ntheta], xx[2 * i + 1+ 2*j * appContainer.config.Ntheta]);
+                  //printf("%.17e %.17e | ", xx[2 * i+ 2*j * in.dims()[0]], xx[2 * i + 1+ 2*j * in.dims()[0]]);
                }
-               printf("\n");
+               //printf("\n\n");
             }
-         }
-          if (1)
+         }*/
+         /* if (1)
       {
 
          int evenID = 0;
@@ -325,34 +323,34 @@ public:
                (appContainer.config.sizeEvenBlock +
                   appContainer.config.sizeOddBlock) *
                sizeof(double),
-            cudaMemcpyHostToDevice);
-            */
+            cudaMemcpyHostToDevice);*/
+            
       parallALT_launchParams launchParams;
       launchParams.input_buffer_S = (double*)in.data();
       launchParams.temp_buffer_S = temp_buffer;
-      launchParams.buffer_S = (double*)out.data();
+      launchParams.buffer_S = temp_buffer2;
+      launchParams.output_buffer_S = (double*)out.data();
      // if (testAccuracy) {
 				
       launchApp_parallALT(&appContainer, &launchParams);
-      /*
-      cudaMemcpy(xx, out.data(),
-            2 * appContainer.config.Ntheta *
-               (appContainer.config.sizeEvenBlock +
-                  appContainer.config.sizeOddBlock) *
+      
+      /* cudaMemcpy(xx, out.data(),
+            2 * out.dims()[0] *
+               528 *
                sizeof(double),
             cudaMemcpyDeviceToHost);
       if (appContainer.config.projector)
       {
-         for (int j = 0; j < 8; j++)
+         for (int j = 0; j < 528; j++)
             {
-               for (int i = 0; i < appContainer.config.Ntheta; i++)
+               for (int i = 0; i < out.dims()[0]; i++)
                {
-                  printf("%.3e %.3e | ", xx[i], xx[i+ appContainer.config.Ntheta]);
+                  //printf("%.17e %.17e | ", xx[2 * i+ 2*j * out.dims()[0]], xx[2 * i + 1+ 2*j * out.dims()[0]]);
                }
-               printf("\n");
+               //printf("\n");
             }
-      }
-      if (1)
+      }*/
+      /* if (1)
       {
          int evenID = 0;
          int oddID = 0;
@@ -435,11 +433,15 @@ public:
                (appContainer.config.sizeEvenBlock +
                   appContainer.config.sizeOddBlock) *
                sizeof(double),
-            cudaMemcpyHostToDevice);
-      free(xx);
-         free(xx2);*/
+            cudaMemcpyHostToDevice);*/
+      //free(xx);
       };
 
+    void setType(int inputType, int inputDirection)
+      {
+         transformType = inputType;
+         transformDirection = inputDirection;
+      };
  private:
 
     /**
@@ -453,6 +455,8 @@ public:
     mutable parallALT_app appContainer = {};
 
     mutable double* temp_buffer = 0;
+
+    mutable double* temp_buffer2 = 0;
     /**
     * @brief parallALT app pointers
     */
@@ -465,6 +469,8 @@ public:
     /// \todo consider removing shared ptr and using singleton
     std::shared_ptr<Memory::memory_resource> _mem;
 
+    mutable int transformType = 0;
+    mutable int transformDirection = 0;
     /// @brief Give access to base class
     //friend BinaryBaseOp<DiffOp<Tout, Tin, Order, Direction, Treatment>, Tout, Tin, ScaleType>;
 
