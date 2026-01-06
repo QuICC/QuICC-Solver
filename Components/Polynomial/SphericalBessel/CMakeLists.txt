@@ -8,8 +8,15 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_SphericalBessel
 add_library(Polynomial::SphericalBessel ALIAS
   ${QUICC_CURRENT_COMPONENT_LIB}_SphericalBessel)
 
+if(QUICC_BESSEL_IMPL STREQUAL "Boost")
+  include(QuICCFindBoostRequired)
+  quicc_find_boost_required()
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_Bessel INTERFACE Boost::headers)
+endif()
+
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_SphericalBessel PUBLIC
   QuICC::Types
+  Boost::headers
 )
 
 # Teststuite

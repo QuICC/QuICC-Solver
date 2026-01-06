@@ -89,7 +89,7 @@ void MapOps::setAdd(mlir::quiccir::AddOp op)
             using ptTy = cuda::std::complex<double>;
             using T = View::View<ptTy, View::DCCSC3D>;
             using op_t = Op<AddFunctor<ptTy>, T, T, T>;
-            _ops.push_back(std::make_unique<op_t>(AddFunctor<ptTy>()));
+            _ops.push_back(std::make_shared<op_t>(AddFunctor<ptTy>()));
             auto* ptr =
                std::get<std::shared_ptr<NaryOp<T, T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
@@ -186,7 +186,7 @@ void MapOps::setSub(mlir::quiccir::SubOp op)
             using ptTy = cuda::std::complex<double>;
             using T = View::View<ptTy, View::DCCSC3D>;
             using op_t = Op<SubFunctor<ptTy>, T, T, T>;
-            _ops.push_back(std::make_unique<op_t>(SubFunctor<ptTy>()));
+            _ops.push_back(std::make_shared<op_t>(SubFunctor<ptTy>()));
             auto* ptr =
                std::get<std::shared_ptr<NaryOp<T, T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
