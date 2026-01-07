@@ -62,12 +62,18 @@ for dbase in ds:
                     avg = np.average(ts)
                     max = np.max(ts)
                     if impl == refImpl:
+                        refMin = min
                         refAvg = avg
-                        speedup = 0.0
+                        refMax = max
                         speedInfo =' '
                     else:
+                        speedup = 100.0*(min - refMin)/refMin
+                        minSpeedInfo = f'({np.ceil(speedup):+} %)'
                         speedup = 100.0*(avg - refAvg)/refAvg
-                        speedInfo = f'({np.ceil(speedup):+} %)'
+                        avgSpeedInfo = f'({np.ceil(speedup):+} %)'
+                        speedup = 100.0*(max - refMax)/refMax
+                        maxSpeedInfo = f'({np.ceil(speedup):+} %)'
+                        speedInfo = f' | {minSpeedInfo}/{maxSpeedInfo}/{avgSpeedInfo}'
                     print(f'{sp}{sp}{sp}{impl}: {min:.2E}/{max:.2E}/{avg:.2E}{speedInfo}')
                 else:
                     print(f'{sp}{sp}{sp}{impl}: NOT IMPLEMENTED')

@@ -86,13 +86,9 @@ private:
    /// @brief specialized implementation for Phi-Theta slice
    template <std::size_t... Is, std::size_t... Js>
    void phiThetaImpl(Tout& out, const std::tuple<Targs...>& args, std::index_sequence<Is...>, std::index_sequence<Js...>);
-   template <std::size_t... Is, std::size_t... Js>
-   void phiThetaImplCaching(Tout& out, const std::tuple<Targs...>& args, std::index_sequence<Is...>, std::index_sequence<Js...>);
    /// @brief specialized implementation for Phi-R slice
    template <std::size_t... Is, std::size_t... Js>
    void phiRImpl(Tout& out, const std::tuple<Targs...>& args, std::index_sequence<Is...>, std::index_sequence<Js...>);
-   template <std::size_t... Is, std::size_t... Js>
-   void phiRImplCaching(Tout& out, const std::tuple<Targs...>& args, std::index_sequence<Is...>, std::index_sequence<Js...>);
    /// @brief specialized implementation for R slice
    template <std::size_t... Is, std::size_t... Js, std::size_t... Ks>
    void rImpl(Tout& out, const std::tuple<const Targs&...>& args, std::index_sequence<Is...>, std::index_sequence<Js...>, std::index_sequence<Ks...>);
