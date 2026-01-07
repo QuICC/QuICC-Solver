@@ -31,6 +31,7 @@
 #include "QuICC/NonDimensional/Sort.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/PhysicalNames/MassFlux.hpp"
+#include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "Stability/LinearStability.hpp"
 #include "Stability/Options.hpp"
@@ -107,6 +108,8 @@ void LinearStability::buildMatrices(DecoupledZSparse& matA,
    auto fieldList = this->mspModel->fieldIds();
    bool isVel   = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::Velocity::id()) != fieldList.end();
    bool isMassF = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::MassFlux::id()) != fieldList.end();
+   // otherwise, pick magnetic
+   bool isMag   = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::Magnetic::id()) != fieldList.end();
    
    std::size_t momId;
    if(isVel && !isMassF) 
@@ -116,6 +119,10 @@ void LinearStability::buildMatrices(DecoupledZSparse& matA,
    else if(!isVel && isMassF)
    {
       momId = PhysicalNames::MassFlux::id();
+   }
+   else if(isMag)
+   {
+      momId = PhysicalNames::Magnetic::id();
    }
    else
    {

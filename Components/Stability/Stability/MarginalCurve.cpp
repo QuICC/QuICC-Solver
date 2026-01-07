@@ -158,6 +158,7 @@ void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks,
          {
             std::vector<FieldComponents::Spectral::Id> comps;
             if (fId == PhysicalNames::Velocity::id() ||
+                fId == PhysicalNames::MassFlux::id() ||
                 fId == PhysicalNames::Magnetic::id())
             {
                comps = {FieldComponents::Spectral::TOR,
@@ -545,9 +546,37 @@ void MarginalCurve::setOptions(Stability::Options& opt)
 
    // Scale eigenfunctions to have first coefficient real and positive
    opt.scalingType = 1;
+   auto fieldList = this->mspBackend->fieldIds();
+
+   // pick the correct momentum variable (velocity or massflux) 
+   bool isVel   = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::Velocity::id()) != fieldList.end();
+   bool isMassF = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::MassFlux::id()) != fieldList.end();
+   // otherwise, pick magnetic
+   bool isMag   = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::Magnetic::id()) != fieldList.end();
+   
+   std::size_t momId;
+   if(isVel && !isMassF) 
+   {
+      momId = PhysicalNames::Velocity::id();
+   } 
+   else if(!isVel && isMassF)
+   {
+      momId = PhysicalNames::MassFlux::id();
+   }
+   else if(isMag)
+   {
+      momId = PhysicalNames::Magnetic::id();
+   }
+   else
+   {
+      throw std::logic_error("Momentum variable not recognized");
+   }
+   //opt.scalingRef = {
+   //{PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR},
+   //   {PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL}};
    opt.scalingRef = {
-      {PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR},
-      {PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL}};
+      {momId, FieldComponents::Spectral::TOR},
+      {momId, FieldComponents::Spectral::POL}};
 }
 
 void MarginalCurve::computeSingleMode(
