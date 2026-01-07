@@ -880,23 +880,13 @@ namespace Datatypes {
    template <typename TData> void ViewScalarField<TData>::setZeros()
    {
       auto ptr = this->mView.data();
-
-      for(std::uint32_t i  = 0; i < this->mView.size(); i++)
-      {
-         *ptr = 0;
-         ptr++;
-      }
+      std::fill_n(ptr, this->mView.size(), 0);
    }
 
    template <typename TData> void ViewScalarField<TData>::setConstant(const PointType c)
    {
       auto ptr = this->mView.data();
-
-      for(std::uint32_t i  = 0; i < this->mView.size(); i++)
-      {
-         *ptr = c;
-         ptr++;
-      }
+      std::fill_n(ptr, this->mView.size(), c);
    }
 
    template <typename TData> void ViewScalarField<TData>::rescale(const MHDFloat scale)
