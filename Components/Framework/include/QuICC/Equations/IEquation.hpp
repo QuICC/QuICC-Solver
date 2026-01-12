@@ -13,7 +13,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/MatrixOperations.hpp"
+#include "Arithmetics/LinearAlgebra.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
@@ -296,20 +296,6 @@ namespace Equations {
    typedef std::shared_ptr<IEquation> SharedIEquation;
 
    /**
-    * @brief Apply the quasi-inverse operator
-    *
-    * @param eq         Equation
-    * @param compId     Equation field component ID
-    * @param rField     Output field
-    * @param start      Start index in linear storage
-    * @param matIdx     System index
-    * @param rhsStart   Start index in RHS data
-    * @param rhs        RHS field data
-    */
-   template <typename TData> void applyQuasiInverse(const IEquation& eq, TData& rField, const int start, const int matIdx, const int rhsStart, const TData& rhs);
-   template <> void applyQuasiInverse<DecoupledZMatrix>(const IEquation& eq, DecoupledZMatrix& rField, const int start, const int matIdx, const int rhsStart, const DecoupledZMatrix& rhs);
-
-   /**
     * @brief Apply the galerkin stencil operator
     *
     * @param eq         Equation
@@ -322,67 +308,12 @@ namespace Equations {
    template <typename TData> void applyGalerkinStencil(const IEquation& eq, TData& rField, const int start, const int matIdx, const TData& rhs);
    template <> void applyGalerkinStencil<DecoupledZMatrix>(const IEquation& eq, DecoupledZMatrix& rField, const int start, const int matIdx, const DecoupledZMatrix& rhs);
 
-   template <typename TData> inline void applyQuasiInverse(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& rField, const int start, const int matIdx, const int rhsStart, const TData& rhs)
-   {
-      if(eq.hasQID(compId))
-      {
-         // Create pointer to sparse operator
-         const SparseMatrix * op = &eq.quasiInverse<SparseMatrix>(compId, matIdx);
-
-         // Get number of rows and cols
-         int cols = rField.cols();
-         int rhsRows = op->cols();
-
-         Datatypes::details::addMatrixProduct(rField, start, *op, rhs.block(rhsStart, 0, rhsRows, cols));
-
-      } else if(eq.hasQIZ(compId))
-      {
-         // Create pointer to sparse operator
-         const SparseMatrixZ * op = &eq.quasiInverse<SparseMatrixZ>(compId, matIdx);
-
-         // Get number of rows and cols
-         int cols = rField.cols();
-         int rhsRows = op->cols();
-
-         Datatypes::details::addMatrixProduct(rField, start, *op, rhs.block(rhsStart, 0, rhsRows, cols));
-      }
-   }
-
-   template <> inline void applyQuasiInverse<DecoupledZMatrix>(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& rField, const int start, const int matIdx, const int rhsStart, const DecoupledZMatrix& rhs)
-   {
-      assert(rField.real().rows() == rField.imag().rows());
-      assert(rField.real().cols() == rField.imag().cols());
-
-      if(eq.hasQID(compId))
-      {
-         // Create pointer to sparse operator
-         const SparseMatrix * op = &eq.quasiInverse<SparseMatrix>(compId, matIdx);
-
-         // Get number of rows and cols
-         int cols = rField.real().cols();
-         int rhsRows = op->cols();
-
-         Datatypes::details::addMatrixProduct(rField, start, *op, rhs.real().block(rhsStart, 0, rhsRows, cols), rhs.imag().block(rhsStart, 0, rhsRows, cols));
-
-      } else if(eq.hasQIZ(compId))
-      {
-         // Create pointer to sparse operator
-         const SparseMatrixZ * op = &eq.quasiInverse<SparseMatrixZ>(compId, matIdx);
-
-         // Get number of rows and cols
-         int cols = rField.real().cols();
-         int rhsRows = op->cols();
-
-         Datatypes::details::addMatrixProduct(rField, start, *op, rhs.real().block(rhsStart, 0, rhsRows, cols), rhs.imag().block(rhsStart, 0, rhsRows, cols));
-      }
-   }
-
    template <typename TData> inline void applyGalerkinStencil(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& rField, const int start, const int matIdx, const TData& rhs)
    {
       // Create pointer to sparse operator
       const SparseMatrix * op = &eq.galerkinStencil(compId, matIdx);
 
-      Datatypes::details::setMatrixProduct(rField, 0, *op, rhs.block(start, 0, op->cols(), rhs.cols()));
+      Arithmetics::setMatrixProduct(rField, 0, *op, rhs.block(start, 0, op->cols(), rhs.cols()));
    }
 
    template <> inline void applyGalerkinStencil<DecoupledZMatrix>(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& rField, const int start, const int matIdx, const DecoupledZMatrix& rhs)
@@ -393,132 +324,7 @@ namespace Equations {
       // Create pointer to sparse operator
       const SparseMatrix * op = &eq.galerkinStencil(compId, matIdx);
 
-      Datatypes::details::setMatrixProduct(rField, 0, *op, rhs.real().block(start, 0, op->cols(), rhs.real().cols()), rhs.imag().block(start, 0, op->cols(), rhs.imag().cols()));
-   }
-
-   template <typename T, typename TOperator,typename TData> void computeExplicitTerm(const IEquation& eq, const std::size_t opId, FieldComponents::Spectral::Id compId, TData& rSolverField, const int eqStart, SpectralFieldId fieldId, const typename Framework::Selector::ScalarField<T>& explicitField, const int matIdx)
-   {
-      // Create pointer to sparse operator
-      const TOperator * op = &eq.explicitOperator<TOperator>(opId, compId, fieldId, matIdx);
-
-      const auto& tRes = *eq.res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-      if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
-      {
-         typename Eigen::Matrix<T,Eigen::Dynamic,1>  tmp(op->cols());
-         const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
-         #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
-            // Initialise storage to zero
-            tmp.setZero();
-            int l;
-            int j_;
-            int dimI = eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-            int corrDim;
-            if((eq.res().sim().ss().has(SpatialScheme::Feature::ShellGeometry) || eq.res().sim().ss().has(SpatialScheme::Feature::SphereGeometry)) &&
-                  eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123) &&
-                  eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
-            {
-               corrDim = tRes.idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
-            }
-            for(int j = 0; j < cols; j++)
-            {
-               j_ = tRes.idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
-               if(corrDim > 0)
-               {
-                  j_ -= corrDim;
-               }
-               const int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
-               for(int i = 0; i < useRows; i++)
-               {
-                  // Compute correct position
-                  l = j_ + i;
-
-                  // Copy field value into storage
-                  tmp(l) = explicitField.point(i,j,matIdx);
-               }
-            }
-         #else
-            int k = 0;
-            for(int j = 0; j < cols; j++)
-            {
-               // Effective rows in case of non-uniform truncation
-               int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
-
-               for(int i = 0; i < usedRows; i++)
-               {
-                  // Copy slice into flat array
-                  tmp(k) = explicitField.point(i,j,matIdx);
-
-                  // increase storage counter
-                  k++;
-               }
-            }
-         #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
-
-         // Apply operator to field
-         Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, tmp);
-
-      } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
-      {
-         // Apply operator to field
-         Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(matIdx));
-
-      } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
-      {
-         // Get mode indexes
-         ArrayI mode = tRes.mode(matIdx);
-
-         // Assert correct sizes
-         assert(op->cols() == explicitField.slice(mode(0)).rows());
-
-         // Apply operator to field
-         Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(mode(0)).col(mode(1)));
-
-      } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
-      {
-         assert(matIdx == 0);
-
-         /// \mhdBug very bad and slow implementation!
-         typename Eigen::Matrix<T,Eigen::Dynamic,1>  tmp(op->cols());
-         int l = 0, k_, j_, dimK, dimJ;
-
-         switch(eq.res().sim().ss().dimension())
-         {
-            case 3:
-               dimK = eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.res().sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-               dimJ = eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-               break;
-            case 2:
-               dimK = 1;
-               dimJ = eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-               break;
-            case 1:
-               dimK = 1;
-               dimJ = 1;
-               break;
-         }
-
-         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
-         {
-            k_ = tRes.idx<Dimensions::Data::DAT3D>(k)*dimK;
-            const int cols = tRes.dim<Dimensions::Data::DAT2D>(k);
-            for(int j = 0; j < cols; j++)
-            {
-               j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
-               const int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, k);
-               for(int i = 0; i < usedRows; i++)
-               {
-                  // Compute correct position
-                  l = k_ + j_ + i;
-
-                  // Copy slice into flat array
-                  tmp(l) = explicitField.point(i,j,k);
-               }
-            }
-         }
-
-         // Apply operator to field
-         Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, tmp);
-      }
+      Arithmetics::setMatrixProduct(rField, 0, *op, rhs.real().block(start, 0, op->cols(), rhs.real().cols()), rhs.imag().block(start, 0, op->cols(), rhs.imag().cols()));
    }
 
 } // Equations

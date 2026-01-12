@@ -439,6 +439,8 @@ inline void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<
 
    if(a != 0)
    {
+      auto& yRe = y.real();
+      auto& yIm = y.imag();
       if(a == 1.0)
       {
          for(std::size_t j = 0;  j < x.dims()[1]; j++)
@@ -446,8 +448,9 @@ inline void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<
             for(std::size_t i = 0;  i < x.dims()[0]; i++)
             {
                std::size_t i_ = i + startRow;
-               y.real()(i_,j) += x(i,j).real();
-               y.imag()(i_,j) += x(i,j).imag();
+               auto x_ = x(i,j);
+               yRe(i_,j) += x_.real();
+               yIm(i_,j) += x_.imag();
             }
          }
       }
@@ -458,8 +461,11 @@ inline void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<
             for(std::size_t i = 0;  i < x.dims()[0]; i++)
             {
                std::size_t i_ = i + startRow;
-               y.real()(i_,j) += a*x(i,j).real();
-               y.imag()(i_,j) += a*x(i,j).imag();
+               auto x_ = x(i,j);
+               auto xRe = x_.real();
+               auto xIm = x_.imag();
+               yRe(i_,j) += a*xRe;
+               yIm(i_,j) += a*xIm;
             }
          }
       }

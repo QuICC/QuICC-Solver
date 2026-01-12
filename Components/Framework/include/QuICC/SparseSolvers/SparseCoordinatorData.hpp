@@ -25,6 +25,11 @@
 #include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/Equations/IScalarEquation.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
+#include "QuICC/Equations/AddSource.hpp"
+#include "QuICC/Equations/SetBoundaryValue.hpp"
+#include "QuICC/Equations/ExplicitTerm.hpp"
+#include "QuICC/Equations/CopyNonlinear.hpp"
+#include "QuICC/Equations/SolveStencilUnknown.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolver.hpp"
 #include "QuICC/SparseSolvers/SparseTrivialSolver.hpp"
 

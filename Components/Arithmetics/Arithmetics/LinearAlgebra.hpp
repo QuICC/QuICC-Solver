@@ -3,8 +3,8 @@
  * @brief Useful methods for the DecoupledComplex type
  */
 
-#ifndef QUICC_TYPES_MATRIXOPERATIONS_HPP
-#define QUICC_TYPES_MATRIXOPERATIONS_HPP
+#ifndef QUICC_ARITHMETICS_LINEARALGEBRA_HPP
+#define QUICC_ARITHMETICS_LINEARALGEBRA_HPP
 
 // System includes
 //
@@ -16,9 +16,8 @@
 
 namespace QuICC {
 
-namespace Datatypes {
+namespace Arithmetics {
 
-namespace details {
 //
 // Matrix products
 //
@@ -338,8 +337,8 @@ inline void setTopBlock(T1& rField, const int start, const int rows,
          "Tried to use invalid combination of types in setTopBlock");
    }
 }
-} // namespace details
-} // namespace Datatypes
+
+} // namespace Arithmetics
 } // namespace QuICC
 
-#endif // QUICC_TYPES_MATRIXOPERATIONS_HPP
+#endif // QUICC_ARITHMETICS_LINEARALGEBRA_HPP

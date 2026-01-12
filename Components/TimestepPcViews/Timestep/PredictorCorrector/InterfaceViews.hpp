@@ -17,6 +17,9 @@
 #include "Profiler/Interface.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Equations/CouplingInformation.hpp"
+#include "QuICC/Equations/AddSource.hpp"
+#include "QuICC/Equations/SetBoundaryValue.hpp"
+#include "QuICC/Equations/CopyNonlinear.hpp"
 #include "QuICC/Pseudospectral/Coordinator.hpp"
 #include "QuICC/SolveTiming/Prognostic.hpp"
 #include "QuICC/Timestep/Constants.hpp"
@@ -29,6 +32,8 @@
 #include "View/ViewDense.hpp"
 #include "Memory/Memory.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
+
+#define QUICC_DETAIL_PROF_LVL 3
 
 namespace QuICC {
 
@@ -329,7 +334,7 @@ void InterfaceViews<TScheme>::initSolution(const ScalarEquation_range& scalEq, c
                      Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
                      using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
                      std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
+                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
                      Views::details::computeSet(tmpView, tmp, 0);
 
                      this->mSolverCoord.updateSolution(info, tmpView);
@@ -419,7 +424,7 @@ void InterfaceViews<TScheme>::getExplicitInput(const std::size_t opId,
                      Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
                      using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
                      std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
+                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
                      Views::details::computeSet(tmpView, tmp, 0);
 
                      this->mSolverCoord.updateRhs(info, tmpView);
@@ -459,17 +464,53 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
 
             if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
             {
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:allocateTemp");
+               // Allocate temporary storage
+               std::uint32_t mem_size = 0;
+               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
+               {
+                  mem_size = std::max(mem_size, static_cast<std::uint32_t>(cinfo.galerkinN(i))*static_cast<std::uint32_t>(cinfo.rhsCols(i)));
+               }
+               Memory::MemBlock<MHDComplex> data(mem_size, this->_mem.get());
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:allocateTemp");
+
                DebuggerMacro_msg("Get timestepper input for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
                // Get timestep input
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:createInfo");
                   auto info = createInfo(cinfo, i);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:createInfo");
 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:setupView");
+                  std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
+                  std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
+                  using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
+                  std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
+                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:setupView");
+
+#if 1
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyNonlinear");
+                  // Copy field values into timestepper input
+                  Equations::copyNonlinear(*eqIt, myId.second, tmpView, i, 0, true);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyNonlinear");
+
+                  // Add source term
+                  std::visit(
+                        [&](auto&& p)
+                        {
+                        Equations::addSource(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0);
+                        }, eqIt->spUnknown());
+#else
+
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyNonlinear");
                   // Copy field values into timestepper input
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                   tmp.setZero();
                   Equations::copyNonlinear(*eqIt, myId.second, tmp, i, 0);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyNonlinear");
 
                   // Add source term
                   std::visit(
@@ -478,15 +519,14 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
                         Equations::addSource(*eqIt, p->dom(0).perturbation(), myId.second, tmp, i, 0);
                         }, eqIt->spUnknown());
 
-                  std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
-                  std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                  Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
-                  using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
-                  std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyView");
                   Views::details::computeSet(tmpView, tmp, 0);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyView");
+#endif
 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:updateRhs");
                   this->mSolverCoord.updateRhs(info, tmpView);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:updateRhs");
 
                   // If required set inhomogenous boundary condition value
                   if(cinfo.hasBoundaryValue())
@@ -534,7 +574,8 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
             {
                DebuggerMacro_msg("Get timestepper solution for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
-               // return zero 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:setZero");
+               // return zero
                for(std::size_t i = 0; i < static_cast<std::size_t>(cinfo.fieldStart()); i++)
                {
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
@@ -542,23 +583,41 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
 
                   eqIt->storeSolution(myId.second, tmp, i, 0);
                }
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:setZero");
+
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:allocateTemp");
+               // Allocate temporary storage
+               std::uint32_t mem_size = 0;
+               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
+               {
+                  mem_size = std::max(mem_size, static_cast<std::uint32_t>(cinfo.galerkinN(i))*static_cast<std::uint32_t>(cinfo.rhsCols(i)));
+               }
+               Memory::MemBlock<MHDComplex> data(mem_size, this->_mem.get());
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:allocateTemp");
 
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:createInfo");
                   auto info = createInfo(cinfo, i);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:createInfo");
 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:getSolution");
                   std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
                   std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                  Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
                   using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
                   std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
+                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
                   this->mSolverCoord.getSolution(tmpView, info);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:getSolution");
 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:copyView");
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                   Views::details::computeSet(tmp, tmpView, 0);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:copyView");
 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:storeSolution");
                   eqIt->storeSolution(myId.second, tmp, i, 0);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:storeSolution");
                }
 
                // Apply constraint on solution
@@ -571,24 +630,31 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                   {
                      auto info = createInfo(cinfo, i);
 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-setZero");
                      DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                      tmp.setZero();
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-setZero");
 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-copyUnknown");
                      std::visit(
                            [&](auto&& p)
                            {
                            Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmp, i, 0, true, true);
                            }, eqIt->spUnknown());
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-copyUnknown");
 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-copyView");
                      std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
                      std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                     Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
                      using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
                      std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
+                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
                      Views::details::computeSet(tmpView, tmp, 0);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-copyView");
 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-updateSolution");
                      this->mSolverCoord.updateSolution(info, tmpView);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-updateSolution");
                   }
                }
             }

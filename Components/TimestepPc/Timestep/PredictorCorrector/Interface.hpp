@@ -185,6 +185,8 @@ void Interface<TScheme>::getExplicitInput(const std::size_t opId,
    const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq,
    const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
 {
+   Profiler::RegionFixture<2> fix("Timestep-explicitInput");
+
    this->mSolverCoord.getExplicitInput(opId, scalEq, vectEq, scalVar, vectVar);
 }
 

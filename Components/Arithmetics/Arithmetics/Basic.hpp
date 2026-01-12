@@ -1,10 +1,10 @@
 /**
- * @file DecoupledComplexUtils.hpp
- * @brief Useful methods for the DecoupledComplex type
+ * @file Basic.hpp
+ * @brief Useful generic methods for basis arithmetic operations on various types
  */
 
-#ifndef QUICC_TYPES_DECOUPLEDCOMPLEX_UTILS_HPP
-#define QUICC_TYPES_DECOUPLEDCOMPLEX_UTILS_HPP
+#ifndef QUICC_ARITHMETICS_BASIC_HPP
+#define QUICC_ARITHMETICS_BASIC_HPP
 
 // System includes
 //
@@ -16,26 +16,40 @@
 
 namespace QuICC {
 
-namespace Datatypes {
+namespace Arithmetics {
 
-namespace details {
+/**
+ * @brief Identify type of scalar
+ */
 template <typename TData> struct GetScalarType
 {
    typedef typename TData::Scalar ScalarType;
 };
 
+/**
+ * @brief Identify type of scalar of DecoupledComplex
+ */
 template <> struct GetScalarType<DecoupledZMatrix>
 {
    typedef MHDComplex ScalarType;
 };
 
+/**
+ * @brief Identify type of scalar of View
+ */
 template <typename T1, typename T2> struct GetScalarType<View::View<T1, T2>>
 {
    typedef T1 ScalarType;
 };
 
+/**
+ * @brief Use bracket accessor?
+ */
 template <typename TData> struct use_bracket: std::false_type {};
 
+/**
+ * @brief Use bracket accessor?
+ */
 template <typename T1, typename T2> struct use_bracket<View::View<T1, T2>>: std::true_type {};
 
 template <typename TData> auto getCols(const TData& mat);
@@ -355,8 +369,8 @@ inline void addScalar(T1& mat, const int i, const int j, const T2& val)
          "Tried to use invalid combination of types in addScalar(i,j)");
    }
 }
-} // namespace details
-} // namespace Datatypes
+
+} // namespace Arithmetics
 } // namespace QuICC
 
-#endif // QUICC_TYPES_DECOUPLEDCOMPLEX_UTILS_HPP
+#endif // QUICC_ARITHMETICS_BASIC_HPP
