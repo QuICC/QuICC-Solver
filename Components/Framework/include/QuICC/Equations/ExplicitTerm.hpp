@@ -68,9 +68,6 @@ namespace Equations {
       } else
       {
          // Create pointer to sparse operator
-         const TOperator * op = &eq.template explicitOperator<TOperator>(opId, compId, fieldId, matIdx);
-
-         const auto& tRes = *eq.res().cpu()->dim(Dimensions::Transform::SPECTRAL);
          if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
          {
             ExplicitTermFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(eq, compId, matIdx);

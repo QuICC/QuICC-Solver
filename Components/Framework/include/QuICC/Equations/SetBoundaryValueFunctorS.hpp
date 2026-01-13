@@ -26,12 +26,7 @@ template <>
    {
       const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
       const auto& sRes = eq->res().sim();
-      const auto& info = eq->couplingInfo(compId);
       assert(matIdx == 0);
-
-      //int zeroRow = info.galerkinShift(matIdx,0);
-      //int zeroCol = info.galerkinShift(matIdx,1);
-      //int zeroBlock = info.galerkinShift(matIdx,2);
 
       //Safety assertion
       assert(start >= 0);

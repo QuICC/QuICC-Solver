@@ -35,7 +35,6 @@ template <>
          // Create pointer to sparse operator
          const TOperator * op = &eq->template explicitOperator<TOperator>(opId, compId, fieldId, matIdx);
 
-         const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
          // Apply operator to field
          Arithmetics::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(matIdx));
       }

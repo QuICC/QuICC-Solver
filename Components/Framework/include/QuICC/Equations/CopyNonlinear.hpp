@@ -13,6 +13,7 @@
 //
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Equations/CopyUnknown.hpp"
+#include "QuICC/Equations/ApplyQuasiInverse.hpp"
 
 namespace QuICC {
 
@@ -38,21 +39,26 @@ namespace Equations {
       // Check if a nonlinear computation took place and a quasi-inverse has to be applied
       if(info.hasNonlinear() && info.hasQuasiInverse())
       {
-#if 0
-         // Temporary storage is required
-         TData tmp;
-         tmp = TData(info.tauN(matIdx), info.rhsCols(matIdx));
+         if constexpr(Arithmetics::is_view<TData>::value)
+         {
+            static_assert(false, "NOT SETUP FOR VIEW DATA");
+         }
+         else
+         {
+            // Temporary storage is required
+            TData tmp;
+            tmp = TData(info.tauN(matIdx), info.rhsCols(matIdx));
 
-         // simply copy values from unknown
-         std::visit(
-               [&](auto&& p)
-               {
+            // simply copy values from unknown
+            std::visit(
+                  [&](auto&& p)
+                  {
                   copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);
-               }, eq.spUnknown());
+                  }, eq.spUnknown());
 
-         // Multiply nonlinear term by quasi-inverse
-         applyQuasiInverse(eq, compId, storage, start, matIdx, 0, tmp, isSet);
-#endif
+            // Multiply nonlinear term by quasi-inverse
+            applyQuasiInverse(eq, compId, storage, start, matIdx, 0, tmp, isSet);
+         }
       }
       /// Nonlinear computation took place but no quasi-inverse is required
       else if(info.hasNonlinear())

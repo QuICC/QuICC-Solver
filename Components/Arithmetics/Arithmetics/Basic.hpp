@@ -45,12 +45,12 @@ template <typename T1, typename T2> struct GetScalarType<View::View<T1, T2>>
 /**
  * @brief Use bracket accessor?
  */
-template <typename TData> struct use_bracket: std::false_type {};
+template <typename TData> struct is_view: std::false_type {};
 
 /**
  * @brief Use bracket accessor?
  */
-template <typename T1, typename T2> struct use_bracket<View::View<T1, T2>>: std::true_type {};
+template <typename T1, typename T2> struct is_view<View::View<T1, T2>>: std::true_type {};
 
 template <typename TData> auto getCols(const TData& mat);
 
@@ -159,7 +159,7 @@ template <typename TData> inline auto getScalar(const TData& mat, const int k)
    {
       return MHDComplex(mat.real()(k), mat.imag()(k));
    }
-   else if constexpr(use_bracket<TData>::value)
+   else if constexpr(is_view<TData>::value)
    {
       return mat[k];
    }
@@ -213,7 +213,7 @@ inline void setScalar(T1& mat, const int k, const T2& val)
    }
    else if constexpr (std::is_same<T2, MHDVariant>::value)
    {
-      if constexpr(use_bracket<T1>::value)
+      if constexpr(is_view<T1>::value)
       {
          mat[k] = std::get<typename GetScalarType<T1>::ScalarType>(val);
       }
@@ -224,7 +224,7 @@ inline void setScalar(T1& mat, const int k, const T2& val)
    }
    else if constexpr (std::is_same<T2, typename GetScalarType<T1>::ScalarType>::value)
    {
-      if constexpr(use_bracket<T1>::value)
+      if constexpr(is_view<T1>::value)
       {
          mat[k] = val;
       }
@@ -313,7 +313,7 @@ inline void addScalar(T1& mat, const int k, const T2& val)
    }
    else if constexpr (std::is_same<T2, MHDVariant>::value)
    {
-      if constexpr(use_bracket<T1>::value)
+      if constexpr(is_view<T1>::value)
       {
          mat[k] += std::get<typename GetScalarType<T1>::ScalarType>(val);
       }
@@ -324,7 +324,7 @@ inline void addScalar(T1& mat, const int k, const T2& val)
    }
    else if constexpr (std::is_same<T2, typename GetScalarType<T1>::ScalarType>::value)
    {
-      if constexpr(use_bracket<T1>::value)
+      if constexpr(is_view<T1>::value)
       {
          mat[k] += val;
       }

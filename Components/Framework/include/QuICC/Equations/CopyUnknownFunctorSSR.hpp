@@ -31,7 +31,6 @@ template <>
 template <bool IsSet, typename TData, typename TField> void CopyUnknownFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(const TField& field, TData& storage, const int start)
 {
    const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-   const auto& sRes = eq->res().sim();
 
    int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
 
@@ -39,6 +38,7 @@ template <bool IsSet, typename TData, typename TField> void CopyUnknownFunctor<C
    assert(start >= 0);
 
 #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
+   const auto& sRes = eq->res().sim();
    // Add source data
    int l;
    int j_;

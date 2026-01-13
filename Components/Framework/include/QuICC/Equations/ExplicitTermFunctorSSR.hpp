@@ -36,9 +36,9 @@ template <>
             const TOperator * op = &eq->template explicitOperator<TOperator>(opId, compId, fieldId, matIdx);
 
             const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-            const auto& sRes = eq->res().sim();
             typename Eigen::Matrix<T,Eigen::Dynamic,1>  tmp(op->cols());
 #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
+            const auto& sRes = eq->res().sim();
             // Initialise storage to zero
             tmp.setZero();
             int l;

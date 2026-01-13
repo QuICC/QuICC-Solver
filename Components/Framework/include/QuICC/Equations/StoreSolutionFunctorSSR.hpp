@@ -34,11 +34,11 @@ template <typename TData, typename TField> void StoreSolutionFunctor<CouplingInd
    const TData* solution = init(solStart, storage, start, tmp, eq->couplingInfo(compId));
 
    const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-   const auto& sRes = eq->res().sim();
    int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
 
 #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
    // Add source data
+   const auto& sRes = eq->res().sim();
    int l;
    int j_;
    int dimI = sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
