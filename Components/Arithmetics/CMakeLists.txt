@@ -12,6 +12,7 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 )
 
 set(PHS
+  "Arithmetics/Utility.hpp"
   "Arithmetics/Basic.hpp"
   "Arithmetics/LinearAlgebra.hpp"
 )

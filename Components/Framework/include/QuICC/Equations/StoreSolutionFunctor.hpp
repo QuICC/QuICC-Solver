@@ -14,12 +14,23 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Equations/CouplingIndexType.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
+#include "Arithmetics/Utility.hpp"
 
 namespace QuICC {
 
 namespace Equations {
 
 class IFieldEquation;
+
+namespace details
+{
+   template <typename TData>
+   struct Temporary
+   {
+      TData data;
+   };
+}
+
 
 template <CouplingIndexType IndexType>
 class StoreSolutionFunctor
@@ -52,8 +63,7 @@ class StoreSolutionFunctor
    template <typename TData, typename TField> void apply(TField& field, const TData& storage, const int start);
 
  private:
-
-   template <typename TData> const TData* init(int& solStart, const TData& storage, const int start, TData& tmp, const CouplingInformation& info);
+   template <typename TData> Arithmetics::Temporary<TData> init(int& solStart, const TData& storage, const int start, const CouplingInformation& info);
 
    /**
     * @brief Reference to equation
@@ -78,27 +88,37 @@ StoreSolutionFunctor<IndexType>::StoreSolutionFunctor(IFieldEquation& eq, FieldC
 }
 
 template <CouplingIndexType IndexType>
-template <typename TData> const TData* StoreSolutionFunctor<IndexType>::init(int& solStart, const TData& storage, const int start, TData& tmp, const CouplingInformation& info)
+template <typename TData> Arithmetics::Temporary<TData> StoreSolutionFunctor<IndexType>::init(int& solStart, const TData& storage, const int start, const CouplingInformation& info)
 {
-   const TData * solution;
+   Arithmetics::Temporary<TData> sol;
    if(info.isGalerkin())
    {
-      // Temporary storage is required
-      tmp = TData(info.tauN(matIdx), info.rhsCols(matIdx));
-
-      // Apply Galerkin stencil
-      applyGalerkinStencil(*eq, compId, tmp, start, matIdx, storage);
+      if constexpr (Arithmetics::is_view<TData>::value)
+      {
+         sol.storage.resize(info.tauN(matIdx), info.rhsCols(matIdx));
+         std::array<std::uint32_t, 2> dimensions {info.tauN(matIdx), info.rhsCols(matIdx)};
+         Patch::std::span<typename TData::ScalarType> span(sol.storage.data(), sol.storage.size());
+         sol.data = TData(span, storage.dims());
+      }
+      else
+      {
+         // Temporary storage is required
+         sol.data = TData(info.tauN(matIdx), info.rhsCols(matIdx));
+      }
 
       solStart = 0;
-      solution = &tmp;
+      sol.ptr = &sol.data;
+
+      // Apply Galerkin stencil
+      applyGalerkinStencil(*eq, compId, sol.data, start, matIdx, storage);
    }
    else
    {
       solStart = start;
-      solution = &storage;
+      sol.ptr = &storage;
    }
 
-   return solution;
+   return sol;
 }
 
 } // Equations

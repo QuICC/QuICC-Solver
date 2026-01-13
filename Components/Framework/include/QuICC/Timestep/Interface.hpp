@@ -91,10 +91,8 @@ namespace Timestep {
           * @brief Adapt the timestep used
           *
           * @param cfl     CFL conditions
-          * @param scalEq  Shared scalar equations
-          * @param vectEq  Shared vector equations
           */
-         virtual void adaptTimestep(const Matrix& cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq) = 0;
+         virtual void adaptTimestep(const Matrix& cfl) = 0;
 
          /**
           * @brief Update control status
@@ -129,6 +127,28 @@ namespace Timestep {
          virtual MHDFloat timestep() const;
 
       protected:
+         /**
+          * @brief Process new CFL information
+          *
+          * @param cfl     CFL conditions
+          * @param error   Error measure
+          * @param order   Scheme order
+          */
+         void processCfl(const Matrix& cfl, const MHDFloat error, const int order);
+
+         /**
+          * @brief Write CFL and timestep information
+          */
+         void writeCfl();
+
+         /**
+          * @brief Print timestepper information to stream
+          *
+          * @param stream  Output stream
+          * @param schemeInfo  Scheme information
+          */
+         void printInfo(std::ostream& stream, const std::string schemeInfo);
+
          /**
           * @brief Minimum number of constant timestep before step size increase
           */

@@ -26,8 +26,7 @@ template <>
 template <typename TData, typename TField> void StoreSolutionFunctor<CouplingIndexType::SINGLE>::apply(TField& field, const TData& storage, const int start)
 {
    int solStart;
-   TData tmp;
-   const TData* solution = init(solStart, storage, start, tmp, eq->couplingInfo(compId));
+   auto solution = init(solStart, storage, start, eq->couplingInfo(compId));
 
    const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
    assert(matIdx == 0);
@@ -68,7 +67,7 @@ template <typename TData, typename TField> void StoreSolutionFunctor<CouplingInd
             l = solStart + k_ + j_ + i;
 
             // Copy timestep output into field
-            MHDVariant dataPoint = Arithmetics::getScalar(*solution, l);
+            MHDVariant dataPoint = Arithmetics::getScalar(*solution.ptr, l);
             dataPoint = eq->updateStoredSolution(dataPoint, compId, i, j, k);
             field.rComp(compId).setPoint(dataPoint,i,j,k);
          }

@@ -13,10 +13,21 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
+#include "Arithmetics/Utility.hpp"
 
 namespace QuICC {
 
 namespace Arithmetics {
+
+namespace details {
+   template <typename T1, typename T2, typename T3, typename T4>
+   void setMatrixProduct(T1& rField, const int start, const T2& mat,
+      const T3& rhsRe, const T4& rhsIm);
+
+   template <typename T1, typename T2, typename T3, typename T4>
+      void addMatrixProduct(T1& rField, const int start, const T2& mat,
+            const T3& rhsRe, const T4& rhsIm);
+}
 
 //
 // Matrix products
@@ -26,10 +37,6 @@ template <typename T1, typename T2, typename T3>
 void setMatrixProduct(T1& rField, const int start, const T2& mat,
    const T3& rhs);
 
-template <typename T1, typename T2, typename T3, typename T4>
-void setMatrixProduct(T1& rField, const int start, const T2& mat,
-   const T3& rhsRe, const T4& rhsIm);
-
 template <typename T1, typename T2, typename T3>
 void setMatrixProduct(T1& rField, const int start, const T2& mat,
    const T3& rhs, const std::tuple<int,int,int,int>& blkInfo);
@@ -37,10 +44,6 @@ void setMatrixProduct(T1& rField, const int start, const T2& mat,
 template <typename T1, typename T2, typename T3>
 void addMatrixProduct(T1& rField, const int start, const T2& mat,
    const T3& rhs);
-
-template <typename T1, typename T2, typename T3, typename T4>
-void addMatrixProduct(T1& rField, const int start, const T2& mat,
-   const T3& rhsRe, const T4& rhsIm);
 
 template <typename T1, typename T2, typename T3>
 void addMatrixProduct(T1& rField, const int start, const T2& mat,
@@ -107,49 +110,13 @@ inline void setMatrixProduct(T1& rField, const int start, const T2& mat,
    }
 }
 
-template <typename T1, typename T2, typename T3, typename T4>
-inline void setMatrixProduct(T1& rField, const int start, const T2& mat,
-   const T3& rhsRe, const T4& rhsIm)
-{
-   if constexpr (std::is_same<T1, DecoupledZMatrix>::value)
-   {
-      assert(rField.real().rows() == rField.imag().rows());
-      assert(rField.real().cols() == rField.imag().cols());
-
-      int rows = mat.rows();
-      int cols = rField.real().cols();
-      if constexpr (std::is_same<T2, SparseMatrix>::value)
-      {
-         rField.real().block(start, 0, rows, cols) = mat * rhsRe;
-         rField.imag().block(start, 0, rows, cols) = mat * rhsIm;
-      }
-      else if constexpr (std::is_same<T2, SparseMatrixZ>::value)
-      {
-         rField.real().block(start, 0, rows, cols) =
-            mat.real() * rhsRe - mat.imag() * rhsIm;
-         rField.imag().block(start, 0, rows, cols) =
-            mat.real() * rhsIm + mat.imag() * rhsRe;
-      }
-      else
-      {
-         static_assert(true, "Tried to use invalid combination of types in "
-                             "setMatrixProduct for split RSH");
-      }
-   }
-   else
-   {
-      static_assert(true, "Tried to use invalid combination of types in "
-                          "setMatrixProduct for split RSH");
-   }
-}
-
 template <typename T1, typename T2, typename T3>
 inline void setMatrixProduct(T1& rField, const int start, const T2& mat,
    const T3& rhs, const std::tuple<int,int,int,int>& blkInfo)
 {
    if constexpr (std::is_same<T3, DecoupledZMatrix>::value)
    {
-      setMatrixProduct(rField, start, mat, rhs.real().block(std::get<0>(blkInfo), std::get<1>(blkInfo), std::get<2>(blkInfo), std::get<3>(blkInfo)), rhs.imag().block(std::get<0>(blkInfo), std::get<1>(blkInfo), std::get<2>(blkInfo), std::get<3>(blkInfo)));
+      details::setMatrixProduct(rField, start, mat, rhs.real().block(std::get<0>(blkInfo), std::get<1>(blkInfo), std::get<2>(blkInfo), std::get<3>(blkInfo)), rhs.imag().block(std::get<0>(blkInfo), std::get<1>(blkInfo), std::get<2>(blkInfo), std::get<3>(blkInfo)));
    }
    else
    {
@@ -199,49 +166,13 @@ inline void addMatrixProduct(T1& rField, const int start, const T2& mat,
    }
 }
 
-template <typename T1, typename T2, typename T3, typename T4>
-inline void addMatrixProduct(T1& rField, const int start, const T2& mat,
-   const T3& rhsRe, const T4& rhsIm)
-{
-   if constexpr (std::is_same<T1, DecoupledZMatrix>::value)
-   {
-      assert(rField.real().rows() == rField.imag().rows());
-      assert(rField.real().cols() == rField.imag().cols());
-
-      int rows = mat.rows();
-      int cols = rField.real().cols();
-      if constexpr (std::is_same<T2, SparseMatrix>::value)
-      {
-         rField.real().block(start, 0, rows, cols) += mat * rhsRe;
-         rField.imag().block(start, 0, rows, cols) += mat * rhsIm;
-      }
-      else if (std::is_same<T2, SparseMatrixZ>::value)
-      {
-         rField.real().block(start, 0, rows, cols) +=
-            mat.real() * rhsRe - mat.imag() * rhsIm;
-         rField.imag().block(start, 0, rows, cols) +=
-            mat.real() * rhsIm + mat.imag() * rhsRe;
-      }
-      else
-      {
-         static_assert(true, "Tried to use invalid combination of types in "
-                             "addMatrixProduct for split RHS");
-      }
-   }
-   else
-   {
-      static_assert(true, "Tried to use invalid combination of types in "
-                          "addMatrixProduct for split RHS");
-   }
-}
-
 template <typename T1, typename T2, typename T3>
 inline void addMatrixProduct(T1& rField, const int start, const T2& mat,
    const T3& rhs, const std::tuple<int,int,int,int>& blkInfo)
 {
    if constexpr (std::is_same<T3, DecoupledZMatrix>::value)
    {
-      addMatrixProduct(rField, start, mat, rhs.real().block(std::get<0>(blkInfo), std::get<1>(blkInfo), std::get<2>(blkInfo), std::get<3>(blkInfo)), rhs.imag().block(std::get<0>(blkInfo), std::get<1>(blkInfo), std::get<2>(blkInfo), std::get<3>(blkInfo)));
+      details::addMatrixProduct(rField, start, mat, rhs.real().block(std::get<0>(blkInfo), std::get<1>(blkInfo), std::get<2>(blkInfo), std::get<3>(blkInfo)), rhs.imag().block(std::get<0>(blkInfo), std::get<1>(blkInfo), std::get<2>(blkInfo), std::get<3>(blkInfo)));
    }
    else
    {
@@ -336,6 +267,80 @@ inline void setTopBlock(T1& rField, const int start, const int rows,
       static_assert(true,
          "Tried to use invalid combination of types in setTopBlock");
    }
+}
+
+namespace details {
+   template <typename T1, typename T2, typename T3, typename T4>
+   inline void setMatrixProduct(T1& rField, const int start, const T2& mat,
+      const T3& rhsRe, const T4& rhsIm)
+   {
+      if constexpr (std::is_same<T1, DecoupledZMatrix>::value)
+      {
+         assert(rField.real().rows() == rField.imag().rows());
+         assert(rField.real().cols() == rField.imag().cols());
+
+         int rows = mat.rows();
+         int cols = rField.real().cols();
+         if constexpr (std::is_same<T2, SparseMatrix>::value)
+         {
+            rField.real().block(start, 0, rows, cols) = mat * rhsRe;
+            rField.imag().block(start, 0, rows, cols) = mat * rhsIm;
+         }
+         else if constexpr (std::is_same<T2, SparseMatrixZ>::value)
+         {
+            rField.real().block(start, 0, rows, cols) =
+               mat.real() * rhsRe - mat.imag() * rhsIm;
+            rField.imag().block(start, 0, rows, cols) =
+               mat.real() * rhsIm + mat.imag() * rhsRe;
+         }
+         else
+         {
+            static_assert(true, "Tried to use invalid combination of types in "
+                                "setMatrixProduct for split RHS");
+         }
+      }
+      else
+      {
+         static_assert(true, "Tried to use invalid combination of types in "
+                             "setMatrixProduct for split RHS");
+      }
+   }
+
+   template <typename T1, typename T2, typename T3, typename T4>
+      inline void addMatrixProduct(T1& rField, const int start, const T2& mat,
+            const T3& rhsRe, const T4& rhsIm)
+      {
+         if constexpr (std::is_same<T1, DecoupledZMatrix>::value)
+         {
+            assert(rField.real().rows() == rField.imag().rows());
+            assert(rField.real().cols() == rField.imag().cols());
+
+            int rows = mat.rows();
+            int cols = rField.real().cols();
+            if constexpr (std::is_same<T2, SparseMatrix>::value)
+            {
+               rField.real().block(start, 0, rows, cols) += mat * rhsRe;
+               rField.imag().block(start, 0, rows, cols) += mat * rhsIm;
+            }
+            else if (std::is_same<T2, SparseMatrixZ>::value)
+            {
+               rField.real().block(start, 0, rows, cols) +=
+                  mat.real() * rhsRe - mat.imag() * rhsIm;
+               rField.imag().block(start, 0, rows, cols) +=
+                  mat.real() * rhsIm + mat.imag() * rhsRe;
+            }
+            else
+            {
+               static_assert(true, "Tried to use invalid combination of types in "
+                     "addMatrixProduct for split RHS");
+            }
+         }
+         else
+         {
+            static_assert(true, "Tried to use invalid combination of types in "
+                  "addMatrixProduct for split RHS");
+         }
+      }
 }
 
 } // namespace Arithmetics

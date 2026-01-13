@@ -26,8 +26,7 @@ template <>
 template <typename TData, typename TField> void StoreSolutionFunctor<CouplingIndexType::MODE>::apply(TField& field, const TData& storage, const int start)
 {
    int solStart;
-   TData tmp;
-   const TData* solution = init(solStart, storage, start, tmp, eq->couplingInfo(compId));
+   auto solution = init(solStart, storage, start, eq->couplingInfo(compId));
 
    const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
    // Get mode indexes
@@ -39,7 +38,7 @@ template <typename TData, typename TField> void StoreSolutionFunctor<CouplingInd
    for(int i = 0; i < rows; i++)
    {
       // Copy timestep output into field
-      MHDVariant dataPoint = Arithmetics::getScalar(*solution, k);
+      MHDVariant dataPoint = Arithmetics::getScalar(*solution.ptr, k);
       dataPoint = eq->updateStoredSolution(dataPoint, compId, i, mode(1), mode(0));
       field.rComp(compId).setPoint(dataPoint,i,mode(1),mode(0));
 

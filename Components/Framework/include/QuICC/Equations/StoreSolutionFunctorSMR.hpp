@@ -26,8 +26,7 @@ template <>
 template <typename TData, typename TField> void StoreSolutionFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::apply(TField& field, const TData& storage, const int start)
 {
    int solStart;
-   TData tmp;
-   const TData* solution = init(solStart, storage, start, tmp, eq->couplingInfo(compId));
+   auto solution = init(solStart, storage, start, eq->couplingInfo(compId));
 
    const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
    const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
@@ -39,7 +38,7 @@ template <typename TData, typename TField> void StoreSolutionFunctor<CouplingInd
       for(int i = 0; i < rows; i++)
       {
          // Copy timestep output into field
-         MHDVariant dataPoint = Arithmetics::getScalar(*solution, i + solStart,j);
+         MHDVariant dataPoint = Arithmetics::getScalar(*solution.ptr, i + solStart,j);
          dataPoint = eq->updateStoredSolution(dataPoint, compId, i, j, matIdx);
          field.rComp(compId).setPoint(dataPoint,i,j,matIdx);
       }

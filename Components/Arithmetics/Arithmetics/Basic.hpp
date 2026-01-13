@@ -12,47 +12,12 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
+#include "Arithmetics/Utility.hpp"
 #include "View/View.hpp"
 
 namespace QuICC {
 
 namespace Arithmetics {
-
-/**
- * @brief Identify type of scalar
- */
-template <typename TData> struct GetScalarType
-{
-   typedef typename TData::Scalar ScalarType;
-};
-
-/**
- * @brief Identify type of scalar of DecoupledComplex
- */
-template <> struct GetScalarType<DecoupledZMatrix>
-{
-   typedef MHDComplex ScalarType;
-};
-
-/**
- * @brief Identify type of scalar of View
- */
-template <typename T1, typename T2> struct GetScalarType<View::View<T1, T2>>
-{
-   typedef T1 ScalarType;
-};
-
-/**
- * @brief Use bracket accessor?
- */
-template <typename TData> struct is_view: std::false_type {};
-
-/**
- * @brief Use bracket accessor?
- */
-template <typename T1, typename T2> struct is_view<View::View<T1, T2>>: std::true_type {};
-
-template <typename TData> auto getCols(const TData& mat);
 
 /**
  * @brief Get stored value
@@ -140,18 +105,6 @@ void addScalar(T1& mat, const int k, const T2& val);
  */
 template <typename T1, typename T2>
 void addScalar(T1& mat, const int i, const int j, const T2& val);
-
-template <typename TData> auto getCols(const TData& mat)
-{
-   if constexpr(std::is_same_v<TData, DecoupledZMatrix>)
-   {
-      return mat.real().cols();
-   }
-   else
-   {
-      return mat.cols();
-   }
-}
 
 template <typename TData> inline auto getScalar(const TData& mat, const int k)
 {

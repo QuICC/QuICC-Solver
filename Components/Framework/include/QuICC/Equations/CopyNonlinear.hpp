@@ -41,7 +41,7 @@ namespace Equations {
       {
          if constexpr(Arithmetics::is_view<TData>::value)
          {
-            static_assert(false, "NOT SETUP FOR VIEW DATA");
+            throw std::logic_error("Not yet implemented for View data");
          }
          else
          {

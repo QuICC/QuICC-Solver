@@ -12,7 +12,9 @@
 
 // Project includes
 //
+#include "Arithmetics/Utility.hpp"
 #include "Types/Typedefs.hpp"
+#include "Arithmetics/Utility.hpp"
 #include "Arithmetics/LinearAlgebra.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
@@ -313,18 +315,8 @@ namespace Equations {
       // Create pointer to sparse operator
       const SparseMatrix * op = &eq.galerkinStencil(compId, matIdx);
 
-      Arithmetics::setMatrixProduct(rField, 0, *op, rhs.block(start, 0, op->cols(), rhs.cols()));
-   }
-
-   template <> inline void applyGalerkinStencil<DecoupledZMatrix>(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& rField, const int start, const int matIdx, const DecoupledZMatrix& rhs)
-   {
-      assert(rField.real().rows() == rField.imag().rows());
-      assert(rField.real().cols() == rField.imag().cols());
-
-      // Create pointer to sparse operator
-      const SparseMatrix * op = &eq.galerkinStencil(compId, matIdx);
-
-      Arithmetics::setMatrixProduct(rField, 0, *op, rhs.real().block(start, 0, op->cols(), rhs.real().cols()), rhs.imag().block(start, 0, op->cols(), rhs.imag().cols()));
+      auto blkInfo = std::make_tuple(start, 0, op->cols(), Arithmetics::getCols(rhs));
+      Arithmetics::setMatrixProduct(rField, 0, *op, rhs, blkInfo);
    }
 
 } // Equations
