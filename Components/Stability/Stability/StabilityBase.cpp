@@ -34,6 +34,15 @@ SharedSimulationBoundary StabilityBase::createBoundary()
    return spBcs;
 }
 
+std::pair<std::size_t, FieldComponents::Spectral::Id> StabilityBase::getStabilityConfig() const
+{
+   // Extract stability field/component IDs from stored config
+   std::size_t varStabilityId = this->config().stability().at("stability_field");
+   std::size_t compStablityId = this->config().stability().at("stability_comp");
+
+   return std::make_pair(varStabilityId, static_cast<FieldComponents::Spectral::Id>(compStablityId));
+}
+
 void StabilityBase::setConfiguration(const int dimension,
    const std::string type, const std::vector<bool>& isPeriodicBox,
    const std::vector<std::string>& bcNames,
@@ -61,6 +70,14 @@ void StabilityBase::setConfiguration(const int dimension,
    // Add boundary part to configuration file
    spCfgFile->rspSimulation()->addNode(Io::Config::Simulation::BOUNDARY,
       spBound);
+
+   // Create the stability configuration part
+   std::vector<std::string> stabilityNames = {"stability_field", "stability_comp"};
+   auto spStability = std::make_shared<Io::Config::Simulation::Stability>(stabilityNames);
+
+   // Add stability part to configuration file
+   spCfgFile->rspSimulation()->addNode(Io::Config::Simulation::STABILITY,
+      spStability);
 
    // Add model part to configuration file
    spCfgFile->rspModel()->addNodes(modelCfg);

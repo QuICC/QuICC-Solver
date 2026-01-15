@@ -32,6 +32,7 @@
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/PhysicalNames/MassFlux.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
+#include "QuICC/PhysicalNames/Undefined.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "Stability/LinearStability.hpp"
 #include "Stability/Options.hpp"
@@ -67,7 +68,8 @@ LinearStability::LinearStability(const std::vector<MHDFloat>& eigs,
    const Equations::EquationParameters::NDMapType& params,
    const std::map<std::size_t, std::size_t>& bcs,
    std::shared_ptr<Model::IModelBackend> spModel,
-   std::shared_ptr<const Stability::Options> opt) :
+   std::shared_ptr<const Stability::Options> opt,
+   const std::pair<std::size_t, FieldComponents::Spectral::Id>& stabilityConfig) :
     mcUseMumps(true),
     mNeedInit(true),
     mIdc(0),
@@ -77,7 +79,8 @@ LinearStability::LinearStability(const std::vector<MHDFloat>& eigs,
     mBcs(bcs),
     mspModel(spModel),
     mTarget(0.0),
-    mOptions(opt)
+    mOptions(opt),
+    mStabilityConfig(stabilityConfig)
 {}
 
 LinearStability::~LinearStability()
@@ -103,34 +106,57 @@ void LinearStability::buildMatrices(DecoupledZSparse& matA,
    const Equations::EquationParameters::NDMapType& nds)
 {
    // Fields
+
+   // Extract stability field/component IDs from stored config
+   std::size_t varStabilityId = mStabilityConfig.first;
+   FieldComponents::Spectral::Id compStablityId = mStabilityConfig.second;
+   FieldComponents::Spectral::Id compId;
    
-   // pick the correct momentum variable (velocity or massflux) 
-   auto fieldList = this->mspModel->fieldIds();
-   bool isVel   = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::Velocity::id()) != fieldList.end();
-   bool isMassF = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::MassFlux::id()) != fieldList.end();
-   // otherwise, pick magnetic
-   bool isMag   = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::Magnetic::id()) != fieldList.end();
-   
-   std::size_t momId;
-   if(isVel && !isMassF) 
+   // set the stability field
+   std::size_t varId;
+
+   if (varStabilityId == PhysicalNames::Undefined::id())
    {
-      momId = PhysicalNames::Velocity::id();
-   } 
-   else if(!isVel && isMassF)
-   {
-      momId = PhysicalNames::MassFlux::id();
-   }
-   else if(isMag)
-   {
-      momId = PhysicalNames::Magnetic::id();
+      // default behaviour for umproperly set stability_field value
+
+      // pick the correct momentum variable (velocity or massflux) 
+      auto fieldList = this->mspModel->fieldIds();
+      bool isVel   = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::Velocity::id()) != fieldList.end();
+      bool isMassF = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::MassFlux::id()) != fieldList.end();
+      // otherwise, pick magnetic
+      bool isMag   = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::Magnetic::id()) != fieldList.end();
+      
+      if(isVel && !isMassF) 
+      {
+         varId = PhysicalNames::Velocity::id();
+      } 
+      else if(!isVel && isMassF)
+      {
+         varId = PhysicalNames::MassFlux::id();
+      }
+      else if(isMag)
+      {
+         varId = PhysicalNames::Magnetic::id();
+      }
+      else
+      {
+         throw std::logic_error("Momentum variable not recognized");
+      }
+      // default behaviour
+      compId = FieldComponents::Spectral::TOR;
    }
    else
    {
-      throw std::logic_error("Momentum variable not recognized");
+      varId = varStabilityId;
+      compId = compStablityId;
    }
 
-   //auto fId = std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR);
-   auto fId = std::make_pair(momId, FieldComponents::Spectral::TOR);
+   // set the component
+
+   // set the fId from which coupling and equation info are taken
+   //auto fId = std::make_pair(PhysicalNames::Velocity::id(),
+   //   FieldComponents::Spectral::TOR);
+   auto fId = std::make_pair(varId, compId);
 
    const int matIdx = 0;
    const auto& res = *this->mspRes;

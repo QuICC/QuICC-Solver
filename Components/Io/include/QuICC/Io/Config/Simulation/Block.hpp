@@ -34,7 +34,7 @@ namespace Simulation {
    /**
     * @name Enum of the possible blocks
     */
-   enum NodeId {PHYSICAL, BOUNDARY};
+   enum NodeId {PHYSICAL, BOUNDARY, STABILITY};
 
    /**
     * @brief Implementation of the base for a configuration file
@@ -58,7 +58,7 @@ namespace Simulation {
          void init();
 
          /**
-          * @brief Get boundary node
+          * @brief Get boundary/stability node
           */
          SharedCIConfigurationNode spNode(NodeId id) const;
 

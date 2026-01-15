@@ -17,6 +17,7 @@
 #include "QuICC/Io/Config/ConfigurationReader.hpp"
 #include "QuICC/Io/Config/Simulation/Boundary.hpp"
 #include "QuICC/Io/Config/Simulation/Physical.hpp"
+#include "QuICC/Io/Config/Simulation/Stability.hpp"
 #include "QuICC/LoadSplitter/LoadSplitter.hpp"
 #include "QuICC/Model/IModelBackend.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
@@ -101,6 +102,12 @@ public:
     * @brief Create the simulation wide boundary conditions
     */
    SharedSimulationBoundary createBoundary();
+
+   /**
+    * @brief Get stability field/component configuration
+    */
+   std::pair<std::size_t, FieldComponents::Spectral::Id> getStabilityConfig() const;
+
 
    /**
     * @brief Set the base simulation configuration file and parameters

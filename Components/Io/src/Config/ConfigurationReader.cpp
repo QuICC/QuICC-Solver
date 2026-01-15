@@ -120,7 +120,7 @@ void ConfigurationReader::readBlock(SharedIConfigurationBlock spBlock,
                      itM->second->fTags().setValue(itIF->first, val);
                   }
 
-                  // Create float component iterator
+                  // Create string component iterator
                   auto sRange = itM->second->sTags().crange();
                   // Iterate over all component entries
                   for (auto itIS = sRange.first; itIS != sRange.second; itIS++)
@@ -137,10 +137,26 @@ void ConfigurationReader::readBlock(SharedIConfigurationBlock spBlock,
                   itM->second->checkData();
                }
                else
-               {
-                  throw std::logic_error(
-                     "Couldn't find " + itM->second->parent() +
-                     " component tag from configuration file!");
+               {  
+                  // special case, stability field (for backward compatibility)
+                  if (itM->second->parent() == "stability")
+                  {
+                     std::cerr << 
+                        "Couldn't find " + itM->second->parent() +
+                       " component tag from configuration file!" << std::endl;
+                     std::cerr << 
+                        "Setting stability_field and stability_comp to Default Behaviour" << std::endl;
+
+                     itM->second->sTags().setValue("stability_comp", "invalid");
+                     itM->second->sTags().setValue("stability_field", "invalid");
+
+                  }
+                  else
+                  {
+                     throw std::logic_error(
+                        "Couldn't find " + itM->second->parent() +
+                        " component tag from configuration file!");
+                  }
                }
             }
          }

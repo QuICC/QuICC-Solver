@@ -19,6 +19,7 @@
 // Project includes
 //
 #include "QuICC/Io/Config/Simulation/Boundary.hpp"
+#include "QuICC/Io/Config/Simulation/Stability.hpp"
 #include "QuICC/Io/Config/Simulation/Physical.hpp"
 
 namespace QuICC {

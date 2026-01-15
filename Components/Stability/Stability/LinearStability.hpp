@@ -35,12 +35,14 @@ public:
     * @param params  Nondimensional parameters
     * @param bcMap   Boundary conditions
     * @param spModel Model backend
+    * @param stabilityConfig explicitly given stability fields and components
     */
    LinearStability(const std::vector<MHDFloat>& eigs, SharedResolution spRes,
       const Equations::EquationParameters::NDMapType& params,
       const std::map<std::size_t, std::size_t>& bcMap,
       std::shared_ptr<Model::IModelBackend> spModel,
-      std::shared_ptr<const Stability::Options> opt);
+      std::shared_ptr<const Stability::Options> opt,
+      const std::pair<std::size_t, FieldComponents::Spectral::Id>& stabilityConfig);
 
    /**
     * @brief Simple empty destructor
@@ -202,6 +204,11 @@ private:
     * @brief model backend
     */
    std::shared_ptr<Model::IModelBackend> mspModel;
+
+   /**
+    * @brief stability field
+    */
+   std::pair<std::size_t, FieldComponents::Spectral::Id> mStabilityConfig;
 
    /**
     * @brief SLEPc/PETSc matrix A

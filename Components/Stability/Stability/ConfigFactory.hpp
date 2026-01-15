@@ -14,6 +14,7 @@
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/Io/Config/ConfigurationWriter.hpp"
 #include "QuICC/Io/Config/Simulation/Boundary.hpp"
+#include "QuICC/Io/Config/Simulation/Stability.hpp"
 #include "QuICC/Io/Config/Simulation/Physical.hpp"
 #include "QuICC/NonDimensional/GrowthRate.hpp"
 #include "QuICC/NonDimensional/MaxIteration.hpp"
@@ -141,6 +142,13 @@ typename ConfigFactory<TModel>::ReturnType ConfigFactory<TModel>::create()
       std::make_shared<QuICC::Io::Config::Simulation::Boundary>(bcNames);
    writer->rspSimulation()->addNode(QuICC::Io::Config::Simulation::BOUNDARY,
       spBound);
+
+   // Add the stability field part
+   std::vector<std::string> stabilityNames = {"stability_field", "stability_comp"};
+   auto spStability =
+      std::make_shared<QuICC::Io::Config::Simulation::Stability>(stabilityNames);
+   writer->rspSimulation()->addNode(QuICC::Io::Config::Simulation::STABILITY,
+      spStability);
 
    // Get model configuration tags
    auto modelCfg = model.configTags();

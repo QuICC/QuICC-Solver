@@ -6,6 +6,7 @@
 // System includes
 //
 #include <stdexcept>
+#include <iostream> 
 
 // External includes
 //
@@ -21,11 +22,15 @@
 #include "QuICC/Bc/Scheme/Coordinator.hpp"
 #include "QuICC/Bc/Scheme/registerAll.hpp"
 #include "QuICC/Enums/SplittingTools.hpp"
+#include "QuICC/PhysicalNames/registerAll.hpp"
 #include "QuICC/Tag/Generic/registerAll.hpp"
 #include "QuICC/Timestep/Id/Coordinator.hpp"
 #include "QuICC/Timestep/Id/registerAllPc.hpp"
 #include "QuICC/Timestep/Id/registerAllRkcb.hpp"
 #include "QuICC/Transform/Setup/registerAll.hpp"
+#include "QuICC/Enums/FieldIds.hpp" 
+#include "QuICC/Tools/HumanToId.hpp"
+
 
 namespace QuICC {
 
@@ -317,6 +322,93 @@ std::map<std::string, std::size_t> SimulationConfig::boundary() const
    }
 
    return bcMap;
+}
+
+std::map<std::string, std::size_t> SimulationConfig::stability() const
+{
+   // Safety assert for non NULL pointer
+   assert(this->mspCfgFile);
+
+   auto s = this->mspCfgFile->spSimulation()
+               ->spNode(Io::Config::Simulation::STABILITY)
+               ->sTags()
+               .map();
+
+   std::map<std::string, std::size_t> stabilityMap;
+   // Register all field names
+   PhysicalNames::registerAll();
+   
+   // need to modify the block below
+   for (auto param: s)
+   {
+      auto value = param.second;
+      std::string tag = value;
+      std::transform(value.cbegin(), value.cend(), tag.begin(),
+         [](unsigned char c) { return std::tolower(c); });
+
+      std::size_t id;
+
+      // Map field names:
+      if (param.first == "stability_field")
+      {
+         id = 0;
+         for (auto&& e: PhysicalNames::Coordinator::map())
+         {
+            if (PhysicalNames::Coordinator::tag(e.first) == tag)
+            {
+               id = e.first;
+               break;
+            }
+         }
+         // If not recognized, set to Undefined (sentinel value)
+         if (id == 0)
+         {
+            std::cerr << "Warning: stability_field '" << tag 
+                      << "' not recognized, setting to default behaviour" 
+                      << std::endl;
+            id = PhysicalNames::Undefined::id();
+         }
+      }
+      
+
+      // Map component names
+      else if (param.first == "stability_comp")
+      {
+         // First attempt: Use the existing conversion function
+         try
+         {
+            id = static_cast<std::size_t>(Tools::HumanToId::toComp(tag));
+         }
+         catch (const std::logic_error&)
+         {
+            // Second attempt: Try common alternative spellings
+            if (tag == "tor" || tag == "toroidal")
+            {
+               id = static_cast<std::size_t>(FieldComponents::Spectral::TOR);
+            }
+            else if (tag == "pol" || tag == "poloidal")
+            {
+               id = static_cast<std::size_t>(FieldComponents::Spectral::POL);
+            }
+            else if (tag == "scalar")
+            {
+               id = static_cast<std::size_t>(FieldComponents::Spectral::SCALAR);
+            }
+            else
+            {
+               // Not recognized at all - warn and set to NOTUSED
+               std::cerr << "Warning: stability_comp '" << tag 
+                        << "' not recognized, setting to default behaviour" 
+                        << std::endl;
+               id = static_cast<std::size_t>(QuICC::FieldComponents::Spectral::NOTUSED);
+            }
+         }
+      }
+
+      stabilityMap.emplace(std::make_pair(param.first, id));
+   }
+
+   return stabilityMap;
 }
 
 const std::map<std::string, int>& SimulationConfig::model(
