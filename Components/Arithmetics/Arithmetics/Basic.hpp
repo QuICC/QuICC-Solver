@@ -40,18 +40,18 @@ template <typename TData>
 auto getScalar(const TData& mat, const int i, const int j);
 
 /**
- * @brief Set value
+ * @brief Assign value
  *
  * @tparam TData
  * @param mat
  * @param k
  * @param val
  */
-template <typename T1, typename T2>
-void setScalar(T1& mat, const int k, const T2& val);
+template <Operation EQUALOP, typename T1, typename T2>
+void assignScalar(T1& mat, const int k, const T2& val);
 
 /**
- * @brief Set value
+ * @brief Assign value
  *
  * @tparam TData
  * @param mat
@@ -59,8 +59,8 @@ void setScalar(T1& mat, const int k, const T2& val);
  * @param j
  * @param val
  */
-template <typename T1, typename T2>
-void setScalar(T1& mat, const int i, const int j, const T2& val);
+template <Operation EQUALOP, typename T1, typename T2>
+void assignScalar(T1& mat, const int i, const int j, const T2& val);
 
 /**
  * @brief Zero value
@@ -85,26 +85,55 @@ void setZero(T1& mat, const int k);
 template <typename T1>
 void setZero(T1& mat, const int i, const int j);
 
-/**
- * @brief Add value
- *
- * @param mat
- * @param k
- * @param val
- */
-template <typename T1, typename T2>
-void addScalar(T1& mat, const int k, const T2& val);
+namespace details {
+   template <typename T>
+   inline T& setS(Eigen::SparseMatrix<T>& mat, const int k)
+   {
+      return mat.coeffRef(k, 0);
+   }
 
-/**
- * @brief Add value to DecoupledComplex storage
- *
- * @param mat
- * @param i
- * @param j
- * @param val
- */
-template <typename T1, typename T2>
-void addScalar(T1& mat, const int i, const int j, const T2& val);
+   template <typename T>
+   inline T& setS(Eigen::SparseMatrix<T>& mat, const int i, const int j)
+   {
+      return mat.coeffRef(i, j);
+   }
+
+   template <typename T>
+   inline T& setS(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat, const int k)
+   {
+      return mat(k);
+   }
+
+   template <typename T>
+   inline T& setS(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat, const int i, const int j)
+   {
+      return mat(i, j);
+   }
+
+   template <typename T1, typename T2>
+   inline T1& setS(View::View<T1,T2>& mat, const int k)
+   {
+      return mat[k];
+   }
+
+   template <typename T1, typename T2>
+   inline T1& setS(View::View<T1,T2>& mat, const int i, const int j)
+   {
+      return mat(i, j);
+   }
+
+   template <typename T>
+   inline T getS(const MHDVariant val)
+   {
+      return std::get<T>(val);
+   }
+
+   template <typename T>
+   inline T getS(const T val)
+   {
+      return val;
+   }
+}
 
 template <typename TData> inline auto getScalar(const TData& mat, const int k)
 {
@@ -135,192 +164,92 @@ inline auto getScalar(const TData& mat, const int i, const int j)
    }
 }
 
-template <typename T1, typename T2>
-inline void setScalar(T1& mat, const int k, const T2& val)
+template <Operation EQUALOP, typename T1, typename T2>
+inline void assignScalar(T1& mat, const int k, const T2& val)
 {
-   if constexpr (std::is_same<T1, DecoupledZMatrix>::value &&
-                 std::is_same<T2, MHDComplex>::value)
+   if constexpr (std::is_same<T1, DecoupledZMatrix>::value)
    {
-      mat.real()(k) = val.real();
-      mat.imag()(k) = val.imag();
-   }
-   else if constexpr (std::is_same<T1, DecoupledZMatrix>::value &&
-                      std::is_same<T2, MHDVariant>::value)
-   {
-      mat.real()(k) = std::get<1>(val).real();
-      mat.imag()(k) = std::get<1>(val).imag();
-   }
-   else if constexpr (std::is_same<T2, MHDVariant>::value &&
-                      (std::is_same<T1,
-                          Eigen::SparseMatrix<std::variant_alternative<0,
-                             MHDVariant>::type>>::value ||
-                         std::is_same<T1,
-                            Eigen::SparseMatrix<std::variant_alternative<1,
-                               MHDVariant>::type>>::value))
-   {
-      mat.coeffRef(k, 0) = std::get<typename GetScalarType<T1>::ScalarType>(val);
-   }
-   else if constexpr (std::is_same<T1, Eigen::SparseMatrix<T2>>::value)
-   {
-      mat.coeffRef(k, 0) = val;
-   }
-   else if constexpr (std::is_same<T2, MHDVariant>::value)
-   {
-      if constexpr(is_view<T1>::value)
+      if constexpr(EQUALOP == Operation::Set)
       {
-         mat[k] = std::get<typename GetScalarType<T1>::ScalarType>(val);
+         mat.real()(k) = details::getS<MHDComplex>(val).real();
+         mat.imag()(k) = details::getS<MHDComplex>(val).imag();
       }
-      else
+      else if constexpr(EQUALOP == Operation::Plus)
       {
-         mat(k) = std::get<typename GetScalarType<T1>::ScalarType>(val);
+         mat.real()(k) += details::getS<MHDComplex>(val).real();
+         mat.imag()(k) += details::getS<MHDComplex>(val).imag();
       }
-   }
-   else if constexpr (std::is_same<T2, typename GetScalarType<T1>::ScalarType>::value)
-   {
-      if constexpr(is_view<T1>::value)
+      else if constexpr(EQUALOP == Operation::Minus)
       {
-         mat[k] = val;
-      }
-      else
-      {
-         mat(k) = val;
+         mat.real()(k) -= details::getS<MHDComplex>(val).real();
+         mat.imag()(k) -= details::getS<MHDComplex>(val).imag();
       }
    }
    else
    {
-      static_assert(true,
-         "Tried to use invalid combination of types in setScalar(k)");
+      if constexpr(EQUALOP == Operation::Set)
+      {
+         details::setS(mat, k) = details::getS<typename GetScalarType<T1>::ScalarType>(val);
+      }
+      else if constexpr(EQUALOP == Operation::Plus)
+      {
+         details::setS(mat, k) += details::getS<typename GetScalarType<T1>::ScalarType>(val);
+      }
+      else if constexpr(EQUALOP == Operation::Minus)
+      {
+         details::setS(mat, k) -= details::getS<typename GetScalarType<T1>::ScalarType>(val);
+      }
    }
 }
 
-template <typename T1, typename T2>
-inline void setScalar(T1& mat, const int i, const int j, const T2& val)
+template <Operation EQUALOP, typename T1, typename T2>
+inline void assignScalar(T1& mat, const int i, const int j, const T2& val)
 {
-   if constexpr (std::is_same<T1, DecoupledZMatrix>::value &&
-                 std::is_same<T2, MHDComplex>::value)
+   if constexpr (std::is_same<T1, DecoupledZMatrix>::value)
    {
-      mat.real()(i, j) = val.real();
-      mat.imag()(i, j) = val.imag();
-   }
-   else if constexpr (std::is_same<T1, DecoupledZMatrix>::value &&
-                      std::is_same<T2, MHDVariant>::value)
-   {
-      mat.real()(i, j) = std::get<1>(val).real();
-      mat.imag()(i, j) = std::get<1>(val).imag();
-   }
-   else if constexpr (std::is_same<T2, MHDVariant>::value &&
-                      (std::is_same<T1,
-                          Eigen::SparseMatrix<std::variant_alternative<0,
-                             MHDVariant>::type>>::value ||
-                         std::is_same<T1,
-                            Eigen::SparseMatrix<std::variant_alternative<1,
-                               MHDVariant>::type>>::value))
-   {
-      mat.coeffRef(i, j) = std::get<typename GetScalarType<T1>::ScalarType>(val);
-   }
-   else if constexpr (std::is_same<T1, Eigen::SparseMatrix<T2>>::value)
-   {
-      mat.coeffRef(i, j) = val;
-   }
-   else if constexpr (std::is_same<T2, MHDVariant>::value)
-   {
-      mat(i, j) = std::get<typename GetScalarType<T1>::ScalarType>(val);
-   }
-   else if constexpr (std::is_same<T2, typename GetScalarType<T1>::ScalarType>::value)
-   {
-      mat(i, j) = val;
+      if constexpr(EQUALOP == Operation::Set)
+      {
+         mat.real()(i, j) = details::getS<MHDComplex>(val).real();
+         mat.imag()(i, j) = details::getS<MHDComplex>(val).imag();
+      }
+      else if constexpr(EQUALOP == Operation::Plus)
+      {
+         mat.real()(i, j) += details::getS<MHDComplex>(val).real();
+         mat.imag()(i, j) += details::getS<MHDComplex>(val).imag();
+      }
+      else if constexpr(EQUALOP == Operation::Minus)
+      {
+         mat.real()(i, j) -= details::getS<MHDComplex>(val).real();
+         mat.imag()(i, j) -= details::getS<MHDComplex>(val).imag();
+      }
    }
    else
    {
-      static_assert(true,
-         "Tried to use invalid combination of types in setScalar(i,j)");
+      if constexpr(EQUALOP == Operation::Set)
+      {
+         details::setS(mat, i, j) = details::getS<typename GetScalarType<T1>::ScalarType>(val);
+      }
+      else if constexpr(EQUALOP == Operation::Plus)
+      {
+         details::setS(mat, i, j) += details::getS<typename GetScalarType<T1>::ScalarType>(val);
+      }
+      else if constexpr(EQUALOP == Operation::Minus)
+      {
+         details::setS(mat, i, j) -= details::getS<typename GetScalarType<T1>::ScalarType>(val);
+      }
    }
 }
 
 template <typename T1>
 inline void setZero(T1& mat, const int k)
 {
-   setScalar(mat, k, typename GetScalarType<T1>::ScalarType(0.0));
+   assignScalar<Operation::Set>(mat, k, typename GetScalarType<T1>::ScalarType(0.0));
 }
 
 template <typename T1>
 inline void setZero(T1& mat, const int i, const int j)
 {
-   setScalar(mat, i, j, typename GetScalarType<T1>::ScalarType(0.0));
-}
-
-template <typename T1, typename T2>
-inline void addScalar(T1& mat, const int k, const T2& val)
-{
-   if constexpr (std::is_same<T1, DecoupledZMatrix>::value &&
-                 std::is_same<T2, MHDComplex>::value)
-   {
-      mat.real()(k) += val.real();
-      mat.imag()(k) += val.imag();
-   }
-   else if constexpr (std::is_same<T1, DecoupledZMatrix>::value &&
-                      std::is_same<T2, MHDVariant>::value)
-   {
-      mat.real()(k) += std::get<1>(val).real();
-      mat.imag()(k) += std::get<1>(val).imag();
-   }
-   else if constexpr (std::is_same<T2, MHDVariant>::value)
-   {
-      if constexpr(is_view<T1>::value)
-      {
-         mat[k] += std::get<typename GetScalarType<T1>::ScalarType>(val);
-      }
-      else
-      {
-         mat(k) += std::get<typename GetScalarType<T1>::ScalarType>(val);
-      }
-   }
-   else if constexpr (std::is_same<T2, typename GetScalarType<T1>::ScalarType>::value)
-   {
-      if constexpr(is_view<T1>::value)
-      {
-         mat[k] += val;
-      }
-      else
-      {
-         mat(k) += val;
-      }
-   }
-   else
-   {
-      static_assert(true,
-         "Tried to use invalid combination of types in addScalar(k)");
-   }
-}
-
-template <typename T1, typename T2>
-inline void addScalar(T1& mat, const int i, const int j, const T2& val)
-{
-   if constexpr (std::is_same<T1, DecoupledZMatrix>::value &&
-                 std::is_same<T2, MHDComplex>::value)
-   {
-      mat.real()(i, j) += val.real();
-      mat.imag()(i, j) += val.imag();
-   }
-   else if constexpr (std::is_same<T1, DecoupledZMatrix>::value &&
-                      std::is_same<T2, MHDVariant>::value)
-   {
-      mat.real()(i, j) += std::get<1>(val).real();
-      mat.imag()(i, j) += std::get<1>(val).imag();
-   }
-   else if constexpr (std::is_same<T2, MHDVariant>::value)
-   {
-      mat(i, j) += std::get<typename GetScalarType<T1>::ScalarType>(val);
-   }
-   else if constexpr (std::is_same<T2, typename GetScalarType<T1>::ScalarType>::value)
-   {
-      mat(i, j) += val;
-   }
-   else
-   {
-      static_assert(true,
-         "Tried to use invalid combination of types in addScalar(i,j)");
-   }
+   assignScalar<Operation::Set>(mat, i, j, typename GetScalarType<T1>::ScalarType(0.0));
 }
 
 } // namespace Arithmetics

@@ -42,7 +42,7 @@ namespace Equations {
          for(int i = zeroRow; i < rows; i++)
          {
             // Add source term
-            Arithmetics::addScalar(storage, k, eq->sourceTerm(compId, i, mode(1), mode(0)));
+            Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage, k, eq->sourceTerm(compId, i, mode(1), mode(0)));
 
             // increase storage counter
             k++;

@@ -1,4 +1,4 @@
-# CMake setup for View component
+# CMake setup for Arithmetics
 set(QUICC_CURRENT_COMPONENT_LIB Arithmetics)
 set(QUICC_CURRENT_COMPONENT_LIB_NAMESPACE "${QUICC_CURRENT_COMPONENT_LIB}::")
 message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}" )
@@ -11,34 +11,25 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-set(PHS
-  "Arithmetics/Utility.hpp"
-  "Arithmetics/Basic.hpp"
-  "Arithmetics/LinearAlgebra.hpp"
-)
-
-# Add public header
-set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
-  PROPERTIES
-    PUBLIC_HEADER "${PHS}"
-)
-
-# 
-target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE
-  QuICC::Types
-  QuICC::View
+# Dependencies
+target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}"
+  INTERFACE
+    QuICC::Types
+    QuICC::View
 )
 
 # Alias
 add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB} ALIAS "${QUICC_CURRENT_COMPONENT_LIB}")
 
 # Teststuite
-option(QUICC_TESTSUITE_VIEW "Enable Arithmetics component testsuite?" OFF)
-if(QUICC_TESTSUITE_VIEW)
+option(QUICC_TESTSUITE_ARITHMETICS "Enable Arithmetics component testsuite?" OFF)
+if(QUICC_TESTSUITE_ARITHMETICS)
   add_subdirectory(TestSuite)
-endif(QUICC_TESTSUITE_VIEW)
+endif(QUICC_TESTSUITE_ARITHMETICS)
 
 # Export info
 quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
   COMPONENT ${QUICC_CURRENT_COMPONENT_LIB}
+  DIRECTORIES
+  "${CMAKE_CURRENT_SOURCE_DIR}/Arithmetics"
     )

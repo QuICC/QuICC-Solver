@@ -83,12 +83,12 @@ protected:
    /**
     * @brief Storage for the implicit a factors
     */
-   std::array<MHDFloat, 3> mAIm;
+   std::array<MHDFloat, 2> mAIm;
 
    /**
     * @brief Storage for the step fractions
     */
-   std::array<MHDFloat, 3> mCEx;
+   std::array<MHDFloat, 2> mCEx;
 
 private:
 };

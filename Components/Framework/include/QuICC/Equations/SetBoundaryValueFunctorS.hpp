@@ -66,7 +66,7 @@ template <>
                l = start + k_ + j_ + i;
 
                // Add source term
-               Arithmetics::setScalar(storage, l, eq->boundaryValue(compId, i, j, k));
+               Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, l, eq->boundaryValue(compId, i, j, k));
             }
          }
       }

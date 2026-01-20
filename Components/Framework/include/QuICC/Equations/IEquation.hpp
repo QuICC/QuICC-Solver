@@ -297,28 +297,6 @@ namespace Equations {
    /// Typedef for a smart IEquation
    typedef std::shared_ptr<IEquation> SharedIEquation;
 
-   /**
-    * @brief Apply the galerkin stencil operator
-    *
-    * @param eq         Equation
-    * @param compId     Equation field component ID
-    * @param rField     Output field
-    * @param start      Start index in linear storage
-    * @param matIdx     System index
-    * @param rhs        RHS field data
-    */
-   template <typename TData> void applyGalerkinStencil(const IEquation& eq, TData& rField, const int start, const int matIdx, const TData& rhs);
-   template <> void applyGalerkinStencil<DecoupledZMatrix>(const IEquation& eq, DecoupledZMatrix& rField, const int start, const int matIdx, const DecoupledZMatrix& rhs);
-
-   template <typename TData> inline void applyGalerkinStencil(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& rField, const int start, const int matIdx, const TData& rhs)
-   {
-      // Create pointer to sparse operator
-      const SparseMatrix * op = &eq.galerkinStencil(compId, matIdx);
-
-      auto blkInfo = std::make_tuple(start, 0, op->cols(), Arithmetics::getCols(rhs));
-      Arithmetics::setMatrixProduct(rField, 0, *op, rhs, blkInfo);
-   }
-
 } // Equations
 } // QuICC
 

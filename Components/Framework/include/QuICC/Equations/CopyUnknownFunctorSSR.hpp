@@ -73,12 +73,12 @@ template <bool IsSet, typename TData, typename TField> void CopyUnknownFunctor<C
          if constexpr(IsSet)
          {
             // Copy field value into storage
-            Arithmetics::setScalar(storage, l, field.comp(compId).point(i,j,matIdx));
+            Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, l, field.comp(compId).point(i,j,matIdx));
          }
          else
          {
             // Copy field value into storage
-            Arithmetics::addScalar(storage, l, field.comp(compId).point(i,j,matIdx));
+            Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage, l, field.comp(compId).point(i,j,matIdx));
          }
       }
    }
@@ -95,12 +95,12 @@ template <bool IsSet, typename TData, typename TField> void CopyUnknownFunctor<C
          if constexpr(IsSet)
          {
             // Copy field value into storage
-            Arithmetics::setScalar(storage, k, field.comp(compId).point(i,j,matIdx));
+            Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, k, field.comp(compId).point(i,j,matIdx));
          }
          else
          {
             // Add field value to storage
-            Arithmetics::addScalar(storage, k, field.comp(compId).point(i,j,matIdx));
+            Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage, k, field.comp(compId).point(i,j,matIdx));
          }
 
          // increase storage counter

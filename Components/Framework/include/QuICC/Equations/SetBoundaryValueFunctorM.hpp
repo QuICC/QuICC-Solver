@@ -38,7 +38,7 @@ template <>
       for(int i = zeroRow; i < rows; i++)
       {
          // Add source term
-         Arithmetics::setScalar(storage, k, eq->boundaryValue(compId, i, mode(1), mode(0)));
+         Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, k, eq->boundaryValue(compId, i, mode(1), mode(0)));
 
          // increase storage counter
          k++;

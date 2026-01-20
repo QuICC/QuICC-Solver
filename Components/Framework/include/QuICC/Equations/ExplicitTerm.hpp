@@ -18,6 +18,7 @@
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
+#include "Arithmetics/Utility.hpp"
 #include "QuICC/Equations/ExplicitTermFunctor.hpp"
 #include "QuICC/Equations/ExplicitTermFunctorSSR.hpp"
 #include "QuICC/Equations/ExplicitTermFunctorSMR.hpp"
@@ -63,8 +64,9 @@ namespace Equations {
    template <typename T, typename TOperator, typename TData>
       void computeExplicitTerm(const IFieldEquation& eq, const std::size_t opId, FieldComponents::Spectral::Id compId, TData& rSolverField, const int eqStart, SpectralFieldId fieldId, const typename Framework::Selector::ScalarField<T>& explicitField, const int matIdx)
    {
-      if constexpr((std::is_same<T,MHDFloat>::value || std::is_same<T, MHDComplex>::value ) && (std::is_same<TOperator, SparseMatrixZ>::value && std::is_same<TData, Matrix>::value))
+      if constexpr((std::is_same_v<T,MHDFloat> || std::is_same_v<T, MHDComplex> ) && (std::is_same_v<TOperator, SparseMatrixZ> && std::is_same_v<typename Arithmetics::GetScalarType<TData>::ScalarType, MHDFloat>))
       {
+         throw std::logic_error("This should not be called");
       } else
       {
          // Create pointer to sparse operator

@@ -67,7 +67,7 @@ template <typename TData, typename TField> void SetBoundaryValueFunctor<Coupling
          l = start + j_ + i;
 
          // Add source term
-         Arithmetics::setScalar(storage, l, eq->boundaryValue(compId, i, j, matIdx));
+         Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, l, eq->boundaryValue(compId, i, j, matIdx));
       }
    }
 #else
@@ -81,7 +81,7 @@ template <typename TData, typename TField> void SetBoundaryValueFunctor<Coupling
       for(int i = zeroRow; i < usedRows; i++)
       {
          // Add source term
-         Arithmetics::setScalar(storage, k, eq->boundaryValue(compId, i, j, matIdx));
+         Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, k, eq->boundaryValue(compId, i, j, matIdx));
 
          // increase storage counter
          k++;

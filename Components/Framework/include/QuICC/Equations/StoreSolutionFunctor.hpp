@@ -14,6 +14,7 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Equations/CouplingIndexType.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
+#include "QuICC/Equations/ApplyGalerkinStencil.hpp"
 #include "Arithmetics/Utility.hpp"
 
 namespace QuICC {

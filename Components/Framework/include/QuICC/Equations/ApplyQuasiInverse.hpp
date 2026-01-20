@@ -70,14 +70,15 @@ namespace Equations {
       int cols = Arithmetics::getCols(rField);
       int rhsRows = op->cols();
 
-      auto blkInfo = std::make_tuple(rhsStart, 0, rhsRows, cols);
+      auto outBlk = std::make_tuple(start, 0, op->rows(), Arithmetics::getCols(rhs));
+      auto inBlk = std::make_tuple(rhsStart, 0, rhsRows, cols);
       if constexpr(IsSet)
       {
-         Arithmetics::setMatrixProduct(rField, start, *op, rhs, blkInfo);
+         Arithmetics::computeAx<Arithmetics::Operation::Set>(rField, outBlk, *op, rhs, inBlk);
       }
       else
       {
-         Arithmetics::addMatrixProduct(rField, start, *op, rhs, blkInfo);
+         Arithmetics::computeAx<Arithmetics::Operation::Plus>(rField, outBlk, *op, rhs, inBlk);
       }
    }
 

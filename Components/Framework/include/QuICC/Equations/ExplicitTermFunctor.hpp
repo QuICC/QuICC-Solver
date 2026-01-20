@@ -18,7 +18,6 @@
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
-#include "Arithmetics/Basic.hpp"
 
 namespace QuICC {
 

@@ -18,7 +18,8 @@
 #include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/Equations/ExplicitTermFunctor.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
-#include "Arithmetics/Basic.hpp"
+#include "Arithmetics/Utility.hpp"
+#include "Arithmetics/LinearAlgebra.hpp"
 
 namespace QuICC {
 
@@ -36,7 +37,8 @@ template <>
          const TOperator * op = &eq->template explicitOperator<TOperator>(opId, compId, fieldId, matIdx);
 
          // Apply operator to field
-         Arithmetics::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(matIdx));
+         std::tuple<int,int,int,int> outBlk = std::make_tuple(eqStart, 0, op->rows(), Arithmetics::getCols(explicitField.slice(matIdx)));
+         Arithmetics::computeAx<Arithmetics::Operation::Plus>(rSolverField, outBlk, *op, explicitField.slice(matIdx).eval());
       }
    }
 

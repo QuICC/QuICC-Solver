@@ -74,7 +74,7 @@ namespace Equations {
                   l = start + k_ + j_ + i;
 
                   // Add source term
-                  Arithmetics::addScalar(storage, l, eq->sourceTerm(compId, i, j, k));
+                  Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage, l, eq->sourceTerm(compId, i, j, k));
                }
             }
          }

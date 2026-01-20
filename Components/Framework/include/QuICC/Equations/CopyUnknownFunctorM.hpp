@@ -60,12 +60,12 @@ template <bool IsSet, typename TData, typename TField> void CopyUnknownFunctor<C
          if constexpr(IsSet)
          {
             // Copy field value into storage
-            Arithmetics::setScalar(storage, k, field.comp(compId).point(i,mode(1),mode(0)));
+            Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, k, field.comp(compId).point(i,mode(1),mode(0)));
          }
          else
          {
             // Add field value to storage
-            Arithmetics::addScalar(storage, k, field.comp(compId).point(i,mode(1),mode(0)));
+            Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage, k, field.comp(compId).point(i,mode(1),mode(0)));
          }
 
          // increase storage counter

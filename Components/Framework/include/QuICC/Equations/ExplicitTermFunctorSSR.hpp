@@ -18,7 +18,8 @@
 #include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/Equations/ExplicitTermFunctor.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
-#include "Arithmetics/Basic.hpp"
+#include "Arithmetics/Utility.hpp"
+#include "Arithmetics/LinearAlgebra.hpp"
 
 namespace QuICC {
 
@@ -36,7 +37,7 @@ template <>
             const TOperator * op = &eq->template explicitOperator<TOperator>(opId, compId, fieldId, matIdx);
 
             const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-            typename Eigen::Matrix<T,Eigen::Dynamic,1>  tmp(op->cols());
+            typename Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>  tmp(op->cols(), 1);
 #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
             const auto& sRes = eq->res().sim();
             // Initialise storage to zero
@@ -66,7 +67,7 @@ template <>
                   l = j_ + i;
 
                   // Copy field value into storage
-                  tmp(l) = explicitField.point(i,j,matIdx);
+                  tmp(l,0) = explicitField.point(i,j,matIdx);
                }
             }
 #else
@@ -80,7 +81,7 @@ template <>
                for(int i = 0; i < usedRows; i++)
                {
                   // Copy slice into flat array
-                  tmp(k) = explicitField.point(i,j,matIdx);
+                  tmp(k,0) = explicitField.point(i,j,matIdx);
 
                   // increase storage counter
                   k++;
@@ -89,7 +90,8 @@ template <>
 #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
 
             // Apply operator to field
-            Arithmetics::addMatrixProduct(rSolverField, eqStart, *op, tmp);
+            std::tuple<int,int,int,int> outBlk = std::make_tuple(eqStart, 0, op->rows(), Arithmetics::getCols(tmp));
+            Arithmetics::computeAx<Arithmetics::Operation::Plus>(rSolverField, outBlk, *op, tmp);
          }
       }
 

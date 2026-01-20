@@ -70,7 +70,7 @@ namespace Equations {
                l = start + j_ + i;
 
                // Add source term
-               Arithmetics::addScalar(storage, l, eq->sourceTerm(compId, i, j, matIdx));
+               Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage, l, eq->sourceTerm(compId, i, j, matIdx));
             }
          }
 #else
@@ -84,7 +84,7 @@ namespace Equations {
             for(int i = zeroRow; i < usedRows; i++)
             {
                // Add source term
-               Arithmetics::addScalar(storage, k, eq->sourceTerm(compId, i, j, matIdx));
+               Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage, k, eq->sourceTerm(compId, i, j, matIdx));
 
                // increase storage counter
                k++;

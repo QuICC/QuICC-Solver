@@ -18,7 +18,8 @@
 #include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/Equations/ExplicitTermFunctor.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
-#include "Arithmetics/Basic.hpp"
+#include "Arithmetics/Utility.hpp"
+#include "Arithmetics/LinearAlgebra.hpp"
 
 namespace QuICC {
 
@@ -43,7 +44,9 @@ template <>
          assert(op->cols() == explicitField.slice(mode(0)).rows());
 
          // Apply operator to field
-         Arithmetics::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(mode(0)).col(mode(1)));
+         typename Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> tmp = explicitField.slice(mode(0)).col(mode(1)).eval();
+         std::tuple<int,int,int,int> outBlk = std::make_tuple(eqStart, 0, op->rows(), Arithmetics::getCols(tmp));
+         Arithmetics::computeAx<Arithmetics::Operation::Plus>(rSolverField, outBlk, *op, tmp);
       }
    }
 

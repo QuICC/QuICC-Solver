@@ -18,6 +18,8 @@ namespace QuICC {
 
 namespace Arithmetics {
 
+enum class Operation { Minus = -1, Set = 0, Plus = 1};
+
 /**
  * @brief Identify type of scalar
  */

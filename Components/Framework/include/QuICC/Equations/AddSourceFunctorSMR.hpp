@@ -50,7 +50,7 @@ namespace Equations {
             for(int i = zeroRow; i < rows; i++)
             {
                // Add source term
-               Arithmetics::addScalar(storage, i - zeroRow + start, j - zeroCol, eq->sourceTerm(compId, i, j, matIdx));
+               Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage, i - zeroRow + start, j - zeroCol, eq->sourceTerm(compId, i, j, matIdx));
             }
          }
       }

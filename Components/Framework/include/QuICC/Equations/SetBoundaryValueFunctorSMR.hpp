@@ -48,7 +48,7 @@ template <>
          for(int i = zeroRow; i < rows; i++)
          {
             // Add source term
-            Arithmetics::setScalar(storage, i - zeroRow + start, j - zeroCol, eq->boundaryValue(compId, i, j, matIdx));
+            Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, i - zeroRow + start, j - zeroCol, eq->boundaryValue(compId, i, j, matIdx));
          }
       }
    }
