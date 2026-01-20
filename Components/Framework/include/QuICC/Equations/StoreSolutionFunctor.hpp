@@ -23,16 +23,6 @@ namespace Equations {
 
 class IFieldEquation;
 
-namespace details
-{
-   template <typename TData>
-   struct Temporary
-   {
-      TData data;
-   };
-}
-
-
 template <CouplingIndexType IndexType>
 class StoreSolutionFunctor
 {

@@ -131,10 +131,10 @@ namespace Timestep {
           * @brief Process new CFL information
           *
           * @param cfl     CFL conditions
-          * @param error   Error measure
+          * @param err     Error measure
           * @param order   Scheme order
           */
-         void processCfl(const Matrix& cfl, const MHDFloat error, const int order);
+         void processCfl(const Matrix& cfl, const MHDFloat err, const int order);
 
          /**
           * @brief Write CFL and timestep information

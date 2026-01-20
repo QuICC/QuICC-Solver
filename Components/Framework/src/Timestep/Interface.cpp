@@ -72,8 +72,11 @@ namespace Timestep {
       this->mRefTime = this->mTime;
    }
 
-   void Interface::processCfl(const Matrix& cfl, const MHDFloat error, const int order)
+   void Interface::processCfl(const Matrix& cfl, const MHDFloat err, const int order)
    {
+      // Copy to simplify MPI code
+      MHDFloat error = err;
+
       // Store old timestep
       this->mOldDt = this->timestep();
 
