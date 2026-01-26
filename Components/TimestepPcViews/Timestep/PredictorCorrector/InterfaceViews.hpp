@@ -16,6 +16,7 @@
 #include "Memory/MemoryResource.hpp"
 #include "Profiler/Interface.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
+#include "QuICC/Equations/CorrectSolution.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
 #include "QuICC/Equations/AddSource.hpp"
 #include "QuICC/Equations/SetBoundaryValue.hpp"
@@ -333,11 +334,18 @@ void InterfaceViews<TScheme>::initSolution(const ScalarEquation_range& scalEq, c
                      std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
                      View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
 
-                     std::visit(
-                           [&](auto&& p)
-                           {
-                           Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true);
-                           }, eqIt->spUnknown());
+                     if(cinfo.isGalerkin())
+                     {
+                        Equations::solveStencilUnknown(*eqIt, myId.second, tmpView, i, 0);
+                     }
+                     else
+                     {
+                        std::visit(
+                              [&](auto&& p)
+                              {
+                              Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true);
+                              }, eqIt->spUnknown());
+                     }
 
                      this->mSolverCoord.updateSolution(info, tmpView);
                   }
@@ -614,29 +622,15 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                // Update timestepper solver solution if constraint modified it
                if(changedSolution)
                {
+                  auto corr_ = eqIt->correctionConstraint(myId.second, SolveTiming::After::id());
                   for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                   {
                      auto info = createInfo(cinfo, i);
 
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-copyView");
-                     std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
-                     std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                     using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
-                     std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-copyView");
+                     // Get effective corrections
+                     auto corr = Equations::correctSolution(*eqIt, myId.second, corr_, i, 0);
 
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-copyUnknown");
-                     std::visit(
-                           [&](auto&& p)
-                           {
-                           Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true);
-                           }, eqIt->spUnknown());
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-copyUnknown");
-
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-updateSolution");
-                     this->mSolverCoord.updateSolution(info, tmpView);
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:changed-updateSolution");
+                     this->mSolverCoord.updateSolution(info, corr);
                   }
                }
             }

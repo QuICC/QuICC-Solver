@@ -19,7 +19,7 @@
 #include "QuICC/Equations/IEquation.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "Arithmetics/Basic.hpp"
-#include "QuICC/Equations/StoreSolutionFunctor.hpp"
+#include "QuICC/Equations/details/StoreSolutionFunctor.hpp"
 
 namespace QuICC {
 
@@ -65,6 +65,14 @@ namespace Equations {
          virtual bool applyConstraint(FieldComponents::Spectral::Id compId, const std::size_t timeId);
 
          /**
+          * @brief Get correction corresponding to generic constraint on spectral data
+          *
+          * @param compId  ID of the spectral component
+          * @param timeId  Timing of the constraint
+          */
+         virtual std::vector<std::tuple<MHDVariant,int,int,int>> correctionConstraint(FieldComponents::Spectral::Id compId, const std::size_t timeId);
+
+         /**
           * @brief Generic source term implementation
           *
           * @param compId  ID of the spectral component
@@ -101,7 +109,7 @@ namespace Equations {
           */
          template <typename TData, typename TField> void storeSolutionImpl(TField& field, FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start);
 
-         template <CouplingIndexType IndexType> friend class StoreSolutionFunctor;
+         template <CouplingIndexType IndexType> friend class details::StoreSolutionFunctor;
       private:
 
    };

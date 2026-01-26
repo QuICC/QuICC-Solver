@@ -182,17 +182,14 @@ protected:
    /**
     * @brief Get operator block information
     *
-    * @param tN      Tau radial size
-    * @param gN      Galerkin radial truncation
-    * @param shift   Shift in each direction due to Galerkin basis
-    * @param fId     ID of the field
-    * @param res     Resolution object
-    * @param j       Index on which fast resolution may depend
-    * @param bcs     Boundary conditions
+    * @param tN         Tau radial size
+    * @param gN         Galerkin radial truncation
+    * @param shift      Shift in each direction due to Galerkin basis
+    * @param nTauLines  Number of zeroed tau lines
+    * @param nN         Base radial size
     */
    void blockInfo(int& tN, int& gN, ArrayI& shift, int& rhs,
-      const SpectralFieldId& fId, const Resolution& res, const MHDFloat j,
-      const BcMap& bcs) const;
+      const int nBc, const int refN) const;
 
    /**
     * @brief Compute size information of full system
@@ -200,53 +197,40 @@ protected:
     * @param rowId  Equation Field ID
     * @param colId  Field Id
     * @param fields List of fields Id
-    * @param j0     First 2D index
-    * @param maxJ   Max 2D index
-    * @param res    Resolution object
-    * @param bcs    Boundary conditions
+    * @param nNs    List of base dimensions
     * @param isGalerkin Use Galerkin scheme?
     * @param dropRows?  Drop Tau line rows
     */
    details::SystemInfo systemInfo(const SpectralFieldId& rowId,
       const SpectralFieldId& colId, const SpectralFieldIds& fields,
-      const int j0, const int maxJ, const Resolution& res, const BcMap& bcs,
+      const std::vector<int>& nNs,
       const bool isGalerkin, const bool dropRows) const;
 
    /**
     * @brief Get operator information
     *
-    * @param fId  Field ID
-    * @param j0   First 2D index
-    * @param maxJ Max 2D index
-    * @param res  Resolution object
-    * @param bcs  Boundary conditions
+    * @param nTauLines number of tau lines
+    * @param nNs  List of base 1D size
     * @param isGalerkin Use Galerkin scheme?
     */
-   int blockSize(const SpectralFieldId& fId, const int j0, const int maxJ,
-      const Resolution& res, const BcMap& bcs, const bool isGalerkin) const;
+   int blockSize(const int nTauLines, const std::vector<int>& nNs, const bool isGalerkin) const;
 
    /**
     * @brief Get operator block shape
     *
-    * @param rowId   Equation Field ID
-    * @param colId    Field Id
-    * @param j0   First 2D index
-    * @param maxJ Max 2D index
-    * @param res  Resolution object
-    * @param bcs  Boundary conditions
+    * @param nTauLinesRow  Number of zeroed tau lines for RowId
+    * @param nTauLinesCol  Number of zeroed tau lines for colId
+    * @param nNs  List of base 1D size
     * @param isGalerkin Use Galerkin scheme?
     * @param dropRows?  Drop Tau line rows
     */
-   std::pair<int, int> blockShape(const SpectralFieldId& rowId,
-      const SpectralFieldId& colId, const int j0, const int maxJ,
-      const Resolution& res, const BcMap& bcs, const bool isGalerkin,
+   std::pair<int, int> blockShape(const int nTauLinesRow, const int nTauLinesCol, const std::vector<int>& nNs, const bool isGalerkin,
       const bool dropRows) const;
 
    /**
-    * @brief Build 2D matrix block with fixed width from description
+    * @brief Build 2D matrix block from description
     *
     * @param decMat  Ouput matrix
-    * @param cols    Number of columns
     * @param isComplexBlock block is complex?
     * @param descr   Block description
     * @param rowId   Field ID of block matrix row
@@ -254,45 +238,21 @@ protected:
     * @param matIdx  Matrix ID
     * @param bcType  Type of boundary condition
     * @param res     Resolution object
-    * @param j0      First 2D index
-    * @param maxJ    Max 2D index
+    * @param nNs     First 2D index
     * @param bcs     Boundary conditions for each field
     * @param nds     Nondimension parameters
     * @param isSplitOperator  Set operator of split system
-    * @param ignoreStart  Ignore start shift
-    */
-   void buildFixedBlock(DecoupledZSparse& decMat, const int cols,
-      const bool isComplex, const std::vector<details::BlockDescription>& descr,
-      const SpectralFieldId& rowId, const SpectralFieldId& colId,
-      const SpectralFieldIds& fields, const int matIdx,
-      const std::size_t bcType, const Resolution& res, const int j0,
-      const int maxJ, const BcMap& bcs, const NonDimensional::NdMap& nds,
-      const bool isSplitOperator, const bool ignoreStart = false) const;
-
-   /**
-    * @brief Build 2D matrix block from description
-    *
-    * @param decMat  Ouput matrix
-    * @param descr   Block description
-    * @param rowId   Field ID of block matrix row
-    * @param colId   Field ID of block matrix column
-    * @param matIdx  Matrix ID
-    * @param bcType  Type of boundary condition
-    * @param res     Resolution object
-    * @param j0      First 2D index
-    * @param maxJ    Max 2D index
-    * @param bcs     Boundary conditions for each field
-    * @param nds     Nondimension parameters
-    * @param isSplitOperator  Set operator of split system
+    * @param fixedCols  Force fixed number of columns
     * @param ignoreStart  Ignore start shift
     */
    void buildBlock(DecoupledZSparse& decMat,
+      const bool isComplexBlock,
       const std::vector<details::BlockDescription>& descr,
       const SpectralFieldId& rowId, const SpectralFieldId& colId,
       const SpectralFieldIds& fields, const int matIdx,
-      const std::size_t bcType, const Resolution& res, const int j0,
-      const int maxJ, const BcMap& bcs, const NonDimensional::NdMap& nds,
-      const bool isSplitOperator, const bool ignoreStart = false) const;
+      const std::size_t bcType, const Resolution& res, const int j0, const int maxJ, const std::vector<int>& nNs,
+      const BcMap& bcs, const NonDimensional::NdMap& nds,
+      const bool isSplitOperator, const int fixedCols, const bool ignoreStart = false) const;
 
    /**
     * @brief Add block matrix to full system matrix
@@ -307,6 +267,8 @@ protected:
       const int rowShift, const int colShift, const MHDFloat coeff = 1.0) const;
 
 private:
+   std::tuple<int,int,int,int> blockSystemInfo(const SpectralFieldId& rowId, const SpectralFieldId& colId, const SpectralFieldIds& fields, const std::vector<int>& nNs, const bool ignoreStart, const int fixedCols) const;
+   void computeBlockShift(int& blockShift, const int s0, const int nShift, const int nTauLines, const std::vector<int>& nNs, const int fixedCols) const;
 };
 
 } // namespace Model

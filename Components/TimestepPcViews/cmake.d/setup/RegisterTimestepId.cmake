@@ -1,5 +1,6 @@
 set(tags
   ImexPc2
+  ImexEuler
   ImexPc2b
   )
 

@@ -116,6 +116,14 @@ public:
    void setSolution(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t startRow);
 
    /**
+    * @brief Correct solution
+    *
+    * @param corr corrections to solution data
+    * @param startRow Start row
+    */
+   void correctSolution(const std::vector<std::tuple<MHDComplex,int,int>>& sol, const std::size_t startRow);
+
+   /**
     * @brief Update solver after solution was updated
     */
    void updateSolutions();
@@ -422,6 +430,13 @@ template <typename TOperator, typename TData, typename TImpl>
 void ImExPCTimestepper<TOperator, TData, TImpl>::setSolution(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t startRow)
 {
    details::computeSet(this->reg(Register::Solution::id()),
+         sol, startRow);
+}
+
+template <typename TOperator, typename TData, typename TImpl>
+void ImExPCTimestepper<TOperator, TData, TImpl>::correctSolution(const std::vector<std::tuple<MHDComplex,int,int>>& sol, const std::size_t startRow)
+{
+   details::addCorrection(this->reg(Register::Solution::id()),
          sol, startRow);
 }
 

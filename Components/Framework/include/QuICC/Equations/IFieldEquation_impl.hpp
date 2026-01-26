@@ -20,11 +20,11 @@
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "Arithmetics/Basic.hpp"
 #include "QuICC/Equations/IFieldEquation_decl.hpp"
-#include "QuICC/Equations/StoreSolutionFunctor.hpp"
-#include "QuICC/Equations/StoreSolutionFunctorSSR.hpp"
-#include "QuICC/Equations/StoreSolutionFunctorSMR.hpp"
-#include "QuICC/Equations/StoreSolutionFunctorM.hpp"
-#include "QuICC/Equations/StoreSolutionFunctorS.hpp"
+#include "QuICC/Equations/details/StoreSolutionFunctor.hpp"
+#include "QuICC/Equations/details/StoreSolutionFunctorSSR.hpp"
+#include "QuICC/Equations/details/StoreSolutionFunctorSMR.hpp"
+#include "QuICC/Equations/details/StoreSolutionFunctorM.hpp"
+#include "QuICC/Equations/details/StoreSolutionFunctorS.hpp"
 
 namespace QuICC {
 
@@ -40,22 +40,22 @@ namespace Equations {
    {
       if(this->couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
-         StoreSolutionFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(*this, compId, matIdx);
+         details::StoreSolutionFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(*this, compId, matIdx);
          func.apply(field, storage, start);
       }
       else if(this->couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
       {
-         StoreSolutionFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(*this, compId, matIdx);
+         details::StoreSolutionFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(*this, compId, matIdx);
          func.apply(field, storage, start);
       }
       else if(this->couplingInfo(compId).indexType() == CouplingIndexType::MODE)
       {
-         StoreSolutionFunctor<CouplingIndexType::MODE> func(*this, compId, matIdx);
+         details::StoreSolutionFunctor<CouplingIndexType::MODE> func(*this, compId, matIdx);
          func.apply(field, storage, start);
       }
       else if(this->couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
       {
-         StoreSolutionFunctor<CouplingIndexType::SINGLE> func(*this, compId, matIdx);
+         details::StoreSolutionFunctor<CouplingIndexType::SINGLE> func(*this, compId, matIdx);
          func.apply(field, storage, start);
       }
    }

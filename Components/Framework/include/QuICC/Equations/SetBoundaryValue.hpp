@@ -19,11 +19,11 @@
 #include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "Arithmetics/Basic.hpp"
-#include "QuICC/Equations/SetBoundaryValueFunctor.hpp"
-#include "QuICC/Equations/SetBoundaryValueFunctorSSR.hpp"
-#include "QuICC/Equations/SetBoundaryValueFunctorSMR.hpp"
-#include "QuICC/Equations/SetBoundaryValueFunctorM.hpp"
-#include "QuICC/Equations/SetBoundaryValueFunctorS.hpp"
+#include "QuICC/Equations/details/SetBoundaryValueFunctor.hpp"
+#include "QuICC/Equations/details/SetBoundaryValueFunctorSSR.hpp"
+#include "QuICC/Equations/details/SetBoundaryValueFunctorSMR.hpp"
+#include "QuICC/Equations/details/SetBoundaryValueFunctorM.hpp"
+#include "QuICC/Equations/details/SetBoundaryValueFunctorS.hpp"
 
 namespace QuICC {
 
@@ -53,25 +53,25 @@ namespace Equations {
          // matIdx is the index of the slowest varying direction with a single RHS
          if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
          {
-            SetBoundaryValueFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(eq, compId, matIdx);
+            details::SetBoundaryValueFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(eq, compId, matIdx);
             func.apply(field, storage, start);
          }
          // matIdx is the index of the slowest varying direction with multiple RHS
          else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
          {
-            SetBoundaryValueFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(eq, compId, matIdx);
+            details::SetBoundaryValueFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(eq, compId, matIdx);
             func.apply(field, storage, start);
          }
          // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
          else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
          {
-            SetBoundaryValueFunctor<CouplingIndexType::MODE> func(eq, compId, matIdx);
+            details::SetBoundaryValueFunctor<CouplingIndexType::MODE> func(eq, compId, matIdx);
             func.apply(field, storage, start);
          }
          // There is a single matrix
          else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
          {
-            SetBoundaryValueFunctor<CouplingIndexType::SINGLE> func(eq, compId, matIdx);
+            details::SetBoundaryValueFunctor<CouplingIndexType::SINGLE> func(eq, compId, matIdx);
             func.apply(field, storage, start);
          }
       }

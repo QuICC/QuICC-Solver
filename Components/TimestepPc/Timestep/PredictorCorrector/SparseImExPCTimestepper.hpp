@@ -346,12 +346,12 @@ bool SparseImExPCTimestepper<TOperator, TData, TSolver>::postSolve()
       }
 
       this->mStep += 1;
+   }
 
-      // Check if we are done
-      if (this->mStep == this->steps())
-      {
-         this->mStep = 0;
-      }
+   // Check if we are done
+   if (this->mStep == this->steps())
+   {
+      this->mStep = 0;
    }
 
    return false;

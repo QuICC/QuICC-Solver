@@ -19,11 +19,11 @@
 #include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "Arithmetics/Basic.hpp"
-#include "QuICC/Equations/SetZeroNonlinearFunctor.hpp"
-#include "QuICC/Equations/SetZeroNonlinearFunctorSSR.hpp"
-#include "QuICC/Equations/SetZeroNonlinearFunctorSMR.hpp"
-#include "QuICC/Equations/SetZeroNonlinearFunctorM.hpp"
-#include "QuICC/Equations/SetZeroNonlinearFunctorS.hpp"
+#include "QuICC/Equations/details/SetZeroNonlinearFunctor.hpp"
+#include "QuICC/Equations/details/SetZeroNonlinearFunctorSSR.hpp"
+#include "QuICC/Equations/details/SetZeroNonlinearFunctorSMR.hpp"
+#include "QuICC/Equations/details/SetZeroNonlinearFunctorM.hpp"
+#include "QuICC/Equations/details/SetZeroNonlinearFunctorS.hpp"
 
 namespace QuICC {
 
@@ -45,24 +45,24 @@ namespace Equations {
       // matIdx is the index of the slowest varying direction with a single RHS
       if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
-         SetZeroNonlinearFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(eq, compId, matIdx);
+         details::SetZeroNonlinearFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(eq, compId, matIdx);
          func.apply(field, storage, start);
       }
       // matIdx is the index of the slowest varying direction with multiple RHS
       else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
       {
-         SetZeroNonlinearFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(eq, compId, matIdx);
+         details::SetZeroNonlinearFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(eq, compId, matIdx);
          func.apply(field, storage, start);
       }
       // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
       else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
       {
-         SetZeroNonlinearFunctor<CouplingIndexType::MODE> func(eq, compId, matIdx);
+         details::SetZeroNonlinearFunctor<CouplingIndexType::MODE> func(eq, compId, matIdx);
          func.apply(field, storage, start);
       }
       else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
       {
-         SetZeroNonlinearFunctor<CouplingIndexType::SINGLE> func(eq, compId, matIdx);
+         details::SetZeroNonlinearFunctor<CouplingIndexType::SINGLE> func(eq, compId, matIdx);
          func.apply(field, storage, start);
       }
    }

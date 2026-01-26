@@ -13,11 +13,11 @@
 //
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Equations/IFieldEquation.hpp"
-#include "QuICC/Equations/AddSourceFunctor.hpp"
-#include "QuICC/Equations/AddSourceFunctorSMR.hpp"
-#include "QuICC/Equations/AddSourceFunctorSSR.hpp"
-#include "QuICC/Equations/AddSourceFunctorM.hpp"
-#include "QuICC/Equations/AddSourceFunctorS.hpp"
+#include "QuICC/Equations/details/AddSourceFunctor.hpp"
+#include "QuICC/Equations/details/AddSourceFunctorSMR.hpp"
+#include "QuICC/Equations/details/AddSourceFunctorSSR.hpp"
+#include "QuICC/Equations/details/AddSourceFunctorM.hpp"
+#include "QuICC/Equations/details/AddSourceFunctorS.hpp"
 
 namespace QuICC {
 
@@ -39,25 +39,25 @@ namespace Equations {
       // matIdx is the index of the slowest varying direction with a single RHS
       if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
-         AddSourceFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(eq, compId, matIdx);
+         details::AddSourceFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(eq, compId, matIdx);
          func.apply(field, storage, start);
       }
       // matIdx is the index of the slowest varying direction with multiple RHS
       else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
       {
-         AddSourceFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(eq, compId, matIdx);
+         details::AddSourceFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(eq, compId, matIdx);
          func.apply(field, storage, start);
       }
       // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
       else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
       {
-         AddSourceFunctor<CouplingIndexType::MODE> func(eq, compId, matIdx);
+         details::AddSourceFunctor<CouplingIndexType::MODE> func(eq, compId, matIdx);
          func.apply(field, storage, start);
       }
       // There is a single matrix
       else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
       {
-         AddSourceFunctor<CouplingIndexType::SINGLE> func(eq, compId, matIdx);
+         details::AddSourceFunctor<CouplingIndexType::SINGLE> func(eq, compId, matIdx);
          func.apply(field, storage, start);
       }
    }

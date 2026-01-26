@@ -19,11 +19,11 @@
 #include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "Arithmetics/Utility.hpp"
-#include "QuICC/Equations/ExplicitTermFunctor.hpp"
-#include "QuICC/Equations/ExplicitTermFunctorSSR.hpp"
-#include "QuICC/Equations/ExplicitTermFunctorSMR.hpp"
-#include "QuICC/Equations/ExplicitTermFunctorM.hpp"
-#include "QuICC/Equations/ExplicitTermFunctorS.hpp"
+#include "QuICC/Equations/details/ExplicitTermFunctor.hpp"
+#include "QuICC/Equations/details/ExplicitTermFunctorSSR.hpp"
+#include "QuICC/Equations/details/ExplicitTermFunctorSMR.hpp"
+#include "QuICC/Equations/details/ExplicitTermFunctorM.hpp"
+#include "QuICC/Equations/details/ExplicitTermFunctorS.hpp"
 
 namespace QuICC {
 
@@ -72,22 +72,22 @@ namespace Equations {
          // Create pointer to sparse operator
          if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
          {
-            ExplicitTermFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(eq, compId, matIdx);
+            details::ExplicitTermFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(eq, compId, matIdx);
             func.apply(opId, rSolverField, eqStart, fieldId, explicitField);
          }
          else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
          {
-            ExplicitTermFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(eq, compId, matIdx);
+            details::ExplicitTermFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(eq, compId, matIdx);
             func.apply(opId, rSolverField, eqStart, fieldId, explicitField);
          }
          else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
          {
-            ExplicitTermFunctor<CouplingIndexType::MODE> func(eq, compId, matIdx);
+            details::ExplicitTermFunctor<CouplingIndexType::MODE> func(eq, compId, matIdx);
             func.apply(opId, rSolverField, eqStart, fieldId, explicitField);
          }
          else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
          {
-            ExplicitTermFunctor<CouplingIndexType::SINGLE> func(eq, compId, matIdx);
+            details::ExplicitTermFunctor<CouplingIndexType::SINGLE> func(eq, compId, matIdx);
             func.apply(opId, rSolverField, eqStart, fieldId, explicitField);
          }
       }

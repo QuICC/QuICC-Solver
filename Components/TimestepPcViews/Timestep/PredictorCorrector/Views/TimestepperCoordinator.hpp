@@ -121,9 +121,14 @@ namespace Views {
          void updateRhs(const TimestepperInfo& info, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& rhs);
 
          /**
-          * @brief Update RHS
+          * @brief Update solution
           */
          void updateSolution(const TimestepperInfo& info, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol);
+
+         /**
+          * @brief Update Solution with corrections
+          */
+         void updateSolution(const TimestepperInfo& info, const std::vector<std::tuple<MHDComplex, int, int>>& corr);
 
          /**
           * @brief Get solution
@@ -344,6 +349,30 @@ namespace Views {
          auto& startArr = std::get<1>(stepData);
          assert(startArr.size() > info.fieldIndex);
          spStepper->setSolution(sol, startArr.at(info.fieldIndex));
+         spStepper->updateSolutions();
+      }
+   }
+
+   template <template <class,class,typename> class TStepper> void TimestepperCoordinator<TStepper, base_t>::updateSolution(const TimestepperInfo& info, const std::vector<std::tuple<MHDComplex, int, int>>& corr)
+   {
+      if(info.isComplex)
+      {
+         assert(this->mComplexSteppers.count(info.solverIndex) > 0);
+         auto& stepData = this->mComplexSteppers.at(info.solverIndex);
+         auto spStepper = std::get<0>(stepData);
+         auto& startArr = std::get<1>(stepData);
+         assert(startArr.size() > info.fieldIndex);
+         spStepper->correctSolution(corr, startArr.at(info.fieldIndex));
+         spStepper->updateSolutions();
+      }
+      else
+      {
+         assert(this->mRealSteppers.count(info.solverIndex) > 0);
+         auto& stepData = this->mRealSteppers.at(info.solverIndex);
+         auto spStepper = std::get<0>(stepData);
+         auto& startArr = std::get<1>(stepData);
+         assert(startArr.size() > info.fieldIndex);
+         spStepper->correctSolution(corr, startArr.at(info.fieldIndex));
          spStepper->updateSolutions();
       }
    }

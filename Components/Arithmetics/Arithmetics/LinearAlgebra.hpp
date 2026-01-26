@@ -14,6 +14,7 @@
 //
 #include "Types/Typedefs.hpp"
 #include "Arithmetics/Utility.hpp"
+#include "View/View.hpp"
 
 namespace QuICC {
 
@@ -90,7 +91,7 @@ void setTopBlock(T1& rField, const int start, const int rows,
       else
       {
          static_assert(false,
-            "Tried to use invalid combination of types in setTopBlock");
+            "Tried to use invalid combination of types with Eigen::Matrix in setTopBlock");
       }
    }
    else if constexpr (std::is_same<T1, DecoupledZMatrix>::value &&
@@ -102,6 +103,27 @@ void setTopBlock(T1& rField, const int start, const int rows,
       int cols = rField.real().cols();
       rField.real().block(start, 0, rows, cols) = rhs.real().topRows(rows);
       rField.imag().block(start, 0, rows, cols) = rhs.imag().topRows(rows);
+   }
+   else if constexpr (std::is_same_v<T2, Matrix> ||
+                 std::is_same_v<T2, MatrixZ>)
+   {
+      if constexpr (std::is_same_v<typename Arithmetics::GetScalarType<T1>::ScalarType,
+                       typename T2::Scalar>)
+      {
+         int cols = Arithmetics::getCols(rField);
+         for(int j = 0; j < cols; j++)
+         {
+            for(int i = 0; i < rows; i++)
+            {
+               rField(i + start, j) = rhs(i, j);
+            }
+         }
+      }
+      else
+      {
+         static_assert(false,
+            "Tried to use invalid combination of types with Views in setTopBlock");
+      }
    }
    else
    {

@@ -13,6 +13,8 @@
 
 // Project includes
 //
+#include "Arithmetics/Utility.hpp"
+#include "Eigen/src/Core/util/Constants.h"
 #include "Types/Typedefs.hpp"
 #include "QuICC/Equations/CopyUnknown.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
@@ -35,16 +37,18 @@ namespace Equations {
 
    template <typename TEquation, typename TData> void solveStencilUnknown(const TEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
    {
+      using TmpDataType = typename std::conditional<std::is_same_v<TData, DecoupledZMatrix>, DecoupledZMatrix, Eigen::Matrix<typename Arithmetics::GetScalarType<TData>::ScalarType, Eigen::Dynamic, Eigen::Dynamic>>::type;
+
       const auto& info = eq.couplingInfo(compId);
 
       // Create temporary storage for tau data
-      TData tmp(info.tauN(matIdx), info.rhsCols(matIdx));
+      TmpDataType tmp(info.tauN(matIdx), info.rhsCols(matIdx));
       std::visit(
             [&](auto&& p)
             {
                Equations::copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);
             }, eq.spUnknown());
-      TData rhs(info.galerkinN(matIdx), info.rhsCols(matIdx));
+      TmpDataType rhs(info.galerkinN(matIdx), info.rhsCols(matIdx));
       if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
       {
          Arithmetics::setTopBlock(rhs, 0, info.galerkinN(matIdx), eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL), info.galerkinShift(matIdx, 0), tmp);
@@ -75,7 +79,7 @@ namespace Equations {
       }
 
       // solve for galerkin expansion
-      TData lhs(info.galerkinN(matIdx), info.rhsCols(matIdx));
+      TmpDataType lhs(info.galerkinN(matIdx), info.rhsCols(matIdx));
       Solver::details::solveWrapper(lhs, solver, rhs);
       Arithmetics::setTopBlock(storage, start, info.galerkinN(matIdx), lhs);
    }

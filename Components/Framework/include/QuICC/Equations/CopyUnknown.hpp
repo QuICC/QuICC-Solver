@@ -20,11 +20,11 @@
 #include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "Arithmetics/Basic.hpp"
-#include "QuICC/Equations/CopyUnknownFunctor.hpp"
-#include "QuICC/Equations/CopyUnknownFunctorSMR.hpp"
-#include "QuICC/Equations/CopyUnknownFunctorSSR.hpp"
-#include "QuICC/Equations/CopyUnknownFunctorS.hpp"
-#include "QuICC/Equations/CopyUnknownFunctorM.hpp"
+#include "QuICC/Equations/details/CopyUnknownFunctor.hpp"
+#include "QuICC/Equations/details/CopyUnknownFunctorSMR.hpp"
+#include "QuICC/Equations/details/CopyUnknownFunctorSSR.hpp"
+#include "QuICC/Equations/details/CopyUnknownFunctorS.hpp"
+#include "QuICC/Equations/details/CopyUnknownFunctorM.hpp"
 
 namespace QuICC {
 
@@ -48,7 +48,7 @@ namespace Equations {
       // matIdx is the index of the slowest varying direction with a single RHS
       if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
-         CopyUnknownFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(eq, compId, matIdx, useShift);
+         details::CopyUnknownFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(eq, compId, matIdx, useShift);
 
          // Copy data
          if(isSet)
@@ -63,7 +63,7 @@ namespace Equations {
       // matIdx is the index of the slowest varying direction with multiple RHS
       else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
       {
-         CopyUnknownFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(eq, compId, matIdx, useShift);
+         details::CopyUnknownFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(eq, compId, matIdx, useShift);
 
          // Copy data
          if(isSet)
@@ -78,7 +78,7 @@ namespace Equations {
       // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
       else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
       {
-         CopyUnknownFunctor<CouplingIndexType::MODE> func(eq, compId, matIdx, useShift);
+         details::CopyUnknownFunctor<CouplingIndexType::MODE> func(eq, compId, matIdx, useShift);
 
          // Copy data
          if(isSet)
@@ -93,7 +93,7 @@ namespace Equations {
       // There is a single matrix
       else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
       {
-         CopyUnknownFunctor<CouplingIndexType::SINGLE> func(eq, compId, matIdx, useShift);
+         details::CopyUnknownFunctor<CouplingIndexType::SINGLE> func(eq, compId, matIdx, useShift);
 
          // Copy data
          if(isSet)

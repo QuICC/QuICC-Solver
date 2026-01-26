@@ -284,6 +284,16 @@ void addCorrection(DecoupledZMatrix& rVal, const SparseMatrixZ& corr);
  */
 template <typename TData, typename TCorr> void addCorrection(TData& rVal, const TCorr& corr);
 
+/**
+ * @brief Apply correction from tuple
+ */
+void addCorrection(DecoupledZMatrix& rVal, const std::vector<std::tuple<MHDComplex,int,int>>& corr, const std::size_t startRow);
+
+/**
+ * @brief Apply correction from tuple
+ */
+template <typename TData> void addCorrection(TData& rVal, const std::vector<std::tuple<MHDComplex,int,int>>& corr, const std::size_t startRow);
+
 //
 //
 //
@@ -966,6 +976,29 @@ inline void addCorrection(DecoupledZMatrix& rVal, const SparseMatrixZ& corr)
 template <typename TData, typename TCorr> inline void addCorrection(TData& rVal, const TCorr& corr)
 {
    rVal += corr;
+}
+
+inline void addCorrection(DecoupledZMatrix& rVal, const std::vector<std::tuple<MHDComplex,int,int>>& corr, const std::size_t startRow)
+{
+   for(auto&& c: corr)
+   {
+      auto&& val = std::get<0>(c);
+      auto&& i = std::get<1>(c);
+      auto&& j = std::get<2>(c);
+      rVal.real()(i + startRow,j) += val.real();
+      rVal.imag()(i + startRow,j) += val.imag();
+   }
+}
+
+template <typename TData> inline void addCorrection(TData& rVal, const std::vector<std::tuple<MHDComplex,int,int>>& corr, const std::size_t startRow)
+{
+   for(auto&& c: corr)
+   {
+      auto&& val = std::get<0>(c);
+      auto&& i = std::get<1>(c);
+      auto&& j = std::get<2>(c);
+      rVal(i + startRow,j) += val;
+   }
 }
 
 } // namespace details
