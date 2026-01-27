@@ -6,12 +6,6 @@
 #ifndef QUICC_PARALLEL_MPICONVERTERTOOLS_HPP
 #define QUICC_PARALLEL_MPICONVERTERTOOLS_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <cassert>
@@ -19,9 +13,6 @@
 #include <memory>
 #include <set>
 #include <tuple>
-
-// External includes
-//
 
 // Project includes
 //
@@ -221,6 +212,8 @@ private:
     */
    static void extractShared(CoordinateMap& sharedMap,
       const CoordinateMap& localIdxMap, const std::set<Coordinate>& remoteKeys);
+   static void extractShared(CoordinateMap& sharedMap,
+      const CoordinateMap& localIdxMap, const std::vector<std::array<int,3>>& remoteKeys);
 
    /**
     * @brief Create type
@@ -561,8 +554,13 @@ void MpiConverterTools::buildCpuMap3D(CoordinateMap& sharedMap,
    const Dimensions::Transform::Id tId, const Dimensions::Transform::Id keyId,
    const int cpuId)
 {
+//#define CHECK_KEY_LIST
+
    // List of remote keys
-   std::set<Coordinate> remoteKeys;
+#ifdef CHECK_KEY_LIST
+   std::set<Coordinate> refRemoteKeys;
+#endif
+   std::vector<std::array<int,3>> remoteKeys;
 
    // Storage for the simulation wide indexes
    int i_, j_, k_;
@@ -602,12 +600,34 @@ void MpiConverterTools::buildCpuMap3D(CoordinateMap& sharedMap,
 
                // Create key
                Coordinate key = spRes->counter().makeVKey(keyId, i_, j_, k_);
+               std::array<int,3> key_;
+               std::copy_n(key.begin(), 3, key_.begin());
 
                // Add key to remote set
-               remoteKeys.insert(key);
+               remoteKeys.push_back(key_);
+#ifdef CHECK_KEY_LIST
+               refRemoteKeys.insert(key);
+#endif //CHECK_KEY_LIST
             }
          }
       }
+
+      // Sort the keys
+      std::sort(remoteKeys.begin(), remoteKeys.end());
+#ifdef CHECK_KEY_LIST
+      if((remoteKeys.size() != refRemoteKeys.size()))
+      {
+         throw std::logic_error("Key set size is wrong");
+      }
+      auto it = refRemoteKeys.begin();
+      for(int i = 0; i < remoteKeys.size(); i++, it++)
+      {
+         if(!std::equal(remoteKeys.at(i).begin(), remoteKeys.at(i).end(), it->begin()))
+         {
+            throw std::logic_error("Key set calculation is wrong");
+         }
+      }
+#endif //CHECK_KEY_LIST
 
       // Convert remote keys to matrix to send through MPI
       matRemote.resize(3, remoteKeys.size());
@@ -633,8 +653,8 @@ void MpiConverterTools::buildCpuMap3D(CoordinateMap& sharedMap,
          QuICCEnv().comm(tId));
       QuICCEnv().check(ierr, "Broadcast of 3D remote index map failed");
 
-      // Remote CPU needs to generate list
    }
+   // Remote CPU needs to generate list
    else
    {
       // Get size
@@ -655,14 +675,53 @@ void MpiConverterTools::buildCpuMap3D(CoordinateMap& sharedMap,
       // Convert matrix to remoteKeys set
       for (int i = 0; i < matRemote.cols(); i++)
       {
-         Coordinate key = {matRemote(0, i), matRemote(1, i), matRemote(2, i)};
-         remoteKeys.insert(key);
+         std::array<int,3> key = {matRemote(0, i), matRemote(1, i), matRemote(2, i)};
+         remoteKeys.push_back(key);
+#ifdef CHECK_KEY_LIST
+         Coordinate key_ = {matRemote(0, i), matRemote(1, i), matRemote(2, i)};
+         refRemoteKeys.insert(key_);
+#endif //CHECK_KEY_LIST
       }
+#ifdef CHECK_KEY_LIST
+      if((remoteKeys.size() != refRemoteKeys.size()))
+      {
+         throw std::logic_error("Key set size is wrong");
+      }
+      auto it = refRemoteKeys.begin();
+      for(int i = 0; i < remoteKeys.size(); i++, it++)
+      {
+         if(!std::equal(remoteKeys.at(i).begin(), remoteKeys.at(i).end(), it->begin()))
+         {
+            throw std::logic_error("Key set calculation is wrong");
+         }
+      }
+#endif //CHECK_KEY_LIST
    }
 
    // Extract map of shared indexes (stored as keys)
    sharedMap.clear();
    MpiConverterTools::extractShared(sharedMap, localIdxMap, remoteKeys);
+#ifdef CHECK_KEY_LIST
+   CoordinateMap refSharedMap;
+   MpiConverterTools::extractShared(refSharedMap, localIdxMap, refRemoteKeys);
+   if(sharedMap.size() != refSharedMap.size())
+   {
+      throw std::logic_error("Shared keys map sizes don't match");
+   }
+   auto refIt = refSharedMap.begin();
+   auto newIt = sharedMap.begin();
+   for(;refIt != refSharedMap.end(); refIt++,newIt++)
+   {
+      if(!std::equal(refIt->first.begin(), refIt->first.end(), newIt->first.begin()))
+      {
+         throw std::logic_error("First key doesn't match");
+      }
+      if(!std::equal(refIt->second.begin(), refIt->second.end(), newIt->second.begin()))
+      {
+         throw std::logic_error("second key doesn't match");
+      }
+   }
+#endif //CHECK_KEY_LIST
 }
 
 template <Dimensions::Data::Id TDataId>

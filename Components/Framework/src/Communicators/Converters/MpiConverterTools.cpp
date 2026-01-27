@@ -3,21 +3,12 @@
  * @brief Source of the tools for the MPI converter
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Communicators/Converters/MpiConverterTools.hpp"
-
 // Project includes
 //
+#include "QuICC/Communicators/Converters/MpiConverterTools.hpp"
 #include "QuICC/Communicators/Converters/PassthroughIndexConv.hpp"
 #include "Environment/QuICCEnv.hpp"
 
@@ -66,6 +57,49 @@ namespace Parallel {
             break;
          default:
             throw std::logic_error("Tried to build local forward coordinate map for unimplemented dimension!");
+      }
+   }
+
+   void MpiConverterTools::extractShared(CoordinateMap& sharedMap, const CoordinateMap& localIdxMap, const std::vector<std::array<int,3>>& remoteKeys)
+   {
+      // List of local index keys
+      std::vector<std::array<int,3>>  localKeys;
+
+      // Extract the set of local keys
+      for(auto mapIt = localIdxMap.begin(); mapIt != localIdxMap.end(); ++mapIt)
+      {
+         std::array<int,3> key;
+         std::copy_n(mapIt->first.begin(), 3, key.begin());
+         localKeys.push_back(key);
+      }
+      if(!std::is_sorted(localKeys.begin(), localKeys.end()))
+      {
+         throw std::logic_error("local keys are not sorted!");
+      }
+
+      if(!std::is_sorted(remoteKeys.begin(), remoteKeys.end()))
+      {
+         throw std::logic_error("remote keys are not sorted!");
+      }
+
+      // Storage for the shared keys
+      std::vector<std::array<int,3>> sharedKeys;
+
+      // Create the list of common indexes
+      std::set_intersection(localKeys.begin(), localKeys.end(), remoteKeys.begin(), remoteKeys.end(), std::inserter(sharedKeys, sharedKeys.begin()));
+      if(!std::is_sorted(sharedKeys.begin(), sharedKeys.end()))
+      {
+         throw std::logic_error("local keys are not sorted!");
+      }
+
+      // Clear the shared map
+      sharedMap.clear();
+
+      // Fill shared map
+      for(auto sit = sharedKeys.begin(); sit != sharedKeys.end(); sit++)
+      {
+         Coordinate key = {(*sit)[0], (*sit)[1], (*sit)[2]};
+         sharedMap.insert(std::make_pair(key, localIdxMap.find(key)->second));
       }
    }
 

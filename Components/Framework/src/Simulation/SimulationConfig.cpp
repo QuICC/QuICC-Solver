@@ -401,7 +401,7 @@ std::size_t SimulationConfig::timestepper() const
 
    // For the time being only the Predictor-correct scheme supports split
    // equations
-   if (this->splitEquation() && (id != Timestep::Id::ImexPc2::id()))
+   if (this->splitEquation() && (!((id == Timestep::Id::ImexPc2b::id()) || (id == Timestep::Id::ImexPc2::id()))))
    {
       throw std::logic_error(
          "Split equations are only supported with PC2 scheme");
