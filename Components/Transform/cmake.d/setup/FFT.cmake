@@ -26,7 +26,13 @@ quicc_create_option(NAME QUICC_FFT_WORLAND
                     OPTS ${_FFT_BACKENDS}
                     LABEL "Worland FFT backend"
                     ADVANCED)
+quicc_create_option(NAME QUICC_FFT_ALEGENDRE
+                    OPTS ${_FFT_BACKENDS}
+                    LABEL "ALegendre FFT backend"
+                    ADVANCED)
 if (QUICC_USE_PFSOLVE)
     set(QUICC_FFT_WORLAND "PfSolve")
+    set(QUICC_FFT_ALEGENDRE "PfSolve")
 endif()
 quicc_add_definition(QUICC_FFT_WORLAND)
+quicc_add_definition(QUICC_FFT_ALEGENDRE)

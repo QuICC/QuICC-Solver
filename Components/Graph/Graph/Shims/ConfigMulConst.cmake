@@ -7,7 +7,11 @@ set(ThetaKinds "buoyancy;transport")
 set(ThetaGridBuilder "QuICC::Polynomial::Quadrature::WorlandRule")
 set(ThetaDir "2")
 set(RKinds "coriolis_cos;coriolis_sin")
+if(TARGET PfSolve)
+set(RGridBuilder "QuICC::Polynomial::Quadrature::LegendreChebyshevRule")
+else()
 set(RGridBuilder "QuICC::Polynomial::Quadrature::LegendreRule")
+endif()
 set(RDir "1")
 
 

@@ -43,6 +43,17 @@ quicc_target_cuda_sources(_useCUDA ${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_
   WorlandIntegrator.cpp
 )
 
+if(QUICC_FFT_ALEGENDRE STREQUAL "cuFFT")
+  set(_useCUDA ON)
+else()
+  set(_useCUDA OFF)
+endif()
+
+quicc_target_cuda_sources(_useCUDA ${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
+  ALegendreProjector.cpp
+  ALegendreIntegrator.cpp
+)
+
 add_subdirectory(Fftw)
 add_subdirectory(PfSolve)
 add_subdirectory(CuFft)

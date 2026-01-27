@@ -31,6 +31,11 @@ namespace Quadrature {
          void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size);
 
          /**
+          * @brief Compute the quadrature for r in [0, 1]
+          */
+         void computeQuadrature2(Internal::Array& igrid, Internal::Array& iweights, const int size);
+
+         /**
           * @brief Compute the quadrature for x = 2r^2 - 1 in [-1, 1]
           */
          void computeXQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size);

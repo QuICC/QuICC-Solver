@@ -8,6 +8,8 @@
 #include "ViewOps/Quadrature/Impl.hpp"
 #include "ViewOps/Quadrature/Op.hpp"
 
+#include "ViewOps/ALegendre_parallALT/Tags.hpp"
+#include "ViewOps/ALegendre_parallALT/Builder.hpp"
 namespace QuICC {
 namespace Graph {
 
@@ -58,6 +60,17 @@ void MapOps::setALegendrePrj(mlir::quiccir::AlPOp op)
 #ifdef QUICC_HAS_CUDA_BACKEND
       else
       {
+#ifdef QUICC_USE_PFSOLVE
+         using mods_t = QuICC::View::View<std::complex<double>, QuICC::View::S1CLCSC3DJIK>;
+         using phys_t = QuICC::View::View<std::complex<double>, QuICC::View::DCCSC3DJIK>;
+        
+         _ops.push_back(std::make_unique<QuICC::Transform::ALegendre_parallALT::ParallaltOp<phys_t, mods_t>>(_mem));
+         auto* ptr =
+            std::get<std::shared_ptr<UnaryOp<phys_t, mods_t>>>(_ops.back()).get();
+         // Add to thisArr
+         assert(ptr != nullptr);
+         _thisArr[index] = ptr;
+#else
          using namespace QuICC::Transform::Quadrature;
          using Tin = C_S1CLCSC3DJIK_t;
          using Tout = C_DCCSC3DJIK_t;
@@ -91,6 +104,46 @@ void MapOps::setALegendrePrj(mlir::quiccir::AlPOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
          }
+#endif
+      }
+#endif
+   }
+   else
+   {
+#ifndef NDEBUG
+      std::cout << "operator already allocated\n";
+#endif
+   }
+}
+
+void MapOps::setALegendrePrjV(mlir::quiccir::AlPVOp op)
+{
+   // Get index from MLIR source
+   std::uint64_t index = op.getImplptr().value();
+   if (index >= _thisArr.size())
+   {
+      _thisArr.resize(index + 1, nullptr);
+   }
+   if (_thisArr[index] == nullptr)
+   {
+      if (_isCpu)
+      {
+         
+      }
+#ifdef QUICC_HAS_CUDA_BACKEND
+      else
+      {
+#ifdef QUICC_USE_PFSOLVE
+         using mods_t = QuICC::View::View<std::complex<double>, QuICC::View::S1CLCSC3DJIK>;
+         using phys_t = QuICC::View::View<std::complex<double>, QuICC::View::DCCSC3DJIK>;
+        
+         _ops.push_back(std::make_unique<QuICC::Transform::ALegendre_parallALT::ParallaltOp<phys_t, mods_t>>(_mem));
+         auto* ptr =
+            std::get<std::shared_ptr<UnaryOp<phys_t, mods_t>>>(_ops.back()).get();
+         // Add to thisArr
+         assert(ptr != nullptr);
+         _thisArr[index] = ptr;
+#endif
       }
 #endif
    }
@@ -149,6 +202,17 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
 #ifdef QUICC_HAS_CUDA_BACKEND
       else
       {
+#ifdef QUICC_USE_PFSOLVE
+         using mods_t = QuICC::View::View<std::complex<double>, QuICC::View::S1CLCSC3DJIK>;
+         using phys_t = QuICC::View::View<std::complex<double>, QuICC::View::DCCSC3DJIK>;
+        
+         _ops.push_back(std::make_unique<QuICC::Transform::ALegendre_parallALT::ParallaltOp<mods_t, phys_t>>(_mem));
+         auto* ptr =
+            std::get<std::shared_ptr<UnaryOp<mods_t, phys_t>>>(_ops.back()).get();
+         // Add to thisArr
+         assert(ptr != nullptr);
+         _thisArr[index] = ptr;
+#else
          using namespace QuICC::Transform::Quadrature;
          using Tin = C_DCCSC3DJIK_t;
          using Tout = C_S1CLCSC3DJIK_t;
@@ -182,6 +246,46 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
          }
+#endif
+      }
+#endif
+   }
+   else
+   {
+#ifndef NDEBUG
+      std::cout << "operator already allocated\n";
+#endif
+   }
+}
+
+void MapOps::setALegendreIntV(mlir::quiccir::AlIVOp op)
+{
+   // Get index from MLIR source
+   std::uint64_t index = op.getImplptr().value();
+   if (index >= _thisArr.size())
+   {
+      _thisArr.resize(index + 1, nullptr);
+   }
+   if (_thisArr[index] == nullptr)
+   {
+      if (_isCpu)
+      {
+        
+      }
+#ifdef QUICC_HAS_CUDA_BACKEND
+      else
+      {
+#ifdef QUICC_USE_PFSOLVE
+         using mods_t = QuICC::View::View<std::complex<double>, QuICC::View::S1CLCSC3DJIK>;
+         using phys_t = QuICC::View::View<std::complex<double>, QuICC::View::DCCSC3DJIK>;
+        
+         _ops.push_back(std::make_unique<QuICC::Transform::ALegendre_parallALT::ParallaltOp<mods_t, phys_t>>(_mem));
+         auto* ptr =
+            std::get<std::shared_ptr<UnaryOp<mods_t, phys_t>>>(_ops.back()).get();
+         // Add to thisArr
+         assert(ptr != nullptr);
+         _thisArr[index] = ptr;
+#endif
       }
 #endif
    }

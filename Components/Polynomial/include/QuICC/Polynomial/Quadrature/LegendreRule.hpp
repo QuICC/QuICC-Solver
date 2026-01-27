@@ -33,7 +33,10 @@ namespace Quadrature {
           * @brief Compute the quadrature
           */
          void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size);
-
+         /**
+          * @brief Compute the quadrature
+          */
+         void computeQuadrature2(Internal::Array& igrid, Internal::Array& iweights, const int size);
       protected:
          /**
           * @brief Get p polynomial

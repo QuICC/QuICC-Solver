@@ -9,6 +9,7 @@
 
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
+#include "QuICC/Polynomial/Quadrature/LegendreChebyshevRule.hpp"
 #include "Profiler/Interface.hpp"
 
 

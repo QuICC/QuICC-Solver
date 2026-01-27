@@ -23,6 +23,7 @@ public:
     /// @param in input of the operation with const qualifier
     virtual void apply(Tout& out, const Tin& in) = 0;
 
+    void apply(Tout& out, Tout& out2, const Tin& in, const Tin& in2);
     /// @brief dtor
     virtual ~UnaryOp() = default;
 };
@@ -42,6 +43,11 @@ public:
     void apply(Tout& out, const Tin& in) final {
         auto derivedPtr = static_cast<Derived*>(this);
         derivedPtr->applyImpl(out, in);
+    }
+
+    void apply(Tout& out, Tout& out2, const Tin& in, const Tin& in2) {
+        auto derivedPtr = static_cast<Derived*>(this);
+        derivedPtr->applyImpl(out, out2, in, in2);
     }
 };
 

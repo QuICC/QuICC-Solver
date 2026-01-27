@@ -6,9 +6,13 @@
 # Ops: quiccir.jw.prj, quiccir.jw.int
 set(Ops "prj;int")
 # kinds: P, D1, ...
+if(TARGET PfSolve)
+set(prjKinds "P;Ll;D1;LlD1;DivS1")
+set(intKinds "P;Ll;D1;LlD1;DivS1")
+else()
 set(prjKinds "P;D1;Ll;LlD1;Llm1D1;DivS1;D1DivS1;D1DivS1Dp;DivS1Dp;LlDivS1;LlDivS1Dp;Llm1DivS1;Llm1DivS1Dp")
 set(intKinds "P;D1;Ll;LlD1;DivS1;DivS1Dp;LlDivS1;LlDivS1Dp;Ll2;DivLl;DivLlD1;DivLlDivS1;DivLlDivS1Dp")
-
+endif()
 # Special treatments: operators that require a phi derivative
 set(DivS1DpTreatment "diffPhi_m")
 set(D1DivS1DpTreatment "diffPhi_m")

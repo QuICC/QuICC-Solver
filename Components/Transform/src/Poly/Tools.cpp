@@ -23,7 +23,7 @@ namespace Transform {
 
 namespace Poly {
 
-   const MHDFloat Tools::STD_DEALIASING = 3.0/2.0;
+   const MHDFloat Tools::STD_DEALIASING = 4.0 / 2.0; //parallALT nonlinear
 
    int Tools::dealias(const int size)
    {

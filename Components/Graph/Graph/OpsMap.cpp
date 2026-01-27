@@ -40,9 +40,17 @@ MapOps::MapOps(mlir::ModuleOp module,
          {
             setALegendrePrj(alPrj);
          }
+         else if (auto alPrjV = dyn_cast<mlir::quiccir::AlPVOp>(op))
+         {
+            setALegendrePrjV(alPrjV);
+         }
          else if (auto alInt = dyn_cast<mlir::quiccir::AlIOp>(op))
          {
             setALegendreInt(alInt);
+         }
+         else if (auto alIntV = dyn_cast<mlir::quiccir::AlIVOp>(op))
+         {
+            setALegendreIntV(alIntV);
          }
          else if (auto jwPrj = dyn_cast<mlir::quiccir::JWPOp>(op))
          {

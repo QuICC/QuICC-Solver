@@ -64,6 +64,11 @@
 #include "QuICC/Transform/Poly/ALegendre/Projector/Llm1DivS1Dp.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/DivS1D1S1.hpp"
 
+#include "QuICC/Transform/Fft/ALegendre/Integrator/P.hpp"
+#include "QuICC/Transform/Fft/ALegendre/Integrator/D1.hpp"
+
+#include "QuICC/Transform/Fft/ALegendre/Projector/P.hpp"
+#include "QuICC/Transform/Fft/ALegendre/Projector/D1.hpp"
 namespace QuICC {
 
 namespace Transform {
@@ -97,6 +102,17 @@ void ALegendreTransform::init(ALegendreTransform::SharedSetupType spSetup)
 
 void ALegendreTransform::initOperators()
 {
+#ifdef QUICC_USE_PFSOLVE
+       using backend_t = Fft::ALegendre::viewGpuParallalt_t;
+       this->mImpl.addOperator<Fft::ALegendre::Projector::P<backend_t>>(
+      Backward::P::id());
+   this->mImpl.addOperator<Fft::ALegendre::Projector::D1<backend_t>>(
+      Backward::D1::id());
+   this->mImpl.addOperator<Fft::ALegendre::Integrator::P<backend_t>>(
+      Forward::P::id());
+   this->mImpl.addOperator<Fft::ALegendre::Integrator::D1<backend_t>>(
+      Forward::D1::id());
+   #else     
    using namespace Poly::ALegendre;
    // Reserve storage for the projectors, 1/sin projectors and derivative
 #if QUICC_USE_KOKKOS
@@ -165,6 +181,7 @@ void ALegendreTransform::initOperators()
          Forward::OverlaplhOversinDphi::id());
    this->mImpl.addOperator<Poly::ALegendre::Integrator::LlDivS1Dp<backend_t>>(
       Forward::LaplhOversinDphi::id());
+    #endif
 }
 
 void ALegendreTransform::forward(MatrixZ& rOut, const MatrixZ& in,

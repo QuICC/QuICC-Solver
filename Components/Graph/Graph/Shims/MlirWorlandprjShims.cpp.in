@@ -142,7 +142,7 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_
     //auto std::unique_ptr<QuICC::Operator::UnaryOp<Tout, Tin>> cl = reinterpret_cast<QuICC::Operator::UnaryOp<Tout, Tin>*>(obj);
 
      const char* proj_operator = "@Kind@";
-    printf("%s\n", proj_operator);
+    printf("JW %s\n", proj_operator);
     if (!strcmp(proj_operator, "P"))
         cl->setType(PFSOLVE_RADIAL, 1);
     if (!strcmp(proj_operator, "P_Zero"))

@@ -7,6 +7,15 @@ if(QUICC_FFT_WORLAND STREQUAL "PfSolve")
   set(_use_PFSOLVE ON)
 endif()
 
+if(QUICC_FFT_ALEGENDRE STREQUAL "PfSolve")
+  quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
+    IALegendreBackend.cpp
+    ALegendreProjector.cpp
+    ALegendreIntegrator.cpp
+  )
+set(_use_FFTW ON)
+endif()
+
 if(_use_PFSOLVE)
   quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
     IPfSolveBackend.cpp

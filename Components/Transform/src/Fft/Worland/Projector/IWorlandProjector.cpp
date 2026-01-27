@@ -51,6 +51,7 @@ namespace Projector {
 
    void IWorlandProjector::transformBlock(MatrixZ& rOut, const MatrixZ& in, const bool isEven, const bool useReal) const
    {
+     
       Profiler::RegionStart<5> (this->mProfileTag + "-pre");
       this->applyPreOperator(in, isEven, useReal);
       Profiler::RegionStop<5> (this->mProfileTag + "-pre");
@@ -62,6 +63,7 @@ namespace Projector {
       Profiler::RegionStart<5> (this->mProfileTag + "-post");
       this->applyPostOperator(rOut, isEven, useReal);
       Profiler::RegionStop<5> (this->mProfileTag + "-post");
+      
    }
 
    void IWorlandProjector::transformBlock(Matrix& rOut, const Matrix& in, const bool isEven) const
@@ -86,6 +88,15 @@ namespace Projector {
       assert(this->isInitialized());
       assert(this->mspSetup->fwdSize() == rOut.rows());
       assert(in.cols() <= rOut.cols());
+      /* for (int i = 0; i < 5; i++)
+      {
+         for (int j = 0; j < 5; j++)
+         {
+            printf("%.2e %.2e | ", in(j, i).real(),
+               in(j, i).imag());
+         }
+         printf("aa\n");
+      }*/
 #ifdef QUICC_USE_PFSOLVE
       this->transformBlock(rOut, in, true, true);
 #else
@@ -94,6 +105,16 @@ namespace Projector {
       this->transformBlock(rOut, in, false, true);
       this->transformBlock(rOut, in, false, false);
 #endif
+      /* for (int i = 0; i < 5; i++)
+      {
+         for (int j = 0; j < 5; j++)
+         {
+            printf("%.2e %.2e | ", rOut(j, i).real(),
+               rOut(j, i).imag());
+         }
+         printf("bb\n");
+      }*/
+
    }
 
    void IWorlandProjector::transform(Matrix& rOut, const Matrix& in) const

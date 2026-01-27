@@ -41,6 +41,30 @@ namespace Quadrature {
       iweights.setConstant(Internal::Math::PI/(MHD_MP(2.0)*Internal::MHDFloat(size)));
    }
 
+   void WorlandChebyshevRule::computeQuadrature2(Internal::Array& igrid, Internal::Array& iweights, const int size)
+   {
+      // Internal grid and weights arrays
+      igrid.resize(size);
+      iweights.resize(size);
+
+      for(int k = 0; k < size/2; k++)
+      {
+         Internal::MHDFloat theta = Internal::Math::PI_long*(Internal::MHDFloat(2*k + 1))/Internal::MHDFloat(4*size);
+         igrid(k) = Internal::Math::cos(theta);
+      }
+
+      for(int k = size/2; k < size; k++)
+      {
+         // Reverse grid r = (0, 1)
+         int k_ = size-k;
+
+         Internal::MHDFloat theta = Internal::Math::PI_long*(Internal::MHDFloat(2*k_ - 1))/Internal::MHDFloat(4*size);
+         igrid(k) = Internal::Math::sin(theta);
+      }
+
+      iweights.setConstant(Internal::Math::PI/(MHD_MP(2.0)*Internal::MHDFloat(size)));
+   }
+
    void WorlandChebyshevRule::computeXQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size)
    {
       // Internal grid and weights arrays

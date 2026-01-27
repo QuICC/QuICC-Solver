@@ -65,9 +65,11 @@ private:
    /// @brief map ALegendre projectors
    /// @param op
    void setALegendrePrj(mlir::quiccir::AlPOp op);
+   void setALegendrePrjV(mlir::quiccir::AlPVOp op);
    /// @brief map ALegendre integrators
    /// @param op
    void setALegendreInt(mlir::quiccir::AlIOp op);
+   void setALegendreIntV(mlir::quiccir::AlIVOp op);
    /// @brief map ALegendre projectors
    /// @param op
    void setWorlandPrj(mlir::quiccir::JWPOp op);

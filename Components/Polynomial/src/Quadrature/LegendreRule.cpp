@@ -17,7 +17,36 @@ namespace QuICC {
 namespace Polynomial {
 
 namespace Quadrature {
+   void LegendreRule::computeQuadrature2(Internal::Array& igrid, Internal::Array& iweights, const int size)
+   {
+      // Internal grid and weights arrays
+      igrid.resize(size);
+      igrid.setZero();
+      iweights.resize(size);
+      iweights.setZero();
 
+      for(int k = 0; k < size; k++)
+      {
+         Internal::MHDFloat theta = Internal::Math::PI_long*(Internal::MHDFloat(2*k + 1))/Internal::MHDFloat(2*size);
+         igrid(k) = Internal::Math::cos(theta);
+      }
+
+      for(int k = size; k < size; k++)
+      {
+         // Reverse grid r = (0, 1)
+         int k_ = size-k;
+
+         Internal::MHDFloat theta = Internal::Math::PI_long*(Internal::MHDFloat(2*k_ - 1))/Internal::MHDFloat(4*size);
+         igrid(k) = Internal::Math::sin(theta);
+      }
+
+      iweights.setConstant(Internal::Math::PI/(MHD_MP(2.0)*Internal::MHDFloat(size)));
+      /* for (int i = 0; i < size; i++)
+      {
+         printf("%e ", igrid(i));
+      }
+      printf("\n");*/
+   }
    void LegendreRule::computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size)
    {
       // Internal grid and weights arrays
@@ -82,9 +111,10 @@ namespace Quadrature {
       // Convert derivative to weights
       igrid = ig.cast<Internal::MHDFloat>();
       iweights = (MHD_MP_LONG(2.0)*((MHD_MP_LONG(1.0)-ig.array().square()).array()*iw.array().square()).inverse()).cast<Internal::MHDFloat>();
-
+     
       // Sort the grid and weights
       this->sortQuadrature(igrid, iweights);
+
    }
 
    Internal::MHDLong   LegendreRule::p(const Internal::MHDLong xi, const int diff)

@@ -1,0 +1,588 @@
+/**
+ * @file @Op@@Tag@.cpp
+ * @brief Wrapper of the ALegendre @Op@ @Kind@
+ */
+
+// System includes
+//
+
+// Project includes
+//
+#include "QuICC/Transform/Wrappers/ALegendre/@Kind@/@Op@@Tag@.hpp.inc"
+//#include "ViewOps/ALegendre/OpsBuilder.hpp"
+
+#include "View/ViewSparse.hpp"
+#include "Memory/Cpu/NewDelete.hpp"
+//#include "ViewOps/Quadrature/Op.hpp"
+//#include "ViewOps/Quadrature/Impl.hpp"
+#include "ViewOps/ALegendre_parallALT/Tags.hpp"
+#include "ViewOps/ALegendre_parallALT/Builder.hpp"
+#include "Profiler/Interface.hpp"
+@CppHeaders@
+
+namespace QuICC {
+namespace Transform {
+namespace Fft {
+namespace ALegendre {
+namespace @Kind@ {
+
+@Op@<@Tag@>::~@Op@() {
+   //deleteParallALT(&VkGPU, &appContainer_backward);
+   //cudaFree(appContainer_backward.input_buffer_S);
+   //cudaFree(&appContainer_backward.buffer_S);
+   if(m_even)
+     free(m_even);
+   if(m_even_endBatch)
+    free(m_even_endBatch);
+   if(m_odd)
+    free(m_odd);
+   if(m_odd_endBatch)
+    free(m_odd_endBatch);
+}
+
+void @Op@<@Tag@>::computeALegendreExpansion(const bool isEven) const
+{
+    //launchApp_parallALT(&appContainer_backward,0);
+}
+
+void @Op@<@Tag@>::applyPreOperator(const Matrix& in, const bool isEven) const
+{
+}
+
+void @Op@<@Tag@>::applyPostOperator(Matrix& rOut, const bool isEven) const
+{
+}
+
+void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const bool useReal) const
+{
+     Profiler::RegionStart<2>("applyOperators");
+    std::uint32_t Ntheta = this->mspSetup->fwdSize();
+    
+  uint64_t bufferSize = in.rows() * (m_even_endBatch[num_m_even-1] + m_odd_endBatch[num_m_odd-1]) * sizeof(double);
+    PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
+    double* gpuIn = (double*)mPhysFlat_d.data();
+    void* in_cpu = (void*)in.data();
+  resPfSolve = PfSolve::transferDataFromCPU(&VkGPU, in_cpu, &gpuIn, bufferSize);
+    //if (resPfSolve != PfSolve::PFSOLVE_SUCCESS) return resPfSolve;
+  cudaDeviceSynchronize();
+ 
+  Profiler::RegionStart<2>("applyImpl");
+
+  const char* proj_operator = "@Op@";
+    if (!strcmp(proj_operator, "P"))
+        mOp->setType(PFSOLVE_RADIAL, 0);
+    if (!strcmp(proj_operator, "P_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_ZERO, 0);
+    if (!strcmp(proj_operator, "DivR1"))
+        mOp->setType(PFSOLVE_RADIAL_DIVR, 0);
+    if (!strcmp(proj_operator, "DivR1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_DIVR_ZERO, 0);
+    if (!strcmp(proj_operator, "D1"))
+        mOp->setType(PFSOLVE_RADIAL_DR, 0);
+    if (!strcmp(proj_operator, "R1"))
+        mOp->setType(PFSOLVE_RADIAL_R, 0);
+    if (!strcmp(proj_operator, "R1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_R_ZERO, 0);
+    if (!strcmp(proj_operator, "DivR1D1R1"))
+        mOp->setType(PFSOLVE_RADIAL_DIVR_DR_R, 0);
+    if (!strcmp(proj_operator, "DivR1D1R1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_DIVR_DR_R_ZERO, 0);
+    if (!strcmp(proj_operator, "SphLapl"))
+        mOp->setType(PFSOLVE_RADIAL_SPHLAPL, 0);
+
+    if (!strcmp(proj_operator, "I2"))
+        mOp->setType(PFSOLVE_RADIAL_I2, 0);
+    if (!strcmp(proj_operator, "I2_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_I2_ZERO, 0);
+    if (!strcmp(proj_operator, "I2DivR1"))
+        mOp->setType(PFSOLVE_RADIAL_I2_DIVR, 0);
+    if (!strcmp(proj_operator, "I2DivR1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_I2_DIVR_ZERO, 0);
+    if (!strcmp(proj_operator, "I2DivR1D1R1"))
+        mOp->setType(PFSOLVE_RADIAL_I2_DIVR_DR_R, 0);
+    if (!strcmp(proj_operator, "I2DivR1D1R1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_I2_DIVR_DR_R_ZERO, 0);
+    if (!strcmp(proj_operator, "I4"))
+        mOp->setType(PFSOLVE_RADIAL_I4, 0);    
+    if (!strcmp(proj_operator, "I4_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_I4_ZERO, 0);
+    if (!strcmp(proj_operator, "I4DivR1"))
+        mOp->setType(PFSOLVE_RADIAL_I4_DIVR, 0);
+    if (!strcmp(proj_operator, "I4DivR1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_I4_DIVR_ZERO, 0);
+    if (!strcmp(proj_operator, "I4DivR1D1R1"))
+        mOp->setType(PFSOLVE_RADIAL_I4_DIVR_DR_R, 0);
+    if (!strcmp(proj_operator, "I4DivR1D1R1_Zero"))
+        mOp->setType(PFSOLVE_RADIAL_I4_DIVR_DR_R_ZERO, 0);
+
+    mOp->apply(mModsView, mPhysView);
+  return;
+  /*std::uint32_t Ntheta = this->mspSetup->fwdSize();
+
+    Profiler::RegionStart<2>("applyOperators");
+
+    PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
+    double* inSplit = (double*)calloc(
+        Ntheta *
+        (m_even_endBatch[num_m_even - 1] +
+            m_odd_endBatch[num_m_odd - 1]),
+        sizeof(MHDFloat));
+
+    uint64_t bufferSize = Ntheta * (m_even_endBatch[num_m_even-1]+m_odd_endBatch[num_m_odd-1]) * sizeof(double);
+   
+    std::vector<int> Mseq(num_m_even + num_m_odd);
+    for (int i = 0; i < num_m_even; i++)
+    {
+        Mseq[i] = m_even[i];
+    }
+    for (int i = 0; i < num_m_odd; i++)
+    {
+        Mseq[num_m_even+i] = m_odd[i];
+    }
+    std::sort(Mseq.begin(), Mseq.end());
+    for (int i = 0; i < num_m_even +
+                            num_m_odd;
+        i++)
+    {
+    // printf("%d\n", Mseq[i]);
+    }
+    int evenID = 0;
+    int oddID = 0;
+    int even_startBatch = 0;
+    int odd_startBatch = m_even_endBatch[num_m_even - 1];
+    int current_i = 0;
+    for (int i = 0; i < num_m_even + num_m_odd; i++)
+    {
+        if (Mseq[i] % 2)
+        {
+            int numBatches =
+            (oddID == 0)
+                ? m_odd_endBatch[0]
+                : m_odd_endBatch[oddID] -
+                    m_odd_endBatch[oddID - 1];
+            for (int l = 0;
+            l < (numBatches/2); l++)
+            {
+            for (int j = 0; j < in.rows(); j++)
+            {
+
+                //printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l],outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l +
+                //            Ntheta]);
+                inSplit[j + odd_startBatch * Ntheta + Ntheta *2*l] = in(j, current_i+l).real();
+                inSplit[j + odd_startBatch * Ntheta + Ntheta *2*l +
+                            Ntheta] = in(j, current_i+l).imag();
+            }
+            }
+            odd_startBatch += numBatches;
+            current_i += numBatches/2;
+            oddID++;
+        }
+        else
+        {
+            int numBatches =
+            (evenID == 0)
+                ? m_even_endBatch[0]
+                : m_even_endBatch[evenID] -
+                    m_even_endBatch[evenID - 1];
+            for (int l = 0;
+            l < (numBatches/2); l++)
+            {
+            for (int j = 0; j < in.rows(); j++)
+            {
+
+                // printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + even_startBatch * Ntheta + Ntheta *2*l],outSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
+                //             Ntheta]);
+                inSplit[j + even_startBatch * Ntheta + Ntheta *2*l] = in(j, current_i+l).real();
+                inSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
+                            Ntheta] = in(j, current_i+l).imag();
+                         
+            }
+            }
+            even_startBatch += numBatches;
+            current_i += numBatches /2;
+            evenID++;
+        }
+        //printf("\n");
+    }
+    uint64_t bufferSizeReducedEven = Ntheta * m_even_endBatch[num_m_even-1] * sizeof(double);
+	uint64_t bufferSizeReducedOdd = Ntheta * m_odd_endBatch[num_m_odd-1] * sizeof(double);
+    double* gpuIn = (double*)mPhysFlat_d.data();
+  resPfSolve = PfSolve::transferDataFromCPU(&VkGPU, inSplit, &gpuIn, bufferSizeReducedEven);
+    //if (resPfSolve != PfSolve::PFSOLVE_SUCCESS) return resPfSolve;
+    gpuIn = gpuIn + Ntheta * m_even_endBatch[num_m_even-1];
+    resPfSolve = PfSolve::transferDataFromCPU(&VkGPU, inSplit + Ntheta * m_even_endBatch[num_m_even-1], &gpuIn, bufferSizeReducedOdd);
+    //if (resPfSolve != PfSolve::PFSOLVE_SUCCESS) return resPfSolve;
+  cudaDeviceSynchronize();
+  free(inSplit);
+
+    Profiler::RegionStart<2>("applyImpl");
+
+    mOp->apply(mModsView, mPhysView);*/
+}
+
+void @Op@<@Tag@>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const
+{
+    std::uint32_t Ntheta = this->mspSetup->fwdSize();
+  cudaDeviceSynchronize();
+Profiler::RegionStop<2>("applyImpl");
+uint64_t bufferSize = rOut.rows() * (m_even_endBatch[num_m_even-1]+m_odd_endBatch[num_m_odd-1]) * sizeof(double);
+  double* gpuOut = (double*)mModsFlat_d.data();
+   void* out_cpu = rOut.data();
+   PfSolve::PfSolveResult resPfSolve = PfSolve::transferDataToCPU(&VkGPU, out_cpu, &gpuOut, bufferSize);
+  Profiler::RegionStop<2>("applyOperators");
+  return;
+
+    /*std::uint32_t Ntheta = this->mspSetup->fwdSize();
+    cudaDeviceSynchronize();
+    Profiler::RegionStop<2>("applyImpl");
+
+    PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
+    double* outSplit = (double*)calloc(
+     Ntheta *
+        (m_even_endBatch[num_m_even - 1] +
+           m_odd_endBatch[num_m_odd - 1]),
+     sizeof(MHDFloat));
+
+     uint64_t bufferSize = Ntheta * (m_even_endBatch[num_m_even-1]+m_odd_endBatch[num_m_odd-1]) * sizeof(double);
+     double* gpuOut = (double*)mModsFlat_d.data();
+     resPfSolve = PfSolve::transferDataToCPU(&VkGPU, outSplit, &gpuOut, bufferSize);
+
+     std::vector<int> Mseq(num_m_even + num_m_odd);
+  for (int i = 0; i < num_m_even; i++)
+  {
+     Mseq[i] = m_even[i];
+  }
+
+  for (int i = 0; i < num_m_odd; i++)
+  {
+     Mseq[num_m_even+i] = m_odd[i];
+  }
+  std::sort(Mseq.begin(), Mseq.end());
+   int evenID = 0;
+  int oddID = 0;
+  int even_startBatch = 0;
+  int odd_startBatch = m_even_endBatch[num_m_even - 1];
+  int current_i = 0;
+  for (int i = 0; i < num_m_even + num_m_odd; i++)
+  {
+      if (Mseq[i] % 2)
+      {
+          int numBatches =
+            (oddID == 0)
+               ? m_odd_endBatch[0]
+               : m_odd_endBatch[oddID] -
+                    m_odd_endBatch[oddID - 1];
+           for (int l = 0;
+            l < (numBatches/2); l++)
+         {
+            for (int j = 0; j < rOut.rows(); j++)
+            {
+               rOut(j, current_i + l) = std::complex<double>(outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l] * 2 * 3.1415926535897932384626433832795029,
+               outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l +
+                           Ntheta]* 2 * 3.1415926535897932384626433832795029);
+        
+            }
+         }
+         odd_startBatch += numBatches;
+         current_i += numBatches/2;
+         oddID++;
+     }
+      else
+      {
+         int numBatches =
+            (evenID == 0)
+               ? m_even_endBatch[0]
+               : m_even_endBatch[evenID] -
+                    m_even_endBatch[evenID - 1];
+         for (int l = 0;
+            l < (numBatches/2); l++)
+         {
+            for (int j = 0; j < rOut.rows(); j++)
+            {
+               
+               rOut(j, current_i + l) = std::complex<double>(outSplit[j + even_startBatch * Ntheta + Ntheta *2*l]* 2 * 3.1415926535897932384626433832795029,
+               outSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
+                           Ntheta]* 2 * 3.1415926535897932384626433832795029);
+            }
+         }
+         even_startBatch += numBatches;
+         current_i += numBatches /2;
+         evenID++;
+      }
+  }
+    cudaDeviceSynchronize();
+    free(outSplit);
+
+    Profiler::RegionStop<2>("applyOperators");*/
+
+}
+void @Op@<@Tag@>::initBackend() const
+{
+    Profiler::RegionFixture<3> fix("P<viewGpuParallalt_t>::initBackend");
+
+    //SetupType &setup = &this->mspSetup;
+    std::uint32_t Ntheta = this->mspSetup->fwdSize();//igrid.size();
+    std::uint32_t K = static_cast<std::uint32_t>(this->mspSetup->fastSize(0));
+
+    std::uint32_t nLayers = static_cast<std::uint32_t>(this->mspSetup->slowSize());
+
+    ///\todo this should be the full matrix size
+    std::uint32_t M = static_cast<std::uint32_t>(this->mspSetup->slow(nLayers-1)) + 1;
+    std::uint32_t L = this->mspSetup->specSize();
+    PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
+    
+    num_m_even = 0;
+    num_m_odd = 0;
+    for (std::uint32_t i = 0; i < nLayers; ++i)
+    {
+        if ((static_cast<std::uint32_t>(this->mspSetup->slow(i))%2) == 0 )
+        {
+            num_m_even++;
+        }
+        if ((static_cast<std::uint32_t>(this->mspSetup->slow(i))%2) == 1 )
+        {
+            num_m_odd++;
+        }
+    }
+    int start = 0;
+    int iter = 0;
+    m_even = (int*)calloc(num_m_even, sizeof(int));
+    m_even_endBatch = (int*)calloc(num_m_even, sizeof(int));
+    m_odd = (int*)calloc(num_m_odd, sizeof(int));
+    m_odd_endBatch = (int*)calloc(num_m_odd, sizeof(int));
+    //config_backward.m_even_list = m_even;
+    //config_backward.m_even_endBatch = m_even_endBatch;
+    //config_backward.m_odd_list = m_odd;
+    //config_backward.m_odd_endBatch = m_odd_endBatch;
+   
+    for (std::uint32_t i = 0; i < nLayers; ++i)
+    {
+        if ((static_cast<std::uint32_t>(this->mspSetup->slow(i))%2) == 0 )
+        {
+            start += static_cast<std::uint32_t>(this->mspSetup->mult(i));
+            m_even[iter] = static_cast<std::uint32_t>(this->mspSetup->slow(i));
+            m_even_endBatch[iter] = 2*start;
+            printf("%d %d %d \n", m_even[iter], m_even_endBatch[iter], iter);
+            iter++;
+        }
+    }
+    
+    start = 0;
+    iter = 0;
+    for (std::uint32_t i = 0; i < nLayers; ++i)
+    {
+        if ((static_cast<std::uint32_t>(this->mspSetup->slow(i))%2) == 1 )
+        {
+            start += static_cast<std::uint32_t>(this->mspSetup->mult(i));
+            m_odd[iter] = static_cast<std::uint32_t>(this->mspSetup->slow(i));
+            m_odd_endBatch[iter] = 2*start;
+            printf("%d %d %d \n", m_odd[iter], m_odd_endBatch[iter], iter);
+            iter++;
+        }
+    }
+    
+    //config_backward.M = ((m_even[config_backward.num_m_even - 1]) / 2 + 1) * 2;// M;
+    //config_backward.L = this->mspSetup->specSize();// 3 * M / 2;
+
+    //std::cout << resPfSolve;
+
+    constexpr size_t rank = 3;
+    // dim 0 - Nr - radial points
+    // dim 1 - R  - radial modes
+    // dim 2 - L  - harmonic degree
+    std::array<std::uint32_t, rank> dimensions {M, K, M};
+
+    std::vector<std::uint32_t> layers(nLayers);
+    for(std::uint32_t p = 0; p < nLayers; ++p)
+    {
+        layers[p] = this->mspSetup->slow(p);
+    }
+
+    // Make view operator
+    auto mem = std::make_shared<QuICC::Memory::Cuda::Malloc>();
+    mOp = std::make_unique<QuICC::Transform::ALegendre_parallALT::ParallaltOp<phys_t, mods_t>>(mem);
+    
+    //using op_t = QuICC::Transform::ALegendre_parallALT::ParallaltOp<phys_t, mods_t, 1, opType>;
+    //mOp = std::make_unique<QuICC::Transform::ALegendre_parallALT::ParallaltOp<phys_t, mods_t, 1, opType>>(mem);
+
+    ///\todo move view setups to init
+
+    // alloc in/out dataspace
+    // indices/pointers are the same for In/Out
+    mDataPointers.resize(M+1);
+    mDataPointers[0] = 0;
+
+    std::uint32_t N = 0;
+    std::uint32_t nCols = 0;
+    std::uint32_t inFlatSize = 0;
+    std::uint32_t layerCtr = 0;
+    for (std::uint32_t i = 0; i < M; ++i)
+    {
+        std::uint32_t blockWidth = 0;
+        std::uint32_t blockSize = 0;
+        if (static_cast<std::uint32_t>(this->mspSetup->slow(layerCtr)) == i )
+        {
+            int nPoly = this->mspSetup->fastSize(layerCtr);
+            blockWidth = static_cast<std::uint32_t>(this->mspSetup->mult(layerCtr));
+            blockSize = blockWidth*nPoly;
+            ++layerCtr;
+        }
+
+        nCols += blockWidth;
+        mDataPointers[i+1] = nCols;
+        inFlatSize += blockSize;
+
+        /// make up indices, we don't know them and
+        /// the exact value is needed only for the comm stage
+        for (std::uint32_t idx = 0; idx < blockWidth; idx++)
+        {
+            mDataIndices.push_back(idx);
+        }
+
+        N = std::max(N, blockWidth);
+    }
+
+    // dim 0 - R  - radial modes
+    // dim 1 - M  - harmonic order
+    // dim 2 - L  - harmonic degree
+    //std::array<std::uint32_t, rank> modsDims = {Ntheta, config_backward.M, config_backward.L};
+    //mModsFlat.resize(config_backward.Ntheta* 2*(m_even_endBatch[config_backward.num_m_even -1] + m_odd_endBatch[config_backward.num_m_odd -1]));
+    std::array<std::uint32_t, rank> modsDims = {L, N, M};
+    mModsFlat.resize(Ntheta * nCols);//slightly more for now
+    // dim 0 - Nr - radial points
+    // dim 1 - M  - harmonic order
+    // dim 2 - L  - harmonic degree
+    //std::array<std::uint32_t, rank> physDims = {Ntheta, config_backward.M, config_backward.L};
+    //mPhysFlat.resize(config_backward.Ntheta* 2*(m_even_endBatch[config_backward.num_m_even -1] + m_odd_endBatch[config_backward.num_m_odd -1]));
+    std::array<std::uint32_t, rank> physDims = {Ntheta, N, M};
+    mPhysFlat.resize(Ntheta * nCols);
+
+    using namespace QuICC::View;
+
+    // alloc device memory
+    mModsFlat_d = std::move(QuICC::Memory::MemBlock<cuda::std::complex<double>>(mModsFlat.size(), mem.get()));
+    mDataPointers_d = std::move(QuICC::Memory::MemBlock<std::uint32_t>(mDataPointers.size(), mem.get()));
+    mDataIndices_d = std::move(QuICC::Memory::MemBlock<std::uint32_t>(mDataIndices.size(), mem.get()));
+    mPhysFlat_d = std::move(QuICC::Memory::MemBlock<cuda::std::complex<double>>(mPhysFlat.size(), mem.get()));
+
+    // set device pointers
+    ViewBase<std::uint32_t> dataPointers_d[rank];
+    dataPointers_d[1] = ViewBase<std::uint32_t>(mDataPointers_d.data(), mDataPointers_d.size());
+    ViewBase<std::uint32_t> dataIndices_d[rank];
+    dataIndices_d[1] = ViewBase<std::uint32_t>(mDataIndices_d.data(), mDataIndices_d.size());
+
+    // copy to device memory
+    cudaErrChk(cudaMemcpyAsync(reinterpret_cast<std::complex<double>*>(mModsFlat_d.data()), mModsFlat.data(),
+        mModsFlat_d.size()*sizeof(cuda::std::complex<double>), cudaMemcpyHostToDevice));
+    cudaErrChk(cudaMemcpyAsync(mDataPointers_d.data(), mDataPointers.data(),
+        mDataPointers_d.size()*sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+    cudaErrChk(cudaMemcpyAsync(mDataIndices_d.data(), mDataIndices.data(),
+        mDataIndices_d.size()*sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+    cudaErrChk(cudaMemcpyAsync(reinterpret_cast<std::complex<double>*>(mPhysFlat_d.data()), mPhysFlat.data(),
+        mPhysFlat_d.size()*sizeof(cuda::std::complex<double>), cudaMemcpyHostToDevice));
+
+    // set device views
+    mModsView = mods_t(reinterpret_cast<std::complex<double>*>(mModsFlat_d.data()), mModsFlat_d.size(), modsDims.data(), dataPointers_d, dataIndices_d);
+    mPhysView = phys_t(reinterpret_cast<std::complex<double>*>(mPhysFlat_d.data()), mPhysFlat_d.size(), physDims.data(), dataPointers_d, dataIndices_d);
+
+    
+}
+
+void @Op@<@Tag@>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+{
+    Profiler::RegionFixture<2> fix("@Op@<@Tag@>::applyOperators");
+
+    assert(static_cast<std::size_t>(in.rows()) == mPhysView.dims()[0]);
+    assert(static_cast<std::size_t>(in.cols()) == mPhysView.indices()[1].size());
+    assert(static_cast<std::size_t>(rOut.rows()) == mModsView.dims()[0]);
+    assert(static_cast<std::size_t>(rOut.cols()) == mModsView.indices()[1].size());
+
+    std::uint32_t nLayers = static_cast<std::uint32_t>(this->mspSetup->slowSize());
+
+    /// copy data to view
+    int start = 0;
+    std::int64_t offSet = 0;
+    int inRows = this->mspSetup->fwdSize();
+    for(std::uint32_t p = 0; p < nLayers; ++p)
+    {
+        int cols = this->mspSetup->mult(p);
+        const Eigen::Ref<const MatrixZ> inB = in.block(0, start, inRows, cols);
+
+        for (std::int64_t j = 0; j < inB.cols(); ++j)
+        {
+            for (std::int64_t i = 0; i < inB.rows(); ++i)
+            {
+#if defined QUICC_JW_ROW_MAJOR || defined QUICC_JW_ALL_ROW_MAJOR
+               // copy from padded to flattened and transpose
+               mPhysFlat[offSet + i * inB.cols() + j] =
+                  inB.data()[i + j * in.rows()];
+#else
+               // copy from padded to flattened column
+               mPhysFlat[offSet + i + j * inB.rows()] =
+                  inB.data()[i + j * in.rows()];
+#endif
+            }
+        }
+        offSet += inB.size();
+        start += cols;
+    }
+
+    @HostToDevice@
+
+    /// apply
+    mOp->apply(mModsView, mPhysView);
+
+    /// copy back
+
+    @DeviceToHost@
+
+    start = 0;
+    offSet = 0;
+    for(std::uint32_t p = 0; p < nLayers; p++)
+    {
+        int cols = this->mspSetup->mult(p);
+        int outRows = this->mspSetup->fastSize(p);
+
+        Eigen::Ref<MatrixZ> outB = rOut.block(0, start, outRows, cols);
+
+        for (std::int64_t j = 0; j < outB.cols(); ++j)
+        {
+            for (std::int64_t i = 0; i < outB.rows(); ++i)
+            {
+#if defined QUICC_JW_ROW_MAJOR || defined QUICC_JW_ALL_ROW_MAJOR
+               // copy to padded from flattened column and transpose
+               outB.data()[i + j * rOut.rows()] =
+                  mModsFlat[offSet + i * outB.cols() + j];
+#else
+               // copy to padded from flattened column
+               outB.data()[i + j * rOut.rows()] =
+                  mModsFlat[offSet + i + j * outB.rows()];
+#endif
+            }
+        }
+
+        offSet += outB.size();
+        start += cols;
+    }
+}
+
+void @Op@<@Tag@>::makeOperator(Matrix& op, const int i) const
+{
+    throw std::logic_error("view ALegendre operator should never call this");
+}
+
+void @Op@<@Tag@>::applyOperators(Matrix& rOut, const MatrixZ& in) const
+{
+    throw std::logic_error("view ALegendre operator should never call this");
+}
+
+void @Op@<@Tag@>::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
+{
+    throw std::logic_error("view ALegendre operator should never call this");
+}
+
+} // namespace @Kind@
+} // namespace ALegendre
+} // namespace Poly
+} // namespace Transform
+} // namespace QuICC

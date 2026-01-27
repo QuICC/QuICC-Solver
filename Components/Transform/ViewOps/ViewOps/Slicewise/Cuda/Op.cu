@@ -12,6 +12,7 @@
 
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
+#include "QuICC/Polynomial/Quadrature/LegendreChebyshevRule.hpp"
 
 namespace QuICC {
 namespace Slicewise {
@@ -278,7 +279,15 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiThetaImpl(Tout& out, cons
 template class Op<2, QuICC::Polynomial::Quadrature::WorlandRule, MulRFunctor<double>,
    View::View<double, View::DCCSC3D>,
    View::View<double, View::DCCSC3D>>;
+#ifdef QUICC_USE_PFSOLVE
+template class Op<1, QuICC::Polynomial::Quadrature::LegendreChebyshevRule, MulCosFunctor<double>,
+   View::View<double, View::DCCSC3D>,
+   View::View<double, View::DCCSC3D>>;
 
+template class Op<1, QuICC::Polynomial::Quadrature::LegendreChebyshevRule, MulSinFunctor<double>,
+   View::View<double, View::DCCSC3D>,
+   View::View<double, View::DCCSC3D>>;
+#else
 template class Op<1, QuICC::Polynomial::Quadrature::LegendreRule, MulCosFunctor<double>,
    View::View<double, View::DCCSC3D>,
    View::View<double, View::DCCSC3D>>;
@@ -286,7 +295,7 @@ template class Op<1, QuICC::Polynomial::Quadrature::LegendreRule, MulCosFunctor<
 template class Op<1, QuICC::Polynomial::Quadrature::LegendreRule, MulSinFunctor<double>,
    View::View<double, View::DCCSC3D>,
    View::View<double, View::DCCSC3D>>;
-
+#endif
 } // namespace Cuda
 } // namespace Slicewise
 } // namespace QuICC

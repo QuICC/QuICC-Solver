@@ -5,6 +5,15 @@
 #include "Graph/Types.hpp"
 #include "Graph/Shims/MlirShims.hpp"
 
+#ifdef QUICC_USE_PFSOLVE
+#include "View/ViewSparse.hpp"
+#include "Memory/Cpu/NewDelete.hpp"
+#include "ViewOps/ALegendre_parallALT/Tags.hpp"
+#include "ViewOps/ALegendre_parallALT/Builder.hpp"
+#include <stdio.h>
+#include <string.h> 
+#endif
+
 #include "ViewOps/Quadrature/Op.hpp"
 #include "ViewOps/Quadrature/Impl.hpp"
 #include "ViewOps/ALegendre/OpsBuilder.hpp"
@@ -84,6 +93,117 @@ extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_S1CLCSC3D_complexf64_D
 };
 
 #ifdef QUICC_HAS_CUDA_BACKEND
+#ifdef QUICC_USE_PFSOLVE
+/// @brief C Interface to MLIR for a al prj operator
+/// column major, gpu operators
+/// @param op
+/// @param umod
+/// @param uval
+extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_S1CLCSC3DJIK_complexf64_DCCSC3DJIK(void* obj, view3_cd_t* pUmod, view3_cd_t* pUval)
+{
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirALegendreintShims");
+
+    //#ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_al_@Op@_@Kind@_complexf64_S1CLCSC3DJIK_complexf64_DCCSC3DJIK\n";
+    //#endif
+    assert(obj != nullptr);
+    assert(pUval != nullptr);
+    assert(pUmod != nullptr);
+    // op
+    //using namespace QuICC::Transform::Quadrature;
+    using Tin = C_DCCSC3DJIK_t;
+    using Tout = C_S1CLCSC3DJIK_t;
+    // QUICC_USE_IBLOCKED_CUDA_MATMUL_WARP_TILE
+    using Top = QuICC::View::View<double, QuICC::View::S1CLCSC3DJIK>;
+    
+    // views
+    using namespace QuICC::View;
+    constexpr std::uint32_t rank = 3;
+    ViewBase<std::uint32_t> pointers[rank];
+    pointers[1] = ViewBase<std::uint32_t>(pUmod->pos, pUmod->posSize);
+    ViewBase<std::uint32_t> indices[rank];
+    indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
+    assert(pUmod->pos == pUval->pos);
+    assert(pUmod->coo == pUval->coo);
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->data));
+    Tin viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
+    Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
+    // Check that op was set up
+    //auto cl = reinterpret_cast<op_t*>(obj);
+    using mods_t = QuICC::View::View<std::complex<double>, QuICC::View::S1CLCSC3DJIK>;
+    using phys_t = QuICC::View::View<std::complex<double>, QuICC::View::DCCSC3DJIK>;
+   
+    QuICC::Transform::ALegendre_parallALT::ParallaltOp<mods_t, phys_t>* cl = (QuICC::Transform::ALegendre_parallALT::ParallaltOp<mods_t, phys_t>*)obj;
+    
+    const char* int_operator = "@Kind@";
+    printf("ALT %s\n", int_operator);
+    if (!strcmp(int_operator, "P")){
+        cl->setType(0, 0);
+        cl->apply(viewMod, viewVal);
+    }
+
+};
+extern "C" void _ciface_quiccir_al_@Op@V_@Kind@_complexf64_S1CLCSC3DJIK_complexf64_S1CLCSC3DJIK_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK(void* obj,  view3_cd_t* pUmod,  view3_cd_t* pUmod2, view3_cd_t* pUval, view3_cd_t* pUval2)
+{
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirALegendreintShims");
+
+    //#ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_al_@Op@V_@Kind@_complexf64_S1CLCSC3DJIK_complexf64_S1CLCSC3DJIK_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK\n";
+    //#endif
+    assert(obj != nullptr);
+    assert(pUval != nullptr);
+    assert(pUmod != nullptr);
+    // op
+    //using namespace QuICC::Transform::Quadrature;
+    using Tin = C_DCCSC3DJIK_t;
+    using Tout = C_S1CLCSC3DJIK_t;
+    // QUICC_USE_IBLOCKED_CUDA_MATMUL_WARP_TILE
+    using Top = QuICC::View::View<double, QuICC::View::S1CLCSC3DJIK>;
+    
+    // views
+    using namespace QuICC::View;
+    constexpr std::uint32_t rank = 3;
+    ViewBase<std::uint32_t> pointers[rank];
+    pointers[1] = ViewBase<std::uint32_t>(pUmod->pos, pUmod->posSize);
+    ViewBase<std::uint32_t> indices[rank];
+    indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
+    assert(pUmod->pos == pUval->pos);
+    assert(pUmod->coo == pUval->coo);
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->data));
+    Tin viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
+    Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
+    Tin viewVal2(pUval2->data, pUval2->dataSize, pUval2->dims, pointers, indices);
+    Tout viewMod2(pUmod2->data, pUmod2->dataSize, pUmod2->dims, pointers, indices);
+    // Check that op was set up
+    //auto cl = reinterpret_cast<op_t*>(obj);
+    using mods_t = QuICC::View::View<std::complex<double>, QuICC::View::S1CLCSC3DJIK>;
+    using phys_t = QuICC::View::View<std::complex<double>, QuICC::View::DCCSC3DJIK>;
+   
+    QuICC::Transform::ALegendre_parallALT::ParallaltOp<mods_t, phys_t>* cl = (QuICC::Transform::ALegendre_parallALT::ParallaltOp<mods_t, phys_t>*)obj;
+    
+    const char* int_operator = "@Kind@";
+    printf("ALT %s\n", int_operator);
+    
+    if (!strcmp(int_operator, "D1")){
+        cl->setType(10, 0);
+        // call
+        cl->apply(viewMod, viewMod2, viewVal, viewVal2);
+    }
+    if (!strcmp(int_operator, "DivS1")){
+        cl->setType(20, 0);
+        // call
+        cl->apply(viewMod, viewMod2, viewVal, viewVal2);
+    }
+};
+#else
 /// @brief C Interface to MLIR for a al int operator
 /// column major data, gpu operators
 /// @param op
@@ -162,4 +282,5 @@ extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_S1CLCSC3DJIK_complexf6
     // call
     cl->apply(viewMod, viewVal);
 };
+#endif
 #endif

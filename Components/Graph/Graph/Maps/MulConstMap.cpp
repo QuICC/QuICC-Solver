@@ -6,6 +6,7 @@
 //
 #include "Graph/OpsMap.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
+#include "QuICC/Polynomial/Quadrature/LegendreChebyshevRule.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 #include "ViewOps/Slicewise/Functors.hpp"
 #include "ViewOps/Slicewise/Op.hpp"
@@ -43,6 +44,20 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
             _thisArr[index] = ptr;
          }
 #ifdef QUICC_HAS_CUDA_BACKEND
+#ifdef QUICC_USE_PFSOLVE
+         else
+         {
+            using namespace QuICC::Slicewise::Cuda;
+            using op_t = Op<1, QuICC::Polynomial::Quadrature::LegendreChebyshevRule,
+               MulCosFunctor<double>, T, T>;
+            _ops.push_back(
+               std::make_unique<op_t>(MulCosFunctor<double>(scaling), _mem));
+            auto* ptr =
+               std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
+            assert(ptr != nullptr);
+            _thisArr[index] = ptr;
+         }
+#else
          else
          {
             using namespace QuICC::Slicewise::Cuda;
@@ -55,6 +70,7 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
          }
+#endif
 #endif
       }
       else if (op.getKind() == "coriolis_sin")
@@ -74,6 +90,20 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
             _thisArr[index] = ptr;
          }
 #ifdef QUICC_HAS_CUDA_BACKEND
+#ifdef QUICC_USE_PFSOLVE
+         else
+         {
+            using namespace QuICC::Slicewise::Cuda;
+            using op_t = Op<1, QuICC::Polynomial::Quadrature::LegendreChebyshevRule,
+               MulSinFunctor<double>, T, T>;
+            _ops.push_back(
+               std::make_unique<op_t>(MulSinFunctor<double>(scaling), _mem));
+            auto* ptr =
+               std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
+            assert(ptr != nullptr);
+            _thisArr[index] = ptr;
+         }
+#else
          else
          {
             using namespace QuICC::Slicewise::Cuda;
@@ -86,6 +116,7 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
          }
+#endif
 #endif
       }
       else

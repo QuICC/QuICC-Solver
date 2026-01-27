@@ -86,6 +86,15 @@ namespace Integrator {
       assert(this->isInitialized());
       assert(this->mspSetup->fwdSize() == in.rows());
       assert(in.cols() <= rOut.cols());
+      /* for (int i = 0; i < 5; i++)
+      {
+         for (int j = 0; j < 5; j++)
+         {
+            printf("%.2e %.2e | ", in(j, i).real(),
+               in(j, i).imag());
+         }
+         printf("aa\n");
+      }*/
 #ifdef QUICC_USE_PFSOLVE
       this->transformBlock(rOut, in, true, true);
 #else
@@ -94,6 +103,15 @@ namespace Integrator {
       this->transformBlock(rOut, in, false, true);
       this->transformBlock(rOut, in, false, false);
 #endif
+      /* for (int i = 0; i < 5; i++)
+      {
+         for (int j = 0; j < 5; j++)
+         {
+            printf("%.2e %.2e | ", rOut(j, i).real(),
+               rOut(j, i).imag());
+         }
+         printf("bb\n");
+      }*/
    }
 
    void IWorlandIntegrator::transform(Matrix& rOut, const Matrix& in) const
