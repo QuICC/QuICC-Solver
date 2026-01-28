@@ -36,6 +36,11 @@ set(tags
   Lower3d
   BoundaryHeatFlux
   Lundquist
+  MagDiffEta1
+  MagDiffEta2
+  MagDiffExtraDeg
+  MagDiffN1
+  MagDiffRad
   MagDiffType
   MagneticEkman
   MagneticPrandtl
@@ -61,7 +66,6 @@ set(tags
   Roberts
   Rossby
   Sigma
-  SimulationMode
   StabilityMode
   Sort
   Tau
