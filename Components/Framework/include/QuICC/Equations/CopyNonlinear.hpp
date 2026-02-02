@@ -53,7 +53,7 @@ namespace Equations {
             std::visit(
                   [&](auto&& p)
                   {
-                  copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);
+                  copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true, true);
                   }, eq.spUnknown());
 
             // Multiply nonlinear term by quasi-inverse
@@ -67,7 +67,7 @@ namespace Equations {
          std::visit(
                [&](auto&& p)
                {
-                  copyUnknown(eq, p->dom(0).perturbation(), compId, storage, matIdx, start, true, isSet);
+                  copyUnknown(eq, p->dom(0).perturbation(), compId, storage, matIdx, start, true, isSet, false);
                }, eq.spUnknown());
       }
    }

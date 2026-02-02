@@ -34,7 +34,7 @@ void CopyUnknownFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::apply(
 {
    const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
 
-   int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
+   int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx) - shiftMaxCol;
 
    // Safety assertion
    assert(start >= 0);
@@ -42,7 +42,7 @@ void CopyUnknownFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::apply(
    // Copy data
    for (int j = zeroCol; j < cols; j++)
    {
-      const int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+      const int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx) - shiftMaxRow;
       for (int i = zeroRow; i < rows; i++)
       {
          if constexpr (IsSet)

@@ -18,12 +18,12 @@ namespace QuICC {
 namespace Model {
 
 void ICppModelBackend::blockInfo(int& tN, int& gN, ArrayI& shift, int& rhs,
-   const int nTauLines, const int nN) const
+   const int nTauLines, const int nN, const bool isGalerkin) const
 {
    tN = nN;
 
    int shiftI = nTauLines;
-   if (this->useGalerkin())
+   if (isGalerkin)
    {
       gN = (nN - shiftI);
    }
@@ -42,7 +42,7 @@ void ICppModelBackend::blockInfo(int& tN, int& gN, ArrayI& shift, int& rhs,
 }
 
 int ICppModelBackend::blockSize(const int nTauLines, const std::vector<int>& nNs,
-   const bool isGalerkin) const
+   const bool isGalerkin, const bool dropRows) const
 {
    // Compute size
    auto s = 0;
@@ -50,8 +50,8 @@ int ICppModelBackend::blockSize(const int nTauLines, const std::vector<int>& nNs
    {
       int tN, gN, rhs;
       ArrayI shift(3);
-      this->blockInfo(tN, gN, shift, rhs, nTauLines, nN);
-      if (isGalerkin)
+      this->blockInfo(tN, gN, shift, rhs, nTauLines, nN, isGalerkin);
+      if (isGalerkin || dropRows)
       {
          s += gN;
       }
@@ -69,10 +69,10 @@ std::pair<int, int> ICppModelBackend::blockShape(const int nTauLinesRow, const i
 {
    // Compute number of rows
    auto rows =
-      this->blockSize(nTauLinesRow, nNs, isGalerkin || dropRows);
+      this->blockSize(nTauLinesRow, nNs, isGalerkin, dropRows);
 
    // Compute number of cols
-   int cols = this->blockSize(nTauLinesCol, nNs, isGalerkin);
+   int cols = this->blockSize(nTauLinesCol, nNs, isGalerkin, false);
 
    return std::make_pair(rows, cols);
 }
@@ -95,7 +95,7 @@ details::SystemInfo ICppModelBackend::systemInfo(const SpectralFieldId& rowId,
    for (auto it = fields.begin(); it != fields.end(); ++it)
    {
       auto nTauLines = this->nBc(*it);
-      int s = this->blockSize(nTauLines, nNs, isGalerkin);
+      int s = this->blockSize(nTauLines, nNs, isGalerkin, false);
       sysN += s;
 
       // Get block index of rowId
@@ -141,11 +141,11 @@ void ICppModelBackend::addBlock(SparseMatrix& mat, const SparseMatrix& block,
    mat += full;
 }
 
-std::tuple<int,int,int,int> ICppModelBackend::blockSystemInfo(const SpectralFieldId& rowId, const SpectralFieldId& colId, const SpectralFieldIds& fields, const std::vector<int>& nNs, const bool ignoreStart, const int fixedCols) const
+std::tuple<int,int,int,int> ICppModelBackend::blockSystemInfo(const SpectralFieldId& rowId, const SpectralFieldId& colId, const SpectralFieldIds& fields, const std::vector<int>& nNs, const bool ignoreStart, const int fixedCols, const bool isGalerkin) const
 {
    // Compute system size
    const auto sysInfo = systemInfo(rowId, colId, fields, nNs,
-      this->useGalerkin(), false);
+      isGalerkin, false);
    const auto& sysN = sysInfo.systemSize;
    int sysCols = sysN;
    if(fixedCols > 0)
@@ -164,7 +164,7 @@ std::tuple<int,int,int,int> ICppModelBackend::blockSystemInfo(const SpectralFiel
    return info;
 }
 
-void ICppModelBackend::computeBlockShift(int& blockShift, const int s0, const int nShift, const int nTauLines, const std::vector<int>& nNs, const int fixedCols) const
+void ICppModelBackend::computeBlockShift(int& blockShift, const int s0, const int nShift, const int nTauLines, const std::vector<int>& nNs, const int fixedCols, const bool isGalerkin) const
 {
    int tN, gN, rhs;
    ArrayI shift(3);
@@ -174,7 +174,7 @@ void ICppModelBackend::computeBlockShift(int& blockShift, const int s0, const in
    {
       for (int s = s0; s < s0 + nShift; s++)
       {
-         this->blockInfo(tN, gN, shift, rhs, nTauLines, nNs.at(s));
+         this->blockInfo(tN, gN, shift, rhs, nTauLines, nNs.at(s), isGalerkin);
          blockShift += fixedCols;
       }
    }
@@ -182,27 +182,32 @@ void ICppModelBackend::computeBlockShift(int& blockShift, const int s0, const in
    {
       for (int s = s0; s < s0 + nShift; s++)
       {
-         this->blockInfo(tN, gN, shift, rhs, nTauLines, nNs.at(s));
+         this->blockInfo(tN, gN, shift, rhs, nTauLines, nNs.at(s), isGalerkin);
          blockShift += gN;
       }
    }
 }
 
 void ICppModelBackend::buildBlock(DecoupledZSparse& decMat,
-   const bool isComplexBlock,
-   const std::vector<details::BlockDescription>& descr,
-   const SpectralFieldId& rowId, const SpectralFieldId& colId,
+   const details::BlockDefinition& blkDef,
    const SpectralFieldIds& fields, const int matIdx, const std::size_t bcType,
-   const Resolution& res, const int j0, const int maxJ, const std::vector<int>& nNs, const BcMap& bcs,
+   const int j0, const int maxJ, const std::vector<int>& nNs, const BcMap& bcs,
    const NonDimensional::NdMap& nds, const bool isSplitOperator, const int fixedCols,
    const bool ignoreStart) const
 {
+   const auto rowId = blkDef.rowId;
+   const auto colId = blkDef.colId;
+   const auto isComplexBlock = blkDef.isComplex;
 
    auto nTauLinesRow = this->nBc(rowId);
    auto nTauLinesCol = this->nBc(colId);
 
+   bool needStencil = blkDef.isGalerkin;
+   bool needTau = (bcType == ModelOperatorBoundary::SolverHasBc::id() &&
+                   !needStencil);
+
    // Compute system size
-   const auto sysInfo = this->blockSystemInfo(rowId, colId, fields, nNs, ignoreStart, fixedCols);
+   const auto sysInfo = this->blockSystemInfo(rowId, colId, fields, nNs, ignoreStart, fixedCols, needStencil);
    const auto sysRows = std::get<0>(sysInfo);
    const auto sysCols = std::get<1>(sysInfo);
    const auto baseRowShift = std::get<2>(sysInfo);
@@ -225,21 +230,17 @@ void ICppModelBackend::buildBlock(DecoupledZSparse& decMat,
       assert(decMat.imag().cols() == sysCols);
    }
 
-   bool needStencil = (this->useGalerkin());
-   bool needTau = (bcType == ModelOperatorBoundary::SolverHasBc::id() &&
-                   !this->useGalerkin());
-
-   for (auto&& d: descr)
+   for (auto&& d: blkDef.descr)
    {
       assert(d.nRowShift == 0 || d.nColShift == 0);
 
       // Shift starting row
       int rowShift = baseRowShift;
-      this->computeBlockShift(rowShift, 0, d.nRowShift, nTauLinesRow, nNs, -1);
+      this->computeBlockShift(rowShift, 0, d.nRowShift, nTauLinesRow, nNs, -1, needStencil);
 
       // Shift starting col
       int colShift = baseColShift;
-      this->computeBlockShift(colShift, 0, d.nColShift, nTauLinesCol, nNs, fixedCols);
+      this->computeBlockShift(colShift, 0, d.nColShift, nTauLinesCol, nNs, fixedCols, needStencil);
 
       int jShift = -d.nRowShift + d.nColShift;
 
@@ -257,11 +258,11 @@ void ICppModelBackend::buildBlock(DecoupledZSparse& decMat,
             if (needStencil)
             {
                this->applyGalerkinStencil(bMat, rowId, colId, j, j + jShift,
-                  d.opts, res, bcs, nds);
+                  d.opts, nNr, nNc, bcs, nds);
             }
             else if (needTau)
             {
-               this->applyTau(bMat, rowId, colId, j + jShift, d.opts, res, bcs,
+               this->applyTau(bMat, rowId, colId, j + jShift, d.opts, nNc, bcs,
                   nds, isSplitOperator);
             }
             this->addBlock(decMat.real(), bMat, rowShift, colShift);
@@ -276,11 +277,11 @@ void ICppModelBackend::buildBlock(DecoupledZSparse& decMat,
             if (needStencil)
             {
                this->applyGalerkinStencil(bMat, rowId, colId, j, j + jShift,
-                  d.opts, res, bcs, nds);
+                  d.opts, nNr, nNc, bcs, nds);
             }
             else if (needTau)
             {
-               this->applyTau(bMat, rowId, colId, j + jShift, d.opts, res, bcs,
+               this->applyTau(bMat, rowId, colId, j + jShift, d.opts, nNc, bcs,
                   nds, isSplitOperator);
             }
             this->addBlock(decMat.imag(), bMat, rowShift, colShift);
@@ -288,10 +289,10 @@ void ICppModelBackend::buildBlock(DecoupledZSparse& decMat,
 
          // Shift to next block
          int s_ = j-j0;
-         this->computeBlockShift(rowShift, s_, 1, nTauLinesRow, nNs, -1);
+         this->computeBlockShift(rowShift, s_, 1, nTauLinesRow, nNs, -1, needStencil);
 
          s_ = j + jShift - j0;
-         this->computeBlockShift(colShift, s_, 1, nTauLinesCol, nNs, fixedCols);
+         this->computeBlockShift(colShift, s_, 1, nTauLinesCol, nNs, fixedCols, needStencil);
       }
    }
 }

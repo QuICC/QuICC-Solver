@@ -46,7 +46,7 @@ namespace Equations {
       std::visit(
             [&](auto&& p)
             {
-               Equations::copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);
+               Equations::copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true, true);
             }, eq.spUnknown());
       TmpDataType rhs(info.galerkinN(matIdx), info.rhsCols(matIdx));
       if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))

@@ -16,6 +16,8 @@
 #include "Memory/MemoryResource.hpp"
 #include "Profiler/Interface.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
+#include "QuICC/Equations/CopyUnknown.hpp"
+#include "QuICC/ModelOperator/QuasiInverse.hpp"
 #include "QuICC/Equations/CorrectSolution.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
 #include "QuICC/Equations/AddSource.hpp"
@@ -343,7 +345,7 @@ void InterfaceViews<TScheme>::initSolution(const ScalarEquation_range& scalEq, c
                         std::visit(
                               [&](auto&& p)
                               {
-                              Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true);
+                              Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, true);
                               }, eqIt->spUnknown());
                      }
 
@@ -510,7 +512,14 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
 
    Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyNonlinear");
                   // Copy field values into timestepper input
-                  Equations::copyNonlinear(*eqIt, myId.second, tmpView, i, 0, true);
+                  if(cinfo.hasNonlinear())
+                  {
+                     std::visit(
+                           [&](auto&& p)
+                           {
+                           Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, false);
+                           }, eqIt->spUnknown());
+                  }
    Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyNonlinear");
 
                   // Add source term
@@ -723,46 +732,39 @@ void InterfaceViews<TScheme>::printInfo(std::ostream& stream)
 inline void buildTimestepMatrixWrapper(std::map<std::size_t, DecoupledZSparse>& ops, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp,
    const int idx)
 {
+   auto buildOp = [&](const std::size_t opId, const std::size_t bcId)
+   {
+      auto ret = ops.insert(std::make_pair(opId, DecoupledZSparse()));
+      spEq->buildModelMatrix(ret.first->second, opId, comp, idx, bcId);
+   };
+
    bool isSplit = spEq->couplingInfo(comp).isSplitEquation();
 
+   using namespace ModelOperator;
+   using namespace ModelOperatorBoundary;
    // Compute model's linear operator (without Tau lines)
-   ops.insert(
-      std::make_pair(ModelOperator::ImplicitLinear::id(), DecoupledZSparse()));
-   spEq->buildModelMatrix(ops.find(ModelOperator::ImplicitLinear::id())->second,
-      ModelOperator::ImplicitLinear::id(), comp, idx,
-      ModelOperatorBoundary::SolverNoTau::id());
+   buildOp(ImplicitLinear::id(), SolverNoTau::id());
+
    // Compute model's time operator (without Tau lines)
-   ops.insert(std::make_pair(ModelOperator::Time::id(), DecoupledZSparse()));
-   spEq->buildModelMatrix(ops.find(ModelOperator::Time::id())->second,
-      ModelOperator::Time::id(), comp, idx,
-      ModelOperatorBoundary::SolverNoTau::id());
+   buildOp(Time::id(), SolverNoTau::id());
+
+   // Compute model's quasi-inverse operator (without Tau lines)
+   buildOp(QuasiInverse::id(), SolverNoTau::id());
+
    // Compute model's tau line boundary operator
-   ops.insert(
-      std::make_pair(ModelOperator::Boundary::id(), DecoupledZSparse()));
-   spEq->buildModelMatrix(ops.find(ModelOperator::Boundary::id())->second,
-      ModelOperator::Boundary::id(), comp, idx,
-      ModelOperatorBoundary::SolverHasBc::id());
+   buildOp(Boundary::id(), SolverHasBc::id());
 
    // If equation was split into two lower order systems
    if (isSplit)
    {
       // Compute model's split linear operator (without Tau lines)
-      auto id = ModelOperator::SplitImplicitLinear::id();
-      ops.insert(std::make_pair(id, DecoupledZSparse()));
-      spEq->buildModelMatrix(ops.find(id)->second, id, comp, idx,
-         ModelOperatorBoundary::SolverNoTau::id());
+      buildOp(SplitImplicitLinear::id(), SolverNoTau::id());
 
       // Compute model's tau line boundary operator for split operator
-      id = ModelOperator::SplitBoundary::id();
-      ops.insert(std::make_pair(id, DecoupledZSparse()));
-      spEq->buildModelMatrix(ops.find(id)->second, id, comp, idx,
-         ModelOperatorBoundary::SolverHasBc::id());
+      buildOp(SplitBoundary::id(), SolverHasBc::id());
 
       // Compute model's tau line boundary value for split operator
-      id = ModelOperator::SplitBoundaryValue::id();
-      ops.insert(std::make_pair(id, DecoupledZSparse()));
-      spEq->buildModelMatrix(ops.find(id)->second, id, comp, idx,
-         ModelOperatorBoundary::SolverNoTau::id());
+      buildOp(SplitBoundaryValue::id(), SolverNoTau::id());
    }
 }
 

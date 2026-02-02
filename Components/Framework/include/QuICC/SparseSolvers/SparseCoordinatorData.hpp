@@ -499,7 +499,7 @@ namespace Solver {
             std::visit(
                   [&](auto&& p)
                   {
-                     Equations::copyUnknown(*spEq, p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true);
+                     Equations::copyUnknown(*spEq, p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true, true);
                   }, spEq->spUnknown());
          }
       }

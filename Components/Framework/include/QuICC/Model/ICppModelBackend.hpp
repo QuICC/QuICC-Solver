@@ -18,6 +18,7 @@
 //
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
+#include "QuICC/Model/BlockDefinition.hpp"
 #include "QuICC/Model/EquationInfo.hpp"
 #include "QuICC/Model/IModelBackend.hpp"
 #include "QuICC/NonDimensional/Typedefs.hpp"
@@ -63,43 +64,6 @@ struct SystemInfo
        startRow(row),
        startCol(col) {};
 };
-
-/**
- * @brief Base class for proving options for system block builder
- */
-struct BlockOptions
-{
-   /**
-    * @brief default ctor
-    */
-   BlockOptions() = default;
-
-   /**
-    * @brief default dtor
-    */
-   virtual ~BlockOptions() = default;
-};
-
-/**
- * @brief Operator block description
- */
-struct BlockDescription
-{
-   /// Starting row shift
-   int nRowShift = 0;
-   /// Starting column shift
-   int nColShift = 0;
-   /// Options to build block
-   std::shared_ptr<BlockOptions> opts;
-   /// Builder for real part
-   SparseMatrix (*realOp)(const int nNr, const int nNc, const int j,
-      std::shared_ptr<BlockOptions> opts,
-      const NonDimensional::NdMap& nds) = nullptr;
-   /// Builder for imaginary part
-   SparseMatrix (*imagOp)(const int nNr, const int nNc, const int j,
-      std::shared_ptr<BlockOptions> opts,
-      const NonDimensional::NdMap& nds) = nullptr;
-};
 } // namespace details
 
 /**
@@ -142,14 +106,14 @@ protected:
     * @param colId   ID of field
     * @param j       2D index
     * @param opts    Additional options
-    * @param res     Resolution object
+    * @param nN      1D dimension
     * @param bcs     Boundary conditions
     * @param nds     Nondimensional parameters
     * @param isSplitOperator  Is second operator of split 4th order system?
     */
    virtual void applyTau(SparseMatrix& mat, const SpectralFieldId& rowId,
       const SpectralFieldId& colId, const int j,
-      std::shared_ptr<details::BlockOptions> opts, const Resolution& res,
+      std::shared_ptr<details::BlockOptions> opts, const int nN,
       const BcMap& bcs, const NonDimensional::NdMap& nds,
       const bool isSplitOperator) const = 0;
 
@@ -162,14 +126,15 @@ protected:
     * @param jr      Row space index
     * @param jc      Column space index
     * @param opts    Additional options
-    * @param res     Resolution object
+    * @param nNr     Row 1D dimension
+    * @param nNc     Column 1D dimension
     * @param bcs     Boundary conditions
     * @param nds     Nondimensional parameters
     */
    virtual void applyGalerkinStencil(SparseMatrix& decMat,
       const SpectralFieldId& rowId, const SpectralFieldId& colId, const int jr,
       const int jc, std::shared_ptr<details::BlockOptions> opts,
-      const Resolution& res, const BcMap& bcs,
+      const int nNr, const int nNc, const BcMap& bcs,
       const NonDimensional::NdMap& nds) const = 0;
 
    /**
@@ -189,7 +154,7 @@ protected:
     * @param nN         Base radial size
     */
    void blockInfo(int& tN, int& gN, ArrayI& shift, int& rhs,
-      const int nBc, const int refN) const;
+      const int nBc, const int refN, const bool isGalerkin) const;
 
    /**
     * @brief Compute size information of full system
@@ -212,8 +177,9 @@ protected:
     * @param nTauLines number of tau lines
     * @param nNs  List of base 1D size
     * @param isGalerkin Use Galerkin scheme?
+    * @param isGalerkin Drop rows scheme?
     */
-   int blockSize(const int nTauLines, const std::vector<int>& nNs, const bool isGalerkin) const;
+   int blockSize(const int nTauLines, const std::vector<int>& nNs, const bool isGalerkin, const bool dropRows) const;
 
    /**
     * @brief Get operator block shape
@@ -231,13 +197,9 @@ protected:
     * @brief Build 2D matrix block from description
     *
     * @param decMat  Ouput matrix
-    * @param isComplexBlock block is complex?
     * @param descr   Block description
-    * @param rowId   Field ID of block matrix row
-    * @param colId   Field ID of block matrix column
     * @param matIdx  Matrix ID
     * @param bcType  Type of boundary condition
-    * @param res     Resolution object
     * @param nNs     First 2D index
     * @param bcs     Boundary conditions for each field
     * @param nds     Nondimension parameters
@@ -246,11 +208,9 @@ protected:
     * @param ignoreStart  Ignore start shift
     */
    void buildBlock(DecoupledZSparse& decMat,
-      const bool isComplexBlock,
-      const std::vector<details::BlockDescription>& descr,
-      const SpectralFieldId& rowId, const SpectralFieldId& colId,
+      const details::BlockDefinition& descr,
       const SpectralFieldIds& fields, const int matIdx,
-      const std::size_t bcType, const Resolution& res, const int j0, const int maxJ, const std::vector<int>& nNs,
+      const std::size_t bcType, const int j0, const int maxJ, const std::vector<int>& nNs,
       const BcMap& bcs, const NonDimensional::NdMap& nds,
       const bool isSplitOperator, const int fixedCols, const bool ignoreStart = false) const;
 
@@ -267,8 +227,8 @@ protected:
       const int rowShift, const int colShift, const MHDFloat coeff = 1.0) const;
 
 private:
-   std::tuple<int,int,int,int> blockSystemInfo(const SpectralFieldId& rowId, const SpectralFieldId& colId, const SpectralFieldIds& fields, const std::vector<int>& nNs, const bool ignoreStart, const int fixedCols) const;
-   void computeBlockShift(int& blockShift, const int s0, const int nShift, const int nTauLines, const std::vector<int>& nNs, const int fixedCols) const;
+   std::tuple<int,int,int,int> blockSystemInfo(const SpectralFieldId& rowId, const SpectralFieldId& colId, const SpectralFieldIds& fields, const std::vector<int>& nNs, const bool ignoreStart, const int fixedCols, const bool isGalerkin) const;
+   void computeBlockShift(int& blockShift, const int s0, const int nShift, const int nTauLines, const std::vector<int>& nNs, const int fixedCols, const bool isGalerkin) const;
 };
 
 } // namespace Model

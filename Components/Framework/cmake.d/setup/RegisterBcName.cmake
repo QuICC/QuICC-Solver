@@ -6,6 +6,7 @@ set(tags
   FixedEntropy
   FixedFlux
   Insulating
+  QuasiInverseOnly
   )
 
 include(RegisterTags)

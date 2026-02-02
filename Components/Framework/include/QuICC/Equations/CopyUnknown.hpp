@@ -40,15 +40,16 @@ namespace Equations {
     * @param start      Start index for the storage
     * @param useShift   Use galerkin shifts
     * @param isSet      Arithmetic operation is set
+    * @param shiftTop   shift top?
     */
-   template <typename TData, typename TField> void copyUnknown(const IFieldEquation& eq, const TField& field, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const bool useShift, const bool isSet);
+   template <typename TData, typename TField> void copyUnknown(const IFieldEquation& eq, const TField& field, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const bool useShift, const bool isSet, const bool shiftTop);
 
-   template <typename TData, typename TField> void copyUnknown(const IFieldEquation& eq, const TField& field, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const bool useShift, const bool isSet)
+   template <typename TData, typename TField> void copyUnknown(const IFieldEquation& eq, const TField& field, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const bool useShift, const bool isSet, const bool shiftTop)
    {
       // matIdx is the index of the slowest varying direction with a single RHS
       if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
-         details::CopyUnknownFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(eq, compId, matIdx, useShift);
+         details::CopyUnknownFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(eq, compId, matIdx, useShift, shiftTop);
 
          // Copy data
          if(isSet)
@@ -63,7 +64,7 @@ namespace Equations {
       // matIdx is the index of the slowest varying direction with multiple RHS
       else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
       {
-         details::CopyUnknownFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(eq, compId, matIdx, useShift);
+         details::CopyUnknownFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(eq, compId, matIdx, useShift, shiftTop);
 
          // Copy data
          if(isSet)
@@ -78,7 +79,7 @@ namespace Equations {
       // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
       else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
       {
-         details::CopyUnknownFunctor<CouplingIndexType::MODE> func(eq, compId, matIdx, useShift);
+         details::CopyUnknownFunctor<CouplingIndexType::MODE> func(eq, compId, matIdx, useShift, shiftTop);
 
          // Copy data
          if(isSet)
@@ -93,7 +94,7 @@ namespace Equations {
       // There is a single matrix
       else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
       {
-         details::CopyUnknownFunctor<CouplingIndexType::SINGLE> func(eq, compId, matIdx, useShift);
+         details::CopyUnknownFunctor<CouplingIndexType::SINGLE> func(eq, compId, matIdx, useShift, shiftTop);
 
          // Copy data
          if(isSet)

@@ -22,7 +22,6 @@
 #include "Timestep/PredictorCorrector/Views/Tags.hpp"
 #include "View/ViewDense.hpp"
 
-#include <iostream>
 namespace QuICC {
 
 namespace Timestep {

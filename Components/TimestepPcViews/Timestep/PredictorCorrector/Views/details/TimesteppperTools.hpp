@@ -82,6 +82,18 @@ void computeMV(DecoupledZMatrix& z, const SparseMatrix& mat,
    const DecoupledZMatrix& y);
 
 /**
+ * @brief Compute z = a A*y
+ */
+template <typename TOperator, typename TData>
+void computeMV(TData& z, const MHDFloat a, const TOperator& mat, const TData& y);
+
+/**
+ * @brief Compute z = a A*y
+ */
+void computeMV(DecoupledZMatrix& z, const MHDFloat a, const SparseMatrix& mat,
+   const DecoupledZMatrix& y);
+
+/**
  * @brief Compute z = a*x + b*y + z
  */
 template <typename TData>
@@ -741,6 +753,20 @@ inline void computeMV(DecoupledZMatrix& y, const SparseMatrix& A,
    y.real() = A * x.real();
 
    y.imag() = A * x.imag();
+}
+
+template <typename TOperator, typename TData>
+inline void computeMV(TData& y, const MHDFloat a, const TOperator& A, const TData& x)
+{
+   y = A * (a * x);
+}
+
+inline void computeMV(DecoupledZMatrix& y, const MHDFloat a, const SparseMatrix& A,
+   const DecoupledZMatrix& x)
+{
+   y.real() = A * (a * x.real());
+
+   y.imag() = A * (a * x.imag());
 }
 
 template <typename TData>

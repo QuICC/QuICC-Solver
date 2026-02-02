@@ -4,6 +4,7 @@ set(tags
   ExplicitNextstep
   ExplicitNonlinear
   ImplicitLinear
+  QuasiInverse
   Stencil
   Time
   SplitBoundary

@@ -86,8 +86,8 @@ bool SparseImExRK3RTimestepper<TOperator, TData, TSolver>::preSolve()
       // Update explicit term with explicit (nonlinear) values
       for (size_t i = this->mZeroIdx; i < this->nSystem(); i++)
       {
-         details::computeSet(this->reg(Register::Explicit::id()).at(i),
-            this->reg(Register::Rhs::id()).at(i));
+         details::computeMV(this->reg(Register::Explicit::id()).at(i),
+            this->mQi.at(i), this->reg(Register::Rhs::id()).at(i));
       }
    }
 

@@ -9,8 +9,10 @@
 // Project includes
 //
 #include "QuICC/Timestep/Id/ImexPc2b.hpp"
+#include "QuICC/Timestep/Id/ImexEulerb.hpp"
 #include "Timestep/PredictorCorrector/FactoryViews.hpp"
 #include "Timestep/PredictorCorrector/ImExPC2.hpp"
+#include "Timestep/PredictorCorrector/ImExEuler.hpp"
 #include "Timestep/PredictorCorrector/InterfaceViews.hpp"
 
 namespace QuICC {
@@ -30,6 +32,11 @@ std::shared_ptr<Timestep::Interface> makeInterfaceViews(const std::size_t scheme
    if (schemeId == Id::ImexPc2b::id())
    {
       iface = std::make_shared<InterfaceViews<ImExPC2>>(time, cfl, maxError, scalEq,
+         vectEq, pseudo);
+   }
+   else if (schemeId == Id::ImexEulerb::id())
+   {
+      iface = std::make_shared<InterfaceViews<ImExEuler>>(time, cfl, maxError, scalEq,
          vectEq, pseudo);
    }
 

@@ -35,67 +35,20 @@ void CopyUnknownFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(
 {
    const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
 
-   int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
+   int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx) - shiftMaxCol;
 
    // Safety assertion
    assert(start >= 0);
 
 #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
-   const auto& sRes = eq->res().sim();
-   // Add source data
-   int l;
-   int j_;
-   int dimI =
-      sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-   int corrDim;
-   if ((sRes.ss().has(SpatialScheme::Feature::ShellGeometry) ||
-          sRes.ss().has(SpatialScheme::Feature::SphereGeometry)) &&
-       sRes.ss().has(SpatialScheme::Feature::SpectralOrdering123) &&
-       sRes.ss().has(SpatialScheme::Feature::SpectralMatrix2D))
-   {
-      corrDim = tRes.template idx<Dimensions::Data::DAT3D>(matIdx) * dimI;
-   }
-   if constexpr (IsSet)
-   {
-      ///\mhdBug This is overkill
-      // Set storage to zero
-      setZeroNonlinear(eq, field, compId, storage, matIdx, start);
-   }
-
-   for (int j = zeroCol; j < cols; j++)
-   {
-      j_ = tRes.template idx<Dimensions::Data::DAT2D>(j, matIdx) * dimI;
-      const int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
-      if (corrDim > 0)
-      {
-         j_ -= corrDim;
-      }
-      for (int i = zeroRow; i < rows; i++)
-      {
-         // Compute correct position
-         l = start + j_ + i;
-
-         if constexpr (IsSet)
-         {
-            // Copy field value into storage
-            Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, l,
-               field.comp(compId).point(i, j, matIdx));
-         }
-         else
-         {
-            // Copy field value into storage
-            Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage, l,
-               field.comp(compId).point(i, j, matIdx));
-         }
-      }
-   }
+   static_assert(false, "Parallel MPI solve is not supported anymore");
 #else
    // Copy data
    int k = start;
    for (int j = zeroCol; j < cols; j++)
    {
       // Effective rows in case of non-uniform truncation
-      int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+      int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx) - shiftMaxRow;
 
       for (int i = zeroRow; i < usedRows; i++)
       {

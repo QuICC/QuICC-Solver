@@ -1,7 +1,7 @@
 /**
  * @file ImExEuler.cpp
- * @brief Implementation of an implicit/explicit predictor-corrector scheme of
- * order 2
+ * @brief Implementation of an implicit/explicit Euler scheme of
+ * order 1
  */
 
 // System includes
@@ -33,7 +33,7 @@ int ImExEuler::order() const
 // Scheme has embedded lower order scheme?
 bool ImExEuler::hasEmbedded() const
 {
-   return true;
+   return false;
 }
 
 // Name of the scheme

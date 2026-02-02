@@ -29,7 +29,7 @@ public:
     */
    CopyUnknownFunctor(const IFieldEquation& eq,
       FieldComponents::Spectral::Id compId, const int matIdx,
-      const bool useShift);
+      const bool useShift, const bool shiftTop);
 
    /**
     * @brief deleted default ctor
@@ -51,7 +51,7 @@ private:
    /**
     * @brief Initialization
     */
-   void init();
+   void init(const bool shiftTop);
 
    /**
     * @brief Reference to equation
@@ -77,10 +77,20 @@ private:
     * @brief Starting column
     */
    int zeroCol;
+
+   /**
+    * @brief Shift max row
+    */
+   int shiftMaxRow;
+
+   /**
+    * @brief Shift max col
+    */
+   int shiftMaxCol;
 };
 
 template <CouplingIndexType IndexType>
-void CopyUnknownFunctor<IndexType>::init()
+void CopyUnknownFunctor<IndexType>::init(const bool shiftTop)
 {
    const auto& info = eq->couplingInfo(compId);
    zeroRow = info.galerkinShift(matIdx, 0);
@@ -92,17 +102,25 @@ void CopyUnknownFunctor<IndexType>::init()
    {
       zeroCol = info.galerkinShift(matIdx, 1);
    }
+   shiftMaxRow = 0;
+   shiftMaxCol = 0;
+
+   if(!shiftTop)
+   {
+      std::swap(shiftMaxRow, zeroRow);
+      std::swap(shiftMaxCol, zeroCol);
+   }
 }
 
 template <CouplingIndexType IndexType>
 CopyUnknownFunctor<IndexType>::CopyUnknownFunctor(const IFieldEquation& eq,
    FieldComponents::Spectral::Id compId, const int matIdx,
-   const bool useShift) :
-    eq(&eq), compId(compId), matIdx(matIdx), zeroRow(0), zeroCol(0)
+   const bool useShift, const bool shiftTop) :
+    eq(&eq), compId(compId), matIdx(matIdx), zeroRow(0), zeroCol(0), shiftMaxRow(0), shiftMaxCol(0)
 {
    if (useShift)
    {
-      this->init();
+      this->init(shiftTop);
    }
 }
 

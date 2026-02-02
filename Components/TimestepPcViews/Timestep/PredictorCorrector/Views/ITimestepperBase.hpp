@@ -15,8 +15,6 @@
 //
 #include "QuICC/Tag/Operator/Influence.hpp"
 #include "Types/Math.hpp"
-#include "QuICC/ModelOperator/ImplicitLinear.hpp"
-#include "QuICC/ModelOperator/Boundary.hpp"
 #include "QuICC/Framework/MpiFramework.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
 #include "Timestep/PredictorCorrector/Views/details/SparseLinearSolverTools.hpp"
