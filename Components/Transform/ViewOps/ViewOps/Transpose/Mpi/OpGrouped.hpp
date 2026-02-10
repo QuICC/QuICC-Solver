@@ -72,6 +72,8 @@ void OpGrouped<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
    assert(comm != nullptr);
    if (!comm->isSetup())
    {
+      Profiler::RegionFixture<4> fixComm("Transpose::Mpi::OpGrouped::setComm");
+
       // Set group size
       _groupSize = in.size();
       // Get absolute coordinates
