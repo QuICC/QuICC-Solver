@@ -39,9 +39,9 @@ else:
 # copy file attributes
 for key, value in in_file.attrs.items():
     if key == "type":
-        out_file.attrs[key] = np.string_((value.decode('ascii')[:-1]+out_ordering).encode('ascii'))
+        out_file.attrs[key] = np.bytes_((value.decode('ascii')[:-1]+out_ordering).encode('ascii'))
     else:
-        out_file.attrs[key] = np.string_(value)
+        out_file.attrs[key] = np.bytes_(value)
 
 # copy all groups to output file
 for g in in_file:
