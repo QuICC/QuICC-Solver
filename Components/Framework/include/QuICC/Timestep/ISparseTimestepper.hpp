@@ -19,6 +19,7 @@
 #include "QuICC/ModelOperator/Boundary.hpp"
 #include "QuICC/ModelOperator/ImplicitLinear.hpp"
 #include "QuICC/ModelOperator/QuasiInverse.hpp"
+#include "QuICC/ModelOperator/SplitQuasiInverse.hpp"
 #include "QuICC/ModelOperator/SplitBoundary.hpp"
 #include "QuICC/ModelOperator/SplitBoundaryValue.hpp"
 #include "QuICC/ModelOperator/SplitImplicitLinear.hpp"
@@ -378,6 +379,11 @@ protected:
    std::vector<SparseMatrix> mQi;
 
    /**
+    * @brief Split Quasi-inverse operator
+    */
+   std::vector<SparseMatrix> mSplitQi;
+
+   /**
     * @brief Storage for field
     */
    std::map<std::size_t, std::vector<TData>> mStorage;
@@ -537,14 +543,26 @@ void ISparseTimestepper<TOperator, TData, TSolver>::initMatrices(const int n)
    // Do not reinitialise if work already done by other field
    if (this->mQi.size() == 0)
    {
-      // Reserve space for the RHS matrices
+      // Reserve space for the quasi-inverse matrices
       this->mQi.reserve(n);
 
-      // Initialise storage for RHS matrices
+      // Initialise storage for quasi-inverse matrices
       for (int i = 0; i < n; ++i)
       {
-         // Create storage for LHS matrices
          this->mQi.push_back(SparseMatrix());
+      }
+   }
+
+   // Do not reinitialise if work already done by other field
+   if (this->mSplitQi.size() == 0)
+   {
+      // Reserve space for the split quasi-inverse matrices
+      this->mSplitQi.reserve(n);
+
+      // Initialise storage for split quasi-inverse matrices
+      for (int i = 0; i < n; ++i)
+      {
+         this->mSplitQi.push_back(SparseMatrix());
       }
    }
 }
@@ -576,6 +594,8 @@ void ISparseTimestepper<TOperator, TData, TSolver>::buildOperators(
       ops.find(ModelOperator::SplitBoundary::id());
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSA =
       ops.find(ModelOperator::SplitImplicitLinear::id());
+   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSQ =
+      ops.find(ModelOperator::SplitQuasiInverse::id());
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSCV =
       ops.find(ModelOperator::SplitBoundaryValue::id());
 
@@ -625,6 +645,10 @@ void ISparseTimestepper<TOperator, TData, TSolver>::buildOperators(
 
    if (isSplit)
    {
+      // Set quasi-inverse matrix
+      this->mSplitQi.at(idx).resize(size, size);
+      Solver::details::addOperators(this->mSplitQi.at(idx), 1.0, iOpSQ->second);
+
       // Store information for particular solution
       auto&& infRhs = this->reg(Register::Influence::id()).at(idx);
       details::initInfluence(infRhs, iOpSCV->second, iOpSC->second);

@@ -207,7 +207,7 @@ bool SparseImExPCTimestepper<TOperator, TData, TSolver>::preSolve()
       {
          for (size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            details::computeMV(this->reg(Register::Rhs::id()).at(i), this->mQi.at(i),
+            details::computeMV(this->reg(Register::Rhs::id()).at(i), this->mSplitQi.at(i),
                   this->reg(Register::Rhs::id()).at(i));
          }
          this->mOpId = Tag::Operator::Influence::id();

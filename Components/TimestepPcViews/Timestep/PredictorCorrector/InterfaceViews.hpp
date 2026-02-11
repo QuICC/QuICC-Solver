@@ -18,6 +18,7 @@
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Equations/CopyUnknown.hpp"
 #include "QuICC/ModelOperator/QuasiInverse.hpp"
+#include "QuICC/ModelOperator/SplitQuasiInverse.hpp"
 #include "QuICC/Equations/CorrectSolution.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
 #include "QuICC/Equations/AddSource.hpp"
@@ -759,6 +760,9 @@ inline void buildTimestepMatrixWrapper(std::map<std::size_t, DecoupledZSparse>& 
    {
       // Compute model's split linear operator (without Tau lines)
       buildOp(SplitImplicitLinear::id(), SolverNoTau::id());
+
+      // Compute model's split quasi-inverse operator (without Tau lines)
+      buildOp(SplitQuasiInverse::id(), SolverNoTau::id());
 
       // Compute model's tau line boundary operator for split operator
       buildOp(SplitBoundary::id(), SolverHasBc::id());

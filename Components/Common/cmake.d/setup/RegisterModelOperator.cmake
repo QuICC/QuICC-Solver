@@ -10,6 +10,7 @@ set(tags
   SplitBoundary
   SplitBoundaryValue
   SplitImplicitLinear
+  SplitQuasiInverse
 )
 
 include(RegisterTags)

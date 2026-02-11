@@ -19,6 +19,7 @@
 #include "QuICC/ModelOperator/SplitBoundary.hpp"
 #include "QuICC/ModelOperator/SplitBoundaryValue.hpp"
 #include "QuICC/ModelOperator/SplitImplicitLinear.hpp"
+#include "QuICC/ModelOperator/SplitQuasiInverse.hpp"
 #include "QuICC/ModelOperator/Time.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverHasBc.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverNoTau.hpp"
@@ -147,6 +148,9 @@ void buildTimestepMatrixWrapper(typename std::shared_ptr<TStepper> spSolver,
    {
       // Compute model's split linear operator (without Tau lines)
       buildOp(SplitImplicitLinear::id(), SolverNoTau::id());
+
+      // Compute model's split quasi-inverse operator (without Tau lines)
+      buildOp(SplitQuasiInverse::id(), SolverNoTau::id());
 
       // Compute model's tau line boundary operator for split operator
       buildOp(SplitBoundary::id(), SolverHasBc::id());

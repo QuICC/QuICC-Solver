@@ -21,6 +21,7 @@
 #include "QuICC/ModelOperator/ImplicitLinear.hpp"
 #include "QuICC/ModelOperator/QuasiInverse.hpp"
 #include "QuICC/ModelOperator/SplitImplicitLinear.hpp"
+#include "QuICC/ModelOperator/SplitQuasiInverse.hpp"
 #include "QuICC/ModelOperator/SplitBoundary.hpp"
 #include "QuICC/ModelOperator/SplitBoundaryValue.hpp"
 #include "QuICC/ModelOperator/Time.hpp"
@@ -243,6 +244,8 @@ void ImExPCTimestepper<TOperator, TData, TImpl>::buildOperators(
       ops.find(ModelOperator::SplitBoundary::id());
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSA =
       ops.find(ModelOperator::SplitImplicitLinear::id());
+   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSQ =
+      ops.find(ModelOperator::SplitQuasiInverse::id());
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSCV =
       ops.find(ModelOperator::SplitBoundaryValue::id());
 
@@ -290,6 +293,10 @@ void ImExPCTimestepper<TOperator, TData, TImpl>::buildOperators(
 
    if (isSplit)
    {
+      // Set split quasi-inverse matrix
+      this->mSplitQi.resize(size, size);
+      details::addOperators(this->mSplitQi, 1.0, iOpSQ->second);
+
       // Store information for particular solution
       auto&& infRhs = this->reg(Register::Influence::id());
       details::initInfluence(infRhs, iOpSCV->second, iOpSC->second);
@@ -308,7 +315,7 @@ bool ImExPCTimestepper<TOperator, TData, TImpl>::preSolve()
       const bool isFirstPass = (this->mOpId == Tag::Operator::Lhs::id());
       if (isFirstPass)
       {
-         details::computeMV(this->reg(Register::Rhs::id()), this->mQi,
+         details::computeMV(this->reg(Register::Rhs::id()), this->mSplitQi,
                this->reg(Register::Rhs::id()));
          this->mOpId = Tag::Operator::Influence::id();
          this->mId = 0.0;

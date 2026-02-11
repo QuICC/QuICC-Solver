@@ -130,6 +130,11 @@ protected:
     */
    SparseMatrix mQi;
 
+   /**
+    * @brief Split Quasi-inverse operator
+    */
+   SparseMatrix mSplitQi;
+
 private:
 };
 
