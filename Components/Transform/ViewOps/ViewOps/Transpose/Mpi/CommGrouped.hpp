@@ -140,7 +140,7 @@ template <class TDATA, class TAG>
 void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
    const std::vector<point_t>& cooOld, const std::uint64_t groupSize)
 {
-   Profiler::RegionFixture<4> fixComm("Transpose::Mpi::CommGrouped::setComm");
+   Profiler::RegionFixture<4> fix("Transpose::Mpi::CommGrouped::setComm");
 
    _maxGroupSize = groupSize;
 
