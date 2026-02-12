@@ -21,6 +21,7 @@
 #include "Types/Typedefs.hpp"
 #include "Timestep/PredictorCorrector/Views/Tags.hpp"
 #include "View/ViewDense.hpp"
+#include "ThreadPool/QuICCThreads.hpp"
 
 #include <iostream>
 namespace QuICC {
@@ -409,6 +410,44 @@ namespace Views {
 
    template <template <class,class,typename> class TStepper> void TimestepperCoordinator<TStepper, base_t>::updateMatrices()
    {
+#ifdef QUICC_USE_THREADPOOL
+      auto& tp = QuICC::QuICCThreads();
+      std::vector<std::future<void>> tasks;
+
+      for(auto& tsData: this->mRealSteppers)
+      {
+         auto& ts = *std::get<0>(tsData.second);
+         auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
+                  [dt=this->mDt, &ts]
+                  {
+         ts.updateTimeMatrix(dt);
+         ts.updateSolver();
+                  }
+         ));
+
+         tasks.push_back(std::move(fut));
+      }
+
+      for(auto& tsData: this->mComplexSteppers)
+      {
+         auto& ts = *std::get<0>(tsData.second);
+         auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
+                  [dt=this->mDt, &ts]
+                  {
+         ts.updateTimeMatrix(dt);
+         ts.updateSolver();
+                  }
+         ));
+
+         tasks.push_back(std::move(fut));
+      }
+
+      // Wait for threads and update status
+      for(auto&& task: tasks)
+      {
+         task.wait();
+      }
+#else
       for(auto& tsData: this->mRealSteppers)
       {
          auto& ts = *std::get<0>(tsData.second);
@@ -422,6 +461,7 @@ namespace Views {
          ts.updateTimeMatrix(this->mDt);
          ts.updateSolver();
       }
+#endif //QUICC_USE_THREADPOOL
    }
 
    template <template <class,class,typename> class TStepper> MHDFloat TimestepperCoordinator<TStepper,  base_t>::stepFraction()
@@ -459,6 +499,61 @@ namespace Views {
 
    template <template <class,class,typename> class TStepper> template <typename T> std::pair<bool,MHDFloat> TimestepperCoordinator<TStepper, base_t>::runSteppers(T& steppers)
    {
+#ifdef QUICC_USE_THREADPOOL
+      auto& tp = QuICC::QuICCThreads();
+      std::vector<std::future<std::pair<bool,MHDFloat>>> tasks;
+
+      for(auto& tsData: steppers)
+      {
+         auto& ts = *std::get<0>(tsData.second);
+         auto fut = boost::asio::post(tp.pool(), std::packaged_task<std::pair<bool,MHDFloat>()>(
+                  [&ts]
+                  {
+         bool solving = false;
+         do
+         {
+            // Prepare solve of linear system
+            bool needSolve = ts.preSolve();
+
+            if(needSolve)
+            {
+               // Solve linear system
+               ts.solve();
+
+               // Work on fields after solve
+               solving = ts.postSolve();
+
+            } else
+            {
+               solving = false;
+            }
+
+         } while (solving);
+
+         std::pair<bool,MHDFloat> status = std::make_pair(ts.finished(), ts.error());
+         return status;
+                  }
+         ));
+
+         tasks.push_back(std::move(fut));
+      }
+
+      std::pair<bool,MHDFloat>  status = std::make_pair(false, -1.0);
+      // Wait for threads and update status
+      for(auto&& task: tasks)
+      {
+         task.wait();
+         auto s = task.get();
+         status.first = s.first;
+
+         if(status.first)
+         {
+            status.second = std::max(status.second, s.second);
+         }
+      }
+
+      return status;
+#else
       std::pair<bool,MHDFloat>  status = std::make_pair(false, -1.0);
       for(auto& tsData: steppers)
       {
@@ -493,6 +588,7 @@ namespace Views {
       }
 
       return status;
+#endif
    }
 
 } // Views

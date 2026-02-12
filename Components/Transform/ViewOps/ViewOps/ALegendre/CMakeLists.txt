@@ -35,9 +35,9 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONEN
     QuICC::Profiling
     QuICC::Memory
     QuICC::Polynomial
+    QuICC::ThreadPool
     QuICC::ViewOps::Quadrature
 )
-
 
 # Alias
 add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}${QUICC_CURRENT_SUBCOMPONENT_LIB}

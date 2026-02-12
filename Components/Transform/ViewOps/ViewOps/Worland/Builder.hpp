@@ -15,6 +15,8 @@
 #include "Types/Internal/Typedefs.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 #include "ViewOps/Worland/TypeTraits.hpp"
+#include "ThreadPool/QuICCThreads.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 namespace Transform {
@@ -101,6 +103,11 @@ void Builder<TView, TDenseOpBuilder, TDirection>::compute(TView opView,
       throw std::logic_error("builder for this type is not implemented.");
    }
 
+#ifdef QUICC_USE_THREADPOOL
+   auto& tp = QuICC::QuICCThreads();
+   std::vector<std::future<void>> tasks;
+#endif //QUICC_USE_THREADPOOL
+
    IndexType offSet = 0;
    IndexType layerCounter = 0;
    for (IndexType k = 0; k < opView.dims()[2]; ++k)
@@ -118,6 +125,12 @@ void Builder<TView, TDenseOpBuilder, TDirection>::compute(TView opView,
             continue;
          }
       }
+
+#ifdef QUICC_USE_THREADPOOL
+      auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
+         [k, LIdx, &grid, &weights, &opView, &offSet, this]
+         {
+#endif //QUICC_USE_THREADPOOL
 
       // temporary slice
       using slice_t = Eigen::Matrix<ScalarType, Eigen::Dynamic, Eigen::Dynamic>;
@@ -151,8 +164,23 @@ void Builder<TView, TDenseOpBuilder, TDirection>::compute(TView opView,
 
       offSet += opT.size();
 
+#ifdef QUICC_USE_THREADPOOL
+         }
+         ));
+
+         tasks.push_back(std::move(fut));
+#endif //QUICC_USE_THREADPOOL
+
       ++layerCounter;
    }
+
+#ifdef QUICC_USE_THREADPOOL
+   // Wait for threads and update status
+   for(auto&& task: tasks)
+   {
+      task.wait();
+   }
+#endif //QUICC_USE_THREADPOOL
 }
 
 

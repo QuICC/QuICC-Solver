@@ -461,9 +461,19 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
             {
                DebuggerMacro_msg("Get timestepper input for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
+#ifdef QUICC_USE_THREADPOOL
+               auto& tp = QuICC::QuICCThreads();
+               std::vector<std::future<void>> tasks;
+#endif //QUICC_USE_THREADPOOL
+
                // Get timestep input
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
+#ifdef QUICC_USE_THREADPOOL
+                  auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
+                           [&cinfo,&eqIt,i,myId,this]
+                           {
+#endif //QUICC_USE_THREADPOOL
                   auto info = createInfo(cinfo, i);
 
                   // Copy field values into timestepper input
@@ -500,7 +510,21 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
                            }, eqIt->spUnknown());
                      //               this->mSolverCoord.updateInhomogeneous(info);
                   }
+#ifdef QUICC_USE_THREADPOOL
+                  }
+                  ));
+
+                  tasks.push_back(std::move(fut));
+#endif //QUICC_USE_THREADPOOL
                }
+
+#ifdef QUICC_USE_THREADPOOL
+               // Wait for threads and update status
+               for(auto&& task: tasks)
+               {
+                  task.wait();
+               }
+#endif //QUICC_USE_THREADPOOL
             }
          }
       }
@@ -534,17 +558,41 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
             {
                DebuggerMacro_msg("Get timestepper solution for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
+               // Fill with bad values
+               //eqIt->corruptUnknown(myId.second);
+
+#ifdef QUICC_USE_THREADPOOL
+               auto& tp = QuICC::QuICCThreads();
+               std::vector<std::future<void>> tasks;
+
+#endif //QUICC_USE_THREADPOOL
                // return zero 
                for(std::size_t i = 0; i < static_cast<std::size_t>(cinfo.fieldStart()); i++)
                {
+#ifdef QUICC_USE_THREADPOOL
+                  auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
+                           [&cinfo,&eqIt,i,myId]
+                           {
+#endif //QUICC_USE_THREADPOOL
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                   tmp.setZero();
 
                   eqIt->storeSolution(myId.second, tmp, i, 0);
+#ifdef QUICC_USE_THREADPOOL
+                  }
+                  ));
+
+                  tasks.push_back(std::move(fut));
+#endif //QUICC_USE_THREADPOOL
                }
 
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
+#ifdef QUICC_USE_THREADPOOL
+                  auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
+                           [&cinfo,&eqIt,i,myId,this]
+                           {
+#endif //QUICC_USE_THREADPOOL
                   auto info = createInfo(cinfo, i);
 
                   std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
@@ -559,7 +607,22 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                   Views::details::computeSet(tmp, tmpView, 0);
 
                   eqIt->storeSolution(myId.second, tmp, i, 0);
+#ifdef QUICC_USE_THREADPOOL
+                  }
+                  ));
+
+                  tasks.push_back(std::move(fut));
+#endif //QUICC_USE_THREADPOOL
                }
+
+#ifdef QUICC_USE_THREADPOOL
+               // Wait for threads and update status
+               for(auto&& task: tasks)
+               {
+                  task.wait();
+               }
+               tasks.clear();
+#endif //QUICC_USE_THREADPOOL
 
                // Apply constraint on solution
                auto changedSolution = eqIt->applyConstraint(myId.second, SolveTiming::After::id());
@@ -569,6 +632,11 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                {
                   for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                   {
+#ifdef QUICC_USE_THREADPOOL
+                  auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
+                           [&cinfo,&eqIt,i,myId,this]
+                           {
+#endif //QUICC_USE_THREADPOOL
                      auto info = createInfo(cinfo, i);
 
                      DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
@@ -589,7 +657,21 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                      Views::details::computeSet(tmpView, tmp, 0);
 
                      this->mSolverCoord.updateSolution(info, tmpView);
+#ifdef QUICC_USE_THREADPOOL
                   }
+                  ));
+
+                  tasks.push_back(std::move(fut));
+#endif //QUICC_USE_THREADPOOL
+                  }
+
+#ifdef QUICC_USE_THREADPOOL
+               // Wait for threads and update status
+               for(auto&& task: tasks)
+               {
+                  task.wait();
+               }
+#endif //QUICC_USE_THREADPOOL
                }
             }
          }
@@ -604,6 +686,8 @@ template <typename TScheme>
 void InterfaceViews<TScheme>::adaptTimestep(const Matrix& cfl,
    const ScalarEquation_range&, const VectorEquation_range&)
 {
+   Profiler::RegionFixture<2> fix("Timestep-adapt");
+
    // Store old timestep
    this->mOldDt = this->timestep();
 

@@ -16,6 +16,8 @@
 #include "Std/Span.hpp"
 #include "ViewOps/ALegendre/TypeTraits.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
+#include "ThreadPool/QuICCThreads.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 namespace Transform {
@@ -91,6 +93,11 @@ void builder(Tview opView, const Evector<Tdata>& grid,
       LIdx = 1;
    }
 
+#ifdef QUICC_USE_THREADPOOL
+   auto& tp = QuICC::QuICCThreads();
+   std::vector<std::future<void>> tasks;
+#endif //QUICC_USE_THREADPOOL
+
    IndexType offSet = 0;
    IndexType layerCounter = 0;
    for (IndexType k = 0; k < opView.dims()[2]; ++k)
@@ -115,6 +122,12 @@ void builder(Tview opView, const Evector<Tdata>& grid,
             continue;
          }
       }
+
+#ifdef QUICC_USE_THREADPOOL
+      auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
+         [k, LIdx, &grid, &weightsOrNot, &opView, &offSet, &scaling]
+         {
+#endif //QUICC_USE_THREADPOOL
 
       // temporary slice
       using slice_t = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
@@ -163,8 +176,23 @@ void builder(Tview opView, const Evector<Tdata>& grid,
 
       offSet += opT.size();
 
+#ifdef QUICC_USE_THREADPOOL
+         }
+         ));
+
+         tasks.push_back(std::move(fut));
+#endif //QUICC_USE_THREADPOOL
+
       ++layerCounter;
    }
+
+#ifdef QUICC_USE_THREADPOOL
+   // Wait for threads and update status
+   for(auto&& task: tasks)
+   {
+      task.wait();
+   }
+#endif //QUICC_USE_THREADPOOL
 }
 
 /// @brief convenience wrapper for common scalings
