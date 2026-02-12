@@ -3,9 +3,6 @@
  * @brief Source of the base of the implementation of the load splitting algorithms
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <algorithm>
@@ -21,17 +18,19 @@
 // External includes
 //
 
-// Class include
-//
-#include "QuICC/LoadSplitter/Algorithms/SplittingAlgorithm.hpp"
-
 // Project includes
 //
+#include "QuICC/LoadSplitter/Algorithms/SplittingAlgorithm.hpp"
+#include "Profiler/Interface.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/DimensionTools.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingTools.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
+#include "Utils/Utils.hpp"
+#ifdef QUICC_MPI
+   #include "Utils/Mpi/Utils.hpp"
+#endif
 
 namespace QuICC {
 
@@ -393,8 +392,74 @@ namespace Parallel {
       return score;
    }
 
+   namespace details {
+      void getBwdCoo(Dimensions::Transform::Id dimId, SharedResolution spRes, std::vector<std::array<int,3>>& coos)
+      {
+         Profiler::RegionFixture<4> fix("Framework::LoadSplitter::SplittingAlgorithm::details::getBwdCoo");
+
+         const auto& tRes = *spRes->cpu()->dim(dimId);
+         // Loop over third dimension
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
+         {
+            int k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+
+            // Loop over second dimension
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               int j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
+
+               // Loop over backward dimension
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATB1D>(j,k); i++)
+               {
+                  int i_ = tRes.idx<Dimensions::Data::DATB1D>(i, j, k);
+
+                  // Generate point information
+                  auto point = spRes->counter().makeKey(dimId, i_, j_, k_);
+                  std::array<int,3> p = {std::get<0>(point), std::get<1>(point), std::get<2>(point)}; 
+                  coos.push_back(p);
+               }
+            }
+         }
+
+         std::sort(coos.begin(), coos.end());
+      }
+
+      void getFwdCoo(Dimensions::Transform::Id dimId, SharedResolution spRes, std::vector<std::array<int,3>>& coos)
+      {
+         Profiler::RegionFixture<4> fix("Framework::LoadSplitter::SplittingAlgorithm::details::getFwdCoo");
+
+         const auto& tRes = *spRes->cpu()->dim(dimId);
+         // Loop over third dimension
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
+         {
+            int k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+
+            // Loop over second dimension
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               int j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
+
+               // Loop over forward dimension
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j,k); i++)
+               {
+                  int i_ = tRes.idx<Dimensions::Data::DATF1D>(i, j, k);
+
+                  // Generate point information
+                  auto point = spRes->counter().makeKey(dimId, i_, j_, k_);
+                  std::array<int,3> p = {std::get<0>(point), std::get<1>(point), std::get<2>(point)}; 
+                  coos.push_back(p);
+               }
+            }
+         }
+
+         std::sort(coos.begin(), coos.end());
+      }
+   }
+
    void SplittingAlgorithm::buildCommunicationStructure(const int localId, SharedResolution spRes, std::map<Dimensions::Transform::Id,std::multimap<int,int> >& commStructure)
    {
+      Profiler::RegionFixture<4> fix("Framework::LoadSplitter::SplittingAlgorithm::buildCommunicationStructure");
+
       // Clear the communication structure
       std::map<Dimensions::Transform::Id,std::multimap<int,int> >().swap(commStructure);
 
@@ -643,17 +708,7 @@ namespace Parallel {
       else if(spRes->cpu(0)->nDim() == 3)
       {
          // Simplify syntax
-         typedef std::tuple<int,int,int>   Coordinate;
-
-         // Extract communication structure from resolution object
-         std::set<Coordinate> bwdMap;
-         std::set<Coordinate> fwdMap;
-
-         // Storage for a coordinate
-         Coordinate point;
-
-         // Position iterator for insert calls
-         std::set<Coordinate>::iterator   mapPos;
+         typedef std::array<int,3>   point_t;
 
          // Loop over possible data exchanges
          std::vector<Dimensions::Transform::Id> exchanges = {Dimensions::Transform::TRA1D,Dimensions::Transform::TRA2D,Dimensions::Transform::SPECTRAL};
@@ -662,158 +717,75 @@ namespace Parallel {
             // Create storage for structure
             commStructure.emplace(exId, std::multimap<int,int>());
 
-            // initialise the position hint for inserts
-            mapPos = bwdMap.begin();
-
             dimId = Dimensions::jump(exId, 1);
-            const auto& fwdTRes = *spRes->cpu()->dim(dimId);
-            // Loop over third dimension
-            for(int k = 0; k < fwdTRes.dim<Dimensions::Data::DAT3D>(); k++)
-            {
-               k_ = fwdTRes.idx<Dimensions::Data::DAT3D>(k);
 
-               // Loop over second dimension
-               for(int j = 0; j < fwdTRes.dim<Dimensions::Data::DAT2D>(k); j++)
-               {
-                  j_ = fwdTRes.idx<Dimensions::Data::DAT2D>(j,k);
+            std::vector<point_t> absCooOld;
+            std::vector<point_t> absCooNew;
+            details::getBwdCoo(dimId, spRes, absCooNew);
 
-                  // Loop over backward dimension
-                  for(int i = 0; i < fwdTRes.dim<Dimensions::Data::DATB1D>(j,k); i++)
-                  {
-                     i_ = fwdTRes.idx<Dimensions::Data::DATB1D>(i, j, k);
-
-                     // Generate point information
-                     point = spRes->counter().makeKey(dimId, i_, j_, k_);
-
-                     // Get insertion position to use as next starting point to speed up insertion
-                     mapPos = bwdMap.insert(mapPos,point);
-                  }
-               }
-            }
-
-            // Loop over CPUs
-            MatrixI  matRemote;
-            int matched = 0;
-            int toMatch = -1;
-            std::set<std::pair<int,int> > filter;
-            dimId = exId;
-            const auto& bwdTRes = *spRes->cpu()->dim(dimId);
-            for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
-            {
-               matched = 0;
-
-               // Local CPU
-               if(cpu == localId)
-               {
-                  // Loop over third dimension
-                  for(int k = 0; k < bwdTRes.dim<Dimensions::Data::DAT3D>(); k++)
-                  {
-                     k_ = bwdTRes.idx<Dimensions::Data::DAT3D>(k);
-
-                     // Loop over second dimension
-                     for(int j = 0; j < bwdTRes.dim<Dimensions::Data::DAT2D>(k); j++)
-                     {
-                        j_ = bwdTRes.idx<Dimensions::Data::DAT2D>(j,k);
-
-                        // Loop over forward dimension
-                        for(int i = 0; i < bwdTRes.dim<Dimensions::Data::DATF1D>(j,k); i++)
-                        {
-                           i_ = bwdTRes.idx<Dimensions::Data::DATF1D>(i, j, k);
-
-                           // Generate point information
-                           point = spRes->counter().makeKey(dimId, i_, j_, k_);
-
-                           // Look for same key in backward list
-                           mapPos = bwdMap.find(point);
-
-                           // Key was present, drop entry and extend filter
-                           if(mapPos != bwdMap.end())
-                           {
-                              // Add corresponding communication edge to filter
-                              filter.insert(std::make_pair(cpu, localId));
-
-                              // Delete found coordinate
-                              bwdMap.erase(mapPos);
-                           } else
-                           {
-                              fwdMap.insert(point);
-                           }
-                        }
-                     }
-                  }
-
-                  // Store size of forward coordinates
-                  toMatch = fwdMap.size();
-
-               #ifdef QUICC_MPI
-                  // Convert coordinates set to matrix to send through MPI
-                  matRemote.resize(3, fwdMap.size());
-                  int i =0;
-                  for(auto it = fwdMap.begin(); it != fwdMap.end(); ++it)
-                  {
-                     matRemote(0,i) = std::get<0>(*it);
-                     matRemote(1,i) = std::get<1>(*it);
-                     matRemote(2,i) = std::get<2>(*it);
-                     i++;
-                  }
-
-                  // Broadcast size
-                  QuICCEnv().synchronize();
-                  int ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
-                  QuICCEnv().check(ierr, 720);
-
-                  // Broadcast data
-                  QuICCEnv().synchronize();
-                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
-                  QuICCEnv().check(ierr, 721);
-
-               // Remote CPU
-               } else
-               {
-                  // Get size
-                  QuICCEnv().synchronize();
-                  int ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
-                  QuICCEnv().check(ierr, 722);
-
-                  // Get remote keys as matrix
-                  matRemote.resize(3, toMatch);
-                  QuICCEnv().synchronize();
-                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
-                  QuICCEnv().check(ierr, 723);
-
-                  // Compare received data to stored indexes
-                  for(int i = 0; i < toMatch; i++)
-                  {
-                     point = std::make_tuple(matRemote(0,i), matRemote(1,i), matRemote(2,i));
-
-                     mapPos = bwdMap.find(point);
-
-                     // Check if point is in backward map
-                     if(mapPos != bwdMap.end())
-                     {
-                        // Add corresponding communication edge to filter
-                        filter.insert(std::make_pair(cpu, localId));
-
-                        // Delete found entry
-                        bwdMap.erase(mapPos);
-
-                        // Increase matched counter
-                        matched++;
-                     }
-                  }
-               }
-
-               #else
-               }
-               #endif // QUICC_MPI
-            }
+            details::getFwdCoo(exId, spRes, absCooOld);
 
             #ifdef QUICC_MPI
-               // Gather total number of match entries
-               QuICCEnv().synchronize();
-               int ierr = MPI_Allreduce(MPI_IN_PLACE, &matched, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-               QuICCEnv().check(ierr, 724);
+            int ranks = spRes->nCpu();
+            int rank = localId;
+            MPI_Comm comm = MPI_COMM_WORLD;
+
+            std::vector<int> locOldIdxSplit;
+            Utils::getSplitIdx(locOldIdxSplit, absCooOld);
+
+            std::vector<int> remNewIdxSplit;
+            Utils::getSplitIdx(remNewIdxSplit, absCooNew);
+
+            std::vector<int> remNewIdxSplitNeededAll;
+            std::vector<int> remNewIdxSplitNeededSizes;
+            for (int r = 0; r < ranks; ++r)
+            {
+               // get new coo from other rank and check if it is here
+               std::vector<int> tmpSplit;
+               const std::vector<int>* pRemSplit;
+
+               pRemSplit = Utils::Mpi::broadcastSplitIdx(r, rank, tmpSplit, remNewIdxSplit, comm);
+
+               // Match split indexes
+               Utils::matchSplitIdx(remNewIdxSplitNeededAll, remNewIdxSplitNeededSizes, locOldIdxSplit, *pRemSplit);
+            }
+
+            // Distributed split indexes
+            std::vector<int> locNewIdxSplitNeededAll;
+            std::vector<int> locNewIdxSplitNeededSizes;
+            std::vector<int> locNewIdxSplitNeededDispl;
+            Utils::Mpi::distributeSplitIdx(remNewIdxSplitNeededAll, remNewIdxSplitNeededSizes, locNewIdxSplitNeededAll, locNewIdxSplitNeededSizes, locNewIdxSplitNeededDispl, comm);
+
+            // Filter new indexes
+            std::vector<point_t> absCooNewAll;
+            std::vector<int> absCooNewSizes;
+            Utils::filterIdx(absCooNewAll, absCooNewSizes, absCooNew, locNewIdxSplitNeededAll, locNewIdxSplitNeededDispl);
+
+            // Distributed filtered split indexes
+            std::vector<point_t> remAbsCooNewAll;
+            std::vector<int> remAbsCooNewSizes;
+            std::vector<int> remAbsCooNewDispl;
+            Utils::Mpi::distributeSplitIdx(absCooNewAll, absCooNewSizes, remAbsCooNewAll, remAbsCooNewSizes, remAbsCooNewDispl, comm);
+
+            // Find matches for sendDispls
+            std::vector<std::vector<int>> sendDispls;
+            Utils::matchSendDispl(sendDispls, absCooOld, remAbsCooNewAll, remAbsCooNewSizes, remAbsCooNewDispl);
+            #else
+            std::vector<std::vector<int>> sendDispls;
+            Utils::matchSendDispl(sendDispls, absCooOld, absCooNew);
             #endif // QUICC_MPI
+
+            int toMatch = absCooOld.size();
+            int matched = 0;
+            std::set<std::pair<int,int> > filter;
+            for(int r = 0; r < sendDispls.size(); r++)
+            {
+               if(sendDispls.at(r).size() > 0)
+               {
+                  filter.emplace(r, localId);
+                  matched += sendDispls.at(r).size();
+               }
+            }
 
             // Check that everything matched
             if(toMatch != matched)
@@ -822,53 +794,56 @@ namespace Parallel {
             }
 
             #ifdef QUICC_MPI
-               // Store current filter
-               MatrixI locFilter(2, filter.size());
-               int i = 0;
-               for(auto it = filter.begin(); it != filter.end(); ++it)
+            MatrixI  matRemote;
+            Profiler::RegionStart<4> ("Framework::LoadSplitter::SplittingAlgorithm::buildCommunicationStructure::commStruct");
+            // Store current filter
+            MatrixI locFilter(2, filter.size());
+            int i = 0;
+            for(auto it = filter.begin(); it != filter.end(); ++it)
+            {
+               locFilter(0, i) = it->first;
+               locFilter(1, i) = it->second;
+               i++;
+            }
+
+            // Gather full communication structure
+            for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
+            {
+               int filterSize = 0;
+               if(cpu == localId)
                {
-                  locFilter(0, i) = it->first;
-                  locFilter(1, i) = it->second;
-                  i++;
-               }
+                  filterSize = locFilter.cols();
 
-               // Gather full communication structure
-               for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
+                  // Get size
+                  QuICCEnv().synchronize();
+                  int ierr = MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 725);
+
+                  // Get remote keys as matrix
+                  QuICCEnv().synchronize();
+                  ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 726);
+
+               } else
                {
-                  int filterSize = 0;
-                  if(cpu == localId)
+                  // Get size
+                  QuICCEnv().synchronize();
+                  int ierr = MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 727);
+
+                  // Get remote keys as matrix
+                  matRemote.resize(2, filterSize);
+                  QuICCEnv().synchronize();
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 728);
+
+                  for(int i = 0; i < filterSize; ++i)
                   {
-                     filterSize = locFilter.cols();
-
-                     // Get size
-                     QuICCEnv().synchronize();
-                     ierr = MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
-                     QuICCEnv().check(ierr, 725);
-
-                     // Get remote keys as matrix
-                     QuICCEnv().synchronize();
-                     ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD);
-                     QuICCEnv().check(ierr, 726);
-
-                  } else
-                  {
-                     // Get size
-                     QuICCEnv().synchronize();
-                     ierr = MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
-                     QuICCEnv().check(ierr, 727);
-
-                     // Get remote keys as matrix
-                     matRemote.resize(2, filterSize);
-                     QuICCEnv().synchronize();
-                     ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
-                     QuICCEnv().check(ierr, 728);
-
-                     for(int i = 0; i < filterSize; ++i)
-                     {
-                        filter.insert(std::make_pair(matRemote(0,i), matRemote(1,i)));
-                     }
+                     filter.insert(std::make_pair(matRemote(0,i), matRemote(1,i)));
                   }
                }
+            }
+            Profiler::RegionStop<4> ("Framework::LoadSplitter::SplittingAlgorithm::buildCommunicationStructure::commStruct");
             #endif // QUICC_MPI
 
             // Store obtained minimized structure
@@ -876,10 +851,6 @@ namespace Parallel {
             {
                commStructure.at(exId).insert(fId);
             }
-
-            // Clear all the data for next loop
-            bwdMap.clear();
-            fwdMap.clear();
          }
       }
 

@@ -41,6 +41,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
     QuICC::Framework::GitHash
     QuICC::Profiling
     QuICC::Environment
+    QuICC::Utils
     QuICC::TimestepPc
     QuICC::TimestepRkcb
     QuICC::DenseSM
