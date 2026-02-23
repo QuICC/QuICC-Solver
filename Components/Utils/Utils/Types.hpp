@@ -14,7 +14,7 @@
 namespace QuICC {
 namespace Utils {
 
-   typedef std::array<int,3> point_t;
+typedef std::array<int, 3> point_t;
 
 } // namespace Utils
 } // namespace QuICC

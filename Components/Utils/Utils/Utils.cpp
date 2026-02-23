@@ -28,7 +28,7 @@ void getSplitIdx(std::vector<int>& splitIdx, const std::vector<point_t>& coos)
    for (std::size_t i = 0; i < coos.size(); ++i)
    {
       auto&& p = coos[i];
-      for(int i = 0; i < filters.size(); i++)
+      for (int i = 0; i < filters.size(); i++)
       {
          filters.at(i).insert(p[i]);
       }
@@ -36,7 +36,7 @@ void getSplitIdx(std::vector<int>& splitIdx, const std::vector<point_t>& coos)
 
    // Compute total size
    int tot = 0;
-   for(auto&& s: filters)
+   for (auto&& s: filters)
    {
       tot += s.size();
    }
@@ -44,48 +44,54 @@ void getSplitIdx(std::vector<int>& splitIdx, const std::vector<point_t>& coos)
    // Set pointers for accessing indexes for each dimensions
    splitIdx.reserve(filters.size() + dimSize + 1 + tot);
    splitIdx.push_back(filters.size() + 1);
-   for(auto&& s: filters)
+   for (auto&& s: filters)
    {
       splitIdx.push_back(splitIdx.back() + s.size());
    }
 
    // Add all indexes
-   for(auto&& s: filters)
+   for (auto&& s: filters)
    {
       std::copy(s.begin(), s.end(), std::back_inserter(splitIdx));
    }
    assert(splitIdx.size() == splitIdx.at(3));
 }
 
-void matchSplitIdx(std::vector<int>& remNeededIdx, std::vector<int>& remNeededSizes, const std::vector<int>& locSplitIdx, const std::vector<int>& remSplitIdx)
+void matchSplitIdx(std::vector<int>& remNeededIdx,
+   std::vector<int>& remNeededSizes, const std::vector<int>& locSplitIdx,
+   const std::vector<int>& remSplitIdx)
 {
    Profiler::RegionFixture<4> fix("Utils::matchSplitIdx");
 
    const auto dimSize = std::tuple_size<point_t>{};
    // loop over loc coo to find match
-   std::vector<int>  remSplitIdxNeeded(dimSize + 1, 0);
-   for(int i = 0; i < dimSize; i++)
+   std::vector<int> remSplitIdxNeeded(dimSize + 1, 0);
+   for (int i = 0; i < dimSize; i++)
    {
       remSplitIdxNeeded.at(i) = remSplitIdxNeeded.size();
-      if(locSplitIdx.size() > dimSize + 1 && remSplitIdx.size() > dimSize + 1)
+      if (locSplitIdx.size() > dimSize + 1 && remSplitIdx.size() > dimSize + 1)
       {
-         std::set_intersection(
-               locSplitIdx.begin() + locSplitIdx.at(i), locSplitIdx.begin() + locSplitIdx.at(i+1),
-               remSplitIdx.begin() + remSplitIdx.at(i), remSplitIdx.begin() + remSplitIdx.at(i+1),
-               std::back_inserter(remSplitIdxNeeded));
+         std::set_intersection(locSplitIdx.begin() + locSplitIdx.at(i),
+            locSplitIdx.begin() + locSplitIdx.at(i + 1),
+            remSplitIdx.begin() + remSplitIdx.at(i),
+            remSplitIdx.begin() + remSplitIdx.at(i + 1),
+            std::back_inserter(remSplitIdxNeeded));
       }
    }
    remSplitIdxNeeded.at(dimSize) = remSplitIdxNeeded.size();
-   std::copy(remSplitIdxNeeded.begin(), remSplitIdxNeeded.end(), std::back_inserter(remNeededIdx));
+   std::copy(remSplitIdxNeeded.begin(), remSplitIdxNeeded.end(),
+      std::back_inserter(remNeededIdx));
    remNeededSizes.push_back(remSplitIdxNeeded.size());
 }
 
-void filterIdx(std::vector<point_t>& cooFiltered, std::vector<int>& cooSizes, const std::vector<point_t>& cooNew, const std::vector<int>& locIdx, const std::vector<int>& locDispl)
+void filterIdx(std::vector<point_t>& cooFiltered, std::vector<int>& cooSizes,
+   const std::vector<point_t>& cooNew, const std::vector<int>& locIdx,
+   const std::vector<int>& locDispl)
 {
    Profiler::RegionFixture<4> fix("Utils::filterIdx");
 
    cooFiltered.reserve(cooNew.size());
-   for(int r = 0; r < locDispl.size(); ++r)
+   for (int r = 0; r < locDispl.size(); ++r)
    {
       int istart = cooFiltered.size();
       int count = 0;
@@ -96,13 +102,13 @@ void filterIdx(std::vector<point_t>& cooFiltered, std::vector<int>& cooSizes, co
       auto itEnd1 = itStart + (*(itStart + 2));
       auto itStart2 = itStart + (*(itStart + 2));
       auto itEnd2 = itStart + (*(itStart + 3));
-      for(auto&& p: cooNew)
+      for (auto&& p: cooNew)
       {
-         if(std::binary_search(itStart0, itEnd0, p[0]))
+         if (std::binary_search(itStart0, itEnd0, p[0]))
          {
-            if(std::binary_search(itStart1, itEnd1, p[1]))
+            if (std::binary_search(itStart1, itEnd1, p[1]))
             {
-               if(std::binary_search(itStart2, itEnd2, p[2]))
+               if (std::binary_search(itStart2, itEnd2, p[2]))
                {
                   cooFiltered.push_back(p);
                   count++;
@@ -111,11 +117,13 @@ void filterIdx(std::vector<point_t>& cooFiltered, std::vector<int>& cooSizes, co
          }
       }
       cooSizes.push_back(count);
-      std::sort(cooFiltered.begin()+istart, cooFiltered.end());
+      std::sort(cooFiltered.begin() + istart, cooFiltered.end());
    }
 }
 
-void matchSendDispl(std::vector<std::vector<int>>& sendDispl, const std::vector<point_t>& locIdx, const std::vector<point_t>& remIdx, const std::vector<int>& remSizes, const std::vector<int>& remDispl)
+void matchSendDispl(std::vector<std::vector<int>>& sendDispl,
+   const std::vector<point_t>& locIdx, const std::vector<point_t>& remIdx,
+   const std::vector<int>& remSizes, const std::vector<int>& remDispl)
 {
    Profiler::RegionFixture<4> fix("Utils::matchSendDispl");
 
@@ -123,13 +131,14 @@ void matchSendDispl(std::vector<std::vector<int>>& sendDispl, const std::vector<
    std::vector<int> argsort(locIdx.size());
    std::iota(argsort.begin(), argsort.end(), 0);
    std::sort(argsort.begin(), argsort.end(),
-     [&](std::size_t i, std::size_t j){ return locIdx[i] < locIdx[j]; });
+      [&](std::size_t i, std::size_t j) { return locIdx[i] < locIdx[j]; });
 
    // Reserve memory
    sendDispl.resize(remDispl.size());
    for (int r = 0; r < remDispl.size(); ++r)
    {
-      sendDispl[r].reserve(std::min(locIdx.size(), static_cast<std::size_t>(remSizes.at(r))));
+      sendDispl[r].reserve(
+         std::min(locIdx.size(), static_cast<std::size_t>(remSizes.at(r))));
    }
 
    // Extract matching list
@@ -144,7 +153,7 @@ void matchSendDispl(std::vector<std::vector<int>>& sendDispl, const std::vector<
          auto remEnd = remIdx.begin() + remDispl.at(r) + remSizes.at(r);
          assert(std::is_sorted(remBegin, remEnd));
 
-         if(std::binary_search(remBegin, remEnd, p))
+         if (std::binary_search(remBegin, remEnd, p))
          {
             sendDispl[r].emplace_back(i);
             break;
@@ -153,7 +162,8 @@ void matchSendDispl(std::vector<std::vector<int>>& sendDispl, const std::vector<
    }
 }
 
-void matchSendDispl(std::vector<std::vector<int>>& sendDispl, const std::vector<point_t>& locIdx, const std::vector<point_t>& remIdx)
+void matchSendDispl(std::vector<std::vector<int>>& sendDispl,
+   const std::vector<point_t>& locIdx, const std::vector<point_t>& remIdx)
 {
    Profiler::RegionFixture<4> fix("Utils::matchSendDisplSerial");
 
@@ -161,7 +171,7 @@ void matchSendDispl(std::vector<std::vector<int>>& sendDispl, const std::vector<
    std::vector<int> argsort(locIdx.size());
    std::iota(argsort.begin(), argsort.end(), 0);
    std::sort(argsort.begin(), argsort.end(),
-     [&](std::size_t i, std::size_t j){ return locIdx[i] < locIdx[j]; });
+      [&](std::size_t i, std::size_t j) { return locIdx[i] < locIdx[j]; });
 
    // Reserve memory
    sendDispl.resize(1);
@@ -175,7 +185,7 @@ void matchSendDispl(std::vector<std::vector<int>>& sendDispl, const std::vector<
       // get new coo from other rank and check if it is here
       assert(std::is_sorted(remIdx.begin(), remIdx.end()));
 
-      if(std::binary_search(remIdx.begin(), remIdx.end(), p))
+      if (std::binary_search(remIdx.begin(), remIdx.end(), p))
       {
          sendDispl[0].emplace_back(i);
       }

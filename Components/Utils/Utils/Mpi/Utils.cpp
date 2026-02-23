@@ -11,14 +11,16 @@
 
 // Project includes
 //
-#include "Utils/Mpi/Utils.hpp"
 #include "Profiler/Interface.hpp"
+#include "Utils/Mpi/Utils.hpp"
 
 namespace QuICC {
 namespace Utils {
 namespace Mpi {
 
-const std::vector<int>* broadcastSplitIdx(const int r, const int rank, std::vector<int>& remSplit, const std::vector<int>& locSplit, const MPI_Comm comm)
+const std::vector<int>* broadcastSplitIdx(const int r, const int rank,
+   std::vector<int>& remSplit, const std::vector<int>& locSplit,
+   const MPI_Comm comm)
 {
    Profiler::RegionFixture<4> fix("Utils::broadcastSplitIdx");
 
@@ -40,21 +42,22 @@ const std::vector<int>* broadcastSplitIdx(const int r, const int rank, std::vect
 
    if (r == rank)
    {
-      MPI_Bcast(const_cast<int*>(locSplit.data()),
-            locSplit.size(), MPI_INT, r, comm);
+      MPI_Bcast(const_cast<int*>(locSplit.data()), locSplit.size(), MPI_INT, r,
+         comm);
    }
    else
    {
       // comm remote coordinates
       remSplit.resize(remAbsCooNewSize);
-      MPI_Bcast(remSplit.data(), remSplit.size(), MPI_INT,
-            r, comm);
+      MPI_Bcast(remSplit.data(), remSplit.size(), MPI_INT, r, comm);
    }
 
    return pRemSplit;
 }
 
-void distributeSplitSizes(const std::vector<int>& sendSizes, std::vector<int>& sendDispl, std::vector<int>& recvSizes, std::vector<int>& recvDispl, const MPI_Comm comm)
+void distributeSplitSizes(const std::vector<int>& sendSizes,
+   std::vector<int>& sendDispl, std::vector<int>& recvSizes,
+   std::vector<int>& recvDispl, const MPI_Comm comm)
 {
    Profiler::RegionFixture<5> fix("Utils::distributeSplitSizes");
 
@@ -62,20 +65,24 @@ void distributeSplitSizes(const std::vector<int>& sendSizes, std::vector<int>& s
    MPI_Comm_size(comm, &ranks);
 
    recvSizes.resize(ranks);
-   MPI_Alltoall(sendSizes.data(), 1, MPI_INT, recvSizes.data(), 1, MPI_INT, comm);
+   MPI_Alltoall(sendSizes.data(), 1, MPI_INT, recvSizes.data(), 1, MPI_INT,
+      comm);
 
    recvDispl.clear();
    sendDispl.clear();
    recvDispl.push_back(0);
    sendDispl.push_back(0);
-   for(int i = 0; i < ranks-1; i++)
+   for (int i = 0; i < ranks - 1; i++)
    {
       recvDispl.push_back(recvDispl.back() + recvSizes.at(i));
       sendDispl.push_back(sendDispl.back() + sendSizes.at(i));
    }
 }
 
-void distributeSplitIdx(const std::vector<int>& sendIdx, const std::vector<int>& sendSizes, std::vector<int>& recvIdx, std::vector<int>& recvSizes, std::vector<int>& recvDispl, const MPI_Comm comm)
+void distributeSplitIdx(const std::vector<int>& sendIdx,
+   const std::vector<int>& sendSizes, std::vector<int>& recvIdx,
+   std::vector<int>& recvSizes, std::vector<int>& recvDispl,
+   const MPI_Comm comm)
 {
    Profiler::RegionFixture<4> fix("Utils::distributeSplitIdx");
 
@@ -83,16 +90,20 @@ void distributeSplitIdx(const std::vector<int>& sendIdx, const std::vector<int>&
    distributeSplitSizes(sendSizes, sendDispl, recvSizes, recvDispl, comm);
 
    int tot = 0;
-   for(auto&& s: recvSizes)
+   for (auto&& s: recvSizes)
    {
       tot += s;
    }
 
    recvIdx.resize(tot);
-   MPI_Alltoallv(sendIdx.data(), sendSizes.data(), sendDispl.data(), MPI_INT, recvIdx.data(), recvSizes.data(), recvDispl.data(), MPI_INT, comm);
+   MPI_Alltoallv(sendIdx.data(), sendSizes.data(), sendDispl.data(), MPI_INT,
+      recvIdx.data(), recvSizes.data(), recvDispl.data(), MPI_INT, comm);
 }
 
-void distributeSplitIdx(const std::vector<point_t>& sendIdx, const std::vector<int>& sendSizes, std::vector<point_t>& recvIdx, std::vector<int>& recvSizes, std::vector<int>& recvDispl, const MPI_Comm comm)
+void distributeSplitIdx(const std::vector<point_t>& sendIdx,
+   const std::vector<int>& sendSizes, std::vector<point_t>& recvIdx,
+   std::vector<int>& recvSizes, std::vector<int>& recvDispl,
+   const MPI_Comm comm)
 {
    Profiler::RegionFixture<4> fix("Utils::distributeSplitIdx_point");
 
@@ -102,7 +113,7 @@ void distributeSplitIdx(const std::vector<point_t>& sendIdx, const std::vector<i
    distributeSplitSizes(sendSizes, sendDispl, recvSizes, recvDispl, comm);
 
    int tot = 0;
-   for(auto&& s: recvSizes)
+   for (auto&& s: recvSizes)
    {
       tot += s;
    }
@@ -112,7 +123,7 @@ void distributeSplitIdx(const std::vector<point_t>& sendIdx, const std::vector<i
    std::vector<int> sendDispl_(sendDispl);
    std::vector<int> recvSizes_(recvSizes);
    std::vector<int> recvDispl_(recvDispl);
-   for(int i = 0; i < sendDispl.size(); i++)
+   for (int i = 0; i < sendDispl.size(); i++)
    {
       sendSizes_.at(i) *= dimSize;
       sendDispl_.at(i) *= dimSize;
@@ -120,7 +131,8 @@ void distributeSplitIdx(const std::vector<point_t>& sendIdx, const std::vector<i
       recvDispl_.at(i) *= dimSize;
    }
 
-   MPI_Alltoallv(sendIdx.data(), sendSizes_.data(), sendDispl_.data(), MPI_INT, recvIdx.data(), recvSizes_.data(), recvDispl_.data(), MPI_INT, comm);
+   MPI_Alltoallv(sendIdx.data(), sendSizes_.data(), sendDispl_.data(), MPI_INT,
+      recvIdx.data(), recvSizes_.data(), recvDispl_.data(), MPI_INT, comm);
 }
 
 } // namespace Mpi
