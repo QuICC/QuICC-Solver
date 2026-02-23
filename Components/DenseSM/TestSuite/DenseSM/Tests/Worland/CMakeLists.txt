@@ -127,6 +127,7 @@ set(_tests
   DivR2CFD1R1:dense
   DivR2D1R1FC:dense
   DivR2FD1R1:dense
+  DivR1FD1R1:dense
   )
 set (_ids 0 1 2 3 4 5 6)
 set (_ulps 140 300 380 200 1900 720 290)
@@ -140,8 +141,9 @@ set(_tests
   DivR1D1DivR1FD1R1:dense
   DivR1D1DivR1D1R1F:dense
   DivR3D1R1FD1R1:dense
+  FC:dense
   )
-set (_min_qis 1 1 2 2 1 1)
+set (_min_qis 1 1 2 2 1 1 1)
 set (_ids 100 101 102 103 104 105 106)
 set (_ulps 90 270 270 230 230 720 720)
 run_iq_tests("Elsasser, dipolar" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis} ULPS ${_ulps})
@@ -155,8 +157,9 @@ set(_tests
   DivR2CFD1R1:dense
   DivR2D1R1FC:dense
   DivR2FD1R1:dense
+  DivR1FD1R1:dense
   )
-set (_min_qis 1 1 3 1 1 2 1)
+set (_min_qis 1 1 3 1 1 2 1 1)
 set (_ids 200 201 202 203 204 205 206 207 208 209)
 set (_ulps 250 800 220 250 280 420 1600 230 500 2600)
 run_iq_tests("Gaunt, quadrupolar" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis} ULPS ${_ulps})
@@ -169,8 +172,9 @@ set(_tests
   DivR1D1DivR1FD1R1:dense
   DivR1D1DivR1D1R1F:dense
   DivR3D1R1FD1R1:dense
+  FC:dense
   )
-set (_min_qis 1 1 2 2 1 1)
+set (_min_qis 1 1 2 2 1 1 1)
 set (_ids 300 301 302 303 304 305 306 307 308 309 310 311)
 set (_ulps 140 170 550 550 350 250 1200 1200 180 180 3000 3000)
 run_iq_tests("Elsasser, quadrupolar" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis} ULPS ${_ulps})
