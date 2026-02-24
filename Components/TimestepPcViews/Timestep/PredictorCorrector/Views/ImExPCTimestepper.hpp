@@ -17,6 +17,14 @@
 #include "QuICC/Register/Implicit.hpp"
 #include "QuICC/Register/Intermediate.hpp"
 #include "QuICC/Register/Solution.hpp"
+#include "QuICC/ModelOperator/Boundary.hpp"
+#include "QuICC/ModelOperator/ImplicitLinear.hpp"
+#include "QuICC/ModelOperator/QuasiInverse.hpp"
+#include "QuICC/ModelOperator/SplitImplicitLinear.hpp"
+#include "QuICC/ModelOperator/SplitQuasiInverse.hpp"
+#include "QuICC/ModelOperator/SplitBoundary.hpp"
+#include "QuICC/ModelOperator/SplitBoundaryValue.hpp"
+#include "QuICC/ModelOperator/Time.hpp"
 #include "Timestep//PredictorCorrector/Views/ITimestepper.hpp"
 #include "Timestep/PredictorCorrector/IImExPCScheme.hpp"
 #include "View/ViewDense.hpp"
@@ -114,6 +122,14 @@ public:
     * @param startRow Start row
     */
    void setSolution(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t startRow);
+
+   /**
+    * @brief Correct solution
+    *
+    * @param corr corrections to solution data
+    * @param startRow Start row
+    */
+   void correctSolution(const std::vector<std::tuple<MHDComplex,int,int>>& sol, const std::size_t startRow);
 
    /**
     * @brief Update solver after solution was updated
@@ -215,6 +231,8 @@ void ImExPCTimestepper<TOperator, TData, TImpl>::buildOperators(
 {
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpA =
       ops.find(ModelOperator::ImplicitLinear::id());
+   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpQ =
+      ops.find(ModelOperator::QuasiInverse::id());
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpB =
       ops.find(ModelOperator::Time::id());
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpC =
@@ -226,6 +244,8 @@ void ImExPCTimestepper<TOperator, TData, TImpl>::buildOperators(
       ops.find(ModelOperator::SplitBoundary::id());
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSA =
       ops.find(ModelOperator::SplitImplicitLinear::id());
+   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSQ =
+      ops.find(ModelOperator::SplitQuasiInverse::id());
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSCV =
       ops.find(ModelOperator::SplitBoundaryValue::id());
 
@@ -239,6 +259,10 @@ void ImExPCTimestepper<TOperator, TData, TImpl>::buildOperators(
    // Set mass matrix
    this->mMassMatrix.resize(size, size);
    details::addOperators(this->mMassMatrix, 1.0, iOpB->second);
+
+   // Set quasi-inverse matrix
+   this->mQi.resize(size, size);
+   details::addOperators(this->mQi, 1.0, iOpQ->second);
 
    // Set implicit matrix
    for (int i = 0; i < this->steps(); ++i)
@@ -269,6 +293,10 @@ void ImExPCTimestepper<TOperator, TData, TImpl>::buildOperators(
 
    if (isSplit)
    {
+      // Set split quasi-inverse matrix
+      this->mSplitQi.resize(size, size);
+      details::addOperators(this->mSplitQi, 1.0, iOpSQ->second);
+
       // Store information for particular solution
       auto&& infRhs = this->reg(Register::Influence::id());
       details::initInfluence(infRhs, iOpSCV->second, iOpSC->second);
@@ -287,6 +315,8 @@ bool ImExPCTimestepper<TOperator, TData, TImpl>::preSolve()
       const bool isFirstPass = (this->mOpId == Tag::Operator::Lhs::id());
       if (isFirstPass)
       {
+         details::computeMV(this->reg(Register::Rhs::id()), this->mSplitQi,
+               this->reg(Register::Rhs::id()));
          this->mOpId = Tag::Operator::Influence::id();
          this->mId = 0.0;
 
@@ -313,7 +343,7 @@ bool ImExPCTimestepper<TOperator, TData, TImpl>::preSolve()
       MHDFloat aN = this->mDt;
       if (this->mHasExplicit)
       {
-         details::computeSet(this->reg(Register::Explicit::id()), -1.0,
+         details::computeMV(this->reg(Register::Explicit::id()), -1.0, this->mQi,
                this->reg(Register::Rhs::id()));
          details::computeSet(this->reg(Register::Rhs::id()), aN,
                this->reg(Register::Explicit::id()));
@@ -338,7 +368,7 @@ bool ImExPCTimestepper<TOperator, TData, TImpl>::preSolve()
       {
          details::computeSet(this->reg(Register::Error::id()), aNold,
             this->reg(Register::Explicit::id()));
-         details::computeSet(this->reg(Register::Explicit::id()), -1.0,
+         details::computeMV(this->reg(Register::Explicit::id()), -1.0, this->mQi,
             this->reg(Register::Rhs::id()));
          details::computeSet(this->reg(Register::Rhs::id()), aNnew,
             this->reg(Register::Explicit::id()));
@@ -364,9 +394,7 @@ bool ImExPCTimestepper<TOperator, TData, TImpl>::postSolve()
 
       if (isFirstPass)
       {
-         // Apply quasi-inverse
-         details::computeMV(this->reg(Register::Rhs::id()),
-               this->mMassMatrix,
+         details::computeSet(this->reg(Register::Rhs::id()),
                this->reg(Register::Solution::id()));
 
          return true;
@@ -407,12 +435,12 @@ bool ImExPCTimestepper<TOperator, TData, TImpl>::postSolve()
       }
 
       this->mStep += 1;
+   }
 
-      // Check if we are done
-      if (this->mStep == this->steps())
-      {
-         this->mStep = 0;
-      }
+   // Check if we are done
+   if (this->mStep == this->steps())
+   {
+      this->mStep = 0;
    }
 
    return false;
@@ -422,6 +450,13 @@ template <typename TOperator, typename TData, typename TImpl>
 void ImExPCTimestepper<TOperator, TData, TImpl>::setSolution(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t startRow)
 {
    details::computeSet(this->reg(Register::Solution::id()),
+         sol, startRow);
+}
+
+template <typename TOperator, typename TData, typename TImpl>
+void ImExPCTimestepper<TOperator, TData, TImpl>::correctSolution(const std::vector<std::tuple<MHDComplex,int,int>>& sol, const std::size_t startRow)
+{
+   details::addCorrection(this->reg(Register::Solution::id()),
          sol, startRow);
 }
 

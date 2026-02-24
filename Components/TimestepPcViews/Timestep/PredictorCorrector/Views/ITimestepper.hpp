@@ -16,18 +16,13 @@
 
 // Project includes
 //
-#include "QuICC/ModelOperator/Boundary.hpp"
-#include "QuICC/ModelOperator/ImplicitLinear.hpp"
-#include "QuICC/ModelOperator/SplitBoundary.hpp"
-#include "QuICC/ModelOperator/SplitBoundaryValue.hpp"
-#include "QuICC/ModelOperator/SplitImplicitLinear.hpp"
-#include "QuICC/ModelOperator/Time.hpp"
 #include "QuICC/Register/Implicit.hpp"
 #include "QuICC/Register/Influence.hpp"
 #include "QuICC/Tag/Operator/Rhs.hpp"
+#include "QuICC/Tag/Operator/Influence.hpp"
+#include "QuICC/Tag/Operator/Qi.hpp"
 #include "Timestep/PredictorCorrector/Views/ITimestepperBase.hpp"
 #include "Timestep/PredictorCorrector/Views/details/TimesteppperTools.hpp"
-#include "QuICC/Tag/Operator/Influence.hpp"
 
 namespace QuICC {
 
@@ -129,6 +124,16 @@ protected:
     * @brief Mass matrix operator
     */
    SparseMatrix mMassMatrix;
+
+   /**
+    * @brief Quasi-inverse operator
+    */
+   SparseMatrix mQi;
+
+   /**
+    * @brief Split Quasi-inverse operator
+    */
+   SparseMatrix mSplitQi;
 
 private:
 };
@@ -249,6 +254,8 @@ void ITimestepper<TOperator, TData, TImpl>::initMatrices()
    }
 
    this->initMatrices(Tag::Operator::Rhs::id(), 0);
+
+   this->initMatrices(Tag::Operator::Qi::id(), 0);
 }
 
 template <typename TOperator, typename TData, typename TImpl>

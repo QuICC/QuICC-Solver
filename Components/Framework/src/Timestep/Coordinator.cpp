@@ -55,9 +55,9 @@ namespace Timestep {
       this->mpImpl->tuneAdaptive(time);
    }
 
-   void Coordinator::adaptTimestep(const Matrix& cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   void Coordinator::adaptTimestep(const Matrix& cfl)
    {
-      this->mpImpl->adaptTimestep(cfl, scalEq, vectEq);
+      this->mpImpl->adaptTimestep(cfl);
    }
 
    void Coordinator::stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)

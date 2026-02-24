@@ -28,11 +28,13 @@
 #     list of tag IDs to use to generate variant name
 # DATAFILTER
 #     list of tag IDs to use to generate data name
+# VALIDATIONFILTER
+#     list of tag IDs to use to generate validation name
 #
 function(quicc_add_benchmark target)
   # parse inputs
   set(oneValueArgs MODEL TYPE ARCHIVEDIR WORKDIR TIMEOUT GITTAG MPIRANKS PREFIX EXE_POSTFIX TOOLSDIR)
-  set(multiValueArgs STARTFILES TOOLS VARIANTS FILTER DATAFILTER)
+  set(multiValueArgs STARTFILES TOOLS VARIANTS FILTER DATAFILTER VALIDATIONFILTER)
   cmake_parse_arguments(QAB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_add_benchmark")
@@ -132,6 +134,11 @@ function(quicc_add_benchmark target)
   endif()
   message(DEBUG "QAB_DATAFILTER: ${QAB_DATAFILTER}")
 
+  if(NOT QAB_VALIDATIONFILTER)
+    set(QAB_VALIDATIONFILTER )
+  endif()
+  message(DEBUG "QAB_VALIDATIONFILTER: ${QAB_VALIDATIONFILTER}")
+
   # default configs
   if(QUICC_USE_MPI)
     set(_mpi_ranks ${QAB_MPIRANKS})
@@ -168,25 +175,40 @@ function(quicc_add_benchmark target)
     list(POP_BACK _item _value)
     string(REGEX REPLACE "/" ";" _item "${_item}")
     list(POP_BACK _item _name)
-    list(FIND QAB_FILTER ${_name} _pos)
-    if(_pos GREATER -1)
-      if("${_value}" STREQUAL "On")
-        string(APPEND _runid "_${_name}")
-      else()
-        string(APPEND _runid "_${_value}")
+    foreach(_it RANGE 1)
+      list(FIND QAB_FILTER ${_name} _pos)
+      if(_pos GREATER -1)
+        if("${_value}" STREQUAL "On")
+          string(APPEND _runid "_${_name}")
+        else()
+          string(APPEND _runid "_${_value}")
+        endif()
       endif()
-    endif()
-    list(FIND QAB_DATAFILTER ${_name} _pos)
-    if(_pos GREATER -1)
-      if("${_value}" STREQUAL "On")
-        string(APPEND _dataid "_${_name}")
-      else()
-        string(APPEND _dataid "_${_value}")
+      # Process data filter
+      list(FIND QAB_DATAFILTER ${_name} _pos)
+      if(_pos GREATER -1)
+        if("${_value}" STREQUAL "On")
+          string(APPEND _dataid "_${_name}")
+        else()
+          string(APPEND _dataid "_${_value}")
+        endif()
       endif()
-    endif()
+      # Process validation filter
+      list(FIND QAB_VALIDATIONFILTER ${_name} _pos)
+      if(_pos GREATER -1)
+        if("${_value}" STREQUAL "On")
+          string(APPEND _validid "_${_name}")
+        else()
+          string(APPEND _validid "_${_value}")
+        endif()
+      endif()
+      list(POP_BACK _item _lvl)
+      set(_name "${_lvl}/${_name}")
+    endforeach()
   endforeach()
   message(DEBUG "_runid: ${_runid}")
   message(DEBUG "_dataid: ${_dataid}")
+  message(DEBUG "_validid: ${_validid}")
 
   set(_exe "${QAB_MODEL}${target}${QAB_EXE_POSTFIX}")
   if(TARGET ${_exe})
@@ -211,7 +233,7 @@ function(quicc_add_benchmark target)
 
     add_custom_target(${_bench} ALL
       COMMAND ${CMAKE_COMMAND} -E copy
-        "${CMAKE_CURRENT_SOURCE_DIR}/validate_${_prefix}benchmark_${target}${_dataid}.py"
+        "${CMAKE_CURRENT_SOURCE_DIR}/validate_${_prefix}benchmark_${target}${_dataid}${_validid}.py"
         "${_rundir}/validate_${_prefix}benchmark.py"
       ${_args}
       )

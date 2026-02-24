@@ -110,6 +110,9 @@ namespace Sphere {
    {
       if(timeId == SolveTiming::After::id())
       {
+         // Clear old corrections
+         this->mCorr.clear();
+
          assert(this->mScalars.size() == 0);
          assert(this->mVectors.size() == 1);
          auto& field = this->mVectors.begin()->second;
@@ -119,7 +122,8 @@ namespace Sphere {
          {
             std::visit([&](auto&& f){
                   mom = (this->mOp.transpose()*f->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mM1j, this->mM1k));
-                  f->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(mom(0), 0, this->mM1j,this->mM1k);
+                  this->mCorr.emplace_back(mom(0) - f->dom(0).total().comp(FieldComponents::Spectral::TOR).point(0, this->mM1j,this->mM1k), 0, this->mM1j,this->mM1k);
+                  f->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(mom(0), 0, this->mM1j, this->mM1k);
                   }, field);
          }
 
@@ -127,6 +131,7 @@ namespace Sphere {
          {
             std::visit([&](auto&& f){
                   mom = (this->mOp.transpose()*f->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mM0j, this->mM0k));
+                  this->mCorr.emplace_back(mom(0) - f->dom(0).total().comp(FieldComponents::Spectral::TOR).point(0, this->mM0j,this->mM0k), 0, this->mM0j, this->mM0k);
                   f->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(mom(0), 0, this->mM0j, this->mM0k);
                   }, field);
          }

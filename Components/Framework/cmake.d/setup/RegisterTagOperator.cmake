@@ -1,6 +1,7 @@
 set(tags
-  Lhs
   Influence
+  Lhs
+  Qi
   Rhs
   )
 

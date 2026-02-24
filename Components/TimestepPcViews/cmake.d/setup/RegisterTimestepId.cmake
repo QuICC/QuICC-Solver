@@ -1,6 +1,8 @@
 set(tags
   ImexPc2
+  ImexEuler
   ImexPc2b
+  ImexEulerb
   )
 
 include(RegisterTags)

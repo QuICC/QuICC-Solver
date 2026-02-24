@@ -205,6 +205,11 @@ bool SparseImExPCTimestepper<TOperator, TData, TSolver>::preSolve()
       const bool isFirstPass = (this->mOpId == Tag::Operator::Lhs::id());
       if (isFirstPass)
       {
+         for (size_t i = this->mZeroIdx; i < this->nSystem(); i++)
+         {
+            details::computeMV(this->reg(Register::Rhs::id()).at(i), this->mSplitQi.at(i),
+                  this->reg(Register::Rhs::id()).at(i));
+         }
          this->mOpId = Tag::Operator::Influence::id();
          this->mId = 0.0;
 
@@ -233,8 +238,8 @@ bool SparseImExPCTimestepper<TOperator, TData, TSolver>::preSolve()
       {
          if (this->mHasExplicit)
          {
-            details::computeSet(this->reg(Register::Explicit::id()).at(i), -1.0,
-               this->reg(Register::Rhs::id()).at(i));
+            details::computeMV(this->reg(Register::Explicit::id()).at(i), -1.0,
+               this->mQi.at(i), this->reg(Register::Rhs::id()).at(i));
             details::computeSet(this->reg(Register::Rhs::id()).at(i), aN,
                this->reg(Register::Explicit::id()).at(i));
          }
@@ -261,8 +266,8 @@ bool SparseImExPCTimestepper<TOperator, TData, TSolver>::preSolve()
          {
             details::computeSet(this->reg(Register::Error::id()).at(i), aNold,
                this->reg(Register::Explicit::id()).at(i));
-            details::computeSet(this->reg(Register::Explicit::id()).at(i), -1.0,
-               this->reg(Register::Rhs::id()).at(i));
+            details::computeMV(this->reg(Register::Explicit::id()).at(i), -1.0,
+               this->mQi.at(i), this->reg(Register::Rhs::id()).at(i));
             details::computeSet(this->reg(Register::Rhs::id()).at(i), aNnew,
                this->reg(Register::Explicit::id()).at(i));
          }
@@ -291,8 +296,7 @@ bool SparseImExPCTimestepper<TOperator, TData, TSolver>::postSolve()
          // Apply quasi-inverse
          for (std::size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            details::computeMV(this->reg(Register::Rhs::id()).at(i),
-               this->mMassMatrix.at(i),
+            details::computeSet(this->reg(Register::Rhs::id()).at(i),
                this->reg(Register::Solution::id()).at(i));
          }
 
@@ -346,12 +350,12 @@ bool SparseImExPCTimestepper<TOperator, TData, TSolver>::postSolve()
       }
 
       this->mStep += 1;
+   }
 
-      // Check if we are done
-      if (this->mStep == this->steps())
-      {
-         this->mStep = 0;
-      }
+   // Check if we are done
+   if (this->mStep == this->steps())
+   {
+      this->mStep = 0;
    }
 
    return false;

@@ -16,7 +16,14 @@
 #include "Memory/MemoryResource.hpp"
 #include "Profiler/Interface.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
+#include "QuICC/Equations/CopyUnknown.hpp"
+#include "QuICC/ModelOperator/QuasiInverse.hpp"
+#include "QuICC/ModelOperator/SplitQuasiInverse.hpp"
+#include "QuICC/Equations/CorrectSolution.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
+#include "QuICC/Equations/AddSource.hpp"
+#include "QuICC/Equations/SetBoundaryValue.hpp"
+#include "QuICC/Equations/CopyNonlinear.hpp"
 #include "QuICC/Pseudospectral/Coordinator.hpp"
 #include "QuICC/SolveTiming/Prognostic.hpp"
 #include "QuICC/Timestep/Constants.hpp"
@@ -29,6 +36,8 @@
 #include "View/ViewDense.hpp"
 #include "Memory/Memory.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
+
+#define QUICC_DETAIL_PROF_LVL 3
 
 namespace QuICC {
 
@@ -96,11 +105,8 @@ public:
     * @brief Adapt the timestep used
     *
     * @param cfl     CFL conditions
-    * @param scalEq  Shared scalar equations
-    * @param vectEq  Shared vector equations
     */
-   void adaptTimestep(const Matrix& cfl, const ScalarEquation_range& scalEq,
-      const VectorEquation_range& vectEq) final;
+   void adaptTimestep(const Matrix& cfl) final;
 
    /**
     * @brief Compute (partial) forward step
@@ -122,6 +128,8 @@ public:
    void printInfo(std::ostream& stream) final;
 
 protected:
+   using Timestep::Interface::printInfo;
+
    /**
     * @brief Initialize solution
     *
@@ -311,26 +319,36 @@ void InterfaceViews<TScheme>::initSolution(const ScalarEquation_range& scalEq, c
 
                if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
                {
+                  // Allocate temporary storage
+                  std::uint32_t mem_size = 0;
+                  for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
+                  {
+                     mem_size = std::max(mem_size, static_cast<std::uint32_t>(cinfo.galerkinN(i))*static_cast<std::uint32_t>(cinfo.rhsCols(i)));
+                  }
+                  Memory::MemBlock<MHDComplex> data(mem_size, this->_mem.get());
+
                   for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                   {
                      auto info = createInfo(cinfo, i);
 
-                     DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
-                     tmp.setZero();
-
-                     std::visit(
-                           [&](auto&& p)
-                           {
-                           Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmp, i, 0, true, true);
-                           }, eqIt->spUnknown());
-
                      std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
                      std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                     Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
                      using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
                      std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
-                     Views::details::computeSet(tmpView, tmp, 0);
+                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
+
+                     if(cinfo.isGalerkin())
+                     {
+                        Equations::solveStencilUnknown(*eqIt, myId.second, tmpView, i, 0);
+                     }
+                     else
+                     {
+                        std::visit(
+                              [&](auto&& p)
+                              {
+                              Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, true);
+                              }, eqIt->spUnknown());
+                     }
 
                      this->mSolverCoord.updateSolution(info, tmpView);
                   }
@@ -382,6 +400,14 @@ void InterfaceViews<TScheme>::getExplicitInput(const std::size_t opId,
 
                if(r.size() > 0)
                {
+                  // Allocate temporary storage
+                  std::uint32_t mem_size = 0;
+                  for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
+                  {
+                     mem_size = std::max(mem_size, static_cast<std::uint32_t>(cinfo.galerkinN(i))*static_cast<std::uint32_t>(cinfo.rhsCols(i)));
+                  }
+                  Memory::MemBlock<MHDComplex> data(mem_size, this->_mem.get());
+
                   // Get timestep input
                   for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                   {
@@ -416,10 +442,9 @@ void InterfaceViews<TScheme>::getExplicitInput(const std::size_t opId,
 
                      std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
                      std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                     Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
                      using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
                      std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
+                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
                      Views::details::computeSet(tmpView, tmp, 0);
 
                      this->mSolverCoord.updateRhs(info, tmpView);
@@ -459,34 +484,55 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
 
             if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
             {
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:allocateTemp");
+               // Allocate temporary storage
+               std::uint32_t mem_size = 0;
+               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
+               {
+                  mem_size = std::max(mem_size, static_cast<std::uint32_t>(cinfo.galerkinN(i))*static_cast<std::uint32_t>(cinfo.rhsCols(i)));
+               }
+               Memory::MemBlock<MHDComplex> data(mem_size, this->_mem.get());
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:allocateTemp");
+
                DebuggerMacro_msg("Get timestepper input for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
                // Get timestep input
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:createInfo");
                   auto info = createInfo(cinfo, i);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:createInfo");
 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:setupView");
+                  std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
+                  std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
+                  using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
+                  std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
+                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:setupView");
+
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyNonlinear");
                   // Copy field values into timestepper input
-                  DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
-                  tmp.setZero();
-                  Equations::copyNonlinear(*eqIt, myId.second, tmp, i, 0);
+                  if(cinfo.hasNonlinear())
+                  {
+                     std::visit(
+                           [&](auto&& p)
+                           {
+                           Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, false);
+                           }, eqIt->spUnknown());
+                  }
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyNonlinear");
 
                   // Add source term
                   std::visit(
                         [&](auto&& p)
                         {
-                        Equations::addSource(*eqIt, p->dom(0).perturbation(), myId.second, tmp, i, 0);
+                        Equations::addSource(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0);
                         }, eqIt->spUnknown());
 
-                  std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
-                  std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                  Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
-                  using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
-                  std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
-                  Views::details::computeSet(tmpView, tmp, 0);
-
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:updateRhs");
                   this->mSolverCoord.updateRhs(info, tmpView);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:updateRhs");
 
                   // If required set inhomogenous boundary condition value
                   if(cinfo.hasBoundaryValue())
@@ -534,7 +580,8 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
             {
                DebuggerMacro_msg("Get timestepper solution for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
-               // return zero 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:setZero");
+               // return zero
                for(std::size_t i = 0; i < static_cast<std::size_t>(cinfo.fieldStart()); i++)
                {
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
@@ -542,23 +589,41 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
 
                   eqIt->storeSolution(myId.second, tmp, i, 0);
                }
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:setZero");
+
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:allocateTemp");
+               // Allocate temporary storage
+               std::uint32_t mem_size = 0;
+               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
+               {
+                  mem_size = std::max(mem_size, static_cast<std::uint32_t>(cinfo.galerkinN(i))*static_cast<std::uint32_t>(cinfo.rhsCols(i)));
+               }
+               Memory::MemBlock<MHDComplex> data(mem_size, this->_mem.get());
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:allocateTemp");
 
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:createInfo");
                   auto info = createInfo(cinfo, i);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:createInfo");
 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:getSolution");
                   std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
                   std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                  Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
                   using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
                   std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
+                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
                   this->mSolverCoord.getSolution(tmpView, info);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:getSolution");
 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:copyView");
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                   Views::details::computeSet(tmp, tmpView, 0);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:copyView");
 
+   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:storeSolution");
                   eqIt->storeSolution(myId.second, tmp, i, 0);
+   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:storeSolution");
                }
 
                // Apply constraint on solution
@@ -567,28 +632,15 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                // Update timestepper solver solution if constraint modified it
                if(changedSolution)
                {
+                  auto corr_ = eqIt->correctionConstraint(myId.second, SolveTiming::After::id());
                   for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                   {
                      auto info = createInfo(cinfo, i);
 
-                     DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
-                     tmp.setZero();
+                     // Get effective corrections
+                     auto corr = Equations::correctSolution(*eqIt, myId.second, corr_, i, 0);
 
-                     std::visit(
-                           [&](auto&& p)
-                           {
-                           Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmp, i, 0, true, true);
-                           }, eqIt->spUnknown());
-
-                     std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
-                     std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                     Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
-                     using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
-                     std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
-                     Views::details::computeSet(tmpView, tmp, 0);
-
-                     this->mSolverCoord.updateSolution(info, tmpView);
+                     this->mSolverCoord.updateSolution(info, corr);
                   }
                }
             }
@@ -601,145 +653,10 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
 }
 
 template <typename TScheme>
-void InterfaceViews<TScheme>::adaptTimestep(const Matrix& cfl,
-   const ScalarEquation_range&, const VectorEquation_range&)
+void InterfaceViews<TScheme>::adaptTimestep(const Matrix& cfl)
 {
-   // Store old timestep
-   this->mOldDt = this->timestep();
-
-   // Update CFL information
-   this->mDt.block(0, 1, this->mDt.rows(), cfl.cols() - 1) =
-      cfl.rightCols(cfl.cols() - 1);
-
-   // New computed CFL
-   MHDFloat compCfl = cfl(0, 0);
-
-   // Check if CFL allows for a larger timestep
-   MHDFloat newCflDt = 0.0;
-   if (compCfl > this->mcUpWindow * this->timestep())
-   {
-      if (this->mCnstSteps >= this->mcMinCnst)
-      {
-         // Set new timestep
-         newCflDt = std::min(compCfl, this->mcMaxJump * this->timestep());
-      }
-      else
-      {
-         // Reuse same timestep
-         newCflDt = this->timestep();
-      }
-
-      // Check if CFL is below minimal timestep or downard jump is large
-   }
-   else if (compCfl < this->mcMinDt ||
-            compCfl < this->timestep() / this->mcMaxJump)
-   {
-      // Signal simulation abort
-      newCflDt = -compCfl;
-
-      // Check if CFL requires a lower timestep
-   }
-   else if (compCfl < this->timestep() * (2.0 - this->mcUpWindow))
-   {
-      // Set new timestep
-      newCflDt = compCfl;
-   }
-   else
-   {
-      newCflDt = this->timestep();
-   }
-
-   // Get timestepper error (if applicable)
-   MHDFloat error = this->mSolverCoord.error();
-
-// Gather error across processes
-#ifdef QUICC_MPI
-   if (error > 0.0)
-   {
-      MPI_Allreduce(MPI_IN_PLACE, &error, 1, MPI_DOUBLE, MPI_MAX,
-         MPI_COMM_WORLD);
-   }
-#endif // QUICC_MPI
-
-   // No error control and no CFL condition
-   MHDFloat newErrorDt = 0.0;
-
-   // Use what ever condition is used by CFL
-   if (error < 0)
-   {
-      newErrorDt = -1.0;
-
-      // Error is too large, reduce timestep
-   }
-   else if (error > this->mMaxError)
-   {
-      newErrorDt =
-         this->timestep() *
-         std::pow(this->mMaxError / error, 1. / this->mspScheme->order()) /
-         this->mcUpWindow;
-
-      // Error is small, increase timestep
-   }
-   else if (error < this->mMaxError / (this->mcMaxJump * 0.9) &&
-            this->mCnstSteps >= this->mcMinCnst)
-   {
-      newErrorDt =
-         std::min(this->timestep() * std::pow(this->mMaxError / error,
-                                        1. / this->mspScheme->order()),
-            this->timestep() * this->mcMaxJump);
-
-      // Timestep should not be increased
-   }
-   else
-   {
-      newErrorDt = this->timestep();
-   }
-
-   // Update error details
-   if (this->mMaxError > 0.0)
-   {
-      this->mDt(0, this->mDt.cols() - 1) = newErrorDt;
-      this->mDt(1, this->mDt.cols() - 1) = error;
-   }
-
-   // CFL condition requested abort!
-   if (newCflDt < 0.0)
-   {
-      this->mDt(0, 0) = newCflDt;
-      this->mDt(1, 0) = cfl(1, 0);
-
-      // Get minimum between both conditions
-   }
-   else if (newCflDt > 0.0 && newErrorDt > 0.0)
-   {
-      if (newCflDt < newErrorDt)
-      {
-         this->mDt(0, 0) = newCflDt;
-         this->mDt(1, 0) = cfl(1, 0);
-      }
-      else
-      {
-         this->mDt(0, 0) = newErrorDt;
-         this->mDt(1, 0) = ERROR_LOCATION;
-      }
-
-      // Use CFL condition
-   }
-   else if (newCflDt > 0.0)
-   {
-      if (this->timestep() != newCflDt)
-      {
-         this->mDt(0, 0) = newCflDt;
-         this->mDt(1, 0) = cfl(1, 0);
-      }
-
-      // Use error condition
-   }
-   else if (newErrorDt > 0.0)
-   {
-      this->mDt(0, 0) = newErrorDt;
-      this->mDt(1, 0) = ERROR_LOCATION;
-   }
+   // Process CFL information
+   this->processCfl(cfl, this->mSolverCoord.error(), this->mspScheme->order());
 
    //
    // Update the timestep matrices if necessary
@@ -762,13 +679,7 @@ void InterfaceViews<TScheme>::adaptTimestep(const Matrix& cfl,
    }
 
    // Update CFL writer
-   this->mspIo->setSimTime(this->mTime, this->mDt, this->mCnstSteps);
-   this->mspIo->write();
-
-   if (this->timestep() != this->mOldDt && this->timestep() > 0.0)
-   {
-      this->mCnstSteps = 0.0;
-   }
+   this->writeCfl();
 }
 
 template <typename TScheme>
@@ -810,118 +721,54 @@ void InterfaceViews<TScheme>::stepForward(const ScalarEquation_range& scalEq,
 template <typename TScheme>
 void InterfaceViews<TScheme>::printInfo(std::ostream& stream)
 {
-   // Create nice looking ouput header
-   Tools::Formatter::printNewline(stream);
-   Tools::Formatter::printLine(stream, '-');
-   Tools::Formatter::printCentered(stream, "Timestepper information", '*');
-   Tools::Formatter::printLine(stream, '-');
-
-   std::stringstream oss;
-   int base = 20;
-
    // Timestep scheme
+   std::stringstream oss;
    oss << "Timestepper: " << this->mspScheme->name() << " ("
        << this->mspScheme->order() << ")";
-   Tools::Formatter::printCentered(stream, oss.str(), ' ', base);
-   oss.str("");
 
-   // General linear solver
-   oss << "General solver: ";
-#if defined QUICC_SPLINALG_MUMPS
-   oss << "MUMPS";
-#elif defined QUICC_SPLINALG_UMFPACK
-   oss << "UmfPack";
-#elif defined QUICC_SPLINALG_SPARSELU
-   oss << "SparseLU";
-#else
-   oss << "(unknown)";
-#endif // defined QUICC_SPLINALG_MUMPS
-
-   Tools::Formatter::printCentered(stream, oss.str(), ' ', base);
-   oss.str("");
-
-   // Triangular linear solver
-   oss << "Triangular solver: ";
-#if defined QUICC_SPTRILINALG_SPARSELU
-   oss << "SparseLU";
-#elif defined QUICC_SPTRILINALG_MUMPS
-   oss << "MUMPS";
-#elif defined QUICC_SPTRILINALG_UMFPACK
-   oss << "UmfPack";
-#else
-   oss << "(unknown)";
-#endif // defined QUICC_SPTRILINALG_SPARSELU
-
-   Tools::Formatter::printCentered(stream, oss.str(), ' ', base);
-   oss.str("");
-
-   // SPD linear solver
-   oss << "SPD solver: ";
-#if defined QUICC_SPSPDLINALG_SIMPLICIALLDLT
-   oss << "SimplicialLDLT";
-#elif defined QUICC_SPSPDLINALG_SIMPLICIALLLT
-   oss << "SimplicialLLT";
-#elif defined QUICC_SPSPDLINALG_MUMPS
-   oss << "MUMPS";
-#elif defined QUICC_SPSPDLINALG_UMFPACK
-   oss << "UmfPack";
-#elif defined QUICC_SPSPDLINALG_SPARSELU
-   oss << "SparseLU";
-#else
-   oss << "(unknown)";
-#endif // defined QUICC_SPSPDLINALG_SIMPLICIALLDLT
-
-   Tools::Formatter::printCentered(stream, oss.str(), ' ', base);
-   oss.str("");
-
-   Tools::Formatter::printLine(stream, '*');
-   Tools::Formatter::printNewline(stream);
+   this->printInfo(stream, oss.str());
 }
 
 // \todo  move to separate file
 inline void buildTimestepMatrixWrapper(std::map<std::size_t, DecoupledZSparse>& ops, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp,
    const int idx)
 {
+   auto buildOp = [&](const std::size_t opId, const std::size_t bcId)
+   {
+      auto ret = ops.insert(std::make_pair(opId, DecoupledZSparse()));
+      spEq->buildModelMatrix(ret.first->second, opId, comp, idx, bcId);
+   };
+
    bool isSplit = spEq->couplingInfo(comp).isSplitEquation();
 
+   using namespace ModelOperator;
+   using namespace ModelOperatorBoundary;
    // Compute model's linear operator (without Tau lines)
-   ops.insert(
-      std::make_pair(ModelOperator::ImplicitLinear::id(), DecoupledZSparse()));
-   spEq->buildModelMatrix(ops.find(ModelOperator::ImplicitLinear::id())->second,
-      ModelOperator::ImplicitLinear::id(), comp, idx,
-      ModelOperatorBoundary::SolverNoTau::id());
+   buildOp(ImplicitLinear::id(), SolverNoTau::id());
+
    // Compute model's time operator (without Tau lines)
-   ops.insert(std::make_pair(ModelOperator::Time::id(), DecoupledZSparse()));
-   spEq->buildModelMatrix(ops.find(ModelOperator::Time::id())->second,
-      ModelOperator::Time::id(), comp, idx,
-      ModelOperatorBoundary::SolverNoTau::id());
+   buildOp(Time::id(), SolverNoTau::id());
+
+   // Compute model's quasi-inverse operator (without Tau lines)
+   buildOp(QuasiInverse::id(), SolverNoTau::id());
+
    // Compute model's tau line boundary operator
-   ops.insert(
-      std::make_pair(ModelOperator::Boundary::id(), DecoupledZSparse()));
-   spEq->buildModelMatrix(ops.find(ModelOperator::Boundary::id())->second,
-      ModelOperator::Boundary::id(), comp, idx,
-      ModelOperatorBoundary::SolverHasBc::id());
+   buildOp(Boundary::id(), SolverHasBc::id());
 
    // If equation was split into two lower order systems
    if (isSplit)
    {
       // Compute model's split linear operator (without Tau lines)
-      auto id = ModelOperator::SplitImplicitLinear::id();
-      ops.insert(std::make_pair(id, DecoupledZSparse()));
-      spEq->buildModelMatrix(ops.find(id)->second, id, comp, idx,
-         ModelOperatorBoundary::SolverNoTau::id());
+      buildOp(SplitImplicitLinear::id(), SolverNoTau::id());
+
+      // Compute model's split quasi-inverse operator (without Tau lines)
+      buildOp(SplitQuasiInverse::id(), SolverNoTau::id());
 
       // Compute model's tau line boundary operator for split operator
-      id = ModelOperator::SplitBoundary::id();
-      ops.insert(std::make_pair(id, DecoupledZSparse()));
-      spEq->buildModelMatrix(ops.find(id)->second, id, comp, idx,
-         ModelOperatorBoundary::SolverHasBc::id());
+      buildOp(SplitBoundary::id(), SolverHasBc::id());
 
       // Compute model's tau line boundary value for split operator
-      id = ModelOperator::SplitBoundaryValue::id();
-      ops.insert(std::make_pair(id, DecoupledZSparse()));
-      spEq->buildModelMatrix(ops.find(id)->second, id, comp, idx,
-         ModelOperatorBoundary::SolverNoTau::id());
+      buildOp(SplitBoundaryValue::id(), SolverNoTau::id());
    }
 }
 

@@ -82,6 +82,18 @@ void computeMV(DecoupledZMatrix& z, const SparseMatrix& mat,
    const DecoupledZMatrix& y);
 
 /**
+ * @brief Compute z = a A*y
+ */
+template <typename TOperator, typename TData>
+void computeMV(TData& z, const MHDFloat a, const TOperator& mat, const TData& y);
+
+/**
+ * @brief Compute z = a A*y
+ */
+void computeMV(DecoupledZMatrix& z, const MHDFloat a, const SparseMatrix& mat,
+   const DecoupledZMatrix& y);
+
+/**
  * @brief Compute z = a*x + b*y + z
  */
 template <typename TData>
@@ -284,6 +296,16 @@ void addCorrection(DecoupledZMatrix& rVal, const SparseMatrixZ& corr);
  */
 template <typename TData, typename TCorr> void addCorrection(TData& rVal, const TCorr& corr);
 
+/**
+ * @brief Apply correction from tuple
+ */
+void addCorrection(DecoupledZMatrix& rVal, const std::vector<std::tuple<MHDComplex,int,int>>& corr, const std::size_t startRow);
+
+/**
+ * @brief Apply correction from tuple
+ */
+template <typename TData> void addCorrection(TData& rVal, const std::vector<std::tuple<MHDComplex,int,int>>& corr, const std::size_t startRow);
+
 //
 //
 //
@@ -439,6 +461,8 @@ inline void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<
 
    if(a != 0)
    {
+      auto& yRe = y.real();
+      auto& yIm = y.imag();
       if(a == 1.0)
       {
          for(std::size_t j = 0;  j < x.dims()[1]; j++)
@@ -446,8 +470,9 @@ inline void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<
             for(std::size_t i = 0;  i < x.dims()[0]; i++)
             {
                std::size_t i_ = i + startRow;
-               y.real()(i_,j) += x(i,j).real();
-               y.imag()(i_,j) += x(i,j).imag();
+               auto x_ = x(i,j);
+               yRe(i_,j) += x_.real();
+               yIm(i_,j) += x_.imag();
             }
          }
       }
@@ -458,8 +483,11 @@ inline void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<
             for(std::size_t i = 0;  i < x.dims()[0]; i++)
             {
                std::size_t i_ = i + startRow;
-               y.real()(i_,j) += a*x(i,j).real();
-               y.imag()(i_,j) += a*x(i,j).imag();
+               auto x_ = x(i,j);
+               auto xRe = x_.real();
+               auto xIm = x_.imag();
+               yRe(i_,j) += a*xRe;
+               yIm(i_,j) += a*xIm;
             }
          }
       }
@@ -727,6 +755,20 @@ inline void computeMV(DecoupledZMatrix& y, const SparseMatrix& A,
    y.imag() = A * x.imag();
 }
 
+template <typename TOperator, typename TData>
+inline void computeMV(TData& y, const MHDFloat a, const TOperator& A, const TData& x)
+{
+   y = A * (a * x);
+}
+
+inline void computeMV(DecoupledZMatrix& y, const MHDFloat a, const SparseMatrix& A,
+   const DecoupledZMatrix& x)
+{
+   y.real() = A * (a * x.real());
+
+   y.imag() = A * (a * x.imag());
+}
+
 template <typename TData>
 inline void computeErrorFromDiff(MHDFloat& err, const TData& diff,
    const TData& ref)
@@ -960,6 +1002,29 @@ inline void addCorrection(DecoupledZMatrix& rVal, const SparseMatrixZ& corr)
 template <typename TData, typename TCorr> inline void addCorrection(TData& rVal, const TCorr& corr)
 {
    rVal += corr;
+}
+
+inline void addCorrection(DecoupledZMatrix& rVal, const std::vector<std::tuple<MHDComplex,int,int>>& corr, const std::size_t startRow)
+{
+   for(auto&& c: corr)
+   {
+      auto&& val = std::get<0>(c);
+      auto&& i = std::get<1>(c);
+      auto&& j = std::get<2>(c);
+      rVal.real()(i + startRow,j) += val.real();
+      rVal.imag()(i + startRow,j) += val.imag();
+   }
+}
+
+template <typename TData> inline void addCorrection(TData& rVal, const std::vector<std::tuple<MHDComplex,int,int>>& corr, const std::size_t startRow)
+{
+   for(auto&& c: corr)
+   {
+      auto&& val = std::get<0>(c);
+      auto&& i = std::get<1>(c);
+      auto&& j = std::get<2>(c);
+      rVal(i + startRow,j) += val;
+   }
 }
 
 } // namespace details
