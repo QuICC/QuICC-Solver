@@ -65,7 +65,7 @@ namespace Parallel {
           * @param split      Location where the MPI splitting takes place
           * @param onlySpectral  Only initialize for spectral converters
           */
-         void initConverter(SharedResolution spRes, const std::vector<ArrayI>& packs, Splitting::Locations::Id split, const bool only1D);
+         void initConverter(SharedResolution spRes, const std::vector<ArrayI>& packs, Splitting::Locations::Id split, const bool onlySpectral);
 
          /**
           * @brief Transfer forward data to next step
