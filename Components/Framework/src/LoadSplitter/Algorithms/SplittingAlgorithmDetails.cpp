@@ -15,9 +15,6 @@
 #include <mpi.h>
 #endif
 
-// External includes
-//
-
 // Project includes
 //
 #include "Environment/QuICCEnv.hpp"
