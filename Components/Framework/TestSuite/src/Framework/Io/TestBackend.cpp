@@ -14,6 +14,7 @@
 #include "QuICC/PhysicalNames/Entropy.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
+#include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 
 namespace QuICC {
 
@@ -120,7 +121,9 @@ void TestBackend::operatorInfo(QuICC::Model::OperatorInfo& info, const SpectralF
       int tN, gN, rhs;
       ArrayI shift(3);
 
-      this->blockInfo(tN, gN, shift, rhs, fId, res, eigs.at(0), bcs);
+      auto nTauLines = this->nBc(fId);
+      auto nN = this->baseNn(eigs.at(0), res);
+      this->blockInfo(tN, gN, shift, rhs, nTauLines, nN, this->useGalerkin());
 
       info.tauN(idx) = tN;
       info.galN(idx) = gN;
@@ -131,7 +134,8 @@ void TestBackend::operatorInfo(QuICC::Model::OperatorInfo& info, const SpectralF
       int sN = 0;
       for (auto f: this->implicitFields(fId))
       {
-         this->blockInfo(tN, gN, shift, rhs, f, res, eigs.at(0), bcs);
+         nTauLines = this->nBc(f);
+         this->blockInfo(tN, gN, shift, rhs, nTauLines, nN, this->useGalerkin());
          sN += gN;
       }
 
@@ -179,6 +183,13 @@ bool TestBackend::isComplex(const SpectralFieldId& fId) const
 int TestBackend::nBc(const SpectralFieldId& fId) const
 {
    return 0;
+}
+
+int TestBackend::baseNn(const int l, const Resolution& res) const
+{
+   int nN = res.counter().dimensions(Dimensions::Space::SPECTRAL, l)(0);
+
+   return nN;
 }
 
 TestBackend::SpectralFieldIds TestBackend::implicitFields(
