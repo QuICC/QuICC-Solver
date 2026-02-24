@@ -138,7 +138,7 @@ namespace Communicators {
          packs.push_back(spFwdGrouper->packs2D(fwdTree));
          packs.push_back(spBwdGrouper->packs2D(bwdTree));
       }
-      comm.initConverter(spRes, packs, spFwdGrouper->split);
+      comm.initConverter(spRes, packs, spFwdGrouper->split, false);
    }
 
    void setupSpectralCommunication(Test& test)

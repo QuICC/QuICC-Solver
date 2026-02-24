@@ -17,7 +17,7 @@ namespace QuICC {
 
 namespace Transform {
 
-   void TransformCoordinatorTools::init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::vector<ArrayI>& packs, SharedResolution spRes, const std::map<std::size_t,NonDimensional::SharedINumber>& runOptions)
+   void TransformCoordinatorTools::init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::vector<ArrayI>& packs, SharedResolution spRes, const std::map<std::size_t,NonDimensional::SharedINumber>& runOptions, const bool onlySpectral)
    {
       StageTimer stage;
       stage.start("initializing transforms");
@@ -66,7 +66,7 @@ namespace Transform {
       stage.start("initializing converters");
 
       // Initialise the converters
-      rCoord.communicator().initConverter(spRes, packs, spFwdGrouper->split);
+      rCoord.communicator().initConverter(spRes, packs, spFwdGrouper->split, onlySpectral);
 
       stage.done();
    }
