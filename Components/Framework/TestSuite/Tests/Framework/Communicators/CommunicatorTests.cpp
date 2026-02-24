@@ -5,9 +5,6 @@
 
 #define CATCH_CONFIG_RUNNER
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>

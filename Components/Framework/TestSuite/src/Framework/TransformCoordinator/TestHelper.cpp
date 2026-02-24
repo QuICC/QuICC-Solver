@@ -317,7 +317,7 @@ namespace TCoord {
       runOptions.emplace(NonDimensional::Upper1d::id(), std::make_shared<NonDimensional::Upper1d>(1.3));
       std::vector<ArrayI> packs;
       Transform::TransformCoordinatorTools::computePacks(packs, test.spFwdGrouper, test.spBwdGrouper, {{0, test.fwdTree}}, {{0, test.bwdTree}}, {0}, test.spRes);
-      Transform::TransformCoordinatorTools::init(test.coord, test.spFwdGrouper, test.spBwdGrouper, packs, test.spRes, runOptions);
+      Transform::TransformCoordinatorTools::init(test.coord, test.spFwdGrouper, test.spBwdGrouper, packs, test.spRes, runOptions, false);
    }
 
    void setVariables(Test& test)

@@ -61,13 +61,11 @@ namespace Parallel {
           * @brief Initialise the 2D/3D converter
           *
           * @param spRes      Shared resolution information
-          * @param packs1DFwd Packs information for first forward exchange
-          * @param packs1DBwd Packs information for first backward exchange
-          * @param packs2DFwd Packs information for second forward exchange
-          * @param packs2DBwd Packs information for second backward exchange
+          * @param packs      Packs information exchanges
           * @param split      Location where the MPI splitting takes place
+          * @param onlySpectral  Only initialize for spectral converters
           */
-         void initConverter(SharedResolution spRes, const std::vector<ArrayI>& packs, Splitting::Locations::Id split);
+         void initConverter(SharedResolution spRes, const std::vector<ArrayI>& packs, Splitting::Locations::Id split, const bool only1D);
 
          /**
           * @brief Transfer forward data to next step
