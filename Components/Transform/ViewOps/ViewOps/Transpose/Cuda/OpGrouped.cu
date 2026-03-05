@@ -55,6 +55,33 @@ void OpGrouped<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 
 
 // Explicit instantiations
+//#ifdef QUICC_USE_PFSOLVE
+// FT -> AL
+template class OpGrouped<std::vector<View::View<double, View::DCCSC3D>>,
+   std::vector<View::View<double, View::DCCSC3D>>, p201_t>;
+template class OpGrouped<
+   std::vector<View::View<std::complex<double>, View::DCCSC3D>>,
+   std::vector<View::View<std::complex<double>, View::DCCSC3D>>, p201_t>;
+// AL -> FT
+template class OpGrouped<std::vector<View::View<double, View::DCCSC3D>>,
+   std::vector<View::View<double, View::DCCSC3D>>, p120_t>;
+template class OpGrouped<
+   std::vector<View::View<std::complex<double>, View::DCCSC3D>>,
+   std::vector<View::View<std::complex<double>, View::DCCSC3D>>, p120_t>;
+
+// AL -> JW
+template class OpGrouped<std::vector<View::View<double, View::DCCSC3D>>,
+   std::vector<View::View<double, View::S1CLCSC3D>>, p201_t>;
+template class OpGrouped<
+   std::vector<View::View<std::complex<double>, View::DCCSC3D>>,
+   std::vector<View::View<std::complex<double>, View::S1CLCSC3D>>, p201_t>;
+// JW -> AL
+template class OpGrouped<std::vector<View::View<double, View::S1CLCSC3D>>,
+   std::vector<View::View<double, View::DCCSC3D>>, p120_t>;
+template class OpGrouped<
+   std::vector<View::View<std::complex<double>, View::S1CLCSC3D>>,
+   std::vector<View::View<std::complex<double>, View::DCCSC3D>>, p120_t>;
+//#else
 // FT -> AL
 template class OpGrouped<std::vector<View::View<double, View::DCCSC3DJIK>>,
    std::vector<View::View<double, View::DCCSC3D>>, p201_t>;
@@ -80,7 +107,7 @@ template class OpGrouped<std::vector<View::View<double, View::S1CLCSC3DJIK>>,
 template class OpGrouped<
    std::vector<View::View<std::complex<double>, View::S1CLCSC3DJIK>>,
    std::vector<View::View<std::complex<double>, View::DCCSC3DJIK>>, p120_t>;
-
+//#endif
 } // namespace Cuda
 } // namespace Transpose
 } // namespace QuICC

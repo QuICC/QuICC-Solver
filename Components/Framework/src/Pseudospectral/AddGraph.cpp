@@ -72,8 +72,8 @@ void Coordinator::addGraph(const std::string& graphStr,
 #ifdef QUICC_HAS_CUDA_BACKEND
 #ifdef QUICC_USE_PFSOLVE
    layOpt[0] = {"DCCSC3D", "DCCSC3D"};
-   layOpt[1] = {"DCCSC3DJIK", "S1CLCSC3DJIK"};
-   layOpt[2] = {"DCCSC3DJIK", "DCCSC3DJIK"};
+   layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
+   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
 #else
    layOpt[0] = {"DCCSC3D", "DCCSC3D"};
@@ -154,7 +154,7 @@ void Coordinator::addGraph(const std::string& graphStr,
 // for now this works only for JW space
 #ifdef QUICC_HAS_CUDA_BACKEND
 #ifdef QUICC_USE_PFSOLVE
-            using jwLay_t = View::DCCSC3DJIK;
+            using jwLay_t = View::DCCSC3D;
 #else
             using jwLay_t = View::DCCSC3DJIK;
 #endif

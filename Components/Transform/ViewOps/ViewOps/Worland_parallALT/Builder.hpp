@@ -47,7 +47,7 @@ public:
         if (appContainer.config.Ntheta != 0)
             deleteParallALT(&VkGPU, &appContainer);
 
-       if (temp_buffer != 0)
+       /* if (temp_buffer != 0)
         {
            cudaFree(temp_buffer);
            temp_buffer = 0;
@@ -56,7 +56,7 @@ public:
         {
            cudaFree(temp_buffer2);
            temp_buffer2 = 0;
-        };
+        };*/
     };
 
     /// @brief Action implementation
@@ -92,7 +92,7 @@ public:
 	    config.profile_iter = 1;
 	    config.profile_iter_combined = 1;
         config.specifyBuffersAtLaunch = 1;
-        config.convertPackedStrided = 2;
+        config.convertPackedStrided = convertPackedStrided;
 	    config.WMMA_M = 8;
 	    config.WMMA_N = 8;
 	    config.WMMA_K = 4;
@@ -179,14 +179,15 @@ public:
         free(temp_pointers);
         config.M = (m_even[config.num_m_even - 1] > m_odd[config.num_m_odd - 1]) ? ((m_even[config.num_m_even - 1]) / 2 + 1) * 2 : ((m_odd[config.num_m_odd - 1]) / 2 + 1) * 2;// M;
         config.L = (transformDirection) ? in.dims()[0] : out.dims()[0];// 3 * M / 2;
+        config.Lpadded = config.L + config.M / 2 + 8; // enough for I4, standardized for matrix reuse
         if (config.projector) {
-		    config.inputBufferStride = config.L;
+		    config.inputBufferStride = in.dims()[0];
 		    config.outputBufferStride = Ntheta;
         }
         else
         {
             config.inputBufferStride = Ntheta;
-		    config.outputBufferStride = config.L;
+		    config.outputBufferStride = out.dims()[0];
         }
 	    //appContainer.input_buffer_S = (double*)in.data();
         //appContainer.buffer_S = (double*)out.data();
@@ -216,18 +217,15 @@ public:
       assert(QuICC::Cuda::isDeviceMemory(out.data()));
       assert(QuICC::Cuda::isDeviceMemory(in.data()));
 
-      if (temp_buffer == 0)
-      {
-         cudaMalloc((void**)&temp_buffer,
-            appContainer.config.Ntheta * (appContainer.config.sizeEvenBlock + appContainer.config.sizeOddBlock) *
-               sizeof(double));
-      }
-      if (temp_buffer2 == 0)
-      {
-         cudaMalloc((void**)&temp_buffer2,
-            appContainer.config.Ntheta * (appContainer.config.sizeEvenBlock + appContainer.config.sizeOddBlock) *
-               sizeof(double));
-      }
+      auto& memGpu = QuICC::Memory::Pensieve<Memory::Cuda::Pool>::getInstance().getMem();
+      temp_buffer = reinterpret_cast<double*>(memGpu.allocate(appContainer.config.Ntheta *
+                                      (appContainer.config.sizeEvenBlock +
+                                         appContainer.config.sizeOddBlock) *
+                                      sizeof(double)));
+      temp_buffer2 = reinterpret_cast<double*>(memGpu.allocate(appContainer.config.Ntheta *
+                                      (appContainer.config.sizeEvenBlock +
+                                         appContainer.config.sizeOddBlock) *
+                                      sizeof(double)));
       /* double* xx = (double*)calloc(2 * appContainer.config.Ntheta *
                                          (appContainer.config.sizeEvenBlock +
                                             appContainer.config.sizeOddBlock),
@@ -333,7 +331,61 @@ public:
      // if (testAccuracy) {
 				
       launchApp_parallALT(&appContainer, &launchParams);
-      
+
+      memGpu.deallocate(temp_buffer, appContainer.config.Ntheta *
+                                     (appContainer.config.sizeEvenBlock +
+                                        appContainer.config.sizeOddBlock) *
+                                     sizeof(double));
+    memGpu.deallocate(temp_buffer2, appContainer.config.Ntheta *
+                                    (appContainer.config.sizeEvenBlock +
+                                    appContainer.config.sizeOddBlock) *
+                                    sizeof(double));
+      /* double* xx = (double*)calloc(2 * appContainer.config.Ntheta *
+                                         (appContainer.config.sizeEvenBlock +
+                                            appContainer.config.sizeOddBlock),
+            sizeof(double));
+        
+
+         cudaMemcpy(xx, launchParams.input_buffer_S,
+            16 *
+               2*100 *
+               sizeof(double),
+            cudaMemcpyDeviceToHost);
+         //if (appContainer.config.projector)
+         {
+            for (int j = 0; j < 4; j++)
+            {
+               for (int i = 0; i < 4; i++)
+               {
+                  printf("%.17e %.17e | ", xx[2 * i+ 2*j * 16], xx[2 * i + 1+ 2*j * 16]);
+               }
+               printf("\n");
+            }
+         }
+         printf("in\n");
+      cudaMemcpy(xx, launchParams.output_buffer_S,
+            164 *
+               2*100 *
+               sizeof(double),
+            cudaMemcpyDeviceToHost);
+        // if (appContainer.config.projector)
+         {
+            for (int j = 0; j < 4; j++)
+            {
+               for (int i = 0; i < 4; i++)
+               {
+                  printf("%.17e %.17e | ", xx[2 * i+ 2*j * 164], xx[2 * i + 1+ 2*j * 164]);
+               }
+               printf("\n");
+            }
+         }
+         printf("out\n");
+          if (!appContainer.config.projector)
+         {
+            printf("I\n");
+         }
+         free(xx);
+         cudaDeviceSynchronize();*/
       /* cudaMemcpy(xx, out.data(),
             2 * out.dims()[0] *
                528 *
@@ -349,7 +401,7 @@ public:
                }
                //printf("\n");
             }
-      }*/
+      }
       /* if (1)
       {
          int evenID = 0;
@@ -437,10 +489,11 @@ public:
       //free(xx);
       };
 
-    void setType(int inputType, int inputDirection)
+    void setType(int inputType, int inputDirection, int inputConvertPackedStrided)
       {
          transformType = inputType;
          transformDirection = inputDirection;
+         convertPackedStrided = inputConvertPackedStrided;
       };
  private:
 
@@ -471,6 +524,7 @@ public:
 
     mutable int transformType = 0;
     mutable int transformDirection = 0;
+    mutable int convertPackedStrided = 0;
     /// @brief Give access to base class
     //friend BinaryBaseOp<DiffOp<Tout, Tin, Order, Direction, Treatment>, Tout, Tin, ScaleType>;
 

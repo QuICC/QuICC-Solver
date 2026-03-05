@@ -15,7 +15,7 @@
 // Project includes
 //
 #include "Memory/Cpu/Pool.hpp"
-
+#include "Cuda/CudaUtil.hpp"
 namespace QuICC {
 namespace Memory {
 namespace Cpu {
@@ -27,8 +27,9 @@ Pool::~Pool()
    {
       if (_blocks[i].ptr != nullptr)
       {
-         ::operator delete(_blocks[i].ptr, _blocks[i].blockSize,
-            static_cast<std::align_val_t>(_alignment));
+         //::operator delete(_blocks[i].ptr, _blocks[i].blockSize,
+         //   static_cast<std::align_val_t>(_alignment));
+         cudaFreeHost(_blocks[i].ptr);
 #ifndef NDEBUG
          std::cout << "deallocated: " << _blocks[i].blockSize
                    << "\t@: " << _blocks[i].ptr << '\n';
@@ -65,10 +66,12 @@ void* Pool::do_allocate(std::size_t bytes, std::size_t)
       if (bytes > _blocks[i].blockSize)
       {
          // realloc
-         ::operator delete(_blocks[i].ptr, _blocks[i].blockSize,
-            static_cast<std::align_val_t>(_alignment));
-         _blocks[i].ptr = ::operator new(_maxBlockSize,
-            static_cast<std::align_val_t>(_alignment));
+         //::operator delete(_blocks[i].ptr, _blocks[i].blockSize,
+         //   static_cast<std::align_val_t>(_alignment));
+         cudaFreeHost(_blocks[i].ptr);
+         //_blocks[i].ptr = ::operator new(_maxBlockSize,
+         //   static_cast<std::align_val_t>(_alignment));
+         cudaMallocHost(&_blocks[i].ptr, _maxBlockSize);
          _blocks[i].blockSize = _maxBlockSize;
 #ifndef NDEBUG
          std::cout << "realloc block: " << i
@@ -87,8 +90,10 @@ void* Pool::do_allocate(std::size_t bytes, std::size_t)
    }
 
    // if not allocate
-   auto ptr =
-      ::operator new(_maxBlockSize, static_cast<std::align_val_t>(_alignment));
+   //auto ptr =
+   //   ::operator new(_maxBlockSize, static_cast<std::align_val_t>(_alignment));
+   void* ptr;
+   cudaMallocHost(&ptr, _maxBlockSize);
    _blocks[i].blockSize = _maxBlockSize;
 #ifndef NDEBUG
    std::cout << "allocated: " << _blocks[i].blockSize << "\t@: " << ptr << '\n';

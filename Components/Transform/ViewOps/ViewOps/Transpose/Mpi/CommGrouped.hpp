@@ -333,11 +333,71 @@ void CommGrouped<TDATA, TAG>::exchange(structArray<TDATA*, SIZE>& out,
       }
       else if constexpr (std::is_same_v<TAG, alltoallv_t>)
       {
-         details::mpiAssert(MPI_Alltoallv(_sendBufferView.data(),
+         /*details::mpiAssert(MPI_Alltoallv(_sendBufferView.data(),
             _sendCounts.data(), _sendBufferDispls.data(),
             Environment::MpiTypes::type<TDATA>(), _recvBufferView.data(),
             _recvCounts.data(), _recvBufferDispls.data(),
-            Environment::MpiTypes::type<TDATA>(), _subComm));
+            Environment::MpiTypes::type<TDATA>(), _subComm));*/
+
+         std::vector<MPI_Request> reqs;
+         reqs.reserve(2 * _nSubComm);
+         int rank;
+         MPI_Comm_rank(_subComm, &rank);
+         int typesize;
+        MPI_Type_size(Environment::MpiTypes::type<TDATA>(), &typesize);
+         cudaMemcpyAsync(_recvBufferView.data() + _recvBufferDispls[rank],
+                   _sendBufferView.data() + _sendBufferDispls[rank],
+                   _sendCounts[rank] * typesize, cudaMemcpyDeviceToDevice, 0);
+
+         for (int i = 0; i < _nSubComm; ++i)
+         {
+            if ((_recvCounts[i] > 0) && (i!=rank))
+            {
+               MPI_Request r;
+               MPI_Irecv(_recvBufferView.data() + _recvBufferDispls[i],
+                  _recvCounts[i], Environment::MpiTypes::type<TDATA>(), i, 0,
+                  _subComm, &r);
+               reqs.push_back(r);
+            }
+         }
+         for (int i = 0; i < _nSubComm; ++i)
+         {
+            if ((_sendCounts[i] > 0) && (i!=rank))
+            {
+               MPI_Request r;
+               MPI_Isend(_sendBufferView.data() + _sendBufferDispls[i],
+                  _sendCounts[i], Environment::MpiTypes::type<TDATA>(), i, 0,
+                  _subComm, &r);
+               reqs.push_back(r);
+            }
+         }
+         MPI_Waitall(reqs.size(), reqs.data(), MPI_STATUSES_IGNORE);
+
+         /* MPI_Request reqs[2];
+         int rank;
+         MPI_Comm_rank(_subComm, &rank);
+         for (int i = 0; i < _nSubComm; ++i)
+         {
+             if (i == 0)
+             {
+                cudaMemcpyAsync(_recvBufferView.data() + _recvBufferDispls[rank],
+                   _sendBufferView.data() + _sendBufferDispls[rank],
+                   _sendCounts[rank] * sizeof(Environment::MpiTypes::type<TDATA>()), cudaMemcpyDeviceToDevice, 0);
+             }
+             else
+             {
+                int next = (rank + i) % _nSubComm;
+                int prev = (rank - i + _nSubComm) % _nSubComm;
+                MPI_Irecv(_recvBufferView.data() + _recvBufferDispls[prev],
+                   _recvCounts[prev], Environment::MpiTypes::type<TDATA>(),
+                   prev, 0, _subComm, &reqs[0]);
+                MPI_Isend(_sendBufferView.data() + _sendBufferDispls[next],
+                   _sendCounts[next], Environment::MpiTypes::type<TDATA>(),
+                   next, 0, _subComm, &reqs[1]);
+                MPI_Waitall(2, reqs, MPI_STATUSES_IGNORE);
+             }
+         }*/
+         cudaDeviceSynchronize();
       }
       else
       {
@@ -348,6 +408,8 @@ void CommGrouped<TDATA, TAG>::exchange(structArray<TDATA*, SIZE>& out,
 #ifdef QUICC_HAS_CUDA_BACKEND
       if (QuICC::Cuda::isDeviceMemory(out[0]))
       {
+          //Cuda::unPack(out, _sendBufferView, _sendCountsView, _sendDisplsView,
+          //  _sendDisplsView, _maxGroupSize);
          Cuda::unPack(out, _recvBufferView, _recvCountsView, _recvDisplsView,
             _recvBufferDisplsView, _maxGroupSize);
       }

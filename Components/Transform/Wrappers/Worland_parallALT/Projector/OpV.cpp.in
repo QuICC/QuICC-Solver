@@ -70,25 +70,25 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
 
   const char* proj_operator = "@Op@";
     if (!strcmp(proj_operator, "P"))
-        mOp->setType(PFSOLVE_RADIAL, 1);
+        mOp->setType(PFSOLVE_RADIAL, 1, 0);
     if (!strcmp(proj_operator, "P_Zero"))
-       mOp->setType(PFSOLVE_RADIAL_ZERO, 1);
+       mOp->setType(PFSOLVE_RADIAL_ZERO, 1, 0);
     if (!strcmp(proj_operator, "DivR1"))
-       mOp->setType(PFSOLVE_RADIAL_DIVR, 1);
+       mOp->setType(PFSOLVE_RADIAL_DIVR, 1, 0);
     if (!strcmp(proj_operator, "DivR1_Zero"))
-       mOp->setType(PFSOLVE_RADIAL_DIVR_ZERO, 1);
+       mOp->setType(PFSOLVE_RADIAL_DIVR_ZERO, 1, 0);
     if (!strcmp(proj_operator, "D1"))
-       mOp->setType(PFSOLVE_RADIAL_DR, 1);
+       mOp->setType(PFSOLVE_RADIAL_DR, 1, 0);
     if (!strcmp(proj_operator, "R1"))
-       mOp->setType(PFSOLVE_RADIAL_R, 1);
+       mOp->setType(PFSOLVE_RADIAL_R, 1, 0);
     if (!strcmp(proj_operator, "R1_Zero"))
-       mOp->setType(PFSOLVE_RADIAL_R_ZERO, 1);
+       mOp->setType(PFSOLVE_RADIAL_R_ZERO, 1, 0);
     if (!strcmp(proj_operator, "DivR1D1R1"))
-       mOp->setType(PFSOLVE_RADIAL_DIVR_DR_R, 1);
+       mOp->setType(PFSOLVE_RADIAL_DIVR_DR_R, 1, 0);
     if (!strcmp(proj_operator, "DivR1D1R1_Zero"))
-       mOp->setType(PFSOLVE_RADIAL_DIVR_DR_R_ZERO, 1);
+       mOp->setType(PFSOLVE_RADIAL_DIVR_DR_R_ZERO, 1, 0);
     if (!strcmp(proj_operator, "SphLapl"))
-       mOp->setType(PFSOLVE_RADIAL_SPHLAPL, 1);
+       mOp->setType(PFSOLVE_RADIAL_SPHLAPL, 1, 0);
 
   mOp->apply(mPhysView, mModsView);
   return;

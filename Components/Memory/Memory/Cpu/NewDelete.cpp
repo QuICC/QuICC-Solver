@@ -15,6 +15,7 @@
 // Project includes
 //
 #include "NewDelete.hpp"
+#include "Cuda/CudaUtil.hpp"
 
 namespace QuICC {
 namespace Memory {
@@ -25,8 +26,8 @@ void* NewDelete::do_allocate(std::size_t bytes, std::size_t alignment)
     void* ptr{nullptr};
 
     // new
-    ptr = ::operator new(bytes, static_cast<std::align_val_t>(alignment));
-
+    //ptr = ::operator new(bytes, static_cast<std::align_val_t>(alignment));
+    cudaMallocHost(&ptr, bytes);
     #ifndef NDEBUG
     std::cout << "New, bytes: " << bytes << '\n';
     #endif
@@ -41,7 +42,8 @@ void NewDelete::do_deallocate(void* ptr, std::size_t bytes, std::size_t alignmen
         #ifndef NDEBUG
         std::cout << "Delete, bytes: " << bytes << '\n';
         #endif
-        ::operator delete(ptr, bytes, static_cast<std::align_val_t>(alignment));
+        //::operator delete(ptr, bytes, static_cast<std::align_val_t>(alignment));
+        cudaFreeHost(ptr);
     }
 }
 

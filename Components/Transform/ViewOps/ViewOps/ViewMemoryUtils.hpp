@@ -91,7 +91,7 @@ tempOnHostMemorySpace<Tview>::tempOnHostMemorySpace(const Tview& view,
          "auto transfer implemented only for ViewBase");
 
       // allocate host memory
-      auto& mem = Pensieve<Cpu::NewDelete>::getInstance().getMem();
+      auto& mem = Pensieve<Cpu::Pool>::getInstance().getMem();
       _dataHost = MemBlock<ScalarType>(view.size(), &mem);
       // store reference to device memory
       _dataDevice = ViewBase<ScalarType>(view.data(), view.size());

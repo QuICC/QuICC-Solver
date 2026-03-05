@@ -96,6 +96,16 @@ extern "C" void _ciface_quiccir_alloc_data_complexf64_i32_i32_S1CLCSC3D(
 #endif
    // Buffer size
    intptr_t cumSliceSize = 0;
+#ifdef QUICC_HAS_CUDA_BACKEND
+   /// \todo replace with mlir side computation of buffer size
+   if (QuICC::Cuda::isDeviceMemory(ptr->aligned))
+   {
+      cumSliceSize =
+         details::getSizeS1CLCSC3DJIK(ptr->aligned, ptr->sizes[0], lds);
+   }
+   else
+   {
+#endif
    for (intptr_t i = 0; i < ptr->sizes[0] - 1; ++i)
    {
       auto width = ptr->aligned[i + 1] - ptr->aligned[i];
@@ -103,6 +113,9 @@ extern "C" void _ciface_quiccir_alloc_data_complexf64_i32_i32_S1CLCSC3D(
       assert(height > 0);
       cumSliceSize += height * width;
    }
+#ifdef QUICC_HAS_CUDA_BACKEND
+   }
+#endif
    data->sizes[0] = cumSliceSize;
    // Alloc buffer
    details::alloc_ptr(&data->aligned, data->sizes[0], idx->aligned);

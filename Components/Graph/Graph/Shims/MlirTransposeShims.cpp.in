@@ -25,7 +25,11 @@ assert(pOut0 != nullptr);
 #ifdef QUICC_MPI
 using namespace QuICC::Transpose::Mpi;
 #else
-using namespace QuICC::Transpose::@Backend@;
+#ifdef QUICC_HAS_CUDA_BACKEND
+using namespace QuICC::Transpose::Cuda;
+#else
+using namespace QuICC::Transpose::Cpu;
+#endif
 #endif
 using namespace QuICC::Transpose;
 using Tin = std::vector<QuICC::View::View<@TypeIn@, QuICC::View::@LayoutIn@>>;

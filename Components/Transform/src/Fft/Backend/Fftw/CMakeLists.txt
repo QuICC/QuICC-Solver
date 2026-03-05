@@ -36,15 +36,6 @@ if(QUICC_FFT_WORLAND STREQUAL "FFTW")
 set(_use_FFTW ON)
 endif()
 
-if(QUICC_FFT_ALEGENDRE STREQUAL "FFTW")
-  quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
-    IALegendreBackend.cpp
-    ALegendreProjector.cpp
-    ALegendreIntegrator.cpp
-  )
-set(_use_FFTW ON)
-endif()
-
 if(_use_FFTW)
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
   IFftwBackend.cpp
