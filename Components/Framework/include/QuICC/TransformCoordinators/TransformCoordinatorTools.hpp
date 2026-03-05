@@ -52,8 +52,9 @@ namespace Transform {
           * @param packs            pack sizes
           * @param spRes            Shared resolution
           * @param runOptions       Available run options map
+          * @param onlySpectral     Only initialize spectral communications
           */
-         static void init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::vector<ArrayI>& packs, SharedResolution spRes, const std::map<std::size_t,NonDimensional::SharedINumber>& runOptions);
+         static void init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::vector<ArrayI>& packs, SharedResolution spRes, const std::map<std::size_t,NonDimensional::SharedINumber>& runOptions, const bool onlySpectral);
 
       protected:
 

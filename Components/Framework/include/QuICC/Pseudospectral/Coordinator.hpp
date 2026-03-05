@@ -696,6 +696,11 @@ private:
     * @brief Setup the output files added by the model
     */
    void setupOutput();
+
+   /**
+    * @brief Use only spectral legacy converter?
+    */
+   bool onlySpectralLegacyConverter() const;
 };
 
 inline const Coordinator::ScalarVariable_map& Coordinator::scalarVariables()

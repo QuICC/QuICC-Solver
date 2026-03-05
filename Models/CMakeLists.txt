@@ -46,7 +46,7 @@ quicc_set_default_git_branch(BoussinesqSphereRDDDynamo BRANCH "v1.0.0" TYPE Mode
 quicc_set_default_git_branch(BoussinesqSphereDynamo BRANCH "v2.1.1" TYPE Model)
 quicc_set_default_git_branch(BoussinesqShellDynamo BRANCH "v1.14.0" TYPE Model)
 quicc_set_default_git_branch(BoussinesqSphereITO BRANCH "v1.1.0" TYPE Model)
-quicc_set_default_git_branch(BoussinesqShellITO BRANCH "v1.3.0" TYPE Model)
+quicc_set_default_git_branch(BoussinesqShellITO BRANCH "v1.3.1" TYPE Model)
 quicc_set_default_git_branch(BoussinesqSphereRDDC BRANCH "v1.1.0" TYPE Model)
 quicc_set_default_git_branch(BoussinesqSphereRTC BRANCH "v2.1.1" TYPE Model)
 quicc_set_default_git_branch(BoussinesqShellRTC BRANCH "v1.16.0" TYPE Model)

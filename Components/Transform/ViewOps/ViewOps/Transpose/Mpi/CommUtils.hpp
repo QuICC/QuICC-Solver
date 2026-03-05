@@ -96,7 +96,6 @@ std::vector<int> getCount(const std::vector<std::vector<int>>& displs)
    return count;
 }
 
-
 } // namespace Mpi
 } // namespace Transpose
 } // namespace QuICC

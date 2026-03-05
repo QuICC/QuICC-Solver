@@ -6,12 +6,15 @@
 // External includes
 //
 #include <algorithm>
-#include <map>
+#include <numeric>
 #include <set>
 
 // Project includes
 //
 #include "ViewOps/Transpose/Mpi/CommUtils.hpp"
+#include "Utils/Utils.hpp"
+#include "Utils/Mpi/Utils.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 namespace Transpose {
@@ -20,65 +23,53 @@ namespace Mpi {
 std::vector<std::vector<int>> getDispls(const std::vector<point_t>& absCooNew,
    const std::vector<point_t>& absCooOld, const MPI_Comm comm)
 {
+   Profiler::RegionFixture<4> fix("Transpose::Mpi::OpGrouped::getDispls");
+
    int rank, ranks;
    MPI_Comm_rank(comm, &rank);
    MPI_Comm_size(comm, &ranks);
 
-   std::vector<std::vector<int>> sendDispls(ranks);
-   std::map<point_t, int> locOldIdx;
-   for (std::size_t i = 0; i < absCooOld.size(); ++i)
-   {
-      auto&& p = absCooOld[i];
-      locOldIdx[p] = i;
-   }
+   std::vector<int> locOldIdxSplit;
+   Utils::getSplitIdx(locOldIdxSplit, absCooOld);
+
+   std::vector<int> remNewIdxSplit;
+   Utils::getSplitIdx(remNewIdxSplit, absCooNew);
+
+   std::vector<int> remNewIdxSplitNeededAll;
+   std::vector<int> remNewIdxSplitNeededSizes;
    for (int r = 0; r < ranks; ++r)
    {
       // get new coo from other rank and check if it is here
-      std::map<point_t, int> remNewIdx;
-      // comm remote coo size
-      int remAbsCooNewSize = absCooNew.size();
-      MPI_Bcast(&remAbsCooNewSize, 1, MPI_INT, r, comm);
-      if (r == rank)
-      {
-         MPI_Bcast(const_cast<point_t*>(absCooNew.data()),
-            absCooNew.size() * dimSize, MPI_INT, r, comm);
-         // setup remote map
-         for (std::size_t i = 0; i < absCooNew.size(); ++i)
-         {
-            auto&& p = absCooNew[i];
-            remNewIdx[p] = i;
-         }
-      }
-      else
-      {
-         // comm remote coordinates
-         std::vector<point_t> remAbsCooNew(remAbsCooNewSize);
-         MPI_Bcast(remAbsCooNew.data(), remAbsCooNew.size() * dimSize, MPI_INT,
-            r, comm);
-         // setup remote map
-         for (std::size_t i = 0; i < remAbsCooNew.size(); ++i)
-         {
-            auto&& p = remAbsCooNew[i];
-            remNewIdx[p] = i;
-         }
-      }
+      std::vector<int> tmpSplit;
+      const std::vector<int>* pRemSplit;
 
-      // loop over loc coo to find match
-      for (auto itLCoo = locOldIdx.begin(); itLCoo != locOldIdx.end();)
-      {
-         auto lCoo = (*itLCoo).first;
-         if (auto itRCoo = remNewIdx.find(lCoo); itRCoo != remNewIdx.end())
-         {
-            sendDispls[r].push_back((*itLCoo).second);
-            itLCoo = locOldIdx.erase(itLCoo);
-            remNewIdx.erase(itRCoo);
-         }
-         else
-         {
-            ++itLCoo;
-         }
-      }
+      pRemSplit = Utils::Mpi::broadcastSplitIdx(r, rank, tmpSplit, remNewIdxSplit, comm);
+
+      // Match split indexes
+      Utils::matchSplitIdx(remNewIdxSplitNeededAll, remNewIdxSplitNeededSizes, locOldIdxSplit, *pRemSplit);
    }
+
+   // Distributed split indexes
+   std::vector<int> locNewIdxSplitNeededAll;
+   std::vector<int> locNewIdxSplitNeededSizes;
+   std::vector<int> locNewIdxSplitNeededDispl;
+   Utils::Mpi::distributeSplitIdx(remNewIdxSplitNeededAll, remNewIdxSplitNeededSizes, locNewIdxSplitNeededAll, locNewIdxSplitNeededSizes, locNewIdxSplitNeededDispl, comm);
+
+   // Filter new indexes
+   std::vector<point_t> absCooNewAll;
+   std::vector<int> absCooNewSizes;
+   Utils::filterIdx(absCooNewAll, absCooNewSizes, absCooNew, locNewIdxSplitNeededAll, locNewIdxSplitNeededDispl);
+
+   // Distributed filtered split indexes
+   std::vector<point_t> remAbsCooNewAll;
+   std::vector<int> remAbsCooNewSizes;
+   std::vector<int> remAbsCooNewDispl;
+   Utils::Mpi::distributeSplitIdx(absCooNewAll, absCooNewSizes, remAbsCooNewAll, remAbsCooNewSizes, remAbsCooNewDispl, comm);
+
+   // Find matches for sendDispls
+   std::vector<std::vector<int>> sendDispls;
+   Utils::matchSendDispl(sendDispls, absCooOld, remAbsCooNewAll, remAbsCooNewSizes, remAbsCooNewDispl);
+
    return sendDispls;
 }
 
@@ -86,6 +77,8 @@ std::vector<int> getReducedRanksSet(
    const std::vector<std::vector<int>>& sendDispls,
    const std::vector<std::vector<int>>& recvDispls, const MPI_Comm comm)
 {
+   Profiler::RegionFixture<4> fix("Transpose::Mpi::OpGrouped::getReducedRanksSet");
+
    std::set<int> commSet;
    std::set<int> sendSet;
    std::set<int> recvSet;
