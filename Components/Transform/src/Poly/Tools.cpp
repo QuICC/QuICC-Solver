@@ -25,11 +25,17 @@ namespace Poly {
 
    const MHDFloat Tools::STD_DEALIASING = 4.0 / 2.0; //parallALT nonlinear
 
+   const MHDFloat Tools::STD_DEALIASING_3D2 = 3.0 / 2.0; //parallALT nonlinear
+
    int Tools::dealias(const int size)
    {
       return std::ceil(Tools::STD_DEALIASING*static_cast<MHDFloat>(size));
    }
 
+   int Tools::dealias3d2(const int size)
+   {
+      return std::ceil(Tools::STD_DEALIASING_3D2*static_cast<MHDFloat>(size));
+   }
 }
 }
 }

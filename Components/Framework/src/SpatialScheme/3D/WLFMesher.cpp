@@ -121,7 +121,7 @@ namespace SpatialScheme {
       }
 
       // Get dealiased Worland transform size
-      this->mNr = Transform::Poly::Tools::dealias(nR_);
+      this->mNr = Transform::Poly::Tools::dealias3d2(nR_);
 
       // Get dealiased associated Legendre transform size
       this->mNt = Transform::Poly::Tools::dealias(L + 1);

@@ -35,6 +35,8 @@ namespace Poly {
           */
          static int dealias(const int size);
 
+         static int dealias3d2(const int size);
+
       protected:
 
       private:
@@ -43,6 +45,7 @@ namespace Poly {
           */
          static const MHDFloat STD_DEALIASING;
 
+         static const MHDFloat STD_DEALIASING_3D2;
          /**
           * @brief Empty constructor
           */
