@@ -47,7 +47,7 @@ public:
         if (appContainer.config.Ntheta != 0)
             deleteParallALT(&VkGPU, &appContainer);
 
-       /* if (temp_buffer != 0)
+        if (temp_buffer != 0)
         {
            cudaFree(temp_buffer);
            temp_buffer = 0;
@@ -56,7 +56,7 @@ public:
         {
            cudaFree(temp_buffer2);
            temp_buffer2 = 0;
-        };*/
+        };
     };
 
     /// @brief Action implementation
@@ -217,6 +217,19 @@ public:
       assert(QuICC::Cuda::isDeviceMemory(out.data()));
       assert(QuICC::Cuda::isDeviceMemory(in.data()));
 
+		if (temp_buffer == 0)
+      {
+         cudaMalloc((void**)&temp_buffer,
+            appContainer.config.Ntheta * (appContainer.config.sizeEvenBlock + appContainer.config.sizeOddBlock) *
+               sizeof(double));
+      }
+      if (temp_buffer2 == 0)
+      {
+         cudaMalloc((void**)&temp_buffer2,
+            appContainer.config.Ntheta * (appContainer.config.sizeEvenBlock + appContainer.config.sizeOddBlock) *
+               sizeof(double));
+      }
+      /*
       auto& memGpu = QuICC::Memory::Pensieve<Memory::Cuda::Pool>::getInstance().getMem();
       temp_buffer = reinterpret_cast<double*>(memGpu.allocate(appContainer.config.Ntheta *
                                       (appContainer.config.sizeEvenBlock +
@@ -225,7 +238,7 @@ public:
       temp_buffer2 = reinterpret_cast<double*>(memGpu.allocate(appContainer.config.Ntheta *
                                       (appContainer.config.sizeEvenBlock +
                                          appContainer.config.sizeOddBlock) *
-                                      sizeof(double)));
+                                      sizeof(double)));*/
       /* double* xx = (double*)calloc(2 * appContainer.config.Ntheta *
                                          (appContainer.config.sizeEvenBlock +
                                             appContainer.config.sizeOddBlock),
@@ -331,7 +344,7 @@ public:
      // if (testAccuracy) {
 				
       launchApp_parallALT(&appContainer, &launchParams);
-
+/*
       memGpu.deallocate(temp_buffer, appContainer.config.Ntheta *
                                      (appContainer.config.sizeEvenBlock +
                                         appContainer.config.sizeOddBlock) *
@@ -339,8 +352,8 @@ public:
     memGpu.deallocate(temp_buffer2, appContainer.config.Ntheta *
                                     (appContainer.config.sizeEvenBlock +
                                     appContainer.config.sizeOddBlock) *
-                                    sizeof(double));
-      /* double* xx = (double*)calloc(2 * appContainer.config.Ntheta *
+                                    sizeof(double));*/
+       /*double* xx = (double*)calloc(2 * appContainer.config.Ntheta *
                                          (appContainer.config.sizeEvenBlock +
                                             appContainer.config.sizeOddBlock),
             sizeof(double));
@@ -348,7 +361,7 @@ public:
 
          cudaMemcpy(xx, launchParams.input_buffer_S,
             16 *
-               2*100 *
+               2*8 *
                sizeof(double),
             cudaMemcpyDeviceToHost);
          //if (appContainer.config.projector)
@@ -364,8 +377,8 @@ public:
          }
          printf("in\n");
       cudaMemcpy(xx, launchParams.output_buffer_S,
-            164 *
-               2*100 *
+            16 *
+               2*8 *
                sizeof(double),
             cudaMemcpyDeviceToHost);
         // if (appContainer.config.projector)
@@ -374,7 +387,7 @@ public:
             {
                for (int i = 0; i < 4; i++)
                {
-                  printf("%.17e %.17e | ", xx[2 * i+ 2*j * 164], xx[2 * i + 1+ 2*j * 164]);
+                  printf("%.17e %.17e | ", xx[2 * i+ 2*j * 16], xx[2 * i + 1+ 2*j * 16]);
                }
                printf("\n");
             }
