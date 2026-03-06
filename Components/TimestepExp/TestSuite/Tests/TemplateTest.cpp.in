@@ -1,0 +1,149 @@
+/**
+ * @file @Scheme@TimestepTest.cpp
+ * @brief Tests for the @Scheme@ timestepper
+ */
+
+
+// System includes
+//
+#include <catch2/catch.hpp>
+#include <fstream>
+#include <iostream>
+
+// Project includes
+//
+#include "Environment/QuICCEnv.hpp"
+#include "TestSuite/Timestep/Exponential/TestArgs.hpp"
+#include "Timestep/Exponential/@Scheme@.hpp"
+#include "Timestep/Exponential/HighamExponential.hpp"
+#include "Types/Typedefs.hpp"
+
+namespace currentts = ::QuICC::TestSuite::Timestep::Exponential;
+typedef ::QuICC::Timestep::Exponential::@Scheme@ SchemeType;
+
+TEST_CASE("Exponential of small dense matrix (higham)", "[HighamExp]")
+{
+
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+
+   using namespace ::QuICC;
+   Timestep::Exponential::HighamExponential eFunc;
+
+   // Check Pade order 3
+   {
+      Matrix matA = 0.004 * Matrix::Ones(3, 3);
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(3, 3);
+      refA << 1.0040240962886926, 0.004024096288692585, 0.004024096288692585,
+         0.004024096288692585, 1.0040240962886926, 0.004024096288692585,
+         0.004024096288692585, 0.004024096288692585, 1.0040240962886926;
+      double err = (refA - expA).array().abs().maxCoeff() / refA(2, 2);
+      INFO("relative error: " << err);
+      CHECK(err < 3e-16);
+   }
+
+   // Check Pade order 5
+   {
+      Matrix matA = 0.08 * Matrix::Ones(3, 3);
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(3, 3);
+      refA << 1.0904163834404683, 0.09041638344046825, 0.09041638344046825,
+         0.09041638344046823, 1.0904163834404683, 0.09041638344046825,
+         0.09041638344046823, 0.09041638344046825, 1.0904163834404683;
+      double err = (refA - expA).array().abs().maxCoeff() / refA(2, 2);
+      INFO("relative error: " << err);
+      CHECK(err < 1e-16);
+   }
+
+   // Check Pade order 7
+   {
+      Matrix matA = 0.3 * Matrix::Ones(3, 3);
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(3, 3);
+      refA << 1.48653437038565, 0.4865343703856498, 0.4865343703856498,
+         0.4865343703856498, 1.48653437038565, 0.4865343703856497,
+         0.4865343703856498, 0.4865343703856497, 1.48653437038565;
+      double err = (refA - expA).array().abs().maxCoeff() / refA(2, 2);
+      INFO("relative error: " << err);
+      CHECK(err < 2e-16);
+   }
+
+   // Check Pade order 9
+   {
+      Matrix matA = 0.65 * Matrix::Ones(3, 3);
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(3, 3);
+      refA << 3.009562526863098, 2.0095625268630983, 2.009562526863098,
+         2.009562526863098, 3.009562526863098, 2.009562526863098,
+         2.009562526863098, 2.009562526863098, 3.0095625268630974;
+      double err = (refA - expA).array().abs().maxCoeff() / refA(2, 2);
+      INFO("relative error: " << err);
+      CHECK(err < 6e-16);
+   }
+
+   // Check Pade order 13
+   {
+      Matrix matA = 1.7 * Matrix::Ones(3, 3);
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(3, 3);
+      refA << 55.34063576663377, 54.34063576663377, 54.34063576663376,
+         54.34063576663376, 55.34063576663377, 54.34063576663376,
+         54.34063576663376, 54.34063576663377, 55.34063576663377;
+      double err = (refA - expA).array().abs().maxCoeff() / refA(2, 2);
+      INFO("relative error: " << err);
+      CHECK(err < 9e-15);
+   }
+
+   // Check Pade order 13 with scaling and squaring
+   {
+      Matrix matA = 3.0 * Matrix::Ones(3, 3);
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(3, 3);
+      refA << 2701.694642525128, 2700.694642525128, 2700.694642525128,
+         2700.694642525128, 2701.694642525128, 2700.694642525128,
+         2700.694642525128, 2700.694642525128, 2701.694642525128;
+      double err = (refA - expA).array().abs().maxCoeff() / refA(2, 2);
+      INFO("relative error: " << err);
+      CHECK(err < 7e-16);
+   }
+}
+
+TEST_CASE("Arnoldi iteration for Krylov subspace", "[ArnoldiKrylov]")
+{
+
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+}
+
+TEST_CASE("Incomplete orthogonalization for Krylov subspace of length 2",
+   "[IomKrylov2]")
+{
+
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+}
+
+TEST_CASE("Exponential of matrix using phipm algorithm", "[Phipm]")
+{
+
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+}
+
+TEST_CASE("Exponential of matrix using KIOPS algorithm", "[Kiops]")
+{
+
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+}

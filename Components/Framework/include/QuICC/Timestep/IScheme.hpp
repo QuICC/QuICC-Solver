@@ -6,13 +6,7 @@
 #ifndef QUICC_TIMESTEP_ISCHEME_HPP
 #define QUICC_TIMESTEP_ISCHEME_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes

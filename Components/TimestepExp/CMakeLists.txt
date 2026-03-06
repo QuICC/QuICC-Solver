@@ -34,6 +34,7 @@ add_subdirectory(Timestep)
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
   PUBLIC
     QuICC::Framework
+    LAPACK::LAPACK
 )
 
 # Alias

@@ -20,5 +20,5 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_TEST_LIB}
 )
 
 # Add source and tests directories
-#add_subdirectory(Timestep)
-#add_subdirectory(Tests)
+add_subdirectory(Timestep)
+add_subdirectory(Tests)

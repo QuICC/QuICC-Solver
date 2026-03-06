@@ -29,9 +29,9 @@
 #include "QuICC/Timestep/Constants.hpp"
 #include "QuICC/Timestep/IScheme.hpp"
 #include "QuICC/Timestep/Interface.hpp"
-#include "Timestep/PredictorCorrector/Views/TimestepperCoordinator.hpp"
-#include "Timestep/PredictorCorrector/Views/ImExPCTimestepper.hpp"
-#include "Timestep/PredictorCorrector/Views/details/TimesteppperTools.hpp"
+#include "Timestep/Exponential/TimestepperInfo.hpp"
+#include "Timestep/Exponential/TimestepperCoordinator.hpp"
+#include "Timestep/Exponential/details/TimesteppperTools.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "View/ViewDense.hpp"
 #include "Memory/Memory.hpp"
@@ -43,7 +43,9 @@ namespace QuICC {
 
 namespace Timestep {
 
-namespace PredictorCorrector {
+namespace Exponential {
+
+   template <typename T2, typename T1, typename T3> class DummyImpl;
 
 /**
  * @brief Implementation of general interface structure for exponential schemes
@@ -54,12 +56,11 @@ public:
    /// Typedef for solver implementation
    template <typename T1, typename T2, typename T3>
    using SolverImplementationType =
-      Views::ImExPCTimestepper<T1, T2, T3>;
+      DummyImpl<T1, T2, T3>;
 
    /// Typedef for parent coordinator
-   typedef Views::TimestepperCoordinator<SolverImplementationType, base_t>
+   typedef TimestepperCoordinator<SolverImplementationType, base_t>
       SolverCoordinator;
-
    /**
     * @brief Constructor
     *
@@ -96,8 +97,6 @@ public:
 
    /**
     * @brief Tune adaptive timestepper
-    *
-    * \mhdBug Not fully implemented
     */
    void tuneAdaptive(const MHDFloat time) final;
 
@@ -161,7 +160,7 @@ protected:
     * @param scalEq Scalar equations
     * @param vectEq Vector equations
     */
-   void translate(std::vector<Views::TimestepperInfo>& infos,
+   void translate(std::vector<TimestepperInfo>& infos,
       const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
 private:
@@ -171,7 +170,7 @@ private:
    SharedIScheme mspScheme;
 
    /**
-    * @brief Interface to timestepping scheme
+    * @brief Interface to timestepper coordinator
     */
    SolverCoordinator mSolverCoord;
 
@@ -186,11 +185,11 @@ private:
  */
 std::size_t stepperIndex(const std::size_t solverIndex, const std::size_t sysIndex);
 
-Views::TimestepperInfo createInfo(const Equations::CouplingInformation& cinfo);
+TimestepperInfo createInfo(const Equations::CouplingInformation& cinfo);
 
-inline Views::TimestepperInfo createInfo(const Equations::CouplingInformation& cinfo, const std::size_t idx)
+inline TimestepperInfo createInfo(const Equations::CouplingInformation& cinfo, const std::size_t idx)
 {
-   Views::TimestepperInfo info;
+   TimestepperInfo info;
    info.isComplex = cinfo.isComplex();
    info.fieldIndex = cinfo.fieldIndex();
    info.solverIndex = stepperIndex(cinfo.solverIndex(), idx);
@@ -200,11 +199,6 @@ inline Views::TimestepperInfo createInfo(const Equations::CouplingInformation& c
 
    return info;
 }
-
-/**
- * @brief Wrapper to build timestepping matrices
- */
-void buildTimestepMatrixWrapper(std::map<std::size_t, DecoupledZSparse>& ops, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
 template <typename TScheme>
 Interface<TScheme>::Interface(const MHDFloat time, const Matrix& cfl,
@@ -220,12 +214,11 @@ Interface<TScheme>::Interface(const MHDFloat time, const Matrix& cfl,
    // Use embedded scheme to compute error
    if (maxError > 0.0)
    {
-      spScheme->enableEmbedded();
       this->mMaxError = maxError;
    }
    this->mspScheme = spScheme;
 
-   std::vector<Views::TimestepperInfo> infos;
+   std::vector<TimestepperInfo> infos;
    this->translate(infos, scalEq, vectEq);
 
    this->mSolverCoord.init(this->timestep(), infos, spScheme);
@@ -235,7 +228,7 @@ Interface<TScheme>::Interface(const MHDFloat time, const Matrix& cfl,
 
 // \todo convert to free function
 template <typename TScheme>
-void Interface<TScheme>::translate(std::vector<Views::TimestepperInfo>& infos, const ScalarEquation_range& scalEq,
+void Interface<TScheme>::translate(std::vector<TimestepperInfo>& infos, const ScalarEquation_range& scalEq,
    const VectorEquation_range& vectEq)
 {
    auto addInfo = [](auto& infos, auto&& eq_range)
@@ -258,9 +251,6 @@ void Interface<TScheme>::translate(std::vector<Views::TimestepperInfo>& infos, c
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
                   auto info = createInfo(cinfo, i);
-
-                  // Set operators
-                  buildTimestepMatrixWrapper(info.ops, eqIt, myId.second, i);
 
                   infos.push_back(info);
                }
@@ -437,7 +427,7 @@ void Interface<TScheme>::getExplicitInput(const std::size_t opId,
                      using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
                      std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
                      View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
-                     Views::details::computeSet(tmpView, tmp, 0);
+                     details::computeSet(tmpView, tmp, 0);
 
                      this->mSolverCoord.updateRhs(info, tmpView);
                   }
@@ -610,7 +600,7 @@ void Interface<TScheme>::transferOutput(const ScalarEquation_range& scalEq, cons
 
    Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:copyView");
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
-                  Views::details::computeSet(tmp, tmpView, 0);
+                  details::computeSet(tmp, tmpView, 0);
    Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:copyView");
 
    Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:storeSolution");
@@ -719,49 +709,6 @@ void Interface<TScheme>::printInfo(std::ostream& stream)
        << this->mspScheme->order() << ")";
 
    this->printInfo(stream, oss.str());
-}
-
-// \todo  move to separate file
-inline void buildTimestepMatrixWrapper(std::map<std::size_t, DecoupledZSparse>& ops, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp,
-   const int idx)
-{
-   auto buildOp = [&](const std::size_t opId, const std::size_t bcId)
-   {
-      auto ret = ops.insert(std::make_pair(opId, DecoupledZSparse()));
-      spEq->buildModelMatrix(ret.first->second, opId, comp, idx, bcId);
-   };
-
-   bool isSplit = spEq->couplingInfo(comp).isSplitEquation();
-
-   using namespace ModelOperator;
-   using namespace ModelOperatorBoundary;
-   // Compute model's linear operator (without Tau lines)
-   buildOp(ImplicitLinear::id(), SolverNoTau::id());
-
-   // Compute model's time operator (without Tau lines)
-   buildOp(Time::id(), SolverNoTau::id());
-
-   // Compute model's quasi-inverse operator (without Tau lines)
-   buildOp(QuasiInverse::id(), SolverNoTau::id());
-
-   // Compute model's tau line boundary operator
-   buildOp(Boundary::id(), SolverHasBc::id());
-
-   // If equation was split into two lower order systems
-   if (isSplit)
-   {
-      // Compute model's split linear operator (without Tau lines)
-      buildOp(SplitImplicitLinear::id(), SolverNoTau::id());
-
-      // Compute model's split quasi-inverse operator (without Tau lines)
-      buildOp(SplitQuasiInverse::id(), SolverNoTau::id());
-
-      // Compute model's tau line boundary operator for split operator
-      buildOp(SplitBoundary::id(), SolverHasBc::id());
-
-      // Compute model's tau line boundary value for split operator
-      buildOp(SplitBoundaryValue::id(), SolverNoTau::id());
-   }
 }
 
 } // namespace Exponential
