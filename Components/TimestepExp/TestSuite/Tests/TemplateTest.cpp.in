@@ -9,13 +9,17 @@
 #include <catch2/catch.hpp>
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 // Project includes
 //
 #include "Environment/QuICCEnv.hpp"
 #include "TestSuite/Timestep/Exponential/TestArgs.hpp"
+#include "TestSuite/Timestep/Exponential/TestAFunctor.hpp"
 #include "Timestep/Exponential/@Scheme@.hpp"
 #include "Timestep/Exponential/HighamExponential.hpp"
+#include "Timestep/Exponential/ArnoldiKrylov.hpp"
+#include "Timestep/Exponential/IomKrylov.hpp"
 #include "Types/Typedefs.hpp"
 
 namespace currentts = ::QuICC::TestSuite::Timestep::Exponential;
@@ -113,21 +117,52 @@ TEST_CASE("Exponential of small dense matrix (higham)", "[HighamExp]")
 
 TEST_CASE("Arnoldi iteration for Krylov subspace", "[ArnoldiKrylov]")
 {
-
    // Init Environment
    QuICC::QuICCEnv();
 
    Catch::StringMaker<double>::precision = 15;
+
+   using namespace ::QuICC;
+   auto aFunc = std::make_unique<currentts::TestAFunctor>();
+   Timestep::Exponential::ArnoldiKrylov<currentts::TestAFunctor> kFunc(std::move(aFunc));
+
+   int n = 30;
+   int m = 5;
+   Matrix matV = Matrix::Zero(n, m + 1);
+   matV.col(0).setRandom();
+   matV.col(0).normalize();
+
+   Matrix matH = Matrix::Zero(m+1, m+1);
+
+   auto m_ = kFunc.compute(matV, matH, 0, m);
+
+   // Orthogonalization error
+   double oErr = ((matV.transpose() * matV) - Matrix::Identity(m+1,m+1)).array().abs().maxCoeff();
+   INFO( "orthogonalization error: " << oErr );
+   CHECK( oErr < 3e-16 );
 }
 
 TEST_CASE("Incomplete orthogonalization for Krylov subspace of length 2",
    "[IomKrylov2]")
 {
-
    // Init Environment
    QuICC::QuICCEnv();
 
    Catch::StringMaker<double>::precision = 15;
+
+   using namespace ::QuICC;
+   auto aFunc = std::make_unique<currentts::TestAFunctor>();
+   Timestep::Exponential::IomKrylov<currentts::TestAFunctor> kFunc(std::move(aFunc));
+
+   int n = 30;
+   int m = 5;
+   Matrix matV = Matrix::Zero(n, m + 1);
+   matV.col(0).setRandom();
+   matV.col(0).normalize();
+
+   Matrix matH = Matrix::Zero(m+1, m+1);
+
+   kFunc.compute(matV, matH, 0, m);
 }
 
 TEST_CASE("Exponential of matrix using phipm algorithm", "[Phipm]")

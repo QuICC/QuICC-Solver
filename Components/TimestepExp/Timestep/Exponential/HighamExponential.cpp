@@ -60,7 +60,7 @@ void HighamExponential::initPade()
 
 Matrix HighamExponential::compute(const Matrix& matA) const
 {
-   assert(matA.rows() = matA.cols());
+   assert(matA.rows() == matA.cols());
    int n = matA.rows();
 
    Matrix expA = matA;
