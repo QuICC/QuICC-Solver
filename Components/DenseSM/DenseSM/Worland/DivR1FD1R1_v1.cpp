@@ -64,10 +64,8 @@ void DivR1FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    W.compute<Internal::MHDFloat>(opFwd, this->rows(), this->mLout, igrid,
       iweights, ev::Set());
 
-   //Internal::Array f = opFBwd * opFFwd.transpose() *
-   //                    this->mpF->evaluate(igrid, this->mLf, this->mMf);
-
-   Internal::Array f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
+   Internal::Array f = opFBwd * opFFwd.transpose() *
+                       this->mpF->evaluate(igrid, this->mLf, this->mMf);
 
    mat = opFwd.transpose() * f.asDiagonal() * opBwd;
 }

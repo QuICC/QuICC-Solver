@@ -16,10 +16,13 @@
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Tags.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
-//#include "QuICC/Polynomial/Worland/r_1WnlRecurrence.hpp"
 #include "QuICC/Polynomial/Worland/r_1drWnlRecurrence.hpp"
 #include "Types/Internal/BasicTypes.hpp"
 #include "Types/Internal/Typedefs.hpp"
+//second attempt
+#include "QuICC/Polynomial/Worland/drWnl.hpp"
+#include "QuICC/Polynomial/Worland/r_1WnlRecurrence.hpp"
+
 
 namespace QuICC {
 
@@ -46,28 +49,27 @@ void DivR1FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    this->computeQuadrature(igrid, iweights, nR);
 
    Polynomial::Worland::Wnl W;
-   //Polynomial::Worland::r_1Wnl<Polynomial::Worland::recurrence_t> r_1W;
-   Polynomial::Worland::r_1drWnl<Polynomial::Worland::recurrence_t> r_1drW;
+   Polynomial::Worland::r_1Wnl<Polynomial::Worland::recurrence_t> r_1W;
+   //Polynomial::Worland::r_1drWnl<Polynomial::Worland::recurrence_t> r_1drW;
+   Polynomial::Worland::drWnl drWnl;
 
    Internal::Matrix opBwd(igrid.size(), this->cols());
-   r_1drW.compute<Internal::MHDFloat>(opBwd, this->cols(), this->mLin, igrid,
+   drWnl.compute<Internal::MHDFloat>(opBwd, this->cols(), this->mLin, igrid,
       Internal::Array(), ev::Set());
 
    Internal::Matrix opFFwd(igrid.size(), this->mpF->nN());
    W.compute<Internal::MHDFloat>(opFFwd, this->mpF->nN(), this->mLf, igrid,
       iweights, ev::Set());
    Internal::Matrix opFBwd(igrid.size(), this->mpF->nN());
-   W.compute<Internal::MHDFloat>(opFBwd, this->mpF->nN(), this->mLf, igrid,
+   r_1W.compute<Internal::MHDFloat>(opFBwd, this->mpF->nN(), this->mLf, igrid,
       Internal::Array(), ev::Set());
 
    Internal::Matrix opFwd(igrid.size(), this->rows());
    W.compute<Internal::MHDFloat>(opFwd, this->rows(), this->mLout, igrid,
       iweights, ev::Set());
 
-   //Internal::Array f = opFBwd * opFFwd.transpose() *
-   //                    this->mpF->evaluate(igrid, this->mLf, this->mMf);
-
-   Internal::Array f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
+   Internal::Array f = opFBwd * opFFwd.transpose() *
+                       this->mpF->evaluate(igrid, this->mLf, this->mMf);
 
    mat = opFwd.transpose() * f.asDiagonal() * opBwd;
 }

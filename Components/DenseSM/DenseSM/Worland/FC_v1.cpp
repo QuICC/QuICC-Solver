@@ -65,15 +65,15 @@ void FC::buildOpImpl(Internal::Matrix& mat, const int rows,
 
    //Polynomial::Worland::r_1Wnl<Polynomial::Worland::recurrence_t> r_1W;
    auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
-   //Internal::Matrix opFFwd(igrid.size(), this->mpF->nN());
-   //W.compute<Internal::MHDFloat>(opFFwd, opFFwd.cols(), lF, igrid, iweights,
-   //   ev::Set());
-   //Internal::Matrix opFBwd(igrid.size(), this->mpF->nN());
-   //W.compute<Internal::MHDFloat>(opFBwd, opFBwd.cols(), lF, igrid,
-   //   Internal::Array(), ev::Set());
-   //Internal::Array cf = (opFBwd * (opFFwd.transpose() * f));
+   Internal::Matrix opFFwd(igrid.size(), this->mpF->nN());
+   W.compute<Internal::MHDFloat>(opFFwd, opFFwd.cols(), lF, igrid, iweights,
+      ev::Set());
+   Internal::Matrix opFBwd(igrid.size(), this->mpF->nN());
+   W.compute<Internal::MHDFloat>(opFBwd, opFBwd.cols(), lF, igrid,
+      Internal::Array(), ev::Set());
+   Internal::Array cf = (opFBwd * (opFFwd.transpose() * f));
 
-   mat = opFwd.transpose() * f.asDiagonal() * opBwd;
+   mat = opFwd.transpose() * cf.asDiagonal() * opBwd;
 }
 
 } // namespace Worland
