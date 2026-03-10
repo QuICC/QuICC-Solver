@@ -193,6 +193,18 @@ void HighamExponential::preprocess(std::vector<double>& scale, int& ilo,
    {
       throw std::logic_error("Balancing of matrix failed");
    }
+
+   // Rescale for zero indexing
+   ilo--;
+   ihi--;
+   for(int i = 0; i < ilo; i++)
+   {
+      scale[i]--;
+   }
+   for(int i = ihi+1; i < n; i++)
+   {
+      scale[i]--;
+   }
 }
 
 void HighamExponential::postprocess(Matrix& matA, std::vector<double>& scale,
@@ -202,15 +214,54 @@ void HighamExponential::postprocess(Matrix& matA, std::vector<double>& scale,
 
    int n = matA.rows();
 
-   int info;
-   char job = 'B';  // B=Both scale and permute
-   char side = 'R'; // R=right eigenvalues
-   dgebak_(&job, &side, &n, &ilo, &ihi, scale.data(), &n, matA.data(), &n,
-      &info);
-
-   if (info != 0)
+   // undo scaling
+   double s;
+   for(int j = ilo; j <= ihi; j++)
    {
-      throw std::logic_error("Unbalancing of matrix failed");
+      s = scale.at(j);
+      for(int i = 0; i < n; i++)
+      {
+         if(i == j)
+         {
+            continue;
+         }
+         matA(j,i) *= s;
+         matA(i,j) /= s;
+      }
+   }
+
+   // Undo the permutations
+   int jj;
+   if(ilo > 0)
+   {
+      for(int j = ilo-1; j >= 0; j--)
+      {
+         jj = static_cast<int>(scale.at(j));
+         for(int k = 0; k < n; k++)
+         {
+            std::swap(matA(k,j), matA(k,jj));
+         }
+         for(int k = 0; k < n; k++)
+         {
+            std::swap(matA(j,k), matA(jj,k));
+         }
+      }
+   }
+
+   if(ihi < n-1)
+   {
+      for(int j = ihi+1; j < n; j++)
+      {
+         jj = static_cast<int>(scale.at(j));
+         for(int k = 0; k < n; k++)
+         {
+            std::swap(matA(k,j), matA(k,jj));
+         }
+         for(int k = 0; k < n; k++)
+         {
+            std::swap(matA(j,k), matA(jj,k));
+         }
+      }
    }
 }
 

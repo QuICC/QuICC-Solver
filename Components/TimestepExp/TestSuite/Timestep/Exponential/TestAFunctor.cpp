@@ -18,14 +18,30 @@ namespace Timestep {
 
 namespace Exponential {
 
-TestAFunctor::TestAFunctor()
-{}
+TestAFunctor::TestAFunctor(const int n, const int id)
+   : mcN(n), matA(n, n)
+{
+   if(id == 0)
+   {
+      matA = Matrix::Random(n,n);
+   }
+   else
+   {
+      matA = Matrix::Identity(n,n);
+   }
+}
+
+TestAFunctor::TestAFunctor(const Matrix& matA)
+   : mcN(matA.rows()), matA(matA)
+{
+}
 
 void TestAFunctor::operator()(Eigen::Ref<Matrix> out, Eigen::Ref<Matrix> in) const
 {
-   Matrix matA = Matrix::Random(in.rows(), in.cols());
+   assert(in.rows() == this->matA.cols());
+   assert(out.rows() == this->matA.rows());
 
-   out = matA * in;
+   out = this->matA * in;
 }
 
 } // namespace Exponential

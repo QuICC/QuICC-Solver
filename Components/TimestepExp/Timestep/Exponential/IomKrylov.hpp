@@ -59,6 +59,11 @@ public:
    int compute(Matrix& matV, Matrix& matH, const int j,
       const int m);
 
+   /**
+    * @brief Access action of A functor
+    */
+   TAfunc& aFunc();
+
 private:
    /**
     * @brief Length of incomplete orthogonalization
@@ -125,6 +130,12 @@ int IomKrylov<TAfunc>::compute(Matrix& matV, Matrix& matH,
    }
 
    return j;
+}
+
+template <typename TAfunc>
+TAfunc& IomKrylov<TAfunc>::aFunc()
+{
+   return *this->mpAfunc;
 }
 
 } // namespace Exponential

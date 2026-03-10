@@ -57,6 +57,11 @@ public:
     */
    int compute(Matrix& matV, Matrix& matH, const int j, const int m);
 
+   /**
+    * @brief Access action of A functor
+    */
+   TAfunc& aFunc();
+
 private:
    /**
     * @brief Convergence tolerance
@@ -121,6 +126,12 @@ int ArnoldiKrylov<TAfunc>::compute(Matrix& matV, Matrix& matH, const int jIn,
    }
 
    return j;
+}
+
+template <typename TAfunc>
+TAfunc& ArnoldiKrylov<TAfunc>::aFunc()
+{
+   return *this->mpAfunc;
 }
 
 } // namespace Exponential

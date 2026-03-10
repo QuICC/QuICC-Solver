@@ -27,7 +27,12 @@ class TestAFunctor
       /**
        * @brief ctor
        */
-      TestAFunctor();
+      TestAFunctor(const int n, const int id);
+
+      /**
+       * @brief ctor
+       */
+      TestAFunctor(const Matrix& matA);
 
       /**
        * @brief ctor
@@ -40,6 +45,15 @@ class TestAFunctor
       void operator()(Eigen::Ref<Matrix> out, Eigen::Ref<Matrix> in)  const;
 
    private:
+      /**
+       * @brief Size
+       */
+      const int mcN;
+
+      /**
+       * @brief Matrix A
+       */
+      Matrix matA;
 };
 
 } // namespace Exponential
