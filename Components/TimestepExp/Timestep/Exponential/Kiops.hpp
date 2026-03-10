@@ -186,8 +186,16 @@ void Kiops<TKrylov, TExponential>::defineAugmentedA(const Matrix& matU)
 {
    this->mNuMu = this->rescaleU(matU);
 
-   Matrix matB = matU.rightCols(matU.cols()-1).rowwise().reverse();
-   matB.array() *= this->mNuMu.first;
+   Matrix matB;
+   if(matU.cols() > 1)
+   {
+      matB = matU.rightCols(matU.cols()-1).rowwise().reverse();
+      matB.array() *= this->mNuMu.first;
+   }
+   else
+   {
+      matB = Matrix::Zero(matU.rows(), 1);
+   }
 
    this->mpKfunc->aFunc().updateB(matB);
 }
@@ -203,7 +211,7 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
 
    // Get dimensions
    const int n = matU.rows();
-   const int p = matU.cols() - 1;
+   const int p = std::max(1, static_cast<int>(matU.cols()) - 1);
 
    double tNow = 0;
    double tau = tEnd;

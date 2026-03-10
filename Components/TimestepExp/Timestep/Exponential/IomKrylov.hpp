@@ -73,7 +73,7 @@ private:
    /**
     * @brief Convergence tolerance
     */
-   const int mcTol;
+   const double mcTol;
 
    /*
     * @brief Functor for action of A matrix
@@ -119,9 +119,11 @@ int IomKrylov<TAfunc>::compute(Matrix& matV, Matrix& matH,
       double normV = matV.col(j+1).squaredNorm();
       // MPI VERSION HERE
       normV = std::sqrt(normV);
+
       // Stop if subspace converged sufficiently
       if(normV < this->mcTol)
       {
+         j++;
          break;
       }
 

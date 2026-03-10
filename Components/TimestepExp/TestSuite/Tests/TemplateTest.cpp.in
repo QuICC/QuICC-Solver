@@ -235,3 +235,37 @@ TEST_CASE("Exponential of matrix using KIOPS algorithm", "[Kiops]")
    std::cerr << "Output m = " << m_ << std::endl;
    std::cerr << matW.transpose() << std::endl;
 }
+
+TEST_CASE("Exponential of matrix using KIOPS algorithm, p = 0", "[Kiops_p_zero]")
+{
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+
+   using namespace ::QuICC;
+
+   int n = 20;
+
+   Matrix matA = std::pow(2, 0) * Matrix::Ones(n, n);
+
+   std::vector<double> ts = {0.1, 0.2, 0.4, 0.7};
+   Matrix matW = Matrix::Zero(n, ts.size());
+   Matrix matU = Matrix::Ones(n, 1);
+
+   typedef currentts::TestAugmentedAFunctor AFunctorType;
+   auto aFunc = std::make_unique<AFunctorType>(matA);
+   typedef Timestep::Exponential::IomKrylov<AFunctorType> KrylovType;
+   auto kFunc = std::make_unique<KrylovType>(std::move(aFunc));
+   typedef Timestep::Exponential::HighamExponential ExpType;
+   auto eFunc = std::make_unique<ExpType>();
+
+   typedef Timestep::Exponential::Kiops<KrylovType, ExpType> LinCombExpType;
+   LinCombExpType kiops(std::move(kFunc), std::move(eFunc));
+   int m = 10;
+   kiops.setup(ts, matU);
+   int m_ = kiops.compute(matW, ts, matU, m, LinCombExpType::Task::II);
+
+   std::cerr << "Output m = " << m_ << std::endl;
+   std::cerr << matW.transpose() << std::endl;
+}
