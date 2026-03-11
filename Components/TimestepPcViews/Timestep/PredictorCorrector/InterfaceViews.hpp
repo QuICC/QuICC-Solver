@@ -79,11 +79,6 @@ public:
    virtual ~InterfaceViews() = default;
 
    /**
-    * @brief Timestep is finished?
-    */
-   bool finishedStep() const final;
-
-   /**
     * @brief Update equation explicit linear input to solver
     *
     * @param scalEq Scalar equations
@@ -129,6 +124,11 @@ public:
 
 protected:
    using Timestep::Interface::printInfo;
+
+   /**
+    * @brief Timestep is finished?
+    */
+   bool finishedStep() const;
 
    /**
     * @brief Initialize solution

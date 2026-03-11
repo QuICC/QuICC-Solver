@@ -40,11 +40,6 @@ namespace Timestep {
       this->mpImpl->update();
    }
 
-   bool Coordinator::finishedStep() const
-   {
-      return this->mpImpl->finishedStep();
-   }
-
    void Coordinator::getExplicitInput(const std::size_t opId, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
       this->mpImpl->getExplicitInput(opId, scalEq, vectEq, scalVar, vectVar);

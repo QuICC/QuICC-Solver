@@ -112,11 +112,6 @@ namespace Timestep {
          MHDFloat timestep() const;
 
          /**
-          * @brief Timestep is finished?
-          */
-         bool finishedStep() const;
-
-         /**
           * @brief Update equation explicit linear input to solver
           *
           * @param scalEq Scalar equations

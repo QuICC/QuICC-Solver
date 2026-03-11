@@ -67,10 +67,10 @@ namespace Timestep {
           */
          virtual ~Interface();
 
-         /**
-          * @brief Timestep is finished?
-          */
-         virtual bool finishedStep() const = 0;
+//         /**
+//          * @brief Timestep is finished?
+//          */
+//         virtual bool finishedStep() const = 0;
 
          /**
           * @brief Update equation explicit linear input to solver
