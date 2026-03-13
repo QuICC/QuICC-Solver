@@ -1,5 +1,6 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
   IWorlandOperator.cpp
+  FC.cpp
   DivR1F.cpp
   DivR1CF.cpp
   DivR1FC.cpp
@@ -9,6 +10,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   DivR1D1CF.cpp
   DivR1D1FC.cpp
   DivR2D1R1F.cpp
+  DivR1FD1R1.cpp
   DivR2FD1R1.cpp
   DivR2CFD1R1.cpp
   DivR2D1R1FC.cpp
