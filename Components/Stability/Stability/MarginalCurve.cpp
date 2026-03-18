@@ -275,6 +275,9 @@ void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks,
 void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
    const std::vector<MHDComplex>& ef)
 {
+   // stability fields and components
+   auto stabilityConfig = this->getStabilityConfig();
+
    auto&& ss = this->mspRes->sim().ss();
    if (!this->mpH5File)
    {
@@ -337,7 +340,8 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
    FieldComponents::Spectral::Id comp;
    if (this->mVectors.count(pId) > 0)
    {
-      comp = FieldComponents::Spectral::TOR;
+      //comp = FieldComponents::Spectral::TOR;
+      comp = stabilityConfig.second;
    }
    else
    {
