@@ -172,6 +172,13 @@ public:
    void addAsciiOutputFile(Io::Variable::SharedIVariableAsciiWriter spOutFile);
 
    /**
+    * @brief Add One Time ASCII output file to solver
+    *
+    * @param spOutFile Shared ASCII output file
+    */
+   void addOneTimeAsciiOutputFile(Io::Variable::SharedIVariableAsciiWriter spOutFile);
+
+   /**
     * @brief Add HDF5 output file to solver
     *
     * @param spOutFile Shared HDF5 output file

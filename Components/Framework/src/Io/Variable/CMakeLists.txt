@@ -35,6 +35,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ShellNusseltWriter.cpp
   ShellDipolarityWriter.cpp
   ShellLuminosityWriter.cpp
+  ShellRadialProfilesWriter.cpp
   ShellScalarEnergyWriter.cpp
   ShellScalarNSpectrumWriter.cpp
   ShellScalarLSpectrumWriter.cpp

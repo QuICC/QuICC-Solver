@@ -158,6 +158,11 @@ namespace QuICC {
       this->mAsciiWriters.push_back(spOutFile);
    }
 
+   void SimulationIoControl::addOneTimeAsciiOutputFile(Io::Variable::SharedIVariableAsciiWriter spOutFile)
+   {
+      this->mOneTimeAsciiWriters.push_back(spOutFile);
+   }
+
    void SimulationIoControl::addHdf5OutputFile(Io::Variable::SharedIVariableHdf5NWriter spOutFile)
    {
       spOutFile->setGit(this->mGit);
@@ -174,6 +179,15 @@ namespace QuICC {
       // First check that all ASCII writers are full
       SimulationIoControl::ascii_iterator itAscii;
       for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)
+      {
+         if(!(*itAscii)->isFull())
+         {
+            throw std::logic_error("There are missing variables in the ASCII writers");
+         }
+      }
+
+      // First check that all one-time ASCII writers are full
+      for(itAscii = this->mOneTimeAsciiWriters.begin(); itAscii < this->mOneTimeAsciiWriters.end(); itAscii++)
       {
          if(!(*itAscii)->isFull())
          {
@@ -212,6 +226,13 @@ namespace QuICC {
          (*itAscii)->init();
       }
 
+      // Iterate over all one-time ASCII writer
+      for(itAscii = this->mOneTimeAsciiWriters.begin(); itAscii < this->mOneTimeAsciiWriters.end(); itAscii++)
+      {
+         (*itAscii)->setPhysical(phys, boundary);
+         (*itAscii)->init();
+      }
+
       // Iterate over all HDF5 writer
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
       {
@@ -237,6 +258,13 @@ namespace QuICC {
       }
       this->mAsciiWriters.clear();
 
+      // Iterate over all one-time ASCII writer
+      for(itAscii = this->mOneTimeAsciiWriters.begin(); itAscii < this->mOneTimeAsciiWriters.end(); itAscii++)
+      {
+         (*itAscii)->finalize();
+      }
+      this->mOneTimeAsciiWriters.clear();
+
       // Iterate over all HDF5 writer
       SimulationIoControl::hdf5_iterator itHdf5;
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
@@ -261,6 +289,19 @@ namespace QuICC {
       // Iterate over all ASCII writer
       SimulationIoControl::ascii_iterator it;
       for(it = this->mAsciiWriters.begin(); it < this->mAsciiWriters.end(); it++)
+      {
+         (*it)->setSimTime(time,timestep);
+         (*it)->write();
+      }
+   }
+
+   void SimulationIoControl::writeOneTimeAscii(const MHDFloat time, const MHDFloat timestep)
+   {
+      Profiler::RegionFixture<1> fix("SimulationIoControl::writeOneTimeAscii");
+
+      // Iterate over all ASCII writer
+      SimulationIoControl::ascii_iterator it;
+      for(it = this->mOneTimeAsciiWriters.begin(); it < this->mOneTimeAsciiWriters.end(); it++)
       {
          (*it)->setSimTime(time,timestep);
          (*it)->write();
@@ -361,6 +402,16 @@ namespace QuICC {
    SimulationIoControl::ascii_iterator  SimulationIoControl::endAscii()
    {
       return this->mAsciiWriters.end();
+   }
+
+   SimulationIoControl::ascii_iterator  SimulationIoControl::beginOneTimeAscii()
+   {
+      return this->mOneTimeAsciiWriters.begin();
+   }
+
+   SimulationIoControl::ascii_iterator  SimulationIoControl::endOneTimeAscii()
+   {
+      return this->mOneTimeAsciiWriters.end();
    }
 
    SimulationIoControl::hdf5_iterator  SimulationIoControl::beginHdf5()

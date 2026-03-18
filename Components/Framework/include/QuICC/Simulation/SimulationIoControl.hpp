@@ -83,6 +83,13 @@ namespace QuICC {
          void addAsciiOutputFile(Io::Variable::SharedIVariableAsciiWriter spOutFile);
 
          /**
+          * @brief Add a one-time ASCII output file
+          *
+          * @param spOutFile Shared ASCII writer
+          */
+         void addOneTimeAsciiOutputFile(Io::Variable::SharedIVariableAsciiWriter spOutFile);
+
+         /**
           * @brief Add a HDF5 output file
           *
           * @param spOutFile Shared HDF5 writer
@@ -115,6 +122,16 @@ namespace QuICC {
           * @brief Get end iterator to ASCII files
           */
          ascii_iterator endAscii();
+
+         /**
+          * @brief Get begin iterator to one-time ASCII files
+          */
+         ascii_iterator beginOneTimeAscii();
+
+         /**
+          * @brief Get end iterator to one-time ASCII files
+          */
+         ascii_iterator endOneTimeAscii();
 
          /**
           * @brief Get begin iterator to HDF5 files
@@ -173,6 +190,14 @@ namespace QuICC {
          void writeAscii(const MHDFloat time, const MHDFloat timestep);
 
          /**
+          * @brief Write one-time ASCII data
+          * 
+          * @param time    Current simulation time
+          * @param time    Current simulation timestep
+          */
+         void writeOneTimeAscii(const MHDFloat time, const MHDFloat timestep);
+
+         /**
           * @brief Write HDF5 data
           *
           * @param time    Current simulation time
@@ -220,6 +245,11 @@ namespace QuICC {
           * @brief Vector of ASCII output files
           */
          std::vector<Io::Variable::SharedIVariableAsciiWriter> mAsciiWriters;
+
+         /**
+          * @brief Vector of ASCII one-time output files
+          */
+         std::vector<Io::Variable::SharedIVariableAsciiWriter> mOneTimeAsciiWriters;
 
          /**
           * @brief Vector of HDF5 output files

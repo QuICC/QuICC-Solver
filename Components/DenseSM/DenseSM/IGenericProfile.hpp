@@ -63,10 +63,18 @@ public:
       return this->evaluate(rMP, l, m).template cast<MHDFloat>().eval();
    }
 
+   /**
+     * @brief Get the name of the profile
+     */
+    virtual const std::string& getName() const { return mName; }
+
 protected:
 
+   /**
+     * @brief Name of the profile (for output)
+     */
+    std::string mName = "";
 
-protected:
 private:
 };
 

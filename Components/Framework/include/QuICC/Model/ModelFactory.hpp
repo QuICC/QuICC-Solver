@@ -105,6 +105,11 @@ namespace QuICC {
       model.addAsciiOutputFiles(spSim);
       stage.done();
 
+      // Add One Time ASCII output files
+      stage.start("adding model ASCII output");
+      model.addOneTimeAsciiOutputFiles(spSim);
+      stage.done();
+
       // Add HDF5 output files
       stage.start("adding model HDF5 output");
       model.addHdf5OutputFiles(spSim);

@@ -100,6 +100,15 @@ namespace Model {
                                                                                  const std::size_t id, 
                                                                                  std::shared_ptr<TApp> spSim,
                                                                                  std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF);
+
+         /**
+          * @brief Interface to adding a one-time ASCII output file (anelastic case)
+          */
+         template <typename T, typename TApp> std::shared_ptr<T> enableOneTimeAsciiFile(const std::string tag, 
+                                                                                 const std::string prefix, 
+                                                                                 const std::size_t id, 
+                                                                                 std::shared_ptr<TApp> spSim,
+                                                                                 std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF);
       protected:
          /**
           * @brief Register Named IDs needed for simulation
@@ -159,6 +168,34 @@ namespace Model {
             spFile->onlyEvery(spSim->config().model(tag).at("only_every"));
          }
          spSim->addAsciiOutputFile(spFile);
+
+         return spFile;
+      }
+      else
+      {
+         return nullptr;
+      }
+   }
+
+template <typename T, typename TApp> std::shared_ptr<T> IPhysicalModel::enableOneTimeAsciiFile(const std::string tag, 
+                                                                                           const std::string prefix, 
+                                                                                           const std::size_t id, 
+                                                                                           std::shared_ptr<TApp> spSim,
+                                                                                           std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
+   {
+      if(spSim->config().model(tag).at("enable"))
+      {
+         auto spFile = std::make_shared<T>(prefix, spSim->ss().tag(), pF);
+         spFile->expect(id);
+         if((spSim->config().model(tag).count("numbered") > 0) && spSim->config().model(tag).at("numbered"))
+         {
+            spFile->numberOutput();
+         }
+         if(spSim->config().model(tag).count("only_every") > 0)
+         {
+            spFile->onlyEvery(spSim->config().model(tag).at("only_every"));
+         }
+         spSim->addOneTimeAsciiOutputFile(spFile);
 
          return spFile;
       }

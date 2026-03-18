@@ -100,8 +100,15 @@ namespace QuICC {
       // Update heavy calculation required for ASCII output
       SimulationIoTools::updateHeavyAscii(this->mSimIoCtrl.beginAscii(), this->mSimIoCtrl.endAscii(), this->mPseudospectral.transformCoordinator());
 
+      // Update heavy calculation required for one-time ASCII output
+      SimulationIoTools::updateHeavyAscii(this->mSimIoCtrl.beginOneTimeAscii(), this->mSimIoCtrl.endOneTimeAscii(), this->mPseudospectral.transformCoordinator());
+
+
       // Write initial ASCII output
       this->mSimIoCtrl.writeAscii(this->mPseudospectral.time(), this->mPseudospectral.timestep());
+
+      // Write one-time ASCII output
+      this->mSimIoCtrl.writeOneTimeAscii(this->mPseudospectral.time(), this->mPseudospectral.timestep());
 
       stage.done();
       stage.start("write initial HDF5 files");

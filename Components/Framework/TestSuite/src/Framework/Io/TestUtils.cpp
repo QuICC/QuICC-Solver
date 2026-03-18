@@ -92,6 +92,12 @@ std::shared_ptr<StateGenerator> createRunner(std::shared_ptr<SpatialScheme::ISpa
       spRunner->addAsciiOutputFile(f);
    }
 
+   // Add one time ASCII output files
+   for(auto&& f: test.files)
+   {
+      spRunner->addOneTimeAsciiOutputFile(f);
+   }
+
    // Set the boundary conditions
    SharedSimulationBoundary spBcs = spRunner->createBoundary();
 

@@ -13,6 +13,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   Nusselt.cpp
   Luminosity.cpp
   Power.cpp
+  RadialProfiles.cpp
   Spectrum.cpp
   StateFile.cpp
   VariableHdf5.cpp

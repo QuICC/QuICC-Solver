@@ -273,6 +273,12 @@ void SimulationBase::addAsciiOutputFile(
    this->mSimIoCtrl.addAsciiOutputFile(spOutFile);
 }
 
+void SimulationBase::addOneTimeAsciiOutputFile(
+   Io::Variable::SharedIVariableAsciiWriter spOutFile)
+{
+   this->mSimIoCtrl.addOneTimeAsciiOutputFile(spOutFile);
+}
+
 void SimulationBase::addHdf5OutputFile(
    Io::Variable::SharedIVariableHdf5NWriter spOutFile)
 {
@@ -291,6 +297,32 @@ void SimulationBase::setupOutput()
    SimulationIoControl::ascii_iterator asciiIt;
    for (asciiIt = this->mSimIoCtrl.beginAscii();
         asciiIt != this->mSimIoCtrl.endAscii(); ++asciiIt)
+   {
+      // Loop over all scalars
+      for (auto scalIt = this->mPseudospectral.scalarVariables().begin();
+           scalIt != this->mPseudospectral.scalarVariables().end(); scalIt++)
+      {
+         (*asciiIt)->addScalar((*scalIt));
+      }
+
+      // Loop over all vector variables
+      for (auto vectIt = this->mPseudospectral.vectorVariables().begin();
+           vectIt != this->mPseudospectral.vectorVariables().end(); vectIt++)
+      {
+         (*asciiIt)->addVector((*vectIt));
+      }
+
+      // Set mesh
+      if ((*asciiIt)->space() == Dimensions::Space::PHYSICAL)
+      {
+         (*asciiIt)->setMesh(
+            this->mPseudospectral.transformCoordinator().mesh());
+      }
+   }
+
+   // Loop over all one-time ASCII files added to the simulation control
+   for (asciiIt = this->mSimIoCtrl.beginOneTimeAscii();
+        asciiIt != this->mSimIoCtrl.endOneTimeAscii(); ++asciiIt)
    {
       // Loop over all scalars
       for (auto scalIt = this->mPseudospectral.scalarVariables().begin();

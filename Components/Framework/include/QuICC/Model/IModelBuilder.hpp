@@ -63,6 +63,13 @@ namespace Model {
          virtual void addAsciiOutputFiles(std::shared_ptr<TSim> spSim) = 0;
 
          /**
+          * @brief Add the required onet-time ASCII output files
+          *
+          * @param spSim   Shared simulation object
+          */
+         virtual void addOneTimeAsciiOutputFiles(std::shared_ptr<TSim> spSim) {};
+
+         /**
           * @brief Add the required HDF5 output files
           *
           * @param spSim   Shared simulation object
