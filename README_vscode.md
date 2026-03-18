@@ -121,6 +121,12 @@ Specifically:
 
 ## Debug tricks
 
+
+### Kill hanging run
+
+Sometimes, you press the "run" button and VSCode hangs there. If there is the process bar in the "run and debug" panel, you can kill that process with Shift-F5 (Shift-fn-F5 on a Mac)
+
+
 ### Print variable values
 
 In the debug console, once a breakpoint is hit, the command `print` can be used to print variables values. 

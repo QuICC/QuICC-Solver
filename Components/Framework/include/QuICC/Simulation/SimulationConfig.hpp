@@ -98,6 +98,11 @@ public:
    std::map<std::string, std::size_t> boundary() const;
 
    /**
+    * @brief Get the map of stability fields read from the configuration file
+    */
+   std::map<std::string, std::size_t> stability() const;
+
+   /**
     * @brief Get the map of boundary conditions read from the configuration file
     */
    const std::map<std::string, int>& model(const std::string tag) const;

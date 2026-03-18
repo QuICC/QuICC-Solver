@@ -31,6 +31,7 @@
 #include "QuICC/PhysicalNames/Entropy.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/PhysicalNames/MassFlux.hpp"
+#include "QuICC/PhysicalNames/Undefined.hpp"
 #include "QuICC/QuICCTimer.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/SpatialScheme/Feature.hpp"
@@ -137,6 +138,8 @@ void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks,
    std::vector<MHDComplex>& evs, std::vector<std::vector<MHDComplex>>& efs,
    const Stability::Options& opt)
 {
+   // stability fields and components
+   auto stabilityConfig = this->getStabilityConfig();
    // Scaling options
    if (opt.scalingType > 0)
    {
@@ -157,7 +160,14 @@ void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks,
          for (auto fId: this->mspBackend->fieldIds())
          {
             std::vector<FieldComponents::Spectral::Id> comps;
-            if (fId == PhysicalNames::Velocity::id() ||
+            // pick the input field, if valid
+            if (fId == stabilityConfig.first)
+            {
+               comps = {stabilityConfig.second};
+            }
+            // otherwise: default behaviour
+            else if (fId == PhysicalNames::Velocity::id() ||
+                fId == PhysicalNames::MassFlux::id() ||
                 fId == PhysicalNames::Magnetic::id())
             {
                comps = {FieldComponents::Spectral::TOR,
@@ -172,6 +182,7 @@ void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks,
                throw std::logic_error(
                   "Unknown field for processing eigenfuction");
             }
+            
             for (auto cId: comps)
             {
                std::pair<int, MHDComplex> iFirst = {-1, 0};
@@ -264,6 +275,9 @@ void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks,
 void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
    const std::vector<MHDComplex>& ef)
 {
+   // stability fields and components
+   auto stabilityConfig = this->getStabilityConfig();
+
    auto&& ss = this->mspRes->sim().ss();
    if (!this->mpH5File)
    {
@@ -326,7 +340,8 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
    FieldComponents::Spectral::Id comp;
    if (this->mVectors.count(pId) > 0)
    {
-      comp = FieldComponents::Spectral::TOR;
+      //comp = FieldComponents::Spectral::TOR;
+      comp = stabilityConfig.second;
    }
    else
    {
@@ -545,9 +560,50 @@ void MarginalCurve::setOptions(Stability::Options& opt)
 
    // Scale eigenfunctions to have first coefficient real and positive
    opt.scalingType = 1;
-   opt.scalingRef = {
-      {PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR},
-      {PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL}};
+   // available field list
+   auto fieldList = this->mspBackend->fieldIds();
+   // input stability fields
+   auto stabilityConfig = this->getStabilityConfig();
+   std::size_t varStabilityId = stabilityConfig.first;
+   FieldComponents::Spectral::Id compStablityId = stabilityConfig.second;
+
+   std::size_t varId;
+
+   if (varStabilityId == PhysicalNames::Undefined::id())
+   {
+      // default behaviour
+      // pick the correct momentum variable (velocity or massflux) 
+      bool isVel   = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::Velocity::id()) != fieldList.end();
+      bool isMassF = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::MassFlux::id()) != fieldList.end();
+      // otherwise, pick magnetic
+      bool isMag   = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::Magnetic::id()) != fieldList.end();
+      
+      if(isVel && !isMassF) 
+      {
+         varId = PhysicalNames::Velocity::id();
+      } 
+      else if(!isVel && isMassF)
+      {
+         varId = PhysicalNames::MassFlux::id();
+      }
+      else if(isMag)
+      {
+         varId = PhysicalNames::Magnetic::id();
+      }
+      else
+      {
+         throw std::logic_error("Momentum variable not recognized");
+      }
+      opt.scalingRef = {
+         {varId, FieldComponents::Spectral::TOR},
+         {varId, FieldComponents::Spectral::POL}};
+   }
+   else
+   {
+      opt.scalingRef = {
+         {varStabilityId, compStablityId}};
+   }
+   
 }
 
 void MarginalCurve::computeSingleMode(
@@ -558,7 +614,7 @@ void MarginalCurve::computeSingleMode(
 
    auto spLinStab = std::make_shared<LinearStability>(eigs, this->mspRes,
       this->mspEqParams->map(), this->createBoundary()->map(), this->mspBackend,
-      opt);
+      opt, this->getStabilityConfig());
 
    std::vector<MHDComplex> evs(opt->nev);
    std::vector<std::vector<MHDComplex>> efs;
@@ -607,7 +663,7 @@ void MarginalCurve::findCriticalParameter(
 
    auto spLinStab = std::make_shared<LinearStability>(eigs, this->mspRes,
       this->mspEqParams->map(), this->createBoundary()->map(), this->mspBackend,
-      opt);
+      opt, this->getStabilityConfig());
 
    auto idc = NonDimensional::Rayleigh::id();
    auto name = NonDimensional::Coordinator::tag(idc);
@@ -666,7 +722,8 @@ void MarginalCurve::mainRun()
    }
 }
 
-void MarginalCurve::preRun() {}
+void MarginalCurve::preRun() {
+}
 
 void MarginalCurve::postRun() {}
 
