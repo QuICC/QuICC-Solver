@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Io/Variable/ISphericalRadialProfilesWriter.hpp"
+#include "QuICC/Io/Variable/IVariableAsciiWriter.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "QuICC/Polynomial/Quadrature/ChebyshevRule.hpp"
 
