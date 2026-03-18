@@ -1,5 +1,5 @@
 /**
- * @file ShellRadialProfilesWriter.cpp
+ * @file ISphericalRadialProfilesWriter.cpp
  * @brief Source of the implementation of the ASCII Radial Profiles in a spherical shell
  */
 
@@ -12,11 +12,9 @@
 
 // Project includes
 //
-#include "QuICC/Io/Variable/ShellRadialProfilesWriter.hpp"
+#include "QuICC/Io/Variable/ISphericalRadialProfilesWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
-#include "QuICC/NonDimensional/Upper1d.hpp"
-#include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/RadialProfiles.hpp"
 
@@ -26,17 +24,17 @@ namespace Io {
 
 namespace Variable {
 
-   ShellRadialProfilesWriter::ShellRadialProfilesWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
+   ISphericalRadialProfilesWriter::ISphericalRadialProfilesWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
       : IVariableAsciiWriter(prefix + Tags::RadialProfiles::BASENAME, Tags::RadialProfiles::EXTENSION, prefix + Tags::RadialProfiles::HEADER, type, Tags::RadialProfiles::VERSION, Dimensions::Space::SPECTRAL, OVERWRITE), mPF(std::move(pF))
    {
-      assert(this->mPF.size() >= 1 && "ShellRadialProfilesWriter requires at least 1 element in pF vector");
+      assert(this->mPF.size() >= 1 && "ISphericalRadialProfilesWriter requires at least 1 element in pF vector");
    }
 
-   ShellRadialProfilesWriter::~ShellRadialProfilesWriter()
+   ISphericalRadialProfilesWriter::~ISphericalRadialProfilesWriter()
    {
    }
 
-   void ShellRadialProfilesWriter::init()
+   void ISphericalRadialProfilesWriter::init()
    {
       int tmpSize = 2 * this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
       auto ro = this->mPhysical.find(NonDimensional::Upper1d::id())->second->value();
@@ -51,7 +49,7 @@ namespace Variable {
       IVariableAsciiWriter::init();
    }
 
-   void ShellRadialProfilesWriter::writeContent()
+   void ISphericalRadialProfilesWriter::writeContent()
    {
       this->mProfiles.resize(this->mGrid.size(), this->mPF.size());
       for(int i = 0; i < static_cast<int>(this->mPF.size()); i++)
@@ -102,7 +100,7 @@ namespace Variable {
       // Close file
       this->postWrite();
 
-      // Abort if profile is NaN
+      // Abort if kinetic energy is NaN
       if(std::isnan(rProfiles.sum()))
       {
          QuICCEnv().abort("Some spherical Radial Profiles are NaN!");

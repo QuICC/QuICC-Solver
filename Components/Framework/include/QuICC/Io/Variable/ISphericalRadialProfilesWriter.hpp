@@ -1,10 +1,10 @@
 /** 
- * @file ShellRadialProfilesWriter.hpp
+ * @file ISphericalRadialProfilesWriter.hpp
  * @brief Implementation of the Radial Profiles in a spherical shell
  */
 
-#ifndef QUICC_IO_VARIABLE_SHELLRADIALPROFILESWRITER_HPP
-#define QUICC_IO_VARIABLE_SHELLRADIALPROFILESWRITER_HPP
+#ifndef QUICC_IO_VARIABLE_ISPHERICALRADIALPROFILESWRITER_HPP
+#define QUICC_IO_VARIABLE_ISPHERICALRADIALPROFILESWRITER_HPP
 
 // System includes
 //
@@ -12,10 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Io/Variable/ISphericalRadialProfilesWriter.hpp"
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
-#include "QuICC/Polynomial/Quadrature/ChebyshevRule.hpp"
-
+#include "QuICC/Io/Variable/IVariableAsciiWriter.hpp"
 
 namespace QuICC {
 
@@ -26,7 +23,7 @@ namespace Variable {
    /**
     * @brief Implementation of the Radial Profiles in a spherical shell
     */
-   class ShellRadialProfilesWriter: public IVariableAsciiWriter
+   class ISphericalRadialProfilesWriter: public IVariableAsciiWriter
    {
       public:
          /**
@@ -35,14 +32,14 @@ namespace Variable {
           * @param prefix Prefix to use for file name
           * @param type Type of the file (typically scheme name)
           */
-         ShellRadialProfilesWriter(const std::string& prefix, 
+         ISphericalRadialProfilesWriter(const std::string& prefix, 
                                const std::string& type, 
                                std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF);
 
          /**
           * @brief Destructor
           */
-         virtual ~ShellRadialProfilesWriter();
+         virtual ~ISphericalRadialProfilesWriter();
 
          /**
           * @brief Initialise the operator, transform and file
@@ -79,9 +76,9 @@ namespace Variable {
    };
 
    /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef std::shared_ptr<ShellRadialProfilesWriter> SharedShellRadialProfilesWriter;
+   typedef std::shared_ptr<ISphericalRadialProfilesWriter> SharedISphericalRadialProfilesWriter;
 
-   inline bool ShellRadialProfilesWriter::isHeavy() const
+   inline bool ISphericalRadialProfilesWriter::isHeavy() const
    {
       return false;
    }
@@ -90,4 +87,4 @@ namespace Variable {
 }
 }
 
-#endif // QUICC_IO_VARIABLE_SHELLRADIALPROFILESWRITER_HPP
+#endif // QUICC_IO_VARIABLE_ISPHERICALRADIALPROFILESWRITER_HPP
