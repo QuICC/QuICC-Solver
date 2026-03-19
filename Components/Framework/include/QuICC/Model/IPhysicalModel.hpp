@@ -73,6 +73,11 @@ namespace Model {
          virtual void configure(const std::set<SpatialScheme::Feature>& f);
 
          /**
+          * @brief List of excluded field IDs (example: recomputed fields)
+          */
+         virtual std::vector<std::size_t> excludedFieldIds() const;
+
+         /**
           * @brief Add extra field IDs (example: imposed fields)
           */
          virtual std::vector<std::size_t> extraFieldIds() const;

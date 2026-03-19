@@ -34,14 +34,14 @@ public:
     * @param p    Length of incomplete orthogonalization
     * @param tol  Tolerance for subspace convergence
     */
-   IomKrylov(std::unique_ptr<TAfunc>&& a, const int p, const double tol);
+   IomKrylov(std::shared_ptr<TAfunc>& a, const int p, const double tol);
 
    /**
     * @brief ctor
     *
     * @param a Functor for action of A matrix
     */
-   IomKrylov(std::unique_ptr<TAfunc>&& a);
+   IomKrylov(std::shared_ptr<TAfunc>& a);
 
    /**
     * @brief dtor
@@ -78,16 +78,16 @@ private:
    /*
     * @brief Functor for action of A matrix
     */
-   std::unique_ptr<TAfunc> mpAfunc;
+   std::shared_ptr<TAfunc> mpAfunc;
 };
 
 template <typename TAfunc>
-IomKrylov<TAfunc>::IomKrylov(std::unique_ptr<TAfunc>&& a, const int p, const double tol) :
-    mcP(p), mcTol(tol), mpAfunc(std::move(a))
+IomKrylov<TAfunc>::IomKrylov(std::shared_ptr<TAfunc>& a, const int p, const double tol) :
+    mcP(p), mcTol(tol), mpAfunc(a)
 {}
 
 template <typename TAfunc>
-IomKrylov<TAfunc>::IomKrylov(std::unique_ptr<TAfunc>&& a) : IomKrylov(std::move(a), 2, 1e-12)
+IomKrylov<TAfunc>::IomKrylov(std::shared_ptr<TAfunc>& a) : IomKrylov(std::move(a), 2, 1e-12)
 {}
 
 template <typename TAfunc>
@@ -97,7 +97,6 @@ int IomKrylov<TAfunc>::compute(Matrix& matV, Matrix& matH,
    // Check H is big enough
    assert(matH.rows() == matH.cols());
    assert(matH.rows() >= m+1);
-   assert(jIn < m);
 
    auto&& A = *this->mpAfunc;
 

@@ -9,12 +9,10 @@
 // Project includes
 //
 #include "QuICC/Timestep/Coordinator.hpp"
-#include "QuICC/Tools/Formatter.hpp"
-#include "Profiler/Interface.hpp"
-#include "QuICC/Debug/DebuggerMacro.h"
 #include "Timestep/RungeKuttaCB/Factory.hpp"
 #include "Timestep/PredictorCorrector/Factory.hpp"
 #include "Timestep/PredictorCorrector/FactoryViews.hpp"
+#include "Timestep/Exponential/Factory.hpp"
 
 namespace QuICC {
 
@@ -78,6 +76,12 @@ namespace Timestep {
       if(!this->mpImpl)
       {
          this->mpImpl = PredictorCorrector::makeInterface(schemeId, time, cfl, maxError, scalEq, vectEq, pseudo);
+      }
+
+      // Try Exponential schemes
+      if(!this->mpImpl)
+      {
+         this->mpImpl = Exponential::makeInterface(schemeId, time, cfl, maxError, scalEq, vectEq, pseudo);
       }
 
       // No interface was created

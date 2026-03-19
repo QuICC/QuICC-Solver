@@ -17,6 +17,10 @@ namespace Timestep {
 
 namespace Exponential {
 
+ExpEuler::ExpEuler()
+{
+}
+
 // Scheme requires 1 substep
 int ExpEuler::steps() const
 {

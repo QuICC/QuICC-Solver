@@ -129,9 +129,14 @@ namespace Model {
       auto spInit = std::make_shared<Io::Variable::StateFileReader>("_initial", spSim->ss().tag(), spSim->ss().has(SpatialScheme::Feature::RegularSpectrum));
 
       // Set expected field names
+      auto excluded = this->excludedFieldIds();
       for(auto it = ids.cbegin(); it != ids.cend(); ++it)
       {
-         spInit->expect(*it);
+         auto foundIt = std::find(excluded.begin(), excluded.end(), *it);
+         if(excluded.size() == 0 || foundIt == excluded.end())
+         {
+            spInit->expect(*it);
+         }
       }
 
       // Add extra field names

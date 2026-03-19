@@ -9,9 +9,11 @@
 // System includes
 //
 #include <memory>
+#include <map>
 
 // Project includes
 //
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -27,6 +29,9 @@ namespace Exponential {
       std::size_t rows;
       std::size_t cols;
       std::size_t blockN;
+      std::size_t matStart;
+      std::vector<std::size_t> matIds;
+      std::map<std::size_t, std::map<std::size_t, std::pair<int, DecoupledZSparse>>> ops;
    };
 
 } // Exponential

@@ -25,6 +25,7 @@
 #include "QuICC/Timestep/Id/Coordinator.hpp"
 #include "QuICC/Timestep/Id/registerAllPc.hpp"
 #include "QuICC/Timestep/Id/registerAllRkcb.hpp"
+#include "QuICC/Timestep/Id/registerAllExp.hpp"
 #include "QuICC/Transform/Setup/registerAll.hpp"
 
 namespace QuICC {
@@ -383,6 +384,7 @@ std::size_t SimulationConfig::timestepper() const
    // Register all timestepper IDs
    Timestep::Id::registerAllPc();
    Timestep::Id::registerAllRkcb();
+   Timestep::Id::registerAllExp();
 
    std::size_t id = 0;
    for (auto&& e: Timestep::Id::Coordinator::map())

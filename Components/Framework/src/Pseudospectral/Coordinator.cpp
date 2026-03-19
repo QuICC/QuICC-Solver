@@ -222,6 +222,29 @@ void Coordinator::evolveBefore(const int curJ)
    this->solveEquationsBefore(curJ);
 }
 
+void Coordinator::evolveBefore(const int curJ, std::shared_ptr<ExplicitPrognosticFunctor> exFunc)
+{
+   // Compute explicit linear terms
+   DebuggerMacro_msg("Explicit equations", 4);
+   this->explicitEquations(curJ, exFunc);
+
+   QuICCTimer().stop();
+   QuICCTimer().update(ExecutionTimer::RUN);
+   QuICCTimer().start();
+
+   // Compute the nonlinear terms
+   DebuggerMacro_msg("Transform loop", 4);
+   this->computeNonlinear(curJ);
+
+   QuICCTimer().stop();
+   QuICCTimer().update(ExecutionTimer::NONLINEAR);
+   QuICCTimer().update(ExecutionTimer::RUN);
+   QuICCTimer().start();
+
+   // Solve equations before prognostic
+   this->solveEquationsBefore(curJ);
+}
+
 void Coordinator::evolveEndIteration(const int tIt)
 {
    // Solve equations after prognostic
@@ -235,12 +258,17 @@ void Coordinator::evolveEndIteration(const int tIt)
 
 void Coordinator::evolveAfterPrognostic(const bool finishedStep)
 {
-   auto tIt = *this->it().rbegin();
+   this->evolveAfterPrognostic(this->it(), finishedStep);
+}
+
+void Coordinator::evolveAfterPrognostic(const std::set<int>& itIds, const bool finishedStep)
+{
+   auto tIt = *itIds.rbegin();
 
    this->evolveEndIteration(tIt);
 
    // Update the equations
-   for (auto j: this->it())
+   for (auto j: itIds)
    {
       DebuggerMacro_msg("Update equations", 4);
       this->updateEquations(j, finishedStep);
@@ -250,7 +278,7 @@ void Coordinator::evolveAfterPrognostic(const bool finishedStep)
 void Coordinator::evolveUntilPrognostic(const bool finishedStep)
 {
    // Update equation time
-   this->updateEquationTime(this->time(), finishedStep);
+   this->updateEquationTime(this->it(), this->time(), finishedStep);
 
    // Loop over sub-steps
    for (auto j: this->it())
@@ -267,6 +295,36 @@ void Coordinator::evolveUntilPrognostic(const bool finishedStep)
             "Pseudospectral::Coordinator::solveEquations-prognostic");
          this->explicitPrognosticEquations(
             ModelOperator::ExplicitNonlinear::id(), j);
+         Profiler::RegionStop<2>(
+            "Pseudospectral::Coordinator::solveEquations-prognostic");
+         break;
+      }
+
+      // End iteration
+      this->evolveEndIteration(j);
+   }
+}
+
+void Coordinator::evolveUntilPrognostic(const std::set<int>& itIds, const bool finishedStep, std::shared_ptr<ExplicitPrognosticFunctor> exFunc)
+{
+   // Update equation time
+   this->updateEquationTime(itIds, this->time(), finishedStep);
+
+   // Loop over sub-steps
+   for (auto j: itIds)
+   {
+      DebuggerMacro_showValue("Equation sub-iteration ", 3, j);
+
+      // Evolve before prognostic
+      this->evolveBefore(j, exFunc);
+
+      if (this->hasPrognostic(j))
+      {
+         // Solve prognostic equations (timestep)
+         Profiler::RegionStart<2>(
+            "Pseudospectral::Coordinator::solveEquations-prognostic");
+         this->explicitPrognosticEquations(
+            ModelOperator::ExplicitNonlinear::id(), j, exFunc);
          Profiler::RegionStop<2>(
             "Pseudospectral::Coordinator::solveEquations-prognostic");
          break;
@@ -485,7 +543,7 @@ void Coordinator::useStateTime(const MHDFloat time, const MHDFloat timestep)
 void Coordinator::prepareEvolution(const std::size_t schemeId)
 {
    // Update equation time
-   this->updateEquationTime(this->mDiagnostics.startTime(), false);
+   this->updateEquationTime(this->it(), this->mDiagnostics.startTime(), false);
 
    // Update CFL condition
    this->mDiagnostics.initialCfl();
@@ -646,9 +704,9 @@ void Coordinator::initSolvers()
    stage.done();
 }
 
-void Coordinator::updateEquationTime(const MHDFloat time, const bool finished)
+void Coordinator::updateEquationTime(const std::set<int>& itIds, const MHDFloat time, const bool finished)
 {
-   for (auto j: this->it())
+   for (auto j: itIds)
    {
       // Loop over all scalar equations
       assert(this->mScalarEquations.count(j) == 1);
@@ -787,6 +845,20 @@ void Coordinator::explicitPrognosticEquations(const std::size_t opId,
    this->explicitPrognosticEquations(opId, sP, vP);
 }
 
+void Coordinator::explicitPrognosticEquations(const std::size_t opId,
+   const int it, std::shared_ptr<ExplicitPrognosticFunctor> exFunc)
+{
+   auto sP = this->scalarRange(PseudospectralTag::Prognostic::id(), it);
+   auto vP = this->vectorRange(PseudospectralTag::Prognostic::id(), it);
+   if (this->atLeastOne(sP, vP))
+   {
+      DebuggerMacro_msg("Explicit term for prognostic equations for operator " +
+                           ModelOperator::Coordinator::tag(opId),
+         5);
+      (*exFunc)(opId, sP, vP, this->mScalarVariables, this->mVectorVariables);
+   }
+}
+
 void Coordinator::solveTrivialEquations(const std::size_t timeId,
    ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)
 {
@@ -881,6 +953,33 @@ void Coordinator::explicitEquations(const int it)
    Profiler::RegionStart<2>(
       "Pseudospectral::Coordinator::explicitEquations-prognostic");
    this->explicitPrognosticEquations(ModelOperator::ExplicitLinear::id(), it);
+   Profiler::RegionStop<2>(
+      "Pseudospectral::Coordinator::explicitEquations-prognostic");
+}
+
+void Coordinator::explicitEquations(const int it, std::shared_ptr<ExplicitPrognosticFunctor> exFunc)
+{
+   Profiler::RegionFixture<1> fix(
+      "Pseudospectral::Coordinator::explicitEquations");
+
+   // Explicit trivial equations
+   Profiler::RegionStart<2>(
+      "Pseudospectral::Coordinator::explicitEquations-trivial");
+   this->explicitTrivialEquations(ModelOperator::ExplicitLinear::id(), it);
+   Profiler::RegionStop<2>(
+      "Pseudospectral::Coordinator::explicitEquations-trivial");
+
+   // Explicit diagnostic equations
+   Profiler::RegionStart<2>(
+      "Pseudospectral::Coordinator::explicitEquations-diagnostic");
+   this->explicitDiagnosticEquations(ModelOperator::ExplicitLinear::id(), it);
+   Profiler::RegionStop<2>(
+      "Pseudospectral::Coordinator::explicitEquations-diagnostic");
+
+   // Explicit prognostic equations
+   Profiler::RegionStart<2>(
+      "Pseudospectral::Coordinator::explicitEquations-prognostic");
+   this->explicitPrognosticEquations(ModelOperator::ExplicitLinear::id(), it, exFunc);
    Profiler::RegionStop<2>(
       "Pseudospectral::Coordinator::explicitEquations-prognostic");
 }
@@ -1114,6 +1213,8 @@ void Coordinator::sortEquations()
       Equations::Tools::sortByType(this->mScalarEquations.at(j), sP, sD, sT,
          sW);
 
+      std::cerr << "WARNING CHECK DISABLED FOR GETTING EXPONENTIAL TIMESTEPPER TO WORK" << std::endl;
+#if 0
       // Current implementation ony works if prognostic equations are in last
       // iteration
       if (j != *this->it().rbegin() && std::distance(sP.first, sP.second) > 0)
@@ -1122,6 +1223,7 @@ void Coordinator::sortEquations()
             "Current implementation requires scalar Prognostic equations to be "
             "in last sub-iteration");
       }
+#endif
 
       // Add to map
       this->addToMap(PseudospectralTag::Prognostic::id(), j, sP);
@@ -1138,6 +1240,8 @@ void Coordinator::sortEquations()
       Equations::Tools::sortByType(this->mVectorEquations.at(j), vP, vD, vT,
          vW);
 
+      std::cerr << "WARNING CHECK DISABLED FOR GETTING EXPONENTIAL TIMESTEPPER TO WORK" << std::endl;
+#if 0
       // Current implementation ony works if prognostic equations are in last
       // iteration
       if (j != *this->it().rbegin() && std::distance(vP.first, vP.second) > 0)
@@ -1146,6 +1250,7 @@ void Coordinator::sortEquations()
             "Current implementation requires vector Prognostic equations to be "
             "in last sub-iteration");
       }
+#endif
 
       // Add to map
       this->addToMap(PseudospectralTag::Prognostic::id(), j, vP);
@@ -1204,5 +1309,6 @@ void Coordinator::profileStorage() const
    this->mTransformCoordinator.profileStorage();
 #endif // QUICC_STORAGEPROFILE
 }
+
 } // namespace Pseudospectral
 } // namespace QuICC

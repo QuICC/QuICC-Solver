@@ -45,6 +45,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
     QuICC::TimestepPc
     QuICC::TimestepPcViews
     QuICC::TimestepRkcb
+    QuICC::TimestepExp
     QuICC::DenseSM
 )
 

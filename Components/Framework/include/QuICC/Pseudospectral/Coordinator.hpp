@@ -44,6 +44,23 @@ struct GraphOptions
    int groupingSize = 1;
 };
 
+class ExplicitPrognosticFunctor
+{
+   public:
+      typedef std::pair<std::vector<std::shared_ptr<Equations::IScalarEquation>>::iterator, std::vector<std::shared_ptr<Equations::IScalarEquation>>::iterator> ScalarEquation_range;
+      typedef std::pair<std::vector<std::shared_ptr<Equations::IVectorEquation>>::iterator, std::vector<std::shared_ptr<Equations::IVectorEquation>>::iterator> VectorEquation_range;
+      /// Typedef for a shared scalar variable map
+      typedef std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable> ScalarVariable_map;
+
+      /// Typedef for a shared vector variable map
+      typedef std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable> VectorVariable_map;
+
+      ExplicitPrognosticFunctor() = default;
+      virtual ~ExplicitPrognosticFunctor() = default;
+      virtual void operator()(const std::size_t opId, const ScalarEquation_range& scalarEq_range, const VectorEquation_range& vectorEq_range, ScalarVariable_map& scalVar, VectorVariable_map& vectVar) = 0;
+   protected:
+};
+
 /**
  * @brief Constructor
  */
@@ -157,15 +174,23 @@ public:
 
    /**
     * @brief Evolve pseudospectral equations
-    *
-    * @param it Current iteration
     */
    virtual void evolveUntilPrognostic(const bool finishedStep);
 
    /**
     * @brief Evolve pseudospectral equations
     */
+   virtual void evolveUntilPrognostic(const std::set<int>& itIds, const bool finishedStep, std::shared_ptr<ExplicitPrognosticFunctor> exFunc);
+
+   /**
+    * @brief Evolve pseudospectral equations
+    */
    virtual void evolveAfterPrognostic(const bool finishedStep);
+
+   /**
+    * @brief Evolve pseudospectral equations
+    */
+   virtual void evolveAfterPrognostic(const std::set<int>& itIds, const bool finishedStep);
 
    /**
     * @brief Add scalar equation to solver
@@ -365,6 +390,13 @@ public:
    void explicitEquations(const int it);
 
    /**
+    * @brief Explicit linear term for all equations
+    *
+    * @param it   Iteration index
+    */
+   void explicitEquations(const int it, std::shared_ptr<ExplicitPrognosticFunctor> exFunc);
+
+   /**
     * @brief Prepare time evolution
     *
     * @param schemeId ID of timestepping scheme
@@ -401,7 +433,7 @@ public:
    /**
     * @brief Update the time stored in each equation
     */
-   void updateEquationTime(const MHDFloat time, const bool finished);
+   void updateEquationTime(const std::set<int>& itIds, const MHDFloat time, const bool finished);
 
    /**
     * @brief Explicit linear for the prognostic equations
@@ -415,6 +447,13 @@ public:
     * @param it   Iteration index
     */
    void explicitPrognosticEquations(const std::size_t opId, const int it);
+
+   /**
+    * @brief Explicit linear for the prognostic equations
+    *
+    * @param it   Iteration index
+    */
+   void explicitPrognosticEquations(const std::size_t opId, const int it, std::shared_ptr<ExplicitPrognosticFunctor> exFunc);
 
    /**
     * @brief Timestep the prognostic equations
@@ -447,17 +486,6 @@ public:
     */
    void writeDiagnostics(const bool isAsciiTime, const bool isHdf5Time) const;
 
-protected:
-   /// Typedef for map of equations indexed by type ID and iteration index
-   template <typename TEquation>
-   using EquationTypeMapType = std::map<std::pair<std::size_t, int>,
-      std::vector<std::shared_ptr<TEquation>>>;
-
-   /// Typedef for map of equations indexed by iteration
-   template <typename TEquation>
-   using EquationIterMapType =
-      std::map<int, std::vector<std::shared_ptr<TEquation>>>;
-
    /**
     * @brief Get scalar equation range
     *
@@ -474,8 +502,19 @@ protected:
     */
    VectorEquation_range vectorRange(const std::size_t eqId, const int it);
 
+protected:
+   /// Typedef for map of equations indexed by type ID and iteration index
+   template <typename TEquation>
+   using EquationTypeMapType = std::map<std::pair<std::size_t, int>,
+      std::vector<std::shared_ptr<TEquation>>>;
+
+   /// Typedef for map of equations indexed by iteration
+   template <typename TEquation>
+   using EquationIterMapType =
+      std::map<int, std::vector<std::shared_ptr<TEquation>>>;
+
    /**
-    * @brief Get scalar equation range
+    * @brief Get scalar equation
     *
     * @param eqId Equation ID
     * @param it   Iteration index
@@ -484,7 +523,7 @@ protected:
       const int i = 0);
 
    /**
-    * @brief Get vector equation range
+    * @brief Get vector equation
     *
     * @param eqId Equation ID
     * @param it   Iteration index
@@ -503,6 +542,13 @@ protected:
     * @param it Current iteration
     */
    void evolveBefore(const int it);
+
+   /**
+    * @brief Evolve pseudospectral equations
+    *
+    * @param it Current iteration
+    */
+   void evolveBefore(const int it, std::shared_ptr<ExplicitPrognosticFunctor> exFunc);
 
    /**
     * @brief Evolve pseudospectral equations

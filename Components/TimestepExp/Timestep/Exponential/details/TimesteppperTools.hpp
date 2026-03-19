@@ -65,6 +65,36 @@ void computeSet(TData& z, const MHDFloat a, const TData& y);
  */
 void computeSet(DecoupledZMatrix& z, const MHDFloat a,
    const DecoupledZMatrix& y);
+
+/**
+ * @brief Flatten data y_2n = x_n.re, y_2n+1 = x_n.im
+ */
+template <typename TData> void flatten2Real(Matrix& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow, const std::size_t col);
+
+/**
+ * @brief Unflatten data y_n = x_2n + x_2n+1 * j
+ */
+void unflatten2Complex(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const Matrix& x, const std::size_t startRow, const std::size_t col);
+
+/**
+ * @brief Compute y = a*x + y
+ */
+void computeAXPY(Matrix& y, const MHDFloat a, const Matrix& x);
+
+/**
+ * @brief Compute y = a*x + y
+ */
+void flattenAXPY(Matrix& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow, const std::size_t col);
+
+/**
+ * @brief Apply correction from tuple
+ */
+void addCorrection(Matrix& rVal, const std::vector<std::tuple<MHDComplex,int,int>>& corr, const int rows, const int cols, const std::size_t startRow, const std::size_t col);
+
+/**
+ * @brief Add (scaled) real part of decoupled storage to sparse matrix
+ */
+void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat);
 //
 //
 //
@@ -158,6 +188,133 @@ inline void computeSet(DecoupledZMatrix& y, const MHDFloat a,
    y.real() = a * x.real();
 
    y.imag() = a * x.imag();
+}
+
+inline void flatten2Real(Matrix& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow, const std::size_t col)
+{
+   assert(static_cast<std::size_t>(y.cols()) > col);
+   assert(static_cast<std::size_t>(y.rows()) >= 2*x.dims()[0]*x.dims()[1] + startRow);
+
+   size_t kRe = startRow;
+   size_t kIm = kRe + x.dims()[1]*x.dims()[0];
+   for(std::size_t j = 0;  j < x.dims()[1]; j++)
+   {
+      for(std::size_t i = 0;  i < x.dims()[0]; i++)
+      {
+         const MHDComplex& z = x(i,j);
+         y(kRe, col) = z.real();
+         y(kIm, col) = z.imag();
+         kRe++;
+         kIm++;
+      }
+   }
+}
+
+inline void unflatten2Complex(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const Matrix& x, const std::size_t startRow, const std::size_t col)
+{
+   assert(static_cast<std::size_t>(x.cols()) > col);
+   assert(static_cast<std::size_t>(x.rows()) >= 2*y.dims()[0]*y.dims()[1] + startRow);
+
+   size_t kRe = startRow;
+   size_t kIm = kRe + y.dims()[1]*y.dims()[0];
+   for(std::size_t j = 0;  j < y.dims()[1]; j++)
+   {
+      for(std::size_t i = 0;  i < y.dims()[0]; i++)
+      {
+         MHDComplex z(x(kRe,col), x(kIm,col));
+         y(i,j) = z;
+         kRe++;
+         kIm++;
+      }
+   }
+}
+
+inline void computeAXPY(Matrix& y, const MHDFloat a, const Matrix& x)
+{
+   assert(x.rows() == y.rows());
+   assert(x.cols() == y.cols());
+
+   if(a != 0)
+   {
+      if(a == 1.0)
+      {
+         y += x;
+      }
+      else
+      {
+         y += a*x;
+      }
+   }
+}
+
+inline void flattenAXPY(Matrix& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow,  const std::size_t col)
+{
+   assert(static_cast<std::size_t>(y.cols()) > col);
+   assert(static_cast<std::size_t>(y.rows()) >= 2*x.dims()[0]*x.dims()[1] + startRow);
+
+   if(a != 0)
+   {
+      size_t kRe = startRow;
+      size_t kIm = kRe + x.dims()[1]*x.dims()[0];
+      if(a == 1.0)
+      {
+         for(std::size_t j = 0;  j < x.dims()[1]; j++)
+         {
+            for(std::size_t i = 0;  i < x.dims()[0]; i++)
+            {
+               const MHDComplex& z = x(i,j);
+               y(kRe, col) += z.real();
+               y(kIm, col) += z.imag();
+               kRe++;
+               kIm++;
+            }
+         }
+      }
+      else
+      {
+         for(std::size_t j = 0;  j < x.dims()[1]; j++)
+         {
+            for(std::size_t i = 0;  i < x.dims()[0]; i++)
+            {
+               const MHDComplex& z = a*x(i,j);
+               y(kRe, col) += z.real();
+               y(kIm, col) += z.imag();
+               kRe++;
+               kIm++;
+            }
+         }
+      }
+   }
+}
+
+inline void addCorrection(Matrix& rVal, const std::vector<std::tuple<MHDComplex,int,int>>& corr, const int rows, const int cols, const std::size_t startRow, const std::size_t col)
+{
+   for(auto&& c: corr)
+   {
+      auto&& val = std::get<0>(c);
+      auto&& i = std::get<1>(c);
+      auto&& j = std::get<2>(c);
+      std::size_t kRe = startRow + (i + j*rows);
+      std::size_t kIm = kRe + rows*cols;
+
+      rVal(kRe, col) += val.real();
+      rVal(kIm, col) += val.imag();
+   }
+}
+
+inline void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat)
+{
+   assert(decMat.real().rows() > 0);
+   assert(decMat.real().cols() > 0);
+   assert(decMat.imag().size() == 0 || decMat.imag().nonZeros() == 0);
+
+   if(c != 1.0)
+   {
+      mat += c*decMat.real();
+   } else
+   {
+      mat += decMat.real();
+   }
 }
 
 } // namespace details

@@ -16,36 +16,32 @@
 #include "Memory/MemoryResource.hpp"
 #include "Profiler/Interface.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
-#include "QuICC/Equations/CopyUnknown.hpp"
-#include "QuICC/ModelOperator/QuasiInverse.hpp"
-#include "QuICC/ModelOperator/SplitQuasiInverse.hpp"
-#include "QuICC/Equations/CorrectSolution.hpp"
-#include "QuICC/Equations/CouplingInformation.hpp"
-#include "QuICC/Equations/AddSource.hpp"
-#include "QuICC/Equations/SetBoundaryValue.hpp"
-#include "QuICC/Equations/CopyNonlinear.hpp"
+#include "QuICC/PhysicalNames/JacobianMagnetic.hpp"
+#include "QuICC/PhysicalNames/JacobianTemperature.hpp"
+#include "QuICC/PhysicalNames/JacobianVelocity.hpp"
+#include "QuICC/PhysicalNames/Magnetic.hpp"
+#include "QuICC/PhysicalNames/Temperature.hpp"
+#include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/Pseudospectral/Coordinator.hpp"
-#include "QuICC/SolveTiming/Prognostic.hpp"
-#include "QuICC/Timestep/Constants.hpp"
+#include "QuICC/PseudospectralTag/Prognostic.hpp"
+#include "QuICC/Register/Rhs.hpp"
+#include "QuICC/Register/Solution.hpp"
+#include "QuICC/Register/Temporary.hpp"
 #include "QuICC/Timestep/IScheme.hpp"
 #include "QuICC/Timestep/Interface.hpp"
 #include "Timestep/Exponential/TimestepperInfo.hpp"
 #include "Timestep/Exponential/TimestepperCoordinator.hpp"
-#include "Timestep/Exponential/details/TimesteppperTools.hpp"
-#include "QuICC/Tools/Formatter.hpp"
-#include "View/ViewDense.hpp"
-#include "Memory/Memory.hpp"
+#include "Timestep/Exponential/EpirkTimestepper.hpp"
+#include "Timestep/Exponential/InterfaceFunctors.hpp"
+#include "Timestep/Exponential/AugmentedJacobianFunctor.hpp"
+#include "Timestep/Exponential/Functors/CallExplicitPrognosticFunctor.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
-
-#define QUICC_DETAIL_PROF_LVL 3
 
 namespace QuICC {
 
 namespace Timestep {
 
 namespace Exponential {
-
-   template <typename T2, typename T1, typename T3> class DummyImpl;
 
 /**
  * @brief Implementation of general interface structure for exponential schemes
@@ -56,7 +52,7 @@ public:
    /// Typedef for solver implementation
    template <typename T1, typename T2, typename T3>
    using SolverImplementationType =
-      DummyImpl<T1, T2, T3>;
+      EpirkTimestepper<T1, T2, T3>;
 
    /// Typedef for parent coordinator
    typedef TimestepperCoordinator<SolverImplementationType, base_t>
@@ -78,11 +74,6 @@ public:
     * @brief Destructor
     */
    virtual ~Interface() = default;
-
-   /**
-    * @brief Timestep is finished?
-    */
-   bool finishedStep() const final;
 
    /**
     * @brief Update equation explicit linear input to solver
@@ -130,6 +121,11 @@ protected:
    using Timestep::Interface::printInfo;
 
    /**
+    * @brief Initialize functors
+    */
+   void initFunctors();
+
+   /**
     * @brief Initialize solution
     *
     * @param scalEq Scalar equations
@@ -164,6 +160,8 @@ protected:
       const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
 private:
+   std::set<int>  mBaseItIds;
+
    /**
     * @brief Interface to timestepping scheme
     */
@@ -178,33 +176,26 @@ private:
     * @brief
     */
    std::shared_ptr<Memory::memory_resource> _mem;
+
+   /**
+    * @brief Shared field ID to solver field id
+    */
+   std::shared_ptr<std::map<SpectralFieldId, std::size_t>> mpFieldIdMap;
+
+   /**
+    * @brief Shared Jacobian functor
+    */
+   std::shared_ptr<AugmentedJacobianFunctor> mpJac;
+
+   using TSFunctor = GetStepperFunctor<SolverCoordinator>;
+   std::shared_ptr<TSFunctor> mpTsFunc;
 };
-
-/**
- * @brief Compute flat timestepper index
- */
-std::size_t stepperIndex(const std::size_t solverIndex, const std::size_t sysIndex);
-
-TimestepperInfo createInfo(const Equations::CouplingInformation& cinfo);
-
-inline TimestepperInfo createInfo(const Equations::CouplingInformation& cinfo, const std::size_t idx)
-{
-   TimestepperInfo info;
-   info.isComplex = cinfo.isComplex();
-   info.fieldIndex = cinfo.fieldIndex();
-   info.solverIndex = stepperIndex(cinfo.solverIndex(), idx);
-   info.rows = cinfo.systemN(idx);
-   info.cols = cinfo.rhsCols(idx);
-   info.blockN = cinfo.galerkinN(idx);
-
-   return info;
-}
 
 template <typename TScheme>
 Interface<TScheme>::Interface(const MHDFloat time, const Matrix& cfl,
    const MHDFloat maxError, const ScalarEquation_range& scalEq,
    const VectorEquation_range& vectEq, Pseudospectral::Coordinator& pseudo) :
-    Timestep::Interface(time, cfl, maxError, scalEq, vectEq, pseudo)
+    Timestep::Interface(time, cfl, maxError, scalEq, vectEq, pseudo), mBaseItIds({0})
 {
    _mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
 
@@ -218,56 +209,69 @@ Interface<TScheme>::Interface(const MHDFloat time, const Matrix& cfl,
    }
    this->mspScheme = spScheme;
 
+   // Init functors
+   this->initFunctors();
+
    std::vector<TimestepperInfo> infos;
    this->translate(infos, scalEq, vectEq);
 
-   this->mSolverCoord.init(this->timestep(), infos, spScheme);
+   assert(this->mpFieldIdMap);
+   this->mpJac = std::make_shared<AugmentedJacobianFunctor>(-1.0, Register::Temporary::id(), 0, 1, this->mpPseudo, this->mpFieldIdMap, _mem);
+
+   this->mSolverCoord.init(this->timestep(), infos, spScheme, this->mpJac);
 
    this->initSolution(scalEq, vectEq);
 }
 
-// \todo convert to free function
+template <typename TScheme>
+void Interface<TScheme>::initFunctors()
+{
+   this->mpTsFunc = std::make_shared<TSFunctor>(this->mSolverCoord);
+}
+
 template <typename TScheme>
 void Interface<TScheme>::translate(std::vector<TimestepperInfo>& infos, const ScalarEquation_range& scalEq,
    const VectorEquation_range& vectEq)
 {
-   auto addInfo = [](auto& infos, auto&& eq_range)
+   this->mpFieldIdMap = std::make_shared<std::map<SpectralFieldId, std::size_t>>();
+   auto bFunc = std::make_shared<DoNothingFunctor>();
+   auto pFunc = std::make_shared<TranslateInfoFunctor>(infos, this->mpFieldIdMap, this->_mem);
+   auto aFunc = std::make_shared<DoNothingFunctor>();
+   ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   processor(scalEq);
+   processor(vectEq);
+
+   // Update system size
+   std::size_t sysN = 0;
+   for(auto&& t: infos)
    {
-      SpectralFieldId myId;
+      sysN += t.rows;
+   }
+   for(auto&& t: infos)
+   {
+      t.rows = sysN;
+   }
 
-      // Loop over range
-      for(auto& eqIt: make_range(eq_range))
-      {
-         for(auto& compIt: make_range(eqIt->spectralRange()))
-         {
-            // Get field identity
-            myId = std::make_pair(eqIt->name(), compIt);
-
-            const auto& cinfo = eqIt->couplingInfo(myId.second);
-            if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
-            {
-               DebuggerMacro_msg("Creating timesteppers for " + PhysicalNames::Coordinator::tag(eqIt->name()) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(compIt)) + ")", 2);
-
-               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
-               {
-                  auto info = createInfo(cinfo, i);
-
-                  infos.push_back(info);
-               }
-            }
-         }
-      }
+   // Add Jacobians to field ID map
+   std::map<SpectralFieldId, SpectralFieldId> jacMap = {
+      {std::make_pair(PhysicalNames::JacobianTemperature::id(), FieldComponents::Spectral::SCALAR), 
+         std::make_pair(PhysicalNames::Temperature::id(), FieldComponents::Spectral::SCALAR)},
+      {std::make_pair(PhysicalNames::JacobianVelocity::id(), FieldComponents::Spectral::TOR), 
+         std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR)},
+      {std::make_pair(PhysicalNames::JacobianVelocity::id(), FieldComponents::Spectral::POL), 
+         std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL)},
+      {std::make_pair(PhysicalNames::JacobianMagnetic::id(), FieldComponents::Spectral::TOR), 
+         std::make_pair(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::TOR)},
+      {std::make_pair(PhysicalNames::JacobianMagnetic::id(), FieldComponents::Spectral::POL), 
+         std::make_pair(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::POL)}
    };
-
-   addInfo(infos, scalEq);
-   addInfo(infos, vectEq);
-}
-
-inline std::size_t stepperIndex(const std::size_t solverIndex, const std::size_t sysIndex)
-{
-   assert(sysIndex < 10000);
-
-   return 10000*solverIndex + sysIndex;
+   for(auto&& [jId, id]: jacMap)
+   {
+      if(this->mpFieldIdMap->count(id) > 0)
+      {
+         this->mpFieldIdMap->emplace(jId, this->mpFieldIdMap->at(id));
+      }
+   }
 }
 
 template <typename TScheme>
@@ -276,71 +280,19 @@ void Interface<TScheme>::tuneAdaptive(const MHDFloat time)
    this->mStepTime = time;
 }
 
-template <typename TScheme> bool Interface<TScheme>::finishedStep() const
-{
-   return this->mSolverCoord.finishedStep();
-}
-
 template <typename TScheme>
 void Interface<TScheme>::initSolution(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
 {
-   auto processSolution = [this](auto&& eq_range)
-   {
-      // Storage for information and identity
-      SpectralFieldId myId;
+   DebuggerMacro_msg("Initialize timestepper solutions", 6);
 
-      // Loop over all scalar equations
-      for(auto& eqIt: make_range(eq_range))
-      {
-            for(auto& compIt: make_range(eqIt->spectralRange()))
-            {
-               // Get field identity
-               myId = std::make_pair(eqIt->name(), compIt);
-
-               const auto& cinfo = eqIt->couplingInfo(myId.second);
-
-               if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
-               {
-                  // Allocate temporary storage
-                  std::uint32_t mem_size = 0;
-                  for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
-                  {
-                     mem_size = std::max(mem_size, static_cast<std::uint32_t>(cinfo.galerkinN(i))*static_cast<std::uint32_t>(cinfo.rhsCols(i)));
-                  }
-                  Memory::MemBlock<MHDComplex> data(mem_size, this->_mem.get());
-
-                  for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
-                  {
-                     auto info = createInfo(cinfo, i);
-
-                     std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
-                     std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                     using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
-                     std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
-
-                     if(cinfo.isGalerkin())
-                     {
-                        Equations::solveStencilUnknown(*eqIt, myId.second, tmpView, i, 0);
-                     }
-                     else
-                     {
-                        std::visit(
-                              [&](auto&& p)
-                              {
-                              Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, true);
-                              }, eqIt->spUnknown());
-                     }
-
-                     this->mSolverCoord.updateSolution(info, tmpView);
-                  }
-               }
-         }
-      }
-   };
-
-   processSolution(scalEq);
-   processSolution(vectEq);
+   auto bFunc = std::make_shared<DoNothingFunctor>();
+   using OpFunctor = InitSolutionFunctor<TSFunctor>;
+   auto pvFunc = std::make_shared<OpFunctor>(this->mpTsFunc);
+   auto pFunc = std::make_shared<InputFunctor<OpFunctor>>(pvFunc, this->mpFieldIdMap, this->_mem);
+   auto aFunc = std::make_shared<DoNothingFunctor>();
+   ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   processor(scalEq);
+   processor(vectEq);
 }
 
 template <typename TScheme>
@@ -349,96 +301,7 @@ void Interface<TScheme>::getExplicitInput(const std::size_t opId,
    const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
 {
    Profiler::RegionFixture<2> fix("Timestep-explicitInput");
-
-   auto processInput = [this](auto&& eq_range, const std::size_t opId,
-   const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
-   {
-      // Storage for information and identity
-      SpectralFieldId myId;
-
-      // Loop over all scalar equations
-      for(auto& eqIt: make_range(eq_range))
-      {
-         for(auto& compIt: make_range(eqIt->spectralRange()))
-         {
-            // Get field identity
-            myId = std::make_pair(eqIt->name(), compIt);
-
-            const auto& cinfo = eqIt->couplingInfo(myId.second);
-
-            if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
-            {
-               DebuggerMacro_msg("Get explicit timestepper input for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
-
-               // Build range of operator
-               auto r = make_range(cinfo.explicitRange(opId));
-
-#ifdef QUICC_DEBUG
-               if(r.size() == 0)
-               {
-                  DebuggerMacro_msg("(Nothing)", 7);
-               }
-#endif // QUICC_DEBUG
-
-               if(r.size() > 0)
-               {
-                  // Allocate temporary storage
-                  std::uint32_t mem_size = 0;
-                  for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
-                  {
-                     mem_size = std::max(mem_size, static_cast<std::uint32_t>(cinfo.galerkinN(i))*static_cast<std::uint32_t>(cinfo.rhsCols(i)));
-                  }
-                  Memory::MemBlock<MHDComplex> data(mem_size, this->_mem.get());
-
-                  // Get timestep input
-                  for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
-                  {
-                     auto info = createInfo(cinfo, i);
-
-                     // Copy field values into timestepper input
-                     DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
-                     tmp.setZero();
-
-                     // Loop over explicit fields
-                     for(auto& fIt: r)
-                     {
-                        DebuggerMacro_msg("Add " + ModelOperator::Coordinator::tag(opId) + " term from " + PhysicalNames::Coordinator::tag(fIt.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(fIt.second)) + ")", 7);
-
-                        // Get explicit input
-                        if(fIt.second == FieldComponents::Spectral::SCALAR)
-                        {
-                           std::visit(
-                                 [&](auto&& p)
-                                 {
-                                 Equations::addExplicitTerm(*eqIt, opId, myId.second, tmp, 0, fIt, p->dom(0).perturbation(), i);
-                                 }, scalVar.find(fIt.first)->second);
-                        } else
-                        {
-                           std::visit(
-                                 [&](auto&& p)
-                                 {
-                                 Equations::addExplicitTerm(*eqIt, opId, myId.second, tmp, 0, fIt, p->dom(0).perturbation().comp(fIt.second), i);
-                                 }, vectVar.find(fIt.first)->second);
-                        }
-                     }
-
-                     std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
-                     std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                     using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
-                     std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
-                     details::computeSet(tmpView, tmp, 0);
-
-                     this->mSolverCoord.updateRhs(info, tmpView);
-                  }
-               }
-            }
-         }
-      }
-   };
-
-   processInput(scalEq, opId, scalVar, vectVar);
-   processInput(vectEq, opId, scalVar, vectVar);
+   throw std::logic_error("This should not be called");
 }
 
 template <typename TScheme>
@@ -446,96 +309,14 @@ void Interface<TScheme>::getInput(const ScalarEquation_range& scalEq, const Vect
 {
    Profiler::RegionFixture<2> fix("Timestep-input");
 
-   auto processInput = [this](auto&& eq_range)
-   {
-      // Storage for information and identity
-      SpectralFieldId myId;
-
-      // Loop over all scalar equations
-      for(auto& eqIt: make_range(eq_range))
-      {
-         for(auto& compIt: make_range(eqIt->spectralRange()))
-         {
-            // Get field identity
-            myId = std::make_pair(eqIt->name(), compIt);
-
-            // Apply constraint on solution
-            eqIt->applyConstraint(myId.second, SolveTiming::Before::id());
-
-            const auto& cinfo = eqIt->couplingInfo(myId.second);
-
-            if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
-            {
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:allocateTemp");
-               // Allocate temporary storage
-               std::uint32_t mem_size = 0;
-               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
-               {
-                  mem_size = std::max(mem_size, static_cast<std::uint32_t>(cinfo.galerkinN(i))*static_cast<std::uint32_t>(cinfo.rhsCols(i)));
-               }
-               Memory::MemBlock<MHDComplex> data(mem_size, this->_mem.get());
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:allocateTemp");
-
-               DebuggerMacro_msg("Get timestepper input for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
-
-               // Get timestep input
-               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
-               {
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:createInfo");
-                  auto info = createInfo(cinfo, i);
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:createInfo");
-
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:setupView");
-                  std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
-                  std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                  using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
-                  std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:setupView");
-
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyNonlinear");
-                  // Copy field values into timestepper input
-                  if(cinfo.hasNonlinear())
-                  {
-                     std::visit(
-                           [&](auto&& p)
-                           {
-                           Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, false);
-                           }, eqIt->spUnknown());
-                  }
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyNonlinear");
-
-                  // Add source term
-                  std::visit(
-                        [&](auto&& p)
-                        {
-                        Equations::addSource(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0);
-                        }, eqIt->spUnknown());
-
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:updateRhs");
-                  this->mSolverCoord.updateRhs(info, tmpView);
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:updateRhs");
-
-                  // If required set inhomogenous boundary condition value
-                  if(cinfo.hasBoundaryValue())
-                  {
-                     // Set boundary value
-                     std::visit(
-                           [&](auto&& p)
-                           {
-                           throw std::logic_error("NOT YET IMPLEMENTED");
-                           // Equations::setBoundaryValue(*spEq, p->dom(0).perturbation(), id.second, (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
-                           }, eqIt->spUnknown());
-                     //               this->mSolverCoord.updateInhomogeneous(info);
-                  }
-               }
-            }
-         }
-      }
-   };
-
-   processInput(scalEq);
-   processInput(vectEq);
+   auto bFunc = std::make_shared<ApplyConstraintFunctor>(SolveTiming::Before::id());
+   using OpFunctor = GetInputFunctor<TSFunctor>;
+   auto pvFunc = std::make_shared<OpFunctor>(this->mpTsFunc, Register::Rhs::id(), 1);
+   auto pFunc = std::make_shared<InputFunctor<OpFunctor>>(pvFunc, this->mpFieldIdMap, this->_mem);
+   auto aFunc = std::make_shared<DoNothingFunctor>();
+   ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   processor(scalEq);
+   processor(vectEq);
 }
 
 template <typename TScheme>
@@ -543,102 +324,23 @@ void Interface<TScheme>::transferOutput(const ScalarEquation_range& scalEq, cons
 {
    Profiler::RegionFixture<2> fix("Timestep-output");
 
-   auto processOutput = [this](auto&& eq_range)
-   {
-      // Storage for information and identity
-      SpectralFieldId myId;
-
-      // Loop over all scalar equations
-      for(auto& eqIt: make_range(eq_range))
-      {
-         for(auto& compIt: make_range(eqIt->spectralRange()))
-         {
-            // Get field identity
-            myId = std::make_pair(eqIt->name(), compIt);
-
-            const auto& cinfo = eqIt->couplingInfo(myId.second);
-
-            if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
-            {
-               DebuggerMacro_msg("Get timestepper solution for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
-
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:setZero");
-               // return zero
-               for(std::size_t i = 0; i < static_cast<std::size_t>(cinfo.fieldStart()); i++)
-               {
-                  DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
-                  tmp.setZero();
-
-                  eqIt->storeSolution(myId.second, tmp, i, 0);
-               }
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:setZero");
-
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:allocateTemp");
-               // Allocate temporary storage
-               std::uint32_t mem_size = 0;
-               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
-               {
-                  mem_size = std::max(mem_size, static_cast<std::uint32_t>(cinfo.galerkinN(i))*static_cast<std::uint32_t>(cinfo.rhsCols(i)));
-               }
-               Memory::MemBlock<MHDComplex> data(mem_size, this->_mem.get());
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:allocateTemp");
-
-               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
-               {
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:createInfo");
-                  auto info = createInfo(cinfo, i);
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:createInfo");
-
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:getSolution");
-                  std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
-                  std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                  using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
-                  std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
-                  this->mSolverCoord.getSolution(tmpView, info);
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:getSolution");
-
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:copyView");
-                  DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
-                  details::computeSet(tmp, tmpView, 0);
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:copyView");
-
-   Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:storeSolution");
-                  eqIt->storeSolution(myId.second, tmp, i, 0);
-   Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:storeSolution");
-               }
-
-               // Apply constraint on solution
-               auto changedSolution = eqIt->applyConstraint(myId.second, SolveTiming::After::id());
-
-               // Update timestepper solver solution if constraint modified it
-               if(changedSolution)
-               {
-                  auto corr_ = eqIt->correctionConstraint(myId.second, SolveTiming::After::id());
-                  for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
-                  {
-                     auto info = createInfo(cinfo, i);
-
-                     // Get effective corrections
-                     auto corr = Equations::correctSolution(*eqIt, myId.second, corr_, i, 0);
-
-                     this->mSolverCoord.updateSolution(info, corr);
-                  }
-               }
-            }
-         }
-      }
-   };
-
-   processOutput(scalEq);
-   processOutput(vectEq);
+   auto bFunc = std::make_shared<DoNothingFunctor>();
+   using OpFunctor = TransferOutputFunctor<TSFunctor>;
+   auto pvFunc = std::make_shared<OpFunctor>(this->mpTsFunc, Register::Solution::id(), 0);
+   using CorrFunctor = TransferCorrectionFunctor<TSFunctor>;
+   auto cvFunc = std::make_shared<CorrFunctor>(this->mpTsFunc, Register::Solution::id(), 0);
+   auto pFunc = std::make_shared<OutputFunctor<OpFunctor, CorrFunctor>>(pvFunc, cvFunc, this->mpFieldIdMap, this->_mem);
+   auto aFunc = std::make_shared<DoNothingFunctor>();
+   ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   processor(scalEq);
+   processor(vectEq);
 }
 
 template <typename TScheme>
 void Interface<TScheme>::adaptTimestep(const Matrix& cfl)
 {
    // Process CFL information
-   this->processCfl(cfl, this->mSolverCoord.error(), this->mspScheme->order());
+   this->processCfl(cfl, -1, this->mspScheme->order());
 
    //
    // Update the timestep matrices if necessary
@@ -646,14 +348,12 @@ void Interface<TScheme>::adaptTimestep(const Matrix& cfl)
    if (this->timestep() != this->mOldDt && this->timestep() > 0.0)
    {
       DebuggerMacro_showValue(
-         "Updating timestep and matrices with new Dt = ", 0, this->timestep());
+         "Updating timestep to new Dt = ", 0, this->timestep());
 
+      // Update the time dependencies
+      DebuggerMacro_start("Update time dependencies", 0);
       this->mSolverCoord.updateTimestep(this->timestep());
-
-      // Update the time dependence in matrices
-      DebuggerMacro_start("Update matrices", 0);
-      this->mSolverCoord.updateMatrices();
-      DebuggerMacro_stop("Update matrices t = ", 0);
+      DebuggerMacro_stop("Update time dependencies", 0);
    }
    else
    {
@@ -665,39 +365,42 @@ void Interface<TScheme>::adaptTimestep(const Matrix& cfl)
 }
 
 template <typename TScheme>
-void Interface<TScheme>::stepForward(const ScalarEquation_range& scalEq,
-   const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar,
+void Interface<TScheme>::stepForward(const ScalarEquation_range& scalEq_ignore,
+   const VectorEquation_range& vectEq_ignore, const ScalarVariable_map& scalVar,
    const VectorVariable_map& vectVar)
 {
-   bool isIntegrating = true;
-   while (isIntegrating)
-   {
-      DebuggerMacro_msg("Time integration sub-step", 2);
+   DebuggerMacro_msg("Time integration sub-step", 2);
 
-      this->mpPseudo->evolveUntilPrognostic(this->finishedStep());
+   int curIt = *this->mBaseItIds.begin();
+   auto scalEq = this->mpPseudo->scalarRange(PseudospectralTag::Prognostic::id(), curIt);
+   auto vectEq = this->mpPseudo->vectorRange(PseudospectralTag::Prognostic::id(), curIt);
 
-      // Update the equation input to the timestepper
-      this->getInput(scalEq, vectEq);
+   auto progFunc = std::make_shared<Functors::CallExplicitPrognosticFunctor<TSFunctor>>(this->mpTsFunc, Register::Rhs::id(), 1, *this->mBaseItIds.begin(), this->mpFieldIdMap, this->_mem);
+   this->mpPseudo->evolveUntilPrognostic(this->mBaseItIds, false, progFunc);
 
-      Profiler::RegionStart<2>("Timestep-solve");
-      // Solve all the linear systems
-      this->mSolverCoord.solveSystems();
-      Profiler::RegionStop<2>("Timestep-solve");
+   // Update the equation input to the timestepper
+   this->getInput(scalEq, vectEq);
 
-      // Transfer timestep output back to equations
-      this->transferOutput(scalEq, vectEq);
+   Profiler::RegionStart<2>("Timestep-solve");
+   int jacIt = 1;
+   auto jscalEq = this->mpPseudo->scalarRange(PseudospectralTag::Prognostic::id(), jacIt);
+   auto jvectEq = this->mpPseudo->vectorRange(PseudospectralTag::Prognostic::id(), jacIt);
+   this->mpJac->setEquations(jscalEq, jvectEq);
+   // Solve all the linear systems
+   this->mSolverCoord.stepForward();
+   Profiler::RegionStop<2>("Timestep-solve");
 
-      // Clear the solver RHS
-      this->mSolverCoord.clearSolvers();
+   // Transfer timestep output back to equations
+   this->transferOutput(scalEq, vectEq);
 
-      // Update current time
-      this->mTime =
-         this->mRefTime + this->mSolverCoord.stepFraction() * this->timestep();
+   // Reset solvers
+   this->mSolverCoord.resetSolvers();
 
-      this->mpPseudo->evolveAfterPrognostic(this->finishedStep());
+   // Update current time
+   this->mTime =
+      this->mRefTime + this->timestep();
 
-      isIntegrating = !this->finishedStep();
-   }
+   this->mpPseudo->evolveAfterPrognostic(this->mBaseItIds, true);
 }
 
 template <typename TScheme>

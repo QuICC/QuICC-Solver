@@ -51,7 +51,7 @@ public:
     */
    void setup(const std::vector<double>& ts, const Matrix& matU);
 
-   /** 
+   /**
     * @brief Compute action of phi
     */
    int compute(Matrix& matW, const std::vector<double>& ts, const Matrix& matU, const int m, const Task task) const;
@@ -100,14 +100,14 @@ private:
    /**
     * @brief Adaptive Krylov subspace
     */
-   void adaptiveKrylov(int& mNew, double& tNew, double& omega, const double err, const double tNow, const double tEnd, const double tau, const double oldTau, const int m, const int oldm,  const int j, const int ireject) const;
+   void adaptiveKrylov(int& mNew, double& tNew, double& omega, bool& orderOld, bool& kestOld, const double err, const double tNow, const double tEnd, const double tau, const double oldTau, const int m, const int oldm,  const int j, const int ireject) const;
 
    /**
     * @brief Update solution
     */
    void updateSolution(int& l, double& tNow, Matrix& matW, const double tau, const double beta, const std::vector<double>& ts, const Matrix& matV, const Matrix& matH, const Matrix& matF, const int n, const int j) const;
 
-   /** 
+   /**
     * @brief Define action of augmented A
     */
    void defineAugmentedA(const Matrix& matU);
@@ -185,12 +185,13 @@ template <typename TKrylov, typename TExponential>
 void Kiops<TKrylov, TExponential>::defineAugmentedA(const Matrix& matU)
 {
    this->mNuMu = this->rescaleU(matU);
+   const double& nu = this->mNuMu.first;
 
    Matrix matB;
    if(matU.cols() > 1)
    {
       matB = matU.rightCols(matU.cols()-1).rowwise().reverse();
-      matB.array() *= this->mNuMu.first;
+      matB.array() *= nu;
    }
    else
    {
@@ -229,9 +230,11 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
    matW.resize(n, ts.size());
    Matrix matH = Matrix::Zero(this->mcMMax + 1, this->mcMMax + 1);
    Matrix matV = Matrix::Zero(n + p, this->mcMMax + 1);
-   
+
    // Adaptive part
    int oldm = -1;
+   bool kestOld = true;
+   bool orderOld = true;
    double oldTau = 0.0;
    double omega = 0.0;
 
@@ -266,7 +269,6 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
       double err;
       double tNew;
       int mNew;
-      double tauNew;
 
       // Krylov subspace converged before m
       if(happy)
@@ -274,6 +276,7 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
          omega = 0.0;
          err = 0.0;
          tNew = std::min(tEnd - (tNow + tau), tau);
+         mNew = j;
          happy = false;
       }
       else
@@ -282,7 +285,7 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
          err = std::abs(beta * hm1m * matF(j - 1, j));
 
          // Adaptive Krylov
-         this->adaptiveKrylov(mNew, tNew, omega, err, tNow, tEnd, tau, oldTau, m, oldm, j, ireject);
+         this->adaptiveKrylov(mNew, tNew, omega, orderOld, kestOld, err, tNow, tEnd, tau, oldTau, m, oldm, j, ireject);
       }
 
       // Achieved required tolerance
@@ -308,7 +311,7 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
       }
 
       oldTau = tau;
-      tau = tauNew;
+      tau = tNew;
 
       oldm = m;
       m = mNew;
@@ -317,7 +320,7 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
    // Rescale by 1/t^p for Task I
    if(task == Task::I)
    {
-      for(int k = 0; k < ts.size(); k++)
+      for(std::size_t k = 0; k < ts.size(); k++)
       {
          matW.col(k).array() /= std::pow(ts.at(k), p);
       }
@@ -331,7 +334,6 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
 template <typename TKrylov, typename TExponential>
 double Kiops<TKrylov, TExponential>::initKrylov(Matrix& matV, const Matrix& matW, const double tNow, const int l, const int p, const std::pair<double,double>& numu) const
 {
-   const double& nu = numu.first;
    const double& mu = numu.second;
 
    matV.col(0).topRows(matW.rows()) = matW.col(l);
@@ -378,11 +380,11 @@ void Kiops<TKrylov, TExponential>::estimateK(double &kest, bool& kestOld, const 
    if(m != oldm && tau == oldTau && ireject >= 1)
    {
       kest = std::max(1.1, std::pow((omega / oldOmega), 1./(oldm - m)));
-      kestOld = true;
+      kestOld = false;
    }
    else if(kestOld || ireject == 0)
    {
-      kestOld = false;
+      kestOld = true;
       kest = 2.0;
    }
    else
@@ -392,10 +394,8 @@ void Kiops<TKrylov, TExponential>::estimateK(double &kest, bool& kestOld, const 
 }
 
 template <typename TKrylov, typename TExponential>
-void Kiops<TKrylov, TExponential>::adaptiveKrylov(int& mNew, double& tNew, double& omega, const double err, const double tNow, const double tEnd, const double tau, const double oldTau, const int m, const int oldm,  const int j, const int ireject) const
+void Kiops<TKrylov, TExponential>::adaptiveKrylov(int& mNew, double& tNew, double& omega, bool& orderOld, bool& kestOld, const double err, const double tNow, const double tEnd, const double tau, const double oldTau, const int m, const int oldm,  const int j, const int ireject) const
 {
-   bool kestOld = true;
-   bool orderOld = true;
    double order = 0.0;
    double kest = 0.0;
 
@@ -403,9 +403,8 @@ void Kiops<TKrylov, TExponential>::adaptiveKrylov(int& mNew, double& tNew, doubl
    double oldOmega = omega;
    omega = tEnd * err / (tau * this->mcTol);
 
-   // Estimate order
+   // Estimate order: order + 1 = 1/(q + 1) in paper
    this->estimateOrder(order, orderOld, omega, oldOmega, tau, oldTau, m, oldm, j, ireject);
-
    // Estimate k
    this->estimateK(kest, kestOld, omega, oldOmega, tau, oldTau, m, oldm, ireject);
 
@@ -420,18 +419,18 @@ void Kiops<TKrylov, TExponential>::adaptiveKrylov(int& mNew, double& tNew, doubl
    }
 
    double sameTau = std::min(remainingTime, tau);
-   double tOpt = tau * std::pow((this->mGamma.first / omega), 1./order);
+   double tOpt = tau * std::pow((this->mGamma.first / omega), order + 1);
    tOpt = std::min(remainingTime, std::max(tau / 5., std::min(5. * tau, tOpt)));
 
    int mOpt = std::ceil(j + std::log(omega / this->mGamma.first) / std::log(kest));
    mOpt = std::max(this->mcMMin, std::min(this->mcMMax, std::max(static_cast<int>(std::floor(3./4. * m)), std::min(mOpt, static_cast<int>(std::ceil(4./3. * m))))));
 
-   if( j == this->mcMMax)
+   if(j == this->mcMMax)
    {
       if(omega > this->mcDelta)
       {
          mNew = j;
-         tNew = tau * std::pow(this->mGamma.second / omega, 1./order);
+         tNew = tau * std::pow(this->mGamma.second / omega, order + 1);
          tNew = std::min(tEnd - tNow, std::max(tau / 5., tNew));
       }
       else
@@ -454,7 +453,7 @@ void Kiops<TKrylov, TExponential>::updateSolution(int& l, double& tNow, Matrix& 
 
    int nTau = 0;
    double tNext = tNow + tau;
-   for(int k = l; k < ts.size(); k++)
+   for(std::size_t k = l; k < ts.size(); k++)
    {
       if(std::abs(ts.at(k)) < std::abs(tNext))
       {
@@ -475,7 +474,6 @@ void Kiops<TKrylov, TExponential>::updateSolution(int& l, double& tNow, Matrix& 
       }
       l += nTau;
    }
-
 
    Matrix tmp1 = beta * matF.col(0);
    matW.col(l) = tmp1(0) * matV.block(0,0,n,1);

@@ -102,7 +102,7 @@ Matrix HighamExponential::compute(const Matrix& matA) const
          bn = this->mPade9.size();
       }
 
-      Matrix matA2 = matA * matA;
+      Matrix matA2 = expA * expA;
       Matrix matQ = Matrix::Zero(n, n);
       Matrix matU = Matrix::Zero(n, n);
       Matrix matV = Matrix::Zero(n, n);
@@ -129,7 +129,7 @@ Matrix HighamExponential::compute(const Matrix& matA) const
          matV += b[k2] * matQ;
       }
 
-      matU = matA * matU;
+      matU = expA * matU;
       matQ = matV - matU;
       matU += matV;
 
