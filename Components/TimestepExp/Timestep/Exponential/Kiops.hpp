@@ -14,7 +14,10 @@
 
 // Project includes
 //
+#include "Environment/QuICCEnv.hpp"
 #include "Types/Typedefs.hpp"
+#include "Timestep/Exponential/details/TimesteppperTools.hpp"
+#include "Timestep/Exponential/RuntimeStatistics.hpp"
 
 namespace QuICC {
 
@@ -30,6 +33,7 @@ template <typename TKrylov, typename TExponential> class Kiops
 {
 public:
    enum class Task {I, II};
+
    /**
     * @brief ctor
     */
@@ -73,20 +77,10 @@ public:
    void printInfo() const;
 
 private:
-   struct Stats
-   {
-      int step = 0;
-      int krystep = 0;
-      int reject = 0;
-      int exps = 0;
-      int m_ret = 0;
-      double conv = 0.0;
-   };
-
    /**
-    * @brief Scaling factors for U
+    * @brief Scaling factors for B
     */
-   std::pair<double,double> rescaleU(const Matrix& matU) const;
+   std::pair<double,double> computeNuMu(const MHDFloat norm) const;
 
    /**
     * @brief Initialize Krylov subspace
@@ -164,9 +158,9 @@ private:
    std::unique_ptr<TExponential> mpEfunc;
 
    /**
-    * @brief Stats
+    * @brief Runtime statistatics
     */
-   mutable Stats mStats;
+   mutable RuntimeStatistics mStats;
 };
 
 template <typename TKrylov, typename TExponential>
@@ -190,18 +184,24 @@ void Kiops<TKrylov, TExponential>::setup(const std::vector<double>& ts, const Ma
 template <typename TKrylov, typename TExponential>
 void Kiops<TKrylov, TExponential>::defineAugmentedA(const Matrix& matU)
 {
-   this->mNuMu = this->rescaleU(matU);
-   const double& nu = this->mNuMu.first;
-
    Matrix matB;
+   MHDFloat normB;
    if(matU.cols() > 1)
    {
       matB = matU.rightCols(matU.cols()-1).rowwise().reverse();
-      matB.array() *= nu;
+      normB = details::compute1Norm(matB);
    }
    else
    {
       matB = Matrix::Zero(matU.rows(), 1);
+      normB = 0;
+   }
+   this->mNuMu = this->computeNuMu(normB);
+
+   if(matU.cols() > 1)
+   {
+      const double& nu = this->mNuMu.first;
+      matB.array() *= nu;
    }
 
    this->mpKfunc->aFunc().updateB(matB);
@@ -211,7 +211,7 @@ template <typename TKrylov, typename TExponential>
 int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double>& ts, const Matrix& matU, const int mInit, const Task task) const
 {
    // reset stats
-   this->mStats = Stats();
+   this->mStats.reset();
 
    const double sgn = std::copysign(1.0, ts.back());
    const double tEnd = std::abs(ts.back());
@@ -258,7 +258,7 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
       }
 
       // Compute Krylov subspace
-      j = this->mpKfunc->compute(matV, matH, j, m);
+      j = this->mpKfunc->compute(matV, matH, j, m, n);
       happy = (j < m);
       matH(0, j) = 1.0;
       double hm1m = matH(j,j-1);
@@ -332,7 +332,8 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
       }
    }
 
-   this->mStats.m_ret = m;
+   this->mStats.m = m;
+   this->mStats.update();
 
    return m;
 }
@@ -353,9 +354,7 @@ double Kiops<TKrylov, TExponential>::initKrylov(Matrix& matV, const Matrix& matW
       matV(iLast - i, 0) = std::pow(tNow, i)*mu/static_cast<double>(pf);
    }
 
-   double beta = matV.col(0).squaredNorm();
-   // MPI HERE
-   beta = std::sqrt(beta);
+   double beta = details::computeAugmented2Norm(matV, 0, matW.rows());
    matV.col(0).array() /= beta;
 
    return beta;
@@ -509,16 +508,13 @@ void Kiops<TKrylov, TExponential>::setSafety(const std::vector<double>& ts)
 }
 
 template <typename TKrylov, typename TExponential>
-std::pair<double,double> Kiops<TKrylov, TExponential>::rescaleU(const Matrix& matU) const
+std::pair<double,double> Kiops<TKrylov, TExponential>::computeNuMu(const MHDFloat normB) const
 {
    double nu, mu;
 
-   // 1-norm of b_1, ..., b_p
-   double normU = matU.rightCols(matU.cols() - 1).array().abs().sum();
-
-   if(matU.cols() > 1 && normU > 0)
+   if(normB > 0)
    {
-      double ex = std::ceil(std::log2(normU));
+      double ex = std::ceil(std::log2(normB));
       nu = std::pow(2.0, -ex);
       mu = std::pow(2.0, ex);
    }
@@ -546,18 +542,20 @@ TExponential& Kiops<TKrylov, TExponential>::eFunc()
 template <typename TKrylov, typename TExponential>
 void Kiops<TKrylov, TExponential>::printInfo() const
 {
-   const int n = 3;
-   std::cerr
-      << std::string(15, '@')
-      << "KIOPS information: "
-      << std::string(n, ' ') << "step: " << this->mStats.step
-      << std::string(n, ' ') << "krystep: " << this->mStats.krystep
-      << std::string(n, ' ') << "reject: " << this->mStats.reject
-      << std::string(n, ' ') << "exps: " << this->mStats.exps
-      << std::string(n, ' ') << "m_ret: " << this->mStats.m_ret
-      << std::string(n, ' ') << "conv: " << this->mStats.conv
-      << std::string(15, '@')
-      << std::endl;
+   if(QuICCEnv().allowsIO())
+   {
+      std::cerr
+         << std::string(5, '=')
+         << " KIOPS information "
+         << std::string(5, '=')
+         << std::endl;
+
+      this->mStats.printInfo();
+
+      std::cerr
+         << std::string(29, '=')
+         << std::endl;
+   }
 }
 
 } // namespace Exponential

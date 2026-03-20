@@ -14,6 +14,8 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
+#include "Environment/QuICCEnv.hpp"
+#include "Environment/MpiTypes.hpp"
 #include "Types/Math.hpp"
 #include "View/View.hpp"
 
@@ -24,6 +26,42 @@ namespace Timestep {
 namespace Exponential {
 
 namespace details {
+
+/**
+ * @brief Compute matrix 1-norm
+ */
+MHDFloat compute1Norm(const Matrix& mat);
+
+/**
+ * @brief Compute matrix infinity-norm
+ */
+MHDFloat computeInfNorm(const Matrix& mat);
+
+/**
+ * @brief Compute vector 2-norm
+ */
+MHDFloat compute2Norm(const Matrix& mat, const int col, const int n);
+
+/**
+ * @brief Compute vector squared 2-norm
+ */
+MHDFloat computeSquared2Norm(const Matrix& mat, const int col, const int n);
+
+/**
+ * @brief Compute vector 2-norm of augmented systeam
+ */
+MHDFloat computeAugmented2Norm(const Matrix& mat, const int col, const int n);
+
+/**
+ * @brief Compute dot products of multiple colums
+ */
+Matrix computeDot(const Matrix& u, const int colU0, const int colU, const Matrix& v, const int colV, const int n);
+
+/**
+ * @brief Compute dot products of multiple augmented colums
+ */
+Matrix computeAugmentedDot(const Matrix& u, const int colU0, const int colU, const Matrix& v, const int colV, const int n);
+
 /**
  * @brief Compute z = y
  */
@@ -315,6 +353,86 @@ inline void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSp
    {
       mat += decMat.real();
    }
+}
+
+inline MHDFloat compute1Norm(const Matrix& mat)
+{
+   Matrix colSum = mat.array().abs().colwise().sum();
+
+#ifdef QUICC_MPI
+   MPI_Allreduce(MPI_IN_PLACE, colSum.data(), colSum.size(), Environment::MpiTypes::type<MHDFloat>(), MPI_SUM, MPI_COMM_WORLD);
+#endif
+
+   MHDFloat norm = colSum.maxCoeff();
+   return norm;
+}
+
+inline MHDFloat computeInfNorm(const Matrix& mat)
+{
+   Matrix rowSum = mat.array().abs().rowwise().sum();
+
+#ifdef QUICC_MPI
+   MPI_Allreduce(MPI_IN_PLACE, rowSum.data(), rowSum.size(), Environment::MpiTypes::type<MHDFloat>(), MPI_SUM, MPI_COMM_WORLD);
+#endif
+
+   MHDFloat norm = rowSum.maxCoeff();
+   return norm;
+}
+
+inline MHDFloat computeSquared2Norm(const Matrix& mat, const int col, const int n)
+{
+   MHDFloat norm = mat.col(col).topRows(n).squaredNorm();
+
+#ifdef QUICC_MPI
+   MPI_Allreduce(MPI_IN_PLACE, &norm, 1, Environment::MpiTypes::type<MHDFloat>(), MPI_SUM, MPI_COMM_WORLD);
+#endif
+
+   return norm;
+}
+
+inline MHDFloat compute2Norm(const Matrix& mat, const int col, const int n)
+{
+   MHDFloat norm = details::computeSquared2Norm(mat, col, n);
+
+   norm = std::sqrt(norm);
+   return norm;
+}
+
+inline MHDFloat computeAugmented2Norm(const Matrix& mat, const int col, const int n)
+{
+   // Squared 2-norm of split part
+   MHDFloat norm = details::computeSquared2Norm(mat, col, n);
+
+   // Add squared 2-norm of augmented part
+   int p = mat.rows() - n;
+   norm += mat.col(col).bottomRows(p).squaredNorm();
+
+   norm = std::sqrt(norm);
+   return norm;
+}
+
+inline Matrix computeDot(const Matrix& u, const int colU0, const int colU, const Matrix& v, const int colV, const int n)
+{
+   int colsU = colU - colU0 + 1;
+   Matrix dot = u.block(0, colU0, n, colsU).transpose()*v.col(colV).topRows(n);
+
+#ifdef QUICC_MPI
+   MPI_Allreduce(MPI_IN_PLACE, dot.data(), dot.size(), Environment::MpiTypes::type<MHDFloat>(), MPI_SUM, MPI_COMM_WORLD);
+#endif
+
+   return dot;
+}
+
+inline Matrix computeAugmentedDot(const Matrix& u, const int colU0, const int colU, const Matrix& v, const int colV, const int n)
+{
+   Matrix dot = details::computeDot(u, colU0, colU, v, colV, n);
+
+   // Add dot product from augmented part
+   int colsU = dot.rows();
+   int p = u.rows() - n;
+   dot += u.block(n, colU0, p, colsU).transpose() * v.col(colV).bottomRows(p);
+
+   return dot;
 }
 
 } // namespace details

@@ -13,6 +13,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
+#include "Timestep/Exponential/details/TimesteppperTools.hpp"
 
 namespace QuICC {
 
@@ -55,9 +56,10 @@ public:
     * @param matH Projection of A on Krylov subspace
     * @param j    starting index
     * @param m    Max size of Krylov subspace
+    * @param n    Size of distributed part of vector
     */
    int compute(Matrix& matV, Matrix& matH, const int j,
-      const int m);
+      const int m, const int n);
 
    /**
     * @brief Access action of A functor
@@ -92,7 +94,7 @@ IomKrylov<TAfunc>::IomKrylov(std::shared_ptr<TAfunc>& a) : IomKrylov(std::move(a
 
 template <typename TAfunc>
 int IomKrylov<TAfunc>::compute(Matrix& matV, Matrix& matH,
-   const int jIn, const int m)
+   const int jIn, const int m, const int n)
 {
    // Check H is big enough
    assert(matH.rows() == matH.cols());
@@ -107,17 +109,17 @@ int IomKrylov<TAfunc>::compute(Matrix& matV, Matrix& matH,
       A(matV.col(j+1), matV.col(j));
 
       // Orthogonalization
-      for(int i = std::max(0, j + 1 - this->mcP); i <= j; i++)
+      int i0 = std::max(0, j + 1 - this->mcP);
+      Matrix colH = details::computeAugmentedDot(matV, i0, j, matV, j+1, n);
+      for(int i = i0; i <= j; i++)
       {
-         matH(i, j) = matV.col(i).dot(matV.col(j+1));
-         // MPI VERSION HERE
+         matH(i, j) = colH(i-i0, 0);
+
          matV.col(j+1) -= matH(i,j)*matV.col(i);
       }
 
       // Norm
-      double normV = matV.col(j+1).squaredNorm();
-      // MPI VERSION HERE
-      normV = std::sqrt(normV);
+      double normV = details::computeAugmented2Norm(matV, j+1, n);
 
       // Stop if subspace converged sufficiently
       if(normV < this->mcTol)
