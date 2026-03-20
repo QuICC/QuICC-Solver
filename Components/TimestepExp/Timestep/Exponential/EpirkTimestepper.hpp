@@ -337,6 +337,7 @@ void EpirkTimestepper<TOperator, TData, TImpl>::stepForward()
    this->mpJac->setMatrixHandle(this->reg(Register::Temporary::id()));
    this->mpPhi->setup(ts, matU);
    this->mKrylovM = this->mpPhi->compute(matW, ts, matU, this->mKrylovM, PhiFunctor::Task::I);
+   this->mpPhi->printInfo();
 
    details::computeAXPY(this->reg(Register::Solution::id()), this->mDt, matW);
 }

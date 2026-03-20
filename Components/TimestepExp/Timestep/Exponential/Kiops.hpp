@@ -10,6 +10,7 @@
 //
 #include <cmath>
 #include <memory>
+#include <iostream>
 
 // Project includes
 //
@@ -65,6 +66,11 @@ public:
     * @brief Access explicit dense exponential functor
     */
    TExponential& eFunc();
+
+   /**
+    * @brief Print runtime information
+    */
+   void printInfo() const;
 
 private:
    struct Stats
@@ -535,6 +541,23 @@ template <typename TKrylov, typename TExponential>
 TExponential& Kiops<TKrylov, TExponential>::eFunc()
 {
    return *this->mpEfunc;
+}
+
+template <typename TKrylov, typename TExponential>
+void Kiops<TKrylov, TExponential>::printInfo() const
+{
+   const int n = 3;
+   std::cerr
+      << std::string(15, '@')
+      << "KIOPS information: "
+      << std::string(n, ' ') << "step: " << this->mStats.step
+      << std::string(n, ' ') << "krystep: " << this->mStats.krystep
+      << std::string(n, ' ') << "reject: " << this->mStats.reject
+      << std::string(n, ' ') << "exps: " << this->mStats.exps
+      << std::string(n, ' ') << "m_ret: " << this->mStats.m_ret
+      << std::string(n, ' ') << "conv: " << this->mStats.conv
+      << std::string(15, '@')
+      << std::endl;
 }
 
 } // namespace Exponential
