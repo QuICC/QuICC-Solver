@@ -66,6 +66,16 @@ public:
     */
    TAfunc& aFunc();
 
+   /**
+    * @brief Tolerance
+    */
+   double tol() const;
+
+   /**
+    * @brief Gram-schmidt order
+    */
+   int p() const;
+
 private:
    /**
     * @brief Length of incomplete orthogonalization
@@ -139,6 +149,18 @@ template <typename TAfunc>
 TAfunc& IomKrylov<TAfunc>::aFunc()
 {
    return *this->mpAfunc;
+}
+
+template <typename TAfunc>
+double IomKrylov<TAfunc>::tol() const
+{
+   return this->mcTol;
+}
+
+template <typename TAfunc>
+int IomKrylov<TAfunc>::p() const
+{
+   return this->mcP;
 }
 
 } // namespace Exponential

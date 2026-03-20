@@ -56,6 +56,7 @@ namespace Exponential {
       int m;
       int mMax;
       int mMin;
+      int gram_p;
       double conv;
       double convMax;
       double convMin;

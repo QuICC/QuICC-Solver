@@ -212,6 +212,7 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
 {
    // reset stats
    this->mStats.reset();
+   this->mStats.gram_p = this->mpKfunc->p();
 
    const double sgn = std::copysign(1.0, ts.back());
    const double tEnd = std::abs(ts.back());

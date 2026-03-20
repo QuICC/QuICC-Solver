@@ -20,7 +20,7 @@ namespace Timestep {
 namespace Exponential {
 
    RuntimeStatistics::RuntimeStatistics()
-      : step(0), krystep(0), reject(0), exps(0), m(-1), mMax(std::numeric_limits<int>::min()), mMin(std::numeric_limits<int>::max()), conv(0), convMax(std::numeric_limits<double>::min()), convMin(std::numeric_limits<double>::max())
+      : step(0), krystep(0), reject(0), exps(0), m(-1), mMax(std::numeric_limits<int>::min()), mMin(std::numeric_limits<int>::max()), gram_p(-1), conv(0), convMax(std::numeric_limits<double>::min()), convMin(std::numeric_limits<double>::max())
    {
    }
 
@@ -51,6 +51,7 @@ namespace Exponential {
          << std::string(n, ' ') << "reject: " << this->reject
          << std::string(n, ' ') << "exps: " << this->exps
          << std::string(n, ' ') << "m: " << this->m
+         << std::string(n, ' ') << "Gram-Schmidt p: " << this->gram_p
          << std::string(n, ' ') << "mMax: " << this->mMax
          << std::string(n, ' ') << "mMin: " << this->mMin
          << std::string(n, ' ') << "conv: " << this->conv
