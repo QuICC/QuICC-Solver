@@ -1213,7 +1213,10 @@ void Coordinator::sortEquations()
       Equations::Tools::sortByType(this->mScalarEquations.at(j), sP, sD, sT,
          sW);
 
-      std::cerr << "WARNING CHECK DISABLED FOR GETTING EXPONENTIAL TIMESTEPPER TO WORK" << std::endl;
+      if(QuICCEnv().allowsIO())
+      {
+         std::cerr << "WARNING: CHECKS DISABLED FOR GETTING EXPONENTIAL TIMESTEPPER TO WORK" << std::endl;
+      }
 #if 0
       // Current implementation ony works if prognostic equations are in last
       // iteration
@@ -1240,7 +1243,6 @@ void Coordinator::sortEquations()
       Equations::Tools::sortByType(this->mVectorEquations.at(j), vP, vD, vT,
          vW);
 
-      std::cerr << "WARNING CHECK DISABLED FOR GETTING EXPONENTIAL TIMESTEPPER TO WORK" << std::endl;
 #if 0
       // Current implementation ony works if prognostic equations are in last
       // iteration
