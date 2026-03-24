@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <map>
 #include <stdexcept>
+#include <set>
+#include <tuple>
 
 #ifdef QUICC_MPI
 #include <mpi.h>
@@ -25,6 +27,8 @@
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingTools.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
+
+#include "QuICC/Enums/DimensionTools.hpp"
 
 namespace QuICC {
 
@@ -390,6 +394,8 @@ namespace Parallel {
    {
       Profiler::RegionFixture<4> fix("Framework::LoadSplitter::SplittingAlgorithm::buildCommunicationStructure");
 
+
+      #ifdef QUICC_MPI
       // Clear the communication structure
       std::map<Dimensions::Transform::Id,std::multimap<int,int> >().swap(commStructure);
 
@@ -408,7 +414,495 @@ namespace Parallel {
       {
          details::buildCommunicationStructure3D(localId, spRes, commStructure);
       }
+      #else
+      // Clear the communication structure
+      std::map<Dimensions::Transform::Id,std::multimap<int,int> >().swap(commStructure);
 
+      Dimensions::Transform::Id dimId;
+      int i_;
+      int j_;
+      int k_;
+
+      // Handle 1D resolution
+      if(spRes->cpu(0)->nDim() == 1)
+      {
+         throw std::logic_error("Requested computation of communication structure score for 1D resolution!");
+
+      // Handle 2D resolution
+      } else if(spRes->cpu(0)->nDim() == 2)
+      {
+         // Simplify syntax
+         typedef std::pair<int,int>   Coordinate;
+
+         // Extract communication structure from resolution object
+         std::set<Coordinate> bwdMap;
+         std::set<Coordinate> fwdMap;
+
+         // Storage for a coordinate
+         Coordinate point;
+
+         // Position iterator for insert calls
+         std::set<Coordinate>::iterator   mapPos;
+
+         // Loop over possible data exchanges
+         std::vector<Dimensions::Transform::Id> exchanges = {Dimensions::Transform::TRA1D};
+         for(auto exId: exchanges)
+         {
+            // Create storage for structure
+            commStructure.emplace(exId,std::multimap<int,int>());
+
+            // initialise the position hint for inserts
+            mapPos = bwdMap.begin();
+
+            dimId = Dimensions::jump(exId,1);
+            const auto& bwdTRes = *spRes->cpu()->dim(dimId);
+            // Loop over second dimension
+            for(int j = 0; j < bwdTRes.dim<Dimensions::Data::DAT2D>(); j++)
+            {
+               j_ = bwdTRes.idx<Dimensions::Data::DAT2D>(j);
+
+               // Loop over backward dimension
+               for(int i = 0; i < bwdTRes.dim<Dimensions::Data::DATB1D>(); i++)
+               {
+                  i_ = bwdTRes.idx<Dimensions::Data::DATB1D>(i);
+
+                  // Generate point information
+                  point = spRes->counter().makeKey(dimId, i_, j_);
+
+                  // Get insertion position to use as next starting point to speed up insertion
+                  mapPos = bwdMap.insert(mapPos,point);
+               }
+            }
+
+            // Loop over CPUs
+            MatrixI  matRemote;
+            int matched = 0;
+            int toMatch = -1;
+            std::set<std::pair<int,int> > filter;
+            dimId = exId;
+            const auto& fwdTRes = *spRes->cpu()->dim(dimId);
+            for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
+            {
+               matched = 0;
+
+               // Local CPU
+               if(cpu == localId)
+               {
+                  // Loop over second dimension
+                  for(int j = 0; j < fwdTRes.dim<Dimensions::Data::DAT2D>(); j++)
+                  {
+                     j_ = fwdTRes.idx<Dimensions::Data::DAT2D>(j);
+
+                     // Loop over forward dimension
+                     for(int i = 0; i < fwdTRes.dim<Dimensions::Data::DATF1D>(); i++)
+                     {
+                        i_ = fwdTRes.idx<Dimensions::Data::DATF1D>(i);
+
+                        // Generate point information
+                        point = spRes->counter().makeKey(dimId, i_, j_);
+
+                        // Look for same key in backward list
+                        mapPos = bwdMap.find(point);
+
+                        // Key was present, drop entry and extend filter
+                        if(mapPos != bwdMap.end())
+                        {
+                           // Add corresponding communication edge to filter
+                           filter.insert(std::make_pair(cpu, localId));
+
+                           // Delete found coordinate
+                           bwdMap.erase(mapPos);
+                        } else
+                        {
+                           fwdMap.insert(point);
+                        }
+                     }
+                  }
+
+                  // Store size of forward coordinates
+                  toMatch = fwdMap.size();
+
+               #ifdef QUICC_MPI
+                  // Convert coordinates set to matrix to send through MPI
+                  matRemote.resize(2, fwdMap.size());
+                  int i =0;
+                  for(auto it = fwdMap.begin(); it != fwdMap.end(); ++it)
+                  {
+                     matRemote(0,i) = it->first;
+                     matRemote(1,i) = it->second;
+                     i++;
+                  }
+
+                  // Broadcast size
+                  QuICCEnv().synchronize();
+                  int ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 711);
+
+                  // Broadcast data
+                  QuICCEnv().synchronize();
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 712);
+
+               // Remote CPU
+               } else
+               {
+                  // Get size
+                  QuICCEnv().synchronize();
+                  int ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 713);
+
+                  // Get remote keys as matrix
+                  matRemote.resize(2, toMatch);
+                  QuICCEnv().synchronize();
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 714);
+
+                  // Compare received data to stored indexes
+                  for(int i = 0; i < toMatch; i++)
+                  {
+                     point = std::make_pair(matRemote(0,i), matRemote(1,i));
+
+                     mapPos = bwdMap.find(point);
+
+                     // Check if point is in backward map
+                     if(mapPos != bwdMap.end())
+                     {
+                        // Add corresponding communication edge to filter
+                        filter.insert(std::make_pair(cpu, localId));
+
+                        // Delete found entry
+                        bwdMap.erase(mapPos);
+
+                        // Increase matched counter
+                        matched++;
+                     }
+                  }
+               }
+
+               #else
+               }
+               #endif // QUICC_MPI
+            }
+
+            #ifdef QUICC_MPI
+               // Gather total number of match entries
+               QuICCEnv().synchronize();
+               int ierr = MPI_Allreduce(MPI_IN_PLACE, &matched, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+               QuICCEnv().check(ierr, 715);
+            #endif // QUICC_MPI
+
+            // Check that everything matched
+            if(toMatch != matched)
+            {
+               throw std::logic_error("The computed index sets don't match!");
+            }
+
+            #ifdef QUICC_MPI
+               // Store current filter
+               MatrixI locFilter(2, filter.size());
+               int i = 0;
+               for(auto it = filter.begin(); it != filter.end(); ++it)
+               {
+                  locFilter(0, i) = it->first;
+                  locFilter(1, i) = it->second;
+                  i++;
+               }
+
+               // Gather full communication structure
+               for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
+               {
+                  int filterSize = 0;
+                  if(cpu == localId)
+                  {
+                     filterSize = locFilter.cols();
+
+                     // Get size
+                     QuICCEnv().synchronize();
+                     ierr = MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                     QuICCEnv().check(ierr, 716);
+
+                     // Get remote keys as matrix
+                     QuICCEnv().synchronize();
+                     ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                     QuICCEnv().check(ierr, 717);
+
+                  } else
+                  {
+                     // Get size
+                     QuICCEnv().synchronize();
+                     ierr = MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                     QuICCEnv().check(ierr, 718);
+
+                     // Get remote keys as matrix
+                     matRemote.resize(2, filterSize);
+                     QuICCEnv().synchronize();
+                     ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                     QuICCEnv().check(ierr, 719);
+
+                     for(int i = 0; i < filterSize; ++i)
+                     {
+                        filter.insert(std::make_pair(matRemote(0,i), matRemote(1,i)));
+                     }
+                  }
+               }
+            #endif // QUICC_MPI
+
+            // Store obtained minimized structure
+            for(auto filIt = filter.begin(); filIt != filter.end(); filIt++)
+            {
+               commStructure.at(exId).insert(*filIt);
+            }
+
+            // Clear all the data for next loop
+            bwdMap.clear();
+            fwdMap.clear();
+         }
+
+      }
+      // Handle 3D resolution
+      else if(spRes->cpu(0)->nDim() == 3)
+      {
+         // Simplify syntax
+         typedef std::tuple<int,int,int>   Coordinate;
+
+         // Extract communication structure from resolution object
+         std::set<Coordinate> bwdMap;
+         std::set<Coordinate> fwdMap;
+
+         // Storage for a coordinate
+         Coordinate point;
+
+         // Position iterator for insert calls
+         std::set<Coordinate>::iterator   mapPos;
+
+         // Loop over possible data exchanges
+         std::vector<Dimensions::Transform::Id> exchanges = {Dimensions::Transform::TRA1D,Dimensions::Transform::TRA2D,Dimensions::Transform::SPECTRAL};
+         for(auto exId: exchanges)
+         {
+            // Create storage for structure
+            commStructure.emplace(exId, std::multimap<int,int>());
+
+            // initialise the position hint for inserts
+            mapPos = bwdMap.begin();
+
+            dimId = Dimensions::jump(exId, 1);
+            const auto& fwdTRes = *spRes->cpu()->dim(dimId);
+            // Loop over third dimension
+            for(int k = 0; k < fwdTRes.dim<Dimensions::Data::DAT3D>(); k++)
+            {
+               k_ = fwdTRes.idx<Dimensions::Data::DAT3D>(k);
+
+               // Loop over second dimension
+               for(int j = 0; j < fwdTRes.dim<Dimensions::Data::DAT2D>(k); j++)
+               {
+                  j_ = fwdTRes.idx<Dimensions::Data::DAT2D>(j,k);
+
+                  // Loop over backward dimension
+                  for(int i = 0; i < fwdTRes.dim<Dimensions::Data::DATB1D>(j,k); i++)
+                  {
+                     i_ = fwdTRes.idx<Dimensions::Data::DATB1D>(i, j, k);
+
+                     // Generate point information
+                     point = spRes->counter().makeKey(dimId, i_, j_, k_);
+
+                     // Get insertion position to use as next starting point to speed up insertion
+                     mapPos = bwdMap.insert(mapPos,point);
+                  }
+               }
+            }
+
+            // Loop over CPUs
+            MatrixI  matRemote;
+            int matched = 0;
+            int toMatch = -1;
+            std::set<std::pair<int,int> > filter;
+            dimId = exId;
+            const auto& bwdTRes = *spRes->cpu()->dim(dimId);
+            for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
+            {
+               matched = 0;
+
+               // Local CPU
+               if(cpu == localId)
+               {
+                  // Loop over third dimension
+                  for(int k = 0; k < bwdTRes.dim<Dimensions::Data::DAT3D>(); k++)
+                  {
+                     k_ = bwdTRes.idx<Dimensions::Data::DAT3D>(k);
+
+                     // Loop over second dimension
+                     for(int j = 0; j < bwdTRes.dim<Dimensions::Data::DAT2D>(k); j++)
+                     {
+                        j_ = bwdTRes.idx<Dimensions::Data::DAT2D>(j,k);
+
+                        // Loop over forward dimension
+                        for(int i = 0; i < bwdTRes.dim<Dimensions::Data::DATF1D>(j,k); i++)
+                        {
+                           i_ = bwdTRes.idx<Dimensions::Data::DATF1D>(i, j, k);
+
+                           // Generate point information
+                           point = spRes->counter().makeKey(dimId, i_, j_, k_);
+
+                           // Look for same key in backward list
+                           mapPos = bwdMap.find(point);
+
+                           // Key was present, drop entry and extend filter
+                           if(mapPos != bwdMap.end())
+                           {
+                              // Add corresponding communication edge to filter
+                              filter.insert(std::make_pair(cpu, localId));
+
+                              // Delete found coordinate
+                              bwdMap.erase(mapPos);
+                           } else
+                           {
+                              fwdMap.insert(point);
+                           }
+                        }
+                     }
+                  }
+
+                  // Store size of forward coordinates
+                  toMatch = fwdMap.size();
+
+               #ifdef QUICC_MPI
+                  // Convert coordinates set to matrix to send through MPI
+                  matRemote.resize(3, fwdMap.size());
+                  int i =0;
+                  for(auto it = fwdMap.begin(); it != fwdMap.end(); ++it)
+                  {
+                     matRemote(0,i) = std::get<0>(*it);
+                     matRemote(1,i) = std::get<1>(*it);
+                     matRemote(2,i) = std::get<2>(*it);
+                     i++;
+                  }
+
+                  // Broadcast size
+                  QuICCEnv().synchronize();
+                  int ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 720);
+
+                  // Broadcast data
+                  QuICCEnv().synchronize();
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 721);
+
+               // Remote CPU
+               } else
+               {
+                  // Get size
+                  QuICCEnv().synchronize();
+                  int ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 722);
+
+                  // Get remote keys as matrix
+                  matRemote.resize(3, toMatch);
+                  QuICCEnv().synchronize();
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 723);
+
+                  // Compare received data to stored indexes
+                  for(int i = 0; i < toMatch; i++)
+                  {
+                     point = std::make_tuple(matRemote(0,i), matRemote(1,i), matRemote(2,i));
+
+                     mapPos = bwdMap.find(point);
+
+                     // Check if point is in backward map
+                     if(mapPos != bwdMap.end())
+                     {
+                        // Add corresponding communication edge to filter
+                        filter.insert(std::make_pair(cpu, localId));
+
+                        // Delete found entry
+                        bwdMap.erase(mapPos);
+
+                        // Increase matched counter
+                        matched++;
+                     }
+                  }
+               }
+
+               #else
+               }
+               #endif // QUICC_MPI
+            }
+
+            #ifdef QUICC_MPI
+               // Gather total number of match entries
+               QuICCEnv().synchronize();
+               int ierr = MPI_Allreduce(MPI_IN_PLACE, &matched, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+               QuICCEnv().check(ierr, 724);
+            #endif // QUICC_MPI
+
+            // Check that everything matched
+            if(toMatch != matched)
+            {
+               throw std::logic_error("The computed index sets don't match!");
+            }
+
+            #ifdef QUICC_MPI
+               // Store current filter
+               MatrixI locFilter(2, filter.size());
+               int i = 0;
+               for(auto it = filter.begin(); it != filter.end(); ++it)
+               {
+                  locFilter(0, i) = it->first;
+                  locFilter(1, i) = it->second;
+                  i++;
+               }
+
+               // Gather full communication structure
+               for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
+               {
+                  int filterSize = 0;
+                  if(cpu == localId)
+                  {
+                     filterSize = locFilter.cols();
+
+                     // Get size
+                     QuICCEnv().synchronize();
+                     ierr = MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                     QuICCEnv().check(ierr, 725);
+
+                     // Get remote keys as matrix
+                     QuICCEnv().synchronize();
+                     ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                     QuICCEnv().check(ierr, 726);
+
+                  } else
+                  {
+                     // Get size
+                     QuICCEnv().synchronize();
+                     ierr = MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                     QuICCEnv().check(ierr, 727);
+
+                     // Get remote keys as matrix
+                     matRemote.resize(2, filterSize);
+                     QuICCEnv().synchronize();
+                     ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                     QuICCEnv().check(ierr, 728);
+
+                     for(int i = 0; i < filterSize; ++i)
+                     {
+                        filter.insert(std::make_pair(matRemote(0,i), matRemote(1,i)));
+                     }
+                  }
+               }
+            #endif // QUICC_MPI
+
+            // Store obtained minimized structure
+            for(auto&& fId: filter)
+            {
+               commStructure.at(exId).insert(fId);
+            }
+
+            // Clear all the data for next loop
+            bwdMap.clear();
+            fwdMap.clear();
+         }
+      }
+      #endif
       // Synchronize
       QuICCEnv().synchronize();
    }
