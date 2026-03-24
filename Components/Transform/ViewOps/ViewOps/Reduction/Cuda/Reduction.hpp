@@ -15,6 +15,9 @@
 #include "Memory/Memory.hpp"
 #include "Memory/MemoryResource.hpp"
 #include "Operator/Unary.hpp"
+#include "Operator/Nary.hpp"
+#include "Environment/Cfl.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 /// @brief namespace for Reduction type operations
@@ -67,6 +70,59 @@ private:
    Memory::MemBlock<IndexType> _offSetIn;
    /// @brief output offset cache
    Memory::MemBlock<IndexType> _offSetOut;
+};
+/// @tparam T scalar
+template <class T = double> struct MagVelFunctor
+{
+   /// @brief non dimensional scaling for transport term
+   T _scaling;
+
+   /// @brief ctor
+   /// @param scaling
+   MagVelFunctor(T scaling) : _scaling(scaling){};
+
+   /// @brief deleted default constructor
+   MagVelFunctor() = delete;
+
+   /// @brief dtor
+   ~MagVelFunctor() = default;
+
+   /// @brief Cross product, component wise
+   /// @param uj
+   /// @param uk
+   /// @param vj
+   /// @param vk
+   /// @return i component of cross product
+   __host__ __device__ T operator()(T ui, T uj, T uk, T vi, T vj, T vk)
+   {
+      return _scaling * (ui * vi + uj * vj + uk * vk);
+   }
+};
+template <class Functor, class Tout, class Tin0, class Tin1, class Tin2, class Tin3, class Tin4, class Tin5>
+class OpCfl : public QuICC::Operator::NaryBaseOp<OpCfl<Functor, Tout, Tin0, Tin1, Tin2, Tin3, Tin4, Tin5>, Tout, Tin0, Tin1, Tin2, Tin3, Tin4, Tin5>
+{
+private:
+   /// @brief stored functor, i.e. struct with method
+   /// Tout::ScalarType operator()(Targs::ScalarType var, ...)
+	Functor _f;
+
+public:
+   /// @brief capture functor by value
+   /// @param f functor, i.e. struct with method
+   /// Tout::ScalarType operator()(Targs::ScalarType var, ...)
+   OpCfl(Functor f) : _f(f){};
+   /// @brief default constructor
+   OpCfl() = delete;
+   /// @brief dtor
+   ~OpCfl() = default;
+
+private:
+   /// @brief action implementation
+   /// @param out output View
+   /// @param ...args input Views
+   void applyImpl(Tout& out, const Tin0&, const Tin1&, const Tin2&, const Tin3&, const Tin4&, const Tin5&);
+   /// @brief give access to base class
+   friend QuICC::Operator::NaryBaseOp<OpCfl<Functor, Tout, Tin0, Tin1, Tin2, Tin3, Tin4, Tin5>, Tout, Tin0, Tin1, Tin2, Tin3, Tin4, Tin5>;
 };
 
 } // namespace Cuda

@@ -196,7 +196,7 @@ void Coordinator::computeNonlinear(const int it)
       // Copy back physical vel for cfl computation
       /// \todo move cfl computation in the graph and remove these copies
       const auto& ftRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA3D);
-      details::copyView2Vector(vecVel, UrVarv, UthetaVarv, UphiVarv, ftRes);
+      //details::copyView2Vector(vecVel, UrVarv, UthetaVarv, UphiVarv, ftRes);
 
       if (mIsMag)
       {
@@ -204,7 +204,7 @@ void Coordinator::computeNonlinear(const int it)
          // Copy back spectral coeff
          details::copyView2Vector(vecMag, TorMagVarv, PolMagVarv, jwRes);
          // Copy back physical magnetic field for cfl computation
-         details::copyView2Vector(vecMag, BrVarv, BthetaVarv, BphiVarv, ftRes);
+         //details::copyView2Vector(vecMag, BrVarv, BthetaVarv, BphiVarv, ftRes);
       }
    }
 #endif

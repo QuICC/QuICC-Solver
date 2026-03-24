@@ -94,6 +94,8 @@ private:
    /// @brief map transpose
    /// @param op
    void setTranspose(mlir::quiccir::TransposeOp op);
+
+   void setCflMagVel(mlir::quiccir::CflMagVelOp op);
 };
 
 } // namespace Graph

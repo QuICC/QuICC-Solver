@@ -8,4 +8,5 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}
     DotMap.cpp
     MulConstMap.cpp
     TransposeMap.cpp
+    CflMap.cpp
 )

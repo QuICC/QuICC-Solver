@@ -84,6 +84,10 @@ MapOps::MapOps(mlir::ModuleOp module,
          {
             setTranspose(tran);
          }
+         else if (auto cflMagVel = dyn_cast<mlir::quiccir::CflMagVelOp>(op))
+         {
+            setCflMagVel(cflMagVel);
+         }
          // return deallocateBuffers(op);
          //   if (failed(deallocateBuffers(op)))
          //     return WalkResult::interrupt();

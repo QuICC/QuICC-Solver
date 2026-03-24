@@ -2,6 +2,7 @@ set(PHS
   Environment/QuICCEnv.hpp
   Environment/Typedefs.hpp
   Environment/MpiTypes.hpp
+  Environment/Cfl.hpp
 )
 
 # Add public header
@@ -14,6 +15,7 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}
     PRIVATE
         QuICCEnv.cpp
         IEnvironment.cpp
+        Cfl.cpp
 )
 
 if(QUICC_USE_MPI)

@@ -49,6 +49,7 @@ target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE
   QuICC::ViewOps::Transpose
   QuICC::ViewOps::Pointwise
   QuICC::ViewOps::Slicewise
+  QuICC::ViewOps::Reduction
 )
 
 # Alias
