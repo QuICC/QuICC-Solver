@@ -47,7 +47,7 @@ public:
         if (appContainer.config.Ntheta != 0)
             deleteParallALT(&VkGPU, &appContainer);
 
-       if (temp_buffer != 0)
+      if (temp_buffer != 0)
         {
            cudaFree(temp_buffer);
            temp_buffer = 0;
@@ -235,7 +235,7 @@ public:
       assert(QuICC::Cuda::isDeviceMemory(out.data()));
       assert(QuICC::Cuda::isDeviceMemory(in.data()));
 
-       if (temp_buffer == 0)
+      /* if (temp_buffer == 0)
       {
          cudaMalloc((void**)&temp_buffer,
             appContainer.config.Ntheta * (appContainer.config.sizeEvenBlock + appContainer.config.sizeOddBlock) *
@@ -246,8 +246,8 @@ public:
          cudaMalloc((void**)&temp_buffer2,
             appContainer.config.Ntheta * (appContainer.config.sizeEvenBlock + appContainer.config.sizeOddBlock) *
                sizeof(double));
-      }
-      /*auto& memGpu = QuICC::Memory::Pensieve<Memory::Cuda::Pool>::getInstance().getMem();
+      }*/
+      auto& memGpu = QuICC::Memory::Pensieve<Memory::Cuda::Pool>::getInstance().getMem();
       temp_buffer = reinterpret_cast<double*>(memGpu.allocate(appContainer.config.Ntheta *
                                       (appContainer.config.sizeEvenBlock +
                                          appContainer.config.sizeOddBlock) *
@@ -255,7 +255,7 @@ public:
       temp_buffer2 = reinterpret_cast<double*>(memGpu.allocate(appContainer.config.Ntheta *
                                       (appContainer.config.sizeEvenBlock +
                                          appContainer.config.sizeOddBlock) *
-                                      sizeof(double)));*/
+                                      sizeof(double)));
       
         launchParams.input_buffer_S = (double*)in.data();
         launchParams.temp_buffer_S = temp_buffer;
@@ -263,20 +263,25 @@ public:
         launchParams.output_buffer_S = (double*)out.data();
         launchApp_parallALT(&appContainer, &launchParams);
 
-       /* memGpu.deallocate(temp_buffer, appContainer.config.Ntheta *
+       memGpu.deallocate(temp_buffer, appContainer.config.Ntheta *
                                      (appContainer.config.sizeEvenBlock +
                                         appContainer.config.sizeOddBlock) *
                                      sizeof(double));
+        temp_buffer = 0;
         memGpu.deallocate(temp_buffer2, appContainer.config.Ntheta *
                                      (appContainer.config.sizeEvenBlock +
                                         appContainer.config.sizeOddBlock) *
-                                     sizeof(double));*/
-    /*  double* xx =
+                                     sizeof(double));
+        temp_buffer2 = 0;
+      /*double* xx =
                 (double*)calloc(2 * appContainer.config.Ntheta *
                                          (appContainer.config.sizeEvenBlock +
                                             appContainer.config.sizeOddBlock),
             sizeof(double));
-        
+         if (appContainer.config.projector)
+            	printf("proj\n");
+            else
+            	printf("int\n");
       cudaDeviceSynchronize();
           cudaMemcpy(xx, launchParams.input_buffer_S,
             128 *
@@ -285,7 +290,7 @@ public:
             cudaMemcpyDeviceToHost);
          //if (appContainer.config.projector)
          {
-            for (int j = 0; j < 60; j++)
+            for (int j = 0; j < 4; j++)
             {
                for (int i = 0; i < 4; i++)
                {
@@ -303,7 +308,7 @@ public:
             cudaMemcpyDeviceToHost);
         // if (appContainer.config.projector)
          {
-            for (int j = 0; j < 60; j++)
+            for (int j = 0; j < 4; j++)
             {
                for (int i = 0; i < 4; i++)
                {
@@ -334,8 +339,10 @@ public:
 
       assert(QuICC::Cuda::isDeviceMemory(out.data()));
       assert(QuICC::Cuda::isDeviceMemory(in.data()));
-      /*auto& memGpu = QuICC::Memory::Pensieve<Memory::Cuda::Pool>::getInstance().getMem();
-      temp_buffer = reinterpret_cast<double*>(memGpu.allocate(appContainer.config.Ntheta *
+      /* auto& memGpu =
+         QuICC::Memory::Pensieve<Memory::Cuda::Pool>::getInstance().getMem();
+      temp_buffer = reinterpret_cast<double*>(
+         memGpu.allocate(appContainer.config.Ntheta *
                                       (appContainer.config.sizeEvenBlock +
                                          appContainer.config.sizeOddBlock) *
                                       sizeof(double)));
@@ -388,23 +395,28 @@ public:
              launchParams.output_buffer_T = (double*)out2.data();
              launchApp_parallALT(&appContainer, &launchParams);
 
-       /* memGpu.deallocate(temp_buffer, appContainer.config.Ntheta *
+         /* memGpu.deallocate(temp_buffer,
+                appContainer.config.Ntheta *
                                      (appContainer.config.sizeEvenBlock +
                                         appContainer.config.sizeOddBlock) *
                                      sizeof(double));
+         temp_buffer = 0;
         memGpu.deallocate(temp_buffer2, appContainer.config.Ntheta *
                                      (appContainer.config.sizeEvenBlock +
                                         appContainer.config.sizeOddBlock) *
                                      sizeof(double));
+        temp_buffer2 = 0;
         memGpu.deallocate(temp_buffer3, appContainer.config.Ntheta *
                                      (appContainer.config.sizeEvenBlock +
                                         appContainer.config.sizeOddBlock) *
                                      sizeof(double));
+        temp_buffer3 = 0;
         memGpu.deallocate(temp_buffer4, appContainer.config.Ntheta *
                                      (appContainer.config.sizeEvenBlock +
                                         appContainer.config.sizeOddBlock) *
-                                     sizeof(double));*/
-              /*double* xx =
+                                     sizeof(double));
+        temp_buffer4 = 0;*/
+             /* double* xx =
                 (double*)calloc(2 * appContainer.config.Ntheta *
                                          (appContainer.config.sizeEvenBlock +
                                             appContainer.config.sizeOddBlock),
@@ -416,6 +428,10 @@ public:
                2*8 *
                sizeof(double),
             cudaMemcpyDeviceToHost);
+            if (appContainer.config.projector)
+            	printf("proj\n");
+            else
+            	printf("int\n");
          //if (appContainer.config.projector)
          {
             for (int j = 0; j < 4; j++)
