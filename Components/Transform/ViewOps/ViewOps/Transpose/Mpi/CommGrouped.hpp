@@ -353,6 +353,8 @@ void CommGrouped<TDATA, TAG>::exchange(structArray<TDATA*, SIZE>& out,
             const int window = 4; 
             int rank;
              MPI_Comm_rank(_subComm, &rank);
+             int Wrank;
+             MPI_Comm_rank(MPI_COMM_WORLD, &Wrank);
             int typesize;
              MPI_Type_size(Environment::MpiTypes::type<TDATA>(), &typesize);
              size_t sendBytes = _sendBufferView.size() * typesize;
