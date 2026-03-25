@@ -25,6 +25,7 @@ namespace QuICC {
   extern double* Cfl_r;
 	extern double* Cfl_dr;
 	extern double* Cfl_r_ll1;
+    extern int* Cfl_iR;
 
 	extern int Cfl_sliceSize;
 	extern int Cfl_nR;

@@ -63,38 +63,61 @@ namespace Diagnostics {
       const Array& r = this->mMeshSpacings.at(0);
       const Array& dr = this->mMeshSpacings.at(1);
       const Array& r_ll1 = this->mMeshSpacings.at(2);
-
-      int nR = this->mMeshSpacings.at(0).size();
+      const auto& vel = this->mFields.at(this->mVelId);
+      
+      int nR = vel->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       QuICC::Cfl_nR = nR;
+      QuICC::Cfl_sliceSize = vel->one().slice(0).size();
+
       if (!QuICC::Cfl_r)
-        cudaMalloc((void**)&QuICC::Cfl_r, nR* sizeof(double));
+        cudaMalloc((void**)&QuICC::Cfl_r, this->mMeshSpacings.at(0).size()* sizeof(double));
       if (!QuICC::Cfl_dr)
-        cudaMalloc((void**)&QuICC::Cfl_dr, nR* sizeof(double));
+        cudaMalloc((void**)&QuICC::Cfl_dr, this->mMeshSpacings.at(1).size()* sizeof(double));
       if (!QuICC::Cfl_r_ll1)
-        cudaMalloc((void**)&QuICC::Cfl_r_ll1, nR* sizeof(double));
+        cudaMalloc((void**)&QuICC::Cfl_r_ll1, this->mMeshSpacings.at(2).size()* sizeof(double));
 
       if (!QuICC::newCfl_radial)
         cudaMalloc((void**)&QuICC::newCfl_radial, 2* sizeof(double));
       if (!QuICC::newCfl_horizontal)
         cudaMalloc((void**)&QuICC::newCfl_horizontal, 2* sizeof(double));
-      double* temp_arr = (double*)calloc(nR, sizeof(double));
-      for (int i = 0; i < nR; ++i)
+
+      int* temp_iR = (int*)calloc(nR, sizeof(int));
+      
+       for (int i = 0; i < nR; ++i)
+      {
+         int iR = vel->res()
+                     .cpu()
+                     ->dim(Dimensions::Transform::TRA3D)
+                     ->idx<Dimensions::Data::DAT3D>(i);
+         temp_iR[i] = iR;
+         //printf("%d %d\n", nR, iR);
+      }
+       if (!QuICC::Cfl_iR)
+        cudaMalloc((void**)&QuICC::Cfl_iR, nR* sizeof(int));
+        cudaMemcpy(QuICC::Cfl_iR, temp_iR, nR * sizeof(int),
+         cudaMemcpyHostToDevice);
+       free(temp_iR);
+        int maxSize = (this->mMeshSpacings.at(0).size() > this->mMeshSpacings.at(1).size()) ? this->mMeshSpacings.at(0).size() : this->mMeshSpacings.at(1).size();
+        maxSize = (maxSize > this->mMeshSpacings.at(2).size()) ? maxSize : this->mMeshSpacings.at(2).size();
+        //printf("%d\n", maxSize);
+      double* temp_arr = (double*)calloc(maxSize, sizeof(double));
+      for (int i = 0; i < this->mMeshSpacings.at(0).size(); ++i)
       {
          temp_arr[i] = this->mMeshSpacings.at(0)(i);
       }
-      cudaMemcpy(QuICC::Cfl_r, temp_arr, nR * sizeof(double),
+      cudaMemcpy(QuICC::Cfl_r, temp_arr, this->mMeshSpacings.at(0).size() * sizeof(double),
          cudaMemcpyHostToDevice);
-      for (int i = 0; i < nR; ++i)
+      for (int i = 0; i < this->mMeshSpacings.at(1).size(); ++i)
       {
          temp_arr[i] = this->mMeshSpacings.at(1)(i);
       }
-      cudaMemcpy(QuICC::Cfl_dr, temp_arr, nR * sizeof(double),
+      cudaMemcpy(QuICC::Cfl_dr, temp_arr, this->mMeshSpacings.at(1).size() * sizeof(double),
          cudaMemcpyHostToDevice);
-      for (int i = 0; i < nR; ++i)
+      for (int i = 0; i < this->mMeshSpacings.at(2).size(); ++i)
       {
          temp_arr[i] = this->mMeshSpacings.at(2)(i);
       }
-      cudaMemcpy(QuICC::Cfl_r_ll1, temp_arr, nR * sizeof(double),
+      cudaMemcpy(QuICC::Cfl_r_ll1, temp_arr, this->mMeshSpacings.at(2).size() * sizeof(double),
          cudaMemcpyHostToDevice);
       free(temp_arr);
 

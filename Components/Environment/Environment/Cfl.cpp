@@ -19,6 +19,7 @@ namespace QuICC {
     double* Cfl_r=0;
 	double* Cfl_dr=0;
 	double* Cfl_r_ll1=0;
+	int* Cfl_iR=0;
 
 	int Cfl_sliceSize;
 	int Cfl_nR;

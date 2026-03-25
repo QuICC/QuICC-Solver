@@ -93,7 +93,7 @@ template <class T = double> struct MagVelFunctor
    /// @param vj
    /// @param vk
    /// @return i component of cross product
-   __host__ __device__ T operator()(T ui, T uj, T uk, T vi, T vj, T vk)
+   T operator()(T ui, T uj, T uk, T vi, T vj, T vk)
    {
       return _scaling * (ui * vi + uj * vj + uk * vk);
    }

@@ -82,9 +82,25 @@ __device__ void atomicMinDouble(double* addr, double value)
 
 __device__ inline double warpReduceMin(double val)
 {
-    for(int offset = warpSize/2; offset > 0; offset /= 2)
-        val = fmin(val, __shfl_down_sync(0xffffffff, val, offset));
+    for(int offset = warpSize/2; offset > 0; offset /= 2){
+        double temp = __shfl_down_sync(0xffffffff, val, offset);
+        if (temp < val) val = temp;
+    }
 
+    return val;
+}
+
+__device__ double warpReduceMin_noShuffle(double val)
+{
+    __shared__ double smem[128];   // one element per lane
+
+    smem[threadIdx.x] = val;
+    __syncthreads();   // synchronize threads within warp
+
+    for (int i = 0; i < 128; i++) {
+        if (smem[i] < val) val = smem[i];
+    }
+    __syncthreads();
     return val;
 }
 
@@ -110,6 +126,8 @@ __device__ double blockReduceMin(double val)
     // Step 4: final warp reduction
     if(wid == 0)
         val = warpReduceMin(val);
+    
+    __syncthreads();
 
     return val;
 }
@@ -119,6 +137,7 @@ __global__ void cflMagVel(
     double* r,
     double* dr,
     double* r_ll1,
+    int* iR,
 
     const double* vel1,
     const double* vel2,
@@ -143,14 +162,16 @@ __global__ void cflMagVel(
    int numBlocksPerSlice = paddedSize / (blockDim.x*registers_per_thread);
 
    int loc_r = blockIdx.x / (numBlocksPerSlice);
-   
-    if(loc_r >= nR) return;
+
+   if(loc_r >= nR) return;
+
+   int global_r = iR[loc_r];
     
     double aD;
     double newCfl;
 
     // Radial CFL
-    aD = mcAlfvenDamping / dr[loc_r];
+    aD = mcAlfvenDamping / dr[global_r];
     aD = aD * aD;
 
     double maxVel = 0.0;
@@ -164,14 +185,14 @@ __global__ void cflMagVel(
         double val =
             p / sqrt(p + aD)
             + abs(vel1[localID + loc_r*sliceSize]);
-        //if (val > 1e1) printf("gpu %d %e %e %e\n", localID,  dr[loc_r], val, dr[loc_r] / val);
+        //if (val > 1e1) printf("gpu %d %e %e %e\n", localID,  dr[global_r], val, dr[global_r] / val);
         if(val > maxVel)
             maxVel = val;
 
         localID += blockDim.x;
     }
     
-    newCfl = dr[loc_r] / maxVel;
+    newCfl = dr[global_r] / maxVel;
     
     newCfl = blockReduceMin(newCfl);
     
@@ -179,12 +200,12 @@ __global__ void cflMagVel(
         atomicMinDouble(cflRadial, newCfl);
 
         if(newCfl == cflRadial[0])
-            cflRadial[1] = r[loc_r];
+            cflRadial[1] = r[global_r];
     }
 
     // Horizontal CFL
 
-    aD = mcAlfvenDamping / r_ll1[loc_r];
+    aD = mcAlfvenDamping / r_ll1[global_r];
     aD = aD * aD;
 
     maxVel = 0.0;
@@ -208,21 +229,21 @@ __global__ void cflMagVel(
 
         double val =
             p / sqrt(p + aD) + vel;
-        //if (r_ll1[loc_r] / val < 6e-5) printf("gpu %d %e %e %e\n", localID+ loc_r*sliceSize,  r_ll1[loc_r], val, r_ll1[loc_r] / val);
+        //if (r_ll1[global_r] / val < 6e-5) printf("gpu %d %e %e %e\n", localID+ loc_r*sliceSize,  r_ll1[global_r], val, r_ll1[global_r] / val);
         if(val > maxVel)
             maxVel = val;
 
         localID += blockDim.x;
     }
 
-    newCfl = r_ll1[loc_r] / maxVel;
+    newCfl = r_ll1[global_r] / maxVel;
     newCfl = blockReduceMin(newCfl);
 
     if (threadIdx.x == 0){
         atomicMinDouble(cflHorizontal, newCfl);
 
         if(newCfl == cflHorizontal[0])
-            cflHorizontal[1] = r[loc_r];
+            cflHorizontal[1] = r[global_r];
     }
 
 }
@@ -397,7 +418,8 @@ void OpCfl<Functor, Tout, Tin0, Tin1, Tin2, Tin3, Tin4, Tin5>::applyImpl(Tout& o
     blockSize.x = 128;
     blockSize.y = 1;
     blockSize.z = 1;
-    numBlocks.x = QuICC::Cfl_nR*(((inVel0.dims()[0]*inVel0.dims()[1] + blockSize.x*registers_per_thread - 1)/(blockSize.x*registers_per_thread)));
+
+    numBlocks.x = QuICC::Cfl_nR*(((QuICC::Cfl_sliceSize + blockSize.x*registers_per_thread - 1)/(blockSize.x*registers_per_thread)));
     numBlocks.y = 1;
     numBlocks.z = 1;
 
@@ -417,13 +439,14 @@ void OpCfl<Functor, Tout, Tin0, Tin1, Tin2, Tin3, Tin4, Tin5>::applyImpl(Tout& o
         Cfl_r,
         Cfl_dr,
         Cfl_r_ll1,
+        Cfl_iR,
         inVel0.data(),
         inVel1.data(),
         inVel2.data(),
         inMag0.data(),
         inMag1.data(),
         inMag2.data(),
-        inVel0.dims()[0]*inVel0.dims()[1],
+        QuICC::Cfl_sliceSize,
         Cfl_nR,
         registers_per_thread,
         Cfl_mcAlfvenDamping,
