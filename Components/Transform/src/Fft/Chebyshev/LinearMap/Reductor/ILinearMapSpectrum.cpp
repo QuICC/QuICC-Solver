@@ -98,11 +98,6 @@ namespace Reductor {
    {
       throw std::logic_error("Data is not compatible with Chebyshev FFT energy reductor");
    }
-
-   void ILinearMapSpectrum::transform(MatrixZ&, const Matrix&) const
-   {
-      throw std::logic_error("Data is not compatible with Chebyshev FFT energy reductor");
-   }
    
    MHDFloat ILinearMapSpectrum::requiredStorage() const
    {

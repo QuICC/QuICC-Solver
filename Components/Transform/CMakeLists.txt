@@ -30,7 +30,7 @@ include(setup/TruncateQI)
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   QuICC::Types
   QuICC::Environment
-  ${QUICC_SPARSESM_COMPONENT_LIB}
+  QuICC::SparseSM
   QuICC::Polynomial
   QuICC::Profiling
   QuICC::ViewOps

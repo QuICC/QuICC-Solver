@@ -26,7 +26,7 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
 # Dependencies
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} INTERFACE
   QuICC::Polynomial
-  ${QUICC_SPARSESM_COMPONENT_LIB}
+  QuICC::SparseSM
 )
 
 # Alias

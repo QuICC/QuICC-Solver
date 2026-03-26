@@ -4,6 +4,10 @@ add_library(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} STA
   FftCtoC.cpp
   FftCtoR.cpp
   FftRtoC.cpp
+  FftDctType1.cpp
+  FftDctType2.cpp
+  FftDctType3.cpp
+  FftDctType4.cpp
   Library.cpp
 )
 

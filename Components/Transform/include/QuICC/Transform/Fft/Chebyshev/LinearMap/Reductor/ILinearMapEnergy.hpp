@@ -94,6 +94,11 @@ public:
     */
    virtual MHDFloat requiredStorage() const override;
 
+   /**
+    * @brief Unused interface
+    */
+   void transform(MatrixZ& rOut, const MatrixZ& in) const final;
+
 protected:
    /**
     * @brief Initialise FFT backend
@@ -137,22 +142,6 @@ private:
     */
    virtual void applyPreOperator(Matrix& tmp, const MatrixZ& in,
       const bool useReal) const = 0;
-
-   /**
-    * @brief Compute transform R2C (disabled)
-    *
-    * @param rOut Output values
-    * @param in   Input values
-    */
-   virtual void transform(MatrixZ& rOut, const Matrix& in) const override;
-
-   /**
-    * @brief Compute transform C2R (disabled)
-    *
-    * @param rOut Output values
-    * @param in   Input values
-    */
-   virtual void transform(MatrixZ& rOut, const MatrixZ& in) const override;
 };
 
 } // namespace Reductor

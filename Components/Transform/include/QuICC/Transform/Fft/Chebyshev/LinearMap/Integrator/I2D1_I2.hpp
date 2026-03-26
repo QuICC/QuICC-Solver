@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/Base/I2D1_I2.hpp"
-//#include "QuICC/Transform/Wrappers/Chebyshev/LinearMap/Integrator/I2D1_I2viewCpu_t.hpp.inc"
+#include "QuICC/Transform/Wrappers/Chebyshev/LinearMap/Integrator/I2D1_I2viewCpu_t.hpp.inc"
 #ifdef QUICC_HAS_CUDA_BACKEND
 //#include "QuICC/Transform/Wrappers/Chebyshev/LinearMap/Integrator/I2D1_I2viewGpu_t.hpp.inc"
 #endif

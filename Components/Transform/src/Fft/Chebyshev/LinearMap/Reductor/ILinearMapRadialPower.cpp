@@ -63,16 +63,6 @@ namespace Reductor {
       this->applyPostOperator(rOut, tmpSquare);
    }
 
-   void ILinearMapRadialPower::transform(MatrixZ&, const MatrixZ&) const
-   {
-      throw std::logic_error("Data is not compatible with Chebyshev FFT energy reductor");
-   }
-
-   void ILinearMapRadialPower::transform(MatrixZ&, const Matrix&) const
-   {
-      throw std::logic_error("Data is not compatible with Chebyshev FFT energy reductor");
-   }
-
    MHDFloat ILinearMapRadialPower::requiredStorage() const
    {
       MHDFloat mem = 0.0;

@@ -136,12 +136,6 @@ void ILinearMapEnergy::transform(MatrixZ&, const MatrixZ&) const
       "Data is not compatible with Chebyshev FFT energy reductor");
 }
 
-void ILinearMapEnergy::transform(MatrixZ&, const Matrix&) const
-{
-   throw std::logic_error(
-      "Data is not compatible with Chebyshev FFT energy reductor");
-}
-
 MHDFloat ILinearMapEnergy::requiredStorage() const
 {
    MHDFloat mem = 0.0;

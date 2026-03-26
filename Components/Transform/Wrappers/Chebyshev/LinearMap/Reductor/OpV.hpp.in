@@ -1,0 +1,100 @@
+/**
+ * @file @Op@@Tag@.hpp.inc
+ * @brief Wrapper of the Chebyshev LinearMap @Op@ Reductor
+ */
+#pragma once
+
+// System includes
+//
+
+// Project includes
+//
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/ILinearMapEnergy.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Tags.hpp"
+#include "View/View.hpp"
+#include "Operator/Unary.hpp"
+@CuhHeader@
+
+namespace QuICC {
+namespace Transform {
+namespace Fft {
+namespace Chebyshev {
+namespace LinearMap {
+namespace Reductor {
+
+template<class Impl>
+class @Op@;
+
+/**
+ * @brief Implementation of wrapper to the View LinearMap @Op@ Reductor op
+ */
+template<>
+class @Op@<@Tag@>: public ILinearMapEnergy
+{
+public:
+    /**
+     * @brief Constructor
+     */
+    @Op@() = default;
+
+    /**
+     * @brief Destructor
+     */
+    ~@Op@() = default;
+
+    /**
+     * @brief Compute reduction of complex data
+     */
+    void transform(Matrix& rOut, const MatrixZ& in) const final;
+
+    /**
+     * @brief Compute reduction of real data
+     */
+    void transform(Matrix& rOut, const Matrix& in) const final;
+
+    using ILinearMapEnergy::transform;
+
+    /**
+     * @brief Initialise View Op
+     */
+    void initBackend() const final;
+
+protected:
+
+private:
+    @PreOp@
+    @PostOp@
+
+    using mods_t = View::View<std::complex<double>, View::DCCSC3D>;
+    using red_t = View::View<double, View::CSC>;
+
+    /// @brief Operator base class pointer
+    mutable std::unique_ptr<QuICC::Operator::UnaryOp<@OpInOut@>> mOp;
+
+    /// @brief Output View
+    mutable red_t mRedView;
+
+    /// @brief Input View
+    mutable mods_t mModsView;
+
+    /// @brief Temporary storage for flattened output
+    mutable std::vector<double> mRedFlat;
+
+    /// @brief Temporary storage for flattened input
+    mutable std::vector<std::complex<double>> mModsFlat;
+
+    /// @brief Data pointers
+    mutable std::vector<std::uint32_t> mDataPointers;
+
+    /// @brief Data indices
+    mutable std::vector<std::uint32_t> mDataIndices;
+
+    @Storage@
+};
+
+} // namespace Reductor 
+} // namespace LinearMap
+} // namespace Chebyshev
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

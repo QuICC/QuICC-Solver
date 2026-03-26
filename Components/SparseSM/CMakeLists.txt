@@ -1,6 +1,6 @@
 # CMake setup for SparseSM component
 set(QUICC_CURRENT_COMPONENT_DIR Components/SparseSM)
-set(QUICC_CURRENT_COMPONENT_LIB ${QUICC_SPARSESM_COMPONENT_LIB})
+set(QUICC_CURRENT_COMPONENT_LIB SparseSM)
 
 # Set library sources visibility
 set(QUICC_CMAKE_SRC_VISIBILITY PRIVATE)
@@ -28,10 +28,13 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
   PRIVATE
     Boost::headers
 )
-add_library(QuICC::SparseSM ALIAS ${QUICC_SPARSESM_COMPONENT_LIB})
 
 # Add source directory
 add_subdirectory(src)
+
+# Alias
+add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB} ALIAS
+  "${QUICC_CURRENT_COMPONENT_LIB}")
 
 # Teststuite
 include(cmake.d/setup/TestSuite.cmake)

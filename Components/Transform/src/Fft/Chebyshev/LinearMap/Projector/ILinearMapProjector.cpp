@@ -12,6 +12,7 @@
 //
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/ILinearMapProjector.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -32,6 +33,8 @@ namespace Projector {
 
    void ILinearMapProjector::transform(MatrixZ& rOut, const MatrixZ& in) const
    {
+      Profiler::RegionFixture<2> fix("ILinearMapProjector::transform");
+
       assert(this->isInitialized());
       assert(rOut.cols() == this->outCols());
       assert(rOut.rows() == this->outRows());
@@ -50,6 +53,8 @@ namespace Projector {
 
    void ILinearMapProjector::transform(Matrix& rOut, const Matrix& in) const
    {
+      Profiler::RegionFixture<2> fix("ILinearMapProjector::transform");
+
       assert(this->isInitialized());
       assert(rOut.cols() == this->outCols());
       assert(rOut.rows() == this->outRows());
@@ -59,16 +64,6 @@ namespace Projector {
       this->applyPreOperator(tmp, in);
       this->mBackend.applyFft(rOut, tmp);
       this->applyPostOperator(rOut);
-   }
-
-   void ILinearMapProjector::transform(Matrix&, const MatrixZ&) const
-   {
-      throw std::logic_error("Data is not compatible with Chebyshev FFT projector");
-   }
-
-   void ILinearMapProjector::transform(MatrixZ&, const Matrix&) const
-   {
-      throw std::logic_error("Data is not compatible with Chebyshev FFT projector");
    }
 
    int ILinearMapProjector::outRows() const
@@ -90,6 +85,11 @@ namespace Projector {
 #endif // QUICC_STORAGEPROFILE
 
       return mem;
+   }
+
+   void ILinearMapProjector::transform(Matrix&, const MatrixZ&) const
+   {
+      throw std::logic_error("init needs to be implemented by the derived class");
    }
 
 }
