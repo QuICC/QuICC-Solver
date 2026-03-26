@@ -32,8 +32,12 @@
 #include "Timestep/Exponential/TimestepperInfo.hpp"
 #include "Timestep/Exponential/TimestepperCoordinator.hpp"
 #include "Timestep/Exponential/EpirkTimestepper.hpp"
-#include "Timestep/Exponential/InterfaceFunctors.hpp"
 #include "Timestep/Exponential/AugmentedJacobianFunctor.hpp"
+#include "Timestep/Exponential/Functors/DoNothingFunctor.hpp"
+#include "Timestep/Exponential/Functors/ProcessRangeFunctor.hpp"
+#include "Timestep/Exponential/Functors/TranslateInfoFunctor.hpp"
+#include "Timestep/Exponential/Functors/GetStepperFunctor.hpp"
+#include "Timestep/Exponential/Functors/InitSolutionFunctor.hpp"
 #include "Timestep/Exponential/Functors/CallExplicitPrognosticFunctor.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
 
@@ -187,7 +191,7 @@ private:
     */
    std::shared_ptr<AugmentedJacobianFunctor> mpJac;
 
-   using TSFunctor = GetStepperFunctor<SolverCoordinator>;
+   using TSFunctor = Functors::GetStepperFunctor<SolverCoordinator>;
    std::shared_ptr<TSFunctor> mpTsFunc;
 };
 
@@ -234,10 +238,10 @@ void Interface<TScheme>::translate(std::vector<TimestepperInfo>& infos, const Sc
    const VectorEquation_range& vectEq)
 {
    this->mpFieldIdMap = std::make_shared<std::map<SpectralFieldId, std::size_t>>();
-   auto bFunc = std::make_shared<DoNothingFunctor>();
-   auto pFunc = std::make_shared<TranslateInfoFunctor>(infos, this->mpFieldIdMap, this->_mem);
-   auto aFunc = std::make_shared<DoNothingFunctor>();
-   ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   auto bFunc = std::make_shared<Functors::DoNothingFunctor>();
+   auto pFunc = std::make_shared<Functors::TranslateInfoFunctor>(infos, this->mpFieldIdMap, this->_mem);
+   auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
+   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
    processor(scalEq);
    processor(vectEq);
 
@@ -285,12 +289,12 @@ void Interface<TScheme>::initSolution(const ScalarEquation_range& scalEq, const 
 {
    DebuggerMacro_msg("Initialize timestepper solutions", 6);
 
-   auto bFunc = std::make_shared<DoNothingFunctor>();
-   using OpFunctor = InitSolutionFunctor<TSFunctor>;
+   auto bFunc = std::make_shared<Functors::DoNothingFunctor>();
+   using OpFunctor = Functors::InitSolutionFunctor<TSFunctor>;
    auto pvFunc = std::make_shared<OpFunctor>(this->mpTsFunc);
-   auto pFunc = std::make_shared<InputFunctor<OpFunctor>>(pvFunc, this->mpFieldIdMap, this->_mem);
-   auto aFunc = std::make_shared<DoNothingFunctor>();
-   ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   auto pFunc = std::make_shared<Functors::InputFunctor<OpFunctor>>(pvFunc, this->mpFieldIdMap, this->_mem);
+   auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
+   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
    processor(scalEq);
    processor(vectEq);
 }
@@ -309,12 +313,12 @@ void Interface<TScheme>::getInput(const ScalarEquation_range& scalEq, const Vect
 {
    Profiler::RegionFixture<2> fix("Timestep-input");
 
-   auto bFunc = std::make_shared<ApplyConstraintFunctor>(SolveTiming::Before::id());
-   using OpFunctor = GetInputFunctor<TSFunctor>;
+   auto bFunc = std::make_shared<Functors::ApplyConstraintFunctor>(SolveTiming::Before::id());
+   using OpFunctor = Functors::GetInputFunctor<TSFunctor>;
    auto pvFunc = std::make_shared<OpFunctor>(this->mpTsFunc, Register::Rhs::id(), 1);
-   auto pFunc = std::make_shared<InputFunctor<OpFunctor>>(pvFunc, this->mpFieldIdMap, this->_mem);
-   auto aFunc = std::make_shared<DoNothingFunctor>();
-   ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   auto pFunc = std::make_shared<Functors::InputFunctor<OpFunctor>>(pvFunc, this->mpFieldIdMap, this->_mem);
+   auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
+   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
    processor(scalEq);
    processor(vectEq);
 }
@@ -324,14 +328,14 @@ void Interface<TScheme>::transferOutput(const ScalarEquation_range& scalEq, cons
 {
    Profiler::RegionFixture<2> fix("Timestep-output");
 
-   auto bFunc = std::make_shared<DoNothingFunctor>();
-   using OpFunctor = TransferOutputFunctor<TSFunctor>;
+   auto bFunc = std::make_shared<Functors::DoNothingFunctor>();
+   using OpFunctor = Functors::TransferOutputFunctor<TSFunctor>;
    auto pvFunc = std::make_shared<OpFunctor>(this->mpTsFunc, Register::Solution::id(), 0);
-   using CorrFunctor = TransferCorrectionFunctor<TSFunctor>;
+   using CorrFunctor = Functors::TransferCorrectionFunctor<TSFunctor>;
    auto cvFunc = std::make_shared<CorrFunctor>(this->mpTsFunc, Register::Solution::id(), 0);
-   auto pFunc = std::make_shared<OutputFunctor<OpFunctor, CorrFunctor>>(pvFunc, cvFunc, this->mpFieldIdMap, this->_mem);
-   auto aFunc = std::make_shared<DoNothingFunctor>();
-   ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   auto pFunc = std::make_shared<Functors::OutputFunctor<OpFunctor, CorrFunctor>>(pvFunc, cvFunc, this->mpFieldIdMap, this->_mem);
+   auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
+   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
    processor(scalEq);
    processor(vectEq);
 }

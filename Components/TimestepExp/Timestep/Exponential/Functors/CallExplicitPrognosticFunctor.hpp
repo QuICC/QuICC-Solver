@@ -14,7 +14,10 @@
 #include "Memory/MemoryResource.hpp"
 #include "Profiler/Interface.hpp"
 #include "QuICC/Pseudospectral/Coordinator.hpp"
-#include "Timestep/Exponential/InterfaceFunctors.hpp"
+#include "Timestep/Exponential/Functors/DoNothingFunctor.hpp"
+#include "Timestep/Exponential/Functors/GetLinearInputFunctor.hpp"
+#include "Timestep/Exponential/Functors/LinearInputFunctor.hpp"
+#include "Timestep/Exponential/Functors/ProcessRangeFunctor.hpp"
 
 namespace QuICC {
 

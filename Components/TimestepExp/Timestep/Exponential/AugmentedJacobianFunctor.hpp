@@ -14,7 +14,14 @@
 #include "QuICC/Timestep/Interface.hpp"
 #include "Types/Typedefs.hpp"
 #include "Memory/MemoryResource.hpp"
-#include "Timestep/Exponential/InterfaceFunctors.hpp"
+#include "Timestep/Exponential/Functors/DoNothingFunctor.hpp"
+#include "Timestep/Exponential/Functors/StepperWrapperFunctor.hpp"
+#include "Timestep/Exponential/Functors/ApplyConstraintFunctor.hpp"
+#include "Timestep/Exponential/Functors/TransferOutputFunctor.hpp"
+#include "Timestep/Exponential/Functors/TransferCorrectionFunctor.hpp"
+#include "Timestep/Exponential/Functors/InputFunctor.hpp"
+#include "Timestep/Exponential/Functors/GetInputFunctor.hpp"
+#include "Timestep/Exponential/Functors/OutputFunctor.hpp"
 #include "Timestep/Exponential/Tags.hpp"
 
 namespace QuICC {
@@ -41,7 +48,7 @@ class AugmentedJacobianFunctor
       typedef std::map<SpectralFieldId, std::size_t> IdMap;
 
       /// Typedef for the Timestepper functor
-      using TsFunctor = StepperWrapperFunctor<EpirkTimestepper<SparseMatrix, Matrix, base_t>>;
+      using TsFunctor = Functors::StepperWrapperFunctor<EpirkTimestepper<SparseMatrix, Matrix, base_t>>;
 
       /**
        * @brief ctor
@@ -84,10 +91,10 @@ class AugmentedJacobianFunctor
       void setEquations(const Timestep::Interface::ScalarEquation_range& scalEq, const Timestep::Interface::VectorEquation_range& vectEq);
 
    private:
-      using OviewFunctor = TransferOutputFunctor<TsFunctor>;
-      using OcorrFunctor = TransferCorrectionFunctor<TsFunctor>;
-      using IbeforeFunctor = ApplyConstraintFunctor;
-      using IviewFunctor = GetInputFunctor<TsFunctor>;
+      using OviewFunctor = Functors::TransferOutputFunctor<TsFunctor>;
+      using OcorrFunctor = Functors::TransferCorrectionFunctor<TsFunctor>;
+      using IbeforeFunctor = Functors::ApplyConstraintFunctor;
+      using IviewFunctor = Functors::GetInputFunctor<TsFunctor>;
 
       /**
        * @brief Apply Jacobian
@@ -172,7 +179,7 @@ class AugmentedJacobianFunctor
       /**
        * @brief Nothing functor
        */
-      std::shared_ptr<DoNothingFunctor> mpNFunc;
+      std::shared_ptr<Functors::DoNothingFunctor> mpNFunc;
 
       /**
        * @brief Timestepper functor
@@ -192,7 +199,7 @@ class AugmentedJacobianFunctor
       /**
        * @brief Output functor
        */
-      std::shared_ptr<OutputFunctor<OviewFunctor, OcorrFunctor>> mpOutFunc;
+      std::shared_ptr<Functors::OutputFunctor<OviewFunctor, OcorrFunctor>> mpOutFunc;
 
       /**
        * @brief Input before functor
@@ -207,7 +214,7 @@ class AugmentedJacobianFunctor
       /**
        * @brief Input functor
        */
-      std::shared_ptr<InputFunctor<IviewFunctor>> mpInFunc;
+      std::shared_ptr<Functors::InputFunctor<IviewFunctor>> mpInFunc;
 };
 
 } // namespace Exponential
