@@ -136,10 +136,10 @@ namespace Parallel {
       switch(i)
       {
          case(0):
-            return id % factors(0);
+            return id / factors(1);
             break;
          case(1):
-            return id / factors(0);
+            return id % factors(1);
             break;
          case(2):
             return id / (factors(0)*factors(1));
