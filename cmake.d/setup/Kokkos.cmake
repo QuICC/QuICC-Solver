@@ -101,7 +101,9 @@ if(QUICC_USE_KOKKOS)
             )
         endif()
         message(VERBOSE "Kokkos CUDA Enabled = ${Kokkos_ENABLE_CUDA}")
-        kokkos_check(OPTIONS CUDA_LAMBDA)
+		if(Kokkos_VERSION VERSION_LESS 4.1)
+          kokkos_check(OPTIONS CUDA_LAMBDA)
+		endif()
 
         # get cuda flags from the wrapper
         # alternatively we can strip Kokkos_INTERFACE_COMPILE_OPTIONS
