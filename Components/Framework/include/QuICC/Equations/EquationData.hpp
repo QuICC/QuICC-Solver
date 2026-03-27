@@ -230,6 +230,16 @@ namespace Equations {
           */
          const EquationOptions& options() const;
 
+         /**
+          * @brief Get model backend
+          */
+         std::shared_ptr<Model::IModelBackend> spBackend() const;
+
+         /**
+          * @brief Get model backend
+          */
+         const Model::IModelBackend& backend() const;
+
       protected:
          enum ForwardPathsId
          {
@@ -257,11 +267,6 @@ namespace Equations {
           * @brief Get spatial scheme
           */
          const SpatialScheme::ISpatialScheme& ss() const;
-
-         /**
-          * @brief Get model backend
-          */
-         const Model::IModelBackend& backend() const;
 
          /**
           * @brief Get equation options pointer

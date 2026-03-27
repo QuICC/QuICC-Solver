@@ -19,46 +19,10 @@
 #include "QuICC/Equations/IEquation.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "Arithmetics/Basic.hpp"
-#include "QuICC/Equations/IFieldEquation_decl.hpp"
-#include "QuICC/Equations/details/StoreSolutionFunctor.hpp"
-#include "QuICC/Equations/details/StoreSolutionFunctorSSR.hpp"
-#include "QuICC/Equations/details/StoreSolutionFunctorSMR.hpp"
-#include "QuICC/Equations/details/StoreSolutionFunctorM.hpp"
-#include "QuICC/Equations/details/StoreSolutionFunctorS.hpp"
 
 namespace QuICC {
 
 namespace Equations {
-
-   inline MHDVariant IFieldEquation::updateStoredSolution(const MHDVariant newData, FieldComponents::Spectral::Id, const int, const int, const int)
-   {
-      return newData;
-   }
-
-   template<typename TData, typename TField>
-      void IFieldEquation::storeSolutionImpl(TField& field, FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start)
-   {
-      if(this->couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
-      {
-         details::StoreSolutionFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(*this, compId, matIdx);
-         func.apply(field, storage, start);
-      }
-      else if(this->couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
-      {
-         details::StoreSolutionFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(*this, compId, matIdx);
-         func.apply(field, storage, start);
-      }
-      else if(this->couplingInfo(compId).indexType() == CouplingIndexType::MODE)
-      {
-         details::StoreSolutionFunctor<CouplingIndexType::MODE> func(*this, compId, matIdx);
-         func.apply(field, storage, start);
-      }
-      else if(this->couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
-      {
-         details::StoreSolutionFunctor<CouplingIndexType::SINGLE> func(*this, compId, matIdx);
-         func.apply(field, storage, start);
-      }
-   }
 
 } // Equations
 } // QuICC

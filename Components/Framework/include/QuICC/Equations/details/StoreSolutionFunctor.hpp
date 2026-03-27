@@ -16,12 +16,11 @@
 #include "QuICC/Equations/ApplyGalerkinStencil.hpp"
 #include "QuICC/Equations/CouplingIndexType.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
+#include "QuICC/Equations/SolutionUpdater.hpp"
 
 namespace QuICC {
 
 namespace Equations {
-
-class IFieldEquation;
 
 namespace details {
 
@@ -31,7 +30,7 @@ public:
    /**
     * @brief ctor
     */
-   StoreSolutionFunctor(IFieldEquation& eq,
+   StoreSolutionFunctor(const Resolution& res, const CouplingInformation& cinfo, const SparseMatrix* op, std::shared_ptr<SolutionUpdater> spUp,
       FieldComponents::Spectral::Id compId, const int matIdx);
 
    /**
@@ -59,12 +58,27 @@ public:
 private:
    template <typename TData>
    Arithmetics::Temporary<TData> init(int& solStart, const TData& storage,
-      const int start, const CouplingInformation& info);
+      const int start);
+
+   /**
+    * @brief Resolution
+    */
+   const Resolution& res;
+
+   /**
+    * @brief Coupling information
+    */
+   const CouplingInformation& cinfo;
 
    /**
     * @brief Reference to equation
     */
-   IFieldEquation* eq;
+   const SparseMatrix* pOp;
+
+   /**
+    * @brief Update functor
+    */
+   std::shared_ptr<SolutionUpdater> spUp;
 
    /**
     * @brief Field component ID
@@ -78,25 +92,24 @@ private:
 };
 
 template <CouplingIndexType IndexType>
-StoreSolutionFunctor<IndexType>::StoreSolutionFunctor(IFieldEquation& eq,
+StoreSolutionFunctor<IndexType>::StoreSolutionFunctor(const Resolution& res, const CouplingInformation& cinfo, const SparseMatrix* pOp, std::shared_ptr<SolutionUpdater> spUp,
    FieldComponents::Spectral::Id compId, const int matIdx) :
-    eq(&eq), compId(compId), matIdx(matIdx)
+    res(res), cinfo(cinfo), pOp(pOp), spUp(spUp), compId(compId), matIdx(matIdx)
 {}
 
 template <CouplingIndexType IndexType>
 template <typename TData>
 Arithmetics::Temporary<TData> StoreSolutionFunctor<IndexType>::init(
-   int& solStart, const TData& storage, const int start,
-   const CouplingInformation& info)
+   int& solStart, const TData& storage, const int start)
 {
    Arithmetics::Temporary<TData> sol;
-   if (info.isGalerkin())
+   if (cinfo.isGalerkin())
    {
       if constexpr (Arithmetics::is_view<TData>::value)
       {
-         sol.storage.resize(info.tauN(matIdx), info.rhsCols(matIdx));
-         std::array<std::uint32_t, 2> dimensions{info.tauN(matIdx),
-            info.rhsCols(matIdx)};
+         sol.storage.resize(cinfo.tauN(matIdx), cinfo.rhsCols(matIdx));
+         std::array<std::uint32_t, 2> dimensions{cinfo.tauN(matIdx),
+            cinfo.rhsCols(matIdx)};
          Patch::std::span<typename TData::ScalarType> span(sol.storage.data(),
             sol.storage.size());
          sol.data = TData(span, storage.dims());
@@ -104,14 +117,14 @@ Arithmetics::Temporary<TData> StoreSolutionFunctor<IndexType>::init(
       else
       {
          // Temporary storage is required
-         sol.data = TData(info.tauN(matIdx), info.rhsCols(matIdx));
+         sol.data = TData(cinfo.tauN(matIdx), cinfo.rhsCols(matIdx));
       }
 
       solStart = 0;
       sol.ptr = &sol.data;
 
       // Apply Galerkin stencil
-      applyGalerkinStencil(*eq, compId, sol.data, start, matIdx, storage);
+      applyGalerkinStencil(*pOp, compId, sol.data, start, matIdx, storage);
    }
    else
    {

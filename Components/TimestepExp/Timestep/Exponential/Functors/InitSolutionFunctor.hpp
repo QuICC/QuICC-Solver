@@ -51,14 +51,18 @@ void InitSolutionFunctor<TTsFunc>::operator()(ViewType tmpView, const SpectralFi
 {
    if(cinfo.isGalerkin())
    {
-      Equations::solveStencilUnknown(*eqIt, myId.second, tmpView, i, 0);
+      std::visit(
+            [&](auto&& p)
+            {
+               Equations::solveStencilUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), myId.first, p->dom(0).perturbation(), myId.second, tmpView, i, 0, eqIt->backend(), eqIt->bcIds().map(), eqIt->eqParams().map());
+            }, eqIt->spUnknown());
    }
    else
    {
       std::visit(
             [&](auto&& p)
             {
-            Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, true);
+               Equations::copyUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, true);
             }, eqIt->spUnknown());
    }
 

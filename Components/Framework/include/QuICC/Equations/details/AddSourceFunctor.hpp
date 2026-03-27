@@ -13,7 +13,8 @@
 //
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Equations/CouplingIndexType.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
+#include "QuICC/Equations/CouplingInformation.hpp"
+#include "QuICC/SpectralKernels/ISpectralKernel.hpp"
 
 namespace QuICC {
 
@@ -27,7 +28,7 @@ public:
    /**
     * @brief ctor
     */
-   AddSourceFunctor(const IFieldEquation& eq,
+   AddSourceFunctor(const Resolution& res, const CouplingInformation& cinfo, Spectral::Kernel::SharedISpectralKernel spSrc,
       FieldComponents::Spectral::Id compId, const int matIdx);
 
    /**
@@ -52,9 +53,19 @@ public:
 
 private:
    /**
-    * @brief Reference to equation
+    * @brief Resolution
     */
-   const IFieldEquation* eq;
+   const Resolution& res;
+
+   /**
+    * @brief Coupling information
+    */
+   const CouplingInformation& cinfo;
+
+   /**
+    * @brief Source kernel
+    */
+   Spectral::Kernel::SharedISpectralKernel spSrc;
 
    /**
     * @brief Field component ID
@@ -68,9 +79,9 @@ private:
 };
 
 template <CouplingIndexType IndexType>
-AddSourceFunctor<IndexType>::AddSourceFunctor(const IFieldEquation& eq,
+AddSourceFunctor<IndexType>::AddSourceFunctor(const Resolution& res, const CouplingInformation& cinfo, Spectral::Kernel::SharedISpectralKernel spSrc,
    FieldComponents::Spectral::Id compId, const int matIdx) :
-    eq(&eq), compId(compId), matIdx(matIdx)
+    res(res), cinfo(cinfo), spSrc(spSrc), compId(compId), matIdx(matIdx)
 {}
 
 } // namespace details

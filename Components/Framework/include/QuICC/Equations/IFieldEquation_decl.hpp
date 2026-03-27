@@ -19,7 +19,7 @@
 #include "QuICC/Equations/IEquation.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "Arithmetics/Basic.hpp"
-#include "QuICC/Equations/details/StoreSolutionFunctor.hpp"
+#include "QuICC/Equations/SolutionUpdater.hpp"
 
 namespace QuICC {
 
@@ -73,6 +73,20 @@ namespace Equations {
          virtual std::vector<std::tuple<MHDVariant,int,int,int>> correctionConstraint(FieldComponents::Spectral::Id compId, const std::size_t timeId);
 
          /**
+          * @brief Get solution updater kernel
+          *
+          * @param compId  ID of the spectral component
+          */
+         std::shared_ptr<SolutionUpdater> solutionUpdater(FieldComponents::Spectral::Id compId) const;
+
+         /**
+          * @brief Get source term kernel
+          *
+          * @param compId  ID of the spectral component
+          */
+         Spectral::Kernel::SharedISpectralKernel sourceKernel(FieldComponents::Spectral::Id compId) const;
+
+         /**
           * @brief Generic source term implementation
           *
           * @param compId  ID of the spectral component
@@ -81,6 +95,13 @@ namespace Equations {
           * @param k       Slowest index
           */
          virtual MHDVariant sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
+
+         /**
+          * @brief Get boundary value kernel
+          *
+          * @param compId  ID of the spectral component
+          */
+         Spectral::Kernel::SharedISpectralKernel boundaryKernel(FieldComponents::Spectral::Id compId) const;
 
          /**
           * @brief Generic boundary value implementation
@@ -93,23 +114,6 @@ namespace Equations {
          virtual MHDVariant boundaryValue(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
 
       protected:
-         /**
-          * @brief Templated passthrough update the stored value with the solver solution
-          */
-         virtual MHDVariant updateStoredSolution(const MHDVariant newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k);
-
-         /**
-          * @brief Transfer solver solution to equation unknown
-          *
-          * @param field   Scalar or vector field
-          * @param compId  Component ID
-          * @param storage Solver solution
-          * @param matIdx  Index of the given data
-          * @param start   Start index for the storage
-          */
-         template <typename TData, typename TField> void storeSolutionImpl(TField& field, FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start);
-
-         template <CouplingIndexType IndexType> friend class details::StoreSolutionFunctor;
       private:
 
    };

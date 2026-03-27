@@ -24,71 +24,9 @@
 #include "QuICC/PhysicalKernels/DoNothing.hpp"
 #include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
 
-#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-#include "QuICC/PhysicalNames/Coordinator.hpp"
-#include "QuICC/ModelOperator/ImplicitLinear.hpp"
-#include "QuICC/ModelOperator/Time.hpp"
-#include "QuICC/ModelOperator/Boundary.hpp"
-#include <unsupported/Eigen/SparseExtra>
-#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-
 namespace QuICC {
 
 namespace Equations {
-
-#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-namespace debug {
-   /// Create filename to write model operator to MatrixMarket file
-   void filenameWriteModelMatrix(const std::string& opName, const std::vector<SpectralFieldId>& tags, const std::vector<int>& ids);
-
-   /// Write decoupled complex model operator to MatrixMarket file
-   void writeModelMatrix(const DecoupledZSparse& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const std::vector<int>& ids);
-
-   /// Write real model operator to MatrixMarket file
-   void writeModelMatrix(const SparseMatrix& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const std::vector<int>& ids);
-
-   std::string filenameModelMatrix(const std::string& opName, const std::vector<SpectralFieldId>& tags, const std::vector<int>& ids)
-   {
-      std::stringstream ss;
-      ss << opName;
-      for(const auto& f: tags)
-      {
-         ss << "_" << PhysicalNames::Coordinator::tag(f.first);
-         if(f.second == FieldComponents::Spectral::TOR)
-         {
-            ss <<  "_tor";
-         }
-         else if(f.second == FieldComponents::Spectral::POL)
-         {
-            ss <<  "_pol";
-         }
-      }
-      for(auto idx: ids)
-      {
-         ss << "_" << idx;
-      }
-
-      return ss.str();
-   }
-
-   void writeModelMatrix(const DecoupledZSparse& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const std::vector<int>& ids)
-   {
-      auto baseName = filenameModelMatrix(opName, tags, ids);
-
-      std::string matName = baseName + "_re.mtx";
-      Eigen::saveMarket(mat.real(), matName);
-      matName = baseName + "_im.mtx";
-      Eigen::saveMarket(mat.imag(), matName);
-   }
-
-   void writeModelMatrix(const SparseMatrix& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const std::vector<int>& ids)
-   {
-      auto baseName = filenameModelMatrix(opName, tags, ids);
-      std::string matName = baseName + ".mtx";
-      Eigen::saveMarket(mat, matName);
-   }
-}
-#endif
 
    IEquation::IEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend)
       : EquationData(spEqParams, spScheme, spBackend)
@@ -110,6 +48,9 @@ namespace debug {
 
       // Add the nonlinear integration components
       this->setNLComponents();
+
+      // Set solution updater
+      this->initSolutionUpdater();
    }
 
    std::shared_ptr<Transform::ITransformSteps> IEquation::transformSteps() const
@@ -167,6 +108,17 @@ namespace debug {
       }
 
       return paths;
+   }
+
+   void IEquation::initSolutionUpdater()
+   {
+      auto range = this->spectralRange();
+
+      for(auto it = range.first; it != range.second; ++it)
+      {
+         auto spUp = std::make_shared<SolutionUpdater>();
+         this->mSolUps.emplace(*it, spUp);
+      }
    }
 
    void IEquation::initSpectralMatricesComponent(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId)
@@ -322,194 +274,6 @@ namespace debug {
             }
          }
       }
-   }
-
-   void IEquation::dispatchCoupling(FieldComponents::Spectral::Id compId, CouplingInformation::EquationTypeId eqType, const int iZero, const std::map<CouplingFeature,bool>& features, const Resolution& res)
-   {
-      bool hasNL = features.at(CouplingFeature::Nonlinear);
-      bool hasSource = features.at(CouplingFeature::Source);
-      bool hasBoundaryValue = features.at(CouplingFeature::BoundaryValue);
-      bool allowExplicit = features.at(CouplingFeature::AllowExplicit);
-
-      Model::EquationInfo eqInfo;
-      auto fId = std::make_pair(this->name(), compId);
-      this->backend().equationInfo(eqInfo, fId, res);
-
-      // Initialise coupling information
-      std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
-      infoIt = this->mCouplingInfos.insert(std::make_pair(compId,CouplingInformation()));
-      SpectralFieldId eqId = std::make_pair(this->name(), compId);
-
-      // Compute effective starting index for local CPU
-      int cpuIZero = iZero;
-      if(iZero == 1)
-      {
-         const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
-         if(tRes.idx<Dimensions::Data::DAT3D>(0) == 0 && tRes.idx<Dimensions::Data::DAT2D>(0,0) == 0)
-         {
-            cpuIZero = 1;
-         } else
-         {
-            cpuIZero = 0;
-         }
-      } else if(iZero > 1)
-      {
-         throw std::logic_error("Matrix starting index > 1 is not implemented yet!");
-      }
-
-      // General setup: equation type? real/complex solver? start from m = ?
-      infoIt.first->second.setGeneral(eqType, eqInfo.isComplex, cpuIZero, eqInfo.isSplitEquation);
-
-      // Set source flag: has source term?
-      infoIt.first->second.setSource(hasSource);
-
-      // Set boundary value flag: has boundary value?
-      infoIt.first->second.setBoundaryValue(hasBoundaryValue);
-
-      // Set index type: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
-      auto idxType = safe_CouplingIndexType_cast(eqInfo.indexMode);
-      auto spCoupling = res.sim().ss().createCouplingTools(idxType);
-      infoIt.first->second.setIndexType(idxType, spCoupling);
-
-      // Create implicit field coupling
-      int nFields = std::distance(eqInfo.im.begin(), eqInfo.im.end());
-      for(auto fIt = eqInfo.im.cbegin(); fIt != eqInfo.im.cend(); ++fIt)
-      {
-         infoIt.first->second.addImplicitField(fIt->first, fIt->second);
-      }
-
-      // Create explicit fields
-      bool hasQI = false;
-      if(allowExplicit)
-      {
-         // explicit linear
-         for(auto fIt = eqInfo.exL.cbegin(); fIt != eqInfo.exL.cend(); ++fIt)
-         {
-            infoIt.first->second.addExplicitField(fIt->first, fIt->second, ModelOperator::ExplicitLinear::id());
-         }
-
-         // explicit nonlinear
-         for(auto fIt = eqInfo.exNL.cbegin(); fIt != eqInfo.exNL.cend(); ++fIt)
-         {
-            if(!(fIt->first == this->name() && fIt->second == compId))
-            {
-               infoIt.first->second.addExplicitField(fIt->first, fIt->second, ModelOperator::ExplicitNonlinear::id());
-            }
-         }
-
-         // explicit nextstep
-         for(auto fIt = eqInfo.exNS.cbegin(); fIt != eqInfo.exNS.cend(); ++fIt)
-         {
-            infoIt.first->second.addExplicitField(fIt->first, fIt->second, ModelOperator::ExplicitNextstep::id());
-         }
-
-         // Extract quasi inverse
-         auto fIt = std::find(eqInfo.exNL.begin(), eqInfo.exNL.end(), std::make_pair(this->name(), compId));
-         if(fIt != eqInfo.exNL.end())
-         {
-            hasQI = true;
-         }
-      }
-
-      // Set nonlinear flags: has nonlinear term? has quasi-inverse?
-      infoIt.first->second.setNonlinear(hasNL, hasNL && hasQI);
-
-      // Sort implicit fields
-      infoIt.first->second.sortImplicitFields(eqId.first, eqId.second);
-
-      // Get number of matrices
-      int nMat = infoIt.first->second.couplingTools().nMat(res);
-
-      // Set field coupling information
-      Model::OperatorInfo opInfo(nMat);
-      this->backend().operatorInfo(opInfo, fId, res, infoIt.first->second.couplingTools(), this->bcIds().map());
-
-      infoIt.first->second.couplingTools().setTauN(opInfo.tauN, res);
-      infoIt.first->second.couplingTools().setGalerkinN(opInfo.galN, res);
-      infoIt.first->second.couplingTools().setRhsN(opInfo.rhsCols, res);
-      infoIt.first->second.couplingTools().setSystemN(opInfo.sysN, res, nFields);
-      infoIt.first->second.setSizes(nMat, opInfo.tauN, opInfo.galN, opInfo.galShift, opInfo.rhsCols, opInfo.sysN);
-   }
-
-   void  IEquation::dispatchModelMatrix(DecoupledZSparse& rModelMatrix, const std::size_t opId, FieldComponents::Spectral::Id compId, const int matIdx, const std::size_t bcType, const Resolution& res, const std::vector<MHDFloat>& eigs) const
-   {
-      // Get list of implicit fields
-      CouplingInformation::FieldId_range imRange = this->couplingInfo(compId).implicitRange();
-
-      this->backend().modelMatrix(rModelMatrix, opId, imRange, matIdx, bcType, res, eigs, this->bcIds().map(), this->eqParams().map());
-
-#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-      auto opName = ModelOperator::Coordinator::tag(opId);
-      auto tags =  std::vector<SpectralFieldId>(imRange.first, imRange.second);
-
-      std::vector<int> fileIdx;
-      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
-      if(eigs.size() == 1)
-      {
-         fileIdx.push_back(tRes.idx<Dimensions::Data::DAT3D>(matIdx));
-      }
-      else
-      {
-         ArrayI mode = tRes.mode(matIdx);
-         fileIdx.push_back(mode(0));
-         fileIdx.push_back(mode(1));
-      }
-      debug::writeModelMatrix(rModelMatrix, opName, tags, fileIdx);
-#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-   }
-
-   void IEquation::dispatchGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx, const Resolution& res, const std::vector<MHDFloat>& eigs, const bool makeSquare) const
-   {
-      auto fId = std::make_pair(this->name(), compId);
-      this->backend().galerkinStencil(mat, fId, matIdx, res, eigs, makeSquare, this->bcIds().map(), this->eqParams().map());
-
-#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-      std::string opName = "galerkin_stencil";
-      if(makeSquare)
-      {
-         opName += "_sq";
-      }
-      std::vector<SpectralFieldId> tags = {fId};
-
-      std::vector<int> fileIdx;
-      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
-      if(eigs.size() == 1)
-      {
-         fileIdx.push_back(tRes.idx<Dimensions::Data::DAT3D>(matIdx));
-      }
-      else
-      {
-         ArrayI mode = tRes.mode(matIdx);
-         fileIdx.push_back(mode(0));
-         fileIdx.push_back(mode(1));
-      }
-      debug::writeModelMatrix(mat, opName, tags, fileIdx);
-#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-   }
-
-   void IEquation::dispatchExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::size_t opId,  const SpectralFieldId fieldId, const int matIdx, const Resolution& res, const std::vector<MHDFloat>& eigs) const
-   {
-      auto fId = std::make_pair(this->name(), compId);
-      this->backend().explicitBlock(mat, fId, opId, fieldId, matIdx, res, eigs, this->bcIds().map(), this->eqParams().map());
-
-#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-      auto opName = ModelOperator::Coordinator::tag(opId);
-      std::vector<SpectralFieldId> tags = {fId, fieldId};
-
-      std::vector<int> fileIdx;
-      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
-      if(eigs.size() == 1)
-      {
-         fileIdx.push_back(tRes.idx<Dimensions::Data::DAT3D>(matIdx));
-      }
-      else
-      {
-         ArrayI mode = tRes.mode(matIdx);
-         fileIdx.push_back(mode(0));
-         fileIdx.push_back(mode(1));
-      }
-      debug::writeModelMatrix(mat, opName, tags, fileIdx);
-#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    }
 
    void IEquation::setGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const

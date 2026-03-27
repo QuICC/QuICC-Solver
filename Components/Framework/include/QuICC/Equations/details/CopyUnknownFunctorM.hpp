@@ -16,7 +16,6 @@
 //
 #include "Arithmetics/Basic.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/Equations/SetZeroNonlinear.hpp"
 #include "QuICC/Equations/details/CopyUnknownFunctor.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
@@ -33,8 +32,8 @@ template <bool IsSet, typename TData, typename TField>
 void CopyUnknownFunctor<CouplingIndexType::MODE>::apply(const TField& field,
    TData& storage, const int start)
 {
-   const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-   const auto& sRes = eq->res().sim();
+   const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+   const auto& sRes = res.sim();
 
    // Safety assertion
    assert(start >= 0);
@@ -82,7 +81,7 @@ void CopyUnknownFunctor<CouplingIndexType::MODE>::apply(const TField& field,
    }
    else
    {
-      setZeroNonlinear(*eq, field, compId, storage, matIdx, start);
+      setZeroNonlinear(res, cinfo, field, compId, storage, matIdx, start);
    }
 }
 

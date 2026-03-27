@@ -19,6 +19,10 @@
 #include "Timestep/Exponential/CreateInfo.hpp"
 #include "Timestep/Exponential/Functors/BaseFunctor.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
+#ifdef QUICC_DEBUG
+#include "QuICC/PhysicalNames/Coordinator.hpp"
+#include "QuICC/Tools/IdToHuman.hpp"
+#endif //QUICC_DEBUG
 
 namespace QuICC {
 

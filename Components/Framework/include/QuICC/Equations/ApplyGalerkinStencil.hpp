@@ -17,7 +17,6 @@
 #include "Arithmetics/LinearAlgebra.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Equations/IEquation.hpp"
 
 namespace QuICC {
 
@@ -33,16 +32,13 @@ namespace Equations {
     * @param matIdx     System index
     * @param rhs        RHS field data
     */
-   template <typename TData> void applyGalerkinStencil(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& rField, const int start, const int matIdx, const TData& rhs);
+   template <typename TData> void applyGalerkinStencil(const SparseMatrix& op, FieldComponents::Spectral::Id compId, TData& rField, const int start, const int matIdx, const TData& rhs);
 
-   template <typename TData> inline void applyGalerkinStencil(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& rField, const int start, const int matIdx, const TData& rhs)
+   template <typename TData> inline void applyGalerkinStencil(const SparseMatrix& op, FieldComponents::Spectral::Id compId, TData& rField, const int start, const int matIdx, const TData& rhs)
    {
-      // Create pointer to sparse operator
-      const SparseMatrix * op = &eq.galerkinStencil(compId, matIdx);
-
-      auto outBlk = std::make_tuple(0, 0, op->rows(), Arithmetics::getCols(rhs));
-      auto inBlk = std::make_tuple(start, 0, op->cols(), Arithmetics::getCols(rhs));
-      Arithmetics::computeAx<Arithmetics::Operation::Set>(rField, outBlk, *op, rhs, inBlk);
+      auto outBlk = std::make_tuple(0, 0, op.rows(), Arithmetics::getCols(rhs));
+      auto inBlk = std::make_tuple(start, 0, op.cols(), Arithmetics::getCols(rhs));
+      Arithmetics::computeAx<Arithmetics::Operation::Set>(rField, outBlk, op, rhs, inBlk);
    }
 
 } // Equations

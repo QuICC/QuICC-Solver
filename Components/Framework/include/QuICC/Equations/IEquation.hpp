@@ -24,6 +24,7 @@
 #include "QuICC/Equations/CouplingFeature.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
 #include "QuICC/Equations/EquationData.hpp"
+#include "QuICC/Equations/SolutionUpdater.hpp"
 #include "QuICC/Variables/VariableRequirement.hpp"
 #include "QuICC/Simulation/SimulationBoundary.hpp"
 #include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
@@ -131,11 +132,6 @@ namespace Equations {
          virtual void initSpectralMatrices() = 0;
 
          /**
-          * @brief Implementation of the galerkin stencil dispatch to python scripts
-          */
-         void dispatchGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx, const Resolution& res, const std::vector<MHDFloat>& eigs, const bool makeSquare = false) const;
-
-         /**
           * @brief Set spectral constraint kernel
           */
          virtual void setConstraintKernel(FieldComponents::Spectral::Id compId, Spectral::Kernel::SharedISpectralKernel spKernel);
@@ -203,6 +199,11 @@ namespace Equations {
          virtual void setCoupling() = 0;
 
          /**
+          * @brief Initialize source kernels
+          */
+         virtual void initSolutionUpdater();
+
+         /**
           * @brief Set the default nonlinear components
           */
          virtual void setNLComponents() = 0;
@@ -226,29 +227,24 @@ namespace Equations {
          void initSpectralMatricesComponent(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId);
 
          /**
-          * @brief Implementation of the coupling definition to python scripts
-          */
-         void dispatchCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const std::map<CouplingFeature,bool>& features, const Resolution& res);
-
-         /**
-          * @brief Implementation of model operator dispatcher to python scripts
-          */
-         void dispatchModelMatrix(DecoupledZSparse& rModelMatrix, const std::size_t opId, FieldComponents::Spectral::Id comp, const int matIdx, const std::size_t bcType, const Resolution& res, const std::vector<MHDFloat>& eigs) const;
-
-         /**
-          * @brief Implementation of the explicit matrix operator dispatch to python scripts
-          */
-         void dispatchExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::size_t opId, const SpectralFieldId fieldId, const int matIdx, const Resolution& res, const std::vector<MHDFloat>& eigs) const;
-
-         /**
           * @brief Shared physical interaction kernel
           */
          Physical::Kernel::SharedIPhysicalKernel mspNLKernel;
 
          /**
+          * @brief Solution updaters
+          */
+          std::map<FieldComponents::Spectral::Id,std::shared_ptr<SolutionUpdater>> mSolUps;
+
+         /**
           * @brief Shared spectral source kernel for each component
           */
           std::map<FieldComponents::Spectral::Id,Spectral::Kernel::SharedISpectralKernel> mSrcKernel;
+
+         /**
+          * @brief Shared spectral boundary value kernel for each component
+          */
+          std::map<FieldComponents::Spectral::Id,Spectral::Kernel::SharedISpectralKernel> mBoundaryKernel;
 
          /**
           * @brief Shared spectral constraint kernel for each component

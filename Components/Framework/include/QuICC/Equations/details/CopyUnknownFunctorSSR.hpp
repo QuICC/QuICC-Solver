@@ -16,7 +16,6 @@
 //
 #include "Arithmetics/Basic.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/Equations/SetZeroNonlinear.hpp"
 #include "QuICC/Equations/details/CopyUnknownFunctor.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
@@ -33,7 +32,7 @@ template <bool IsSet, typename TData, typename TField>
 void CopyUnknownFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(
    const TField& field, TData& storage, const int start)
 {
-   const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
+   const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
 
    int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx) - shiftMaxCol;
 

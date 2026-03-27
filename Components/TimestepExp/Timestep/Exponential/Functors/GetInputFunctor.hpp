@@ -56,16 +56,19 @@ void GetInputFunctor<TTsFunc>::operator()(ViewType tmpView, const SpectralFieldI
       std::visit(
             [&](auto&& p)
             {
-            Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, false);
+            Equations::copyUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, false);
             }, eqIt->spUnknown());
    }
 
    // Add source term
-   std::visit(
-         [&](auto&& p)
-         {
-         Equations::addSource(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0);
-         }, eqIt->spUnknown());
+   if(cinfo.hasSource())
+   {
+      std::visit(
+            [&](auto&& p)
+            {
+            Equations::addSource(eqIt->res(), cinfo, eqIt->sourceKernel(myId.second), p->dom(0).perturbation(), myId.second, tmpView, i, 0);
+            }, eqIt->spUnknown());
+   }
 
    // Add value to RHS
    auto tsData = (*tsFunc)(info);

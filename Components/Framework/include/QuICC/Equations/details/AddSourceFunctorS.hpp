@@ -28,17 +28,16 @@ template <typename TData, typename TField>
 void AddSourceFunctor<CouplingIndexType::SINGLE>::apply(const TField& field,
    TData& storage, const int start)
 {
-   const auto& info = eq->couplingInfo(compId);
    // Add source term if required
-   if (info.hasSource())
+   if (cinfo.hasSource())
    {
-      const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-      const auto& sRes = eq->res().sim();
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+      const auto& sRes =res.sim();
       assert(matIdx == 0);
 
-      // int zeroRow = info.galerkinShift(matIdx,0);
-      // int zeroCol = info.galerkinShift(matIdx,1);
-      // int zeroBlock = info.galerkinShift(matIdx,2);
+      // int zeroRow = cinfo.galerkinShift(matIdx,0);
+      // int zeroCol = cinfo.galerkinShift(matIdx,1);
+      // int zeroBlock = cinfo.galerkinShift(matIdx,2);
 
       // Safety assertion
       assert(start >= 0);
@@ -86,7 +85,7 @@ void AddSourceFunctor<CouplingIndexType::SINGLE>::apply(const TField& field,
 
                // Add source term
                Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage,
-                  l, eq->sourceTerm(compId, i, j, k));
+                  l, spSrc->compute(i, j, k));
             }
          }
       }

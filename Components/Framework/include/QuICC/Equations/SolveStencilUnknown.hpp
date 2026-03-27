@@ -17,6 +17,7 @@
 #include "Eigen/src/Core/util/Constants.h"
 #include "Types/Typedefs.hpp"
 #include "QuICC/Equations/CopyUnknown.hpp"
+#include "QuICC/Equations/Dispatchers.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolverTools.hpp"
 
@@ -27,40 +28,33 @@ namespace Equations {
    /**
     * @brief Solve for galerkin unknown using the stencil
     *
-    * @param eq         Equation to work on
     * @param compId     Component ID
     * @param storage    Storage for the equation values
     * @param matIdx     Index of the given data
     * @param start      Start index for the storage
     */
-   template <typename TEquation, typename TData> void solveStencilUnknown(const TEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start);
+   template <typename TField, typename TData> void solveStencilUnknown(const Resolution& res, const CouplingInformation& cinfo, std::size_t fieldName, const TField& field, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const Model::IModelBackend& backend, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams);
 
-   template <typename TEquation, typename TData> void solveStencilUnknown(const TEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
+   template <typename TField, typename TData> void solveStencilUnknown(const Resolution& res, const CouplingInformation& cinfo, std::size_t fieldName, const TField& field, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const Model::IModelBackend& backend, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams)
    {
       using TmpDataType = typename std::conditional<std::is_same_v<TData, DecoupledZMatrix>, DecoupledZMatrix, Eigen::Matrix<typename Arithmetics::GetScalarType<TData>::ScalarType, Eigen::Dynamic, Eigen::Dynamic>>::type;
 
-      const auto& info = eq.couplingInfo(compId);
-
       // Create temporary storage for tau data
-      TmpDataType tmp(info.tauN(matIdx), info.rhsCols(matIdx));
-      std::visit(
-            [&](auto&& p)
-            {
-               Equations::copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true, true);
-            }, eq.spUnknown());
-      TmpDataType rhs(info.galerkinN(matIdx), info.rhsCols(matIdx));
-      if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
+      TmpDataType tmp(cinfo.tauN(matIdx), cinfo.rhsCols(matIdx));
+      Equations::copyUnknown(res, cinfo, field, compId, tmp, matIdx, 0, false, true, true);
+      TmpDataType rhs(cinfo.galerkinN(matIdx), cinfo.rhsCols(matIdx));
+      if(res.sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
       {
-         Arithmetics::setTopBlock(rhs, 0, info.galerkinN(matIdx), eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL), info.galerkinShift(matIdx, 0), tmp);
+         Arithmetics::setTopBlock(rhs, 0, cinfo.galerkinN(matIdx), res.sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL), cinfo.galerkinShift(matIdx, 0), tmp);
       }
       else
       {
-         Arithmetics::setTopBlock(rhs, 0, info.galerkinN(matIdx), tmp);
+         Arithmetics::setTopBlock(rhs, 0, cinfo.galerkinN(matIdx), tmp);
       }
 
       // Get a restricted stencil matrix
-      SparseMatrix stencil(info.galerkinN(matIdx),info.galerkinN(matIdx));
-      eq.dispatchGalerkinStencil(compId, stencil, matIdx, eq.res(), info.couplingTools().getIndexes(eq.res(), matIdx), true);
+      SparseMatrix stencil(cinfo.galerkinN(matIdx),cinfo.galerkinN(matIdx));
+      dispatchGalerkinStencil(fieldName, compId, stencil, matIdx, res, true, backend, cinfo, bcIds, eqParams);
       stencil.makeCompressed();
 
       // Check that square stencil was generated. Setup is wrong if matrix is not square
@@ -79,9 +73,9 @@ namespace Equations {
       }
 
       // solve for galerkin expansion
-      TmpDataType lhs(info.galerkinN(matIdx), info.rhsCols(matIdx));
+      TmpDataType lhs(cinfo.galerkinN(matIdx), cinfo.rhsCols(matIdx));
       Solver::details::solveWrapper(lhs, solver, rhs);
-      Arithmetics::setTopBlock(storage, start, info.galerkinN(matIdx), lhs);
+      Arithmetics::setTopBlock(storage, start, cinfo.galerkinN(matIdx), lhs);
    }
 
 } // Equations

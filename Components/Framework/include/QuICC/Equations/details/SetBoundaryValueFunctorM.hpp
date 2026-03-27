@@ -13,7 +13,6 @@
 //
 #include "Arithmetics/Basic.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/Equations/details/SetBoundaryValueFunctor.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
@@ -28,14 +27,14 @@ template <typename TData, typename TField>
 void SetBoundaryValueFunctor<CouplingIndexType::MODE>::apply(
    const TField& field, TData& storage, const int start)
 {
-   const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
+   const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
    // Safety assertion
    assert(start >= 0);
 
    // Get mode indexes
    ArrayI mode = tRes.mode(matIdx);
    int rows = field.comp(compId).slice(mode(0)).rows();
-   int zeroRow = eq->couplingInfo(compId).galerkinShift(matIdx, 0);
+   int zeroRow = cinfo.galerkinShift(matIdx, 0);
 
    // Copy data
    int k = start;
@@ -43,7 +42,7 @@ void SetBoundaryValueFunctor<CouplingIndexType::MODE>::apply(
    {
       // Add source term
       Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, k,
-         eq->boundaryValue(compId, i, mode(1), mode(0)));
+         spBoundary->compute(i, mode(1), mode(0)));
 
       // increase storage counter
       k++;

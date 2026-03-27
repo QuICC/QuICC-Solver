@@ -15,7 +15,6 @@
 #include "Arithmetics/Utility.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/Equations/details/ExplicitTermFunctor.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"

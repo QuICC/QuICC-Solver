@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
+#include "QuICC/Equations/CouplingInformation.hpp"
 
 namespace QuICC {
 
@@ -26,7 +26,7 @@ public:
    /**
     * @brief ctor
     */
-   SetZeroNonlinearFunctor(const IFieldEquation& eq,
+   SetZeroNonlinearFunctor(const Resolution& res, const CouplingInformation& cinfo,
       FieldComponents::Spectral::Id compId, const int matIdx);
 
    /**
@@ -52,9 +52,14 @@ public:
 
 private:
    /**
-    * @brief Reference to equation
+    * @brief Resolution
     */
-   const IFieldEquation* eq;
+   const Resolution& res;
+
+   /**
+    * @brief Coupling information
+    */
+   const Equations::CouplingInformation& cinfo;
 
    /**
     * @brief Field component ID
@@ -69,9 +74,9 @@ private:
 
 template <CouplingIndexType IndexType>
 SetZeroNonlinearFunctor<IndexType>::SetZeroNonlinearFunctor(
-   const IFieldEquation& eq, FieldComponents::Spectral::Id compId,
+   const Resolution& res, const CouplingInformation& cinfo, FieldComponents::Spectral::Id compId,
    const int matIdx) :
-    eq(&eq), compId(compId), matIdx(matIdx)
+    res(res), cinfo(cinfo), compId(compId), matIdx(matIdx)
 {}
 
 } // namespace details

@@ -84,6 +84,11 @@ namespace Equations {
       return *this->mspSpatialScheme;
    }
 
+   std::shared_ptr<Model::IModelBackend> EquationData::spBackend() const
+   {
+      return this->mspBackend;
+   }
+
    const Model::IModelBackend& EquationData::backend() const
    {
       return *this->mspBackend;

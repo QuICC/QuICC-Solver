@@ -339,14 +339,18 @@ void InterfaceViews<TScheme>::initSolution(const ScalarEquation_range& scalEq, c
 
                      if(cinfo.isGalerkin())
                      {
-                        Equations::solveStencilUnknown(*eqIt, myId.second, tmpView, i, 0);
+                        std::visit(
+                              [&](auto&& p)
+                              {
+                                 Equations::solveStencilUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), myId.first, p->dom(0).perturbation(), myId.second, tmpView, i, 0, eqIt->backend(), eqIt->bcIds().map(), eqIt->eqParams().map());
+                              }, eqIt->spUnknown());
                      }
                      else
                      {
                         std::visit(
                               [&](auto&& p)
                               {
-                              Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, true);
+                                 Equations::copyUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, true);
                               }, eqIt->spUnknown());
                      }
 
@@ -518,17 +522,20 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
                      std::visit(
                            [&](auto&& p)
                            {
-                           Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, false);
+                           Equations::copyUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, false);
                            }, eqIt->spUnknown());
                   }
    Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyNonlinear");
 
                   // Add source term
-                  std::visit(
-                        [&](auto&& p)
-                        {
-                        Equations::addSource(*eqIt, p->dom(0).perturbation(), myId.second, tmpView, i, 0);
-                        }, eqIt->spUnknown());
+                  if(cinfo.hasSource())
+                  {
+                     std::visit(
+                           [&](auto&& p)
+                           {
+                           Equations::addSource(eqIt->res(), cinfo, eqIt->sourceKernel(myId.second), p->dom(0).perturbation(), myId.second, tmpView, i, 0);
+                           }, eqIt->spUnknown());
+                  }
 
    Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-input:updateRhs");
                   this->mSolverCoord.updateRhs(info, tmpView);
@@ -542,7 +549,7 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
                            [&](auto&& p)
                            {
                            throw std::logic_error("NOT YET IMPLEMENTED");
-                           // Equations::setBoundaryValue(*spEq, p->dom(0).perturbation(), id.second, (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
+                           // Equations::setBoundaryValue(spEq->res(), cinfo, spEq->boundaryKernel(id.second), p->dom(0).perturbation(), id.second, (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
                            }, eqIt->spUnknown());
                      //               this->mSolverCoord.updateInhomogeneous(info);
                   }
@@ -587,7 +594,16 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                   tmp.setZero();
 
-                  eqIt->storeSolution(myId.second, tmp, i, 0);
+                  const SparseMatrix* pOp;
+                  if(cinfo.isGalerkin())
+                  {
+                     pOp = &eqIt->galerkinStencil(myId.second, i);
+                  }
+                  std::visit(
+                        [&](auto&& p)
+                        {
+                           Equations::storeSolution(p->rDom(0).rPerturbation(), eqIt->res(), cinfo, pOp, eqIt->solutionUpdater(myId.second), myId.second, tmp, i, 0);
+                        }, eqIt->spUnknown());
                }
    Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:setZero");
 
@@ -622,7 +638,16 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
    Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:copyView");
 
    Profiler::RegionStart<QUICC_DETAIL_PROF_LVL>("Timestep-output:storeSolution");
-                  eqIt->storeSolution(myId.second, tmp, i, 0);
+                  const SparseMatrix* pOp;
+                  if(cinfo.isGalerkin())
+                  {
+                     pOp = &eqIt->galerkinStencil(myId.second, i);
+                  }
+                  std::visit(
+                        [&](auto&& p)
+                        {
+                        Equations::storeSolution(p->rDom(0).rPerturbation(), eqIt->res(), cinfo, pOp, eqIt->solutionUpdater(myId.second), myId.second, tmp, i, 0);
+                        }, eqIt->spUnknown());
    Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:storeSolution");
                }
 

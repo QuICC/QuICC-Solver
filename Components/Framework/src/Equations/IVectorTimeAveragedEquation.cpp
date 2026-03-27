@@ -3,21 +3,13 @@
  * @brief Source of vector time averaged equation interface
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Equations/IVectorTimeAveragedEquation.hpp"
-
 // Project includes
 //
+#include "QuICC/Equations/IVectorTimeAveragedEquation.hpp"
+#include "QuICC/Equations/AverageSolutionUpdater.hpp"
 
 namespace QuICC {
 
@@ -59,17 +51,14 @@ namespace Equations {
       this->mTimeAvg = std::make_shared<Datatypes::VectorField<typename Framework::Selector::ScalarField<T>,FieldComponents::Spectral::Id> >(std::visit([](auto&& p)->auto&&{return p->dom(0).perturbation();},this->spUnknown()));
    }
 
-   MHDVariant IVectorTimeAveragedEquation::updateStoredSolution(const MHDVariant newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k)
+   void IVectorTimeAveragedEquation::initSolutionUpdater()
    {
-      // Only update mean on full timestep
-      if(this->mTimeFinished)
+      auto range = this->spectralRange();
+
+      for(auto it = range.first; it != range.second; ++it)
       {
-         T val = incrementTimeAverage(this->mTimeAvg->comp(compId).point(i, j, k), newData, this->time(), this->mTimestep);
-         this->mTimeAvg->rComp(compId).setPoint(val, i, j, k);
-         return val;
-      } else
-      {
-         return noupdateTimeAverage(this->mTimeAvg->comp(compId).point(i, j, k), newData);
+         auto spUp = std::make_shared<AverageSolutionUpdater>();
+         this->mSolUps.emplace(*it, spUp);
       }
    }
 

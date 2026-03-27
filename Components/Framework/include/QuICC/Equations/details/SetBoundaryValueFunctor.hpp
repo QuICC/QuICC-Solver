@@ -12,7 +12,8 @@
 // Project includes
 //
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
+#include "QuICC/SpectralKernels/ISpectralKernel.hpp"
+#include "QuICC/Equations/CouplingInformation.hpp"
 
 namespace QuICC {
 
@@ -26,7 +27,7 @@ public:
    /**
     * @brief ctor
     */
-   SetBoundaryValueFunctor(const IFieldEquation& eq,
+   SetBoundaryValueFunctor(const Resolution& res, const CouplingInformation& cinfo, Spectral::Kernel::SharedISpectralKernel spBoundary,
       FieldComponents::Spectral::Id compId, const int matIdx);
 
    /**
@@ -53,9 +54,19 @@ public:
 
 private:
    /**
-    * @brief Reference to equation
+    * @brief Resolution
     */
-   const IFieldEquation* eq;
+   const Resolution& res;
+
+   /**
+    * @brief Coupling information
+    */
+   const CouplingInformation& cinfo;
+
+   /**
+    * @brief Source kernel
+    */
+   Spectral::Kernel::SharedISpectralKernel spBoundary;
 
    /**
     * @brief Field component ID
@@ -70,9 +81,9 @@ private:
 
 template <CouplingIndexType IndexType>
 SetBoundaryValueFunctor<IndexType>::SetBoundaryValueFunctor(
-   const IFieldEquation& eq, FieldComponents::Spectral::Id compId,
+   const Resolution& res, const CouplingInformation& cinfo, Spectral::Kernel::SharedISpectralKernel spBoundary, FieldComponents::Spectral::Id compId,
    const int matIdx) :
-    eq(&eq), compId(compId), matIdx(matIdx)
+    res(res), cinfo(cinfo), spBoundary(spBoundary), compId(compId), matIdx(matIdx)
 {}
 
 } // namespace details

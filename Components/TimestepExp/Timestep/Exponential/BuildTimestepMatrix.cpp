@@ -1,19 +1,19 @@
 /**
- * @file BuildTimestepMatrixWrapper.hpp
+ * @file BuildTimestepMatrixWrapper.cpp
  * @brief Implementation of functors used in Interface
  */
 
-#pragma once
-
 // System includes
 //
-#include <memory>
-#include <map>
 
 // Project includes
 //
+#include "Timestep/Exponential/BuildTimestepMatrix.hpp"
+#include "QuICC/Equations/CouplingInformation.hpp"
+#include "QuICC/Equations/Dispatchers.hpp"
+#include "QuICC/NonDimensional/INumber.hpp"
+#include "QuICC/Model/IModelBackend.hpp"
 #include "Types/Typedefs.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/ModelOperator/QuasiInverse.hpp"
 #include "QuICC/ModelOperator/Time.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverNoTau.hpp"
@@ -24,6 +24,7 @@
 #include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "QuICC/Tools/IdToHuman.hpp"
 #endif
+#include "QuICC/Debug/DebuggerMacro.h"
 
 namespace QuICC {
 
@@ -31,18 +32,13 @@ namespace Timestep {
 
 namespace Exponential {
 
-/**
- * @brief Wrapper to build timestepping matrices
- */
-void buildTimestepMatrixWrapper(std::map<std::size_t, DecoupledZSparse>& ops, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
-
-inline void buildTimestepMatrixWrapper(std::map<std::size_t, DecoupledZSparse>& ops, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp,
-   const int idx)
+void buildTimestepMatrix(std::map<std::size_t, DecoupledZSparse>& ops, FieldComponents::Spectral::Id comp, const int idx, const Resolution& res, const Model::IModelBackend& backend, const Equations::CouplingInformation cinfo, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams)
 {
    auto buildOp = [&](const std::size_t opId, const std::size_t tId, const std::size_t bcId)
    {
       auto ret = ops.insert(std::make_pair(tId, DecoupledZSparse()));
-      spEq->buildModelMatrix(ret.first->second, opId, comp, idx, bcId);
+      auto& mat = ret.first->second;
+      Equations::dispatchModelMatrix(mat, opId, comp, idx, bcId, res, backend, cinfo, bcIds, eqParams);
    };
 
    using namespace ModelOperator;
@@ -52,7 +48,6 @@ inline void buildTimestepMatrixWrapper(std::map<std::size_t, DecoupledZSparse>& 
 
    // Compute model's quasi-inverse operator (without boundary conditions)
    buildOp(QuasiInverse::id(), Tag::Operator::Qi::id(), SolverNoBc::id());
-
 }
 
 } // namespace Exponential

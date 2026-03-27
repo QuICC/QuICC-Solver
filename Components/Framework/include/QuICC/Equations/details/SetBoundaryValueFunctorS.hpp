@@ -13,7 +13,6 @@
 //
 #include "Arithmetics/Basic.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/Equations/details/SetBoundaryValueFunctor.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
@@ -28,8 +27,8 @@ template <typename TData, typename TField>
 void SetBoundaryValueFunctor<CouplingIndexType::SINGLE>::apply(
    const TField& field, TData& storage, const int start)
 {
-   const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-   const auto& sRes = eq->res().sim();
+   const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+   const auto& sRes = res.sim();
    assert(matIdx == 0);
 
    // Safety assertion
@@ -77,7 +76,7 @@ void SetBoundaryValueFunctor<CouplingIndexType::SINGLE>::apply(
 
             // Add source term
             Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, l,
-               eq->boundaryValue(compId, i, j, k));
+               spBoundary->compute(i, j, k));
          }
       }
    }

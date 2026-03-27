@@ -28,21 +28,20 @@ template <typename TData, typename TField>
 void AddSourceFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::apply(
    const TField& field, TData& storage, const int start)
 {
-   const auto& info = eq->couplingInfo(compId);
    // Add source term if required
-   if (info.hasSource())
+   if (cinfo.hasSource())
    {
-      const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
       int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
-      int zeroRow = info.galerkinShift(matIdx, 0);
+      int zeroRow = cinfo.galerkinShift(matIdx, 0);
       int zeroCol;
-      if (eq->res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
+      if (res.sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
       {
-         zeroCol = info.galerkinShift(matIdx, 2);
+         zeroCol = cinfo.galerkinShift(matIdx, 2);
       }
       else
       {
-         zeroCol = info.galerkinShift(matIdx, 1);
+         zeroCol = cinfo.galerkinShift(matIdx, 1);
       }
 
       // Safety assertion
@@ -57,7 +56,7 @@ void AddSourceFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::apply(
             // Add source term
             Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage,
                i - zeroRow + start, j - zeroCol,
-               eq->sourceTerm(compId, i, j, matIdx));
+               spSrc->compute(i, j, matIdx));
          }
       }
    }

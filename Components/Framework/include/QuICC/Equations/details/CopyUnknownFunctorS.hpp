@@ -16,7 +16,6 @@
 //
 #include "Arithmetics/Basic.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/Equations/details/CopyUnknownFunctor.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "Types/Typedefs.hpp"
@@ -32,8 +31,8 @@ template <bool IsSet, typename TData, typename TField>
 void CopyUnknownFunctor<CouplingIndexType::SINGLE>::apply(const TField& field,
    TData& storage, const int start)
 {
-   const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-   const auto& sRes = eq->res().sim();
+   const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+   const auto& sRes = res.sim();
 
    assert(matIdx == 0);
 

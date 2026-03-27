@@ -12,7 +12,6 @@
 // Project includes
 //
 #include "QuICC/Enums/Dimensions.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/Equations/details/SetZeroNonlinearFunctor.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
@@ -27,8 +26,8 @@ template <typename TData, typename TField>
 void SetZeroNonlinearFunctor<CouplingIndexType::SINGLE>::apply(
    const TField& field, TData& storage, const int start)
 {
-   const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-   const auto& sRes = eq->res().sim();
+   const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+   const auto& sRes = res.sim();
    // Safety assertion
    assert(matIdx == 0);
    assert(start >= 0);

@@ -18,6 +18,7 @@
 #include "Memory/Memory.hpp"
 #include "Memory/MemoryResource.hpp"
 #include "Timestep/Exponential/Functors/BaseFunctor.hpp"
+#include "QuICC/Equations/StoreSolution.hpp"
 
 namespace QuICC {
 
@@ -58,7 +59,16 @@ void OutputFunctor<TFunc, TCorrFunc>::operator()(const SpectralFieldId& myId, TE
       DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
       tmp.setZero();
 
-      eqIt->storeSolution(myId.second, tmp, i, 0);
+      const SparseMatrix* pOp;
+      if(cinfo.isGalerkin())
+      {
+         pOp = &eqIt->galerkinStencil(myId.second, i);
+      }
+      std::visit(
+            [&](auto&& p)
+            {
+               Equations::storeSolution(p->rDom(0).rPerturbation(), eqIt->res(), cinfo, pOp, eqIt->solutionUpdater(myId.second), myId.second, tmp, i, 0);
+            }, eqIt->spUnknown());
    }
 
    // Allocate temporary storage

@@ -16,6 +16,8 @@
 #include "Memory/MemoryResource.hpp"
 #include "Profiler/Interface.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
+#include "QuICC/Equations/CouplingFeature.hpp"
+#include "QuICC/Equations/CouplingInformation.hpp"
 #include "QuICC/PhysicalNames/JacobianMagnetic.hpp"
 #include "QuICC/PhysicalNames/JacobianTemperature.hpp"
 #include "QuICC/PhysicalNames/JacobianVelocity.hpp"
@@ -29,6 +31,7 @@
 #include "QuICC/Register/Temporary.hpp"
 #include "QuICC/Timestep/IScheme.hpp"
 #include "QuICC/Timestep/Interface.hpp"
+#include "QuICC/Model/IModelBackend.hpp"
 #include "Timestep/Exponential/TimestepperInfo.hpp"
 #include "Timestep/Exponential/TimestepperCoordinator.hpp"
 #include "Timestep/Exponential/EpirkTimestepper.hpp"
@@ -167,6 +170,26 @@ private:
    std::set<int>  mBaseItIds;
 
    /**
+    * @brief Model backend
+    */
+   std::shared_ptr<Resolution> mspRes;
+
+   /**
+    * @brief Boundary condition map
+    */
+   std::shared_ptr<std::map<std::size_t, std::size_t>> mspBcIdMap;
+
+   /**
+    * @brief Equation parameters map
+    */
+   std::shared_ptr<std::map<std::size_t, NonDimensional::SharedINumber>> mspEqParamsMap;
+
+   /**
+    * @brief Model backend
+    */
+   std::shared_ptr<Model::IModelBackend> mspBackend;
+
+   /**
     * @brief Interface to timestepping scheme
     */
    SharedIScheme mspScheme;
@@ -180,6 +203,11 @@ private:
     * @brief
     */
    std::shared_ptr<Memory::memory_resource> _mem;
+
+   /**
+    * @brief Shared field ID to coupling information
+    */
+   std::shared_ptr<std::map<SpectralFieldId, Equations::CouplingInformation>> mpCInfoMap;
 
    /**
     * @brief Shared field ID to solver field id
@@ -237,13 +265,19 @@ template <typename TScheme>
 void Interface<TScheme>::translate(std::vector<TimestepperInfo>& infos, const ScalarEquation_range& scalEq,
    const VectorEquation_range& vectEq)
 {
+   this->mpCInfoMap = std::make_shared<std::map<SpectralFieldId, Equations::CouplingInformation>>();
    this->mpFieldIdMap = std::make_shared<std::map<SpectralFieldId, std::size_t>>();
    auto bFunc = std::make_shared<Functors::DoNothingFunctor>();
-   auto pFunc = std::make_shared<Functors::TranslateInfoFunctor>(infos, this->mpFieldIdMap, this->_mem);
+   auto pFunc = std::make_shared<Functors::TranslateInfoFunctor>(infos, this->mpCInfoMap, this->mpFieldIdMap, this->_mem);
    auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
    Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
    processor(scalEq);
    processor(vectEq);
+
+   this->mspBackend = pFunc->spBackend();
+   this->mspBcIdMap = pFunc->spBcIdMap();
+   this->mspEqParamsMap = pFunc->spEqParamsMap();
+   this->mspRes = pFunc->spRes();
 
    // Update system size
    std::size_t sysN = 0;

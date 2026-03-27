@@ -13,7 +13,6 @@
 //
 #include "Arithmetics/Basic.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/Equations/details/SetZeroNonlinearFunctor.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
@@ -28,18 +27,17 @@ template <typename TData, typename TField>
 void SetZeroNonlinearFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::apply(
    const TField& field, TData& storage, const int start)
 {
-   const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-   const auto& info = eq->couplingInfo(compId);
+   const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
    const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
-   int zeroRow = info.galerkinShift(matIdx, 0);
+   int zeroRow = cinfo.galerkinShift(matIdx, 0);
    int zeroCol;
-   if (eq->res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
+   if (res.sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
    {
-      zeroCol = info.galerkinShift(matIdx, 2);
+      zeroCol = cinfo.galerkinShift(matIdx, 2);
    }
    else
    {
-      zeroCol = info.galerkinShift(matIdx, 1);
+      zeroCol = cinfo.galerkinShift(matIdx, 1);
    }
 
    // Safety assertion

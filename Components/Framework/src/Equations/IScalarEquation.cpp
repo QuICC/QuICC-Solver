@@ -9,6 +9,7 @@
 // Project includes
 //
 #include "QuICC/Equations/IScalarEquation.hpp"
+#include "QuICC/Equations/Dispatchers.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
@@ -91,22 +92,27 @@ namespace Equations {
 
    void IScalarEquation::defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const std::map<CouplingFeature,bool>& features)
    {
-      this->dispatchCoupling(comp, eqType, iZero, features, this->res());
+      auto infoIt = this->mCouplingInfos.insert(std::make_pair(comp,CouplingInformation()));
+      auto& cinfo = infoIt.first->second;
+      dispatchCoupling(cinfo, this->name(), comp, eqType, iZero, features, this->res(), this->backend(), this->bcIds().map());
    }
 
    void  IScalarEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const std::size_t opId, FieldComponents::Spectral::Id comp, const int matIdx, const std::size_t bcType) const
    {
-      this->dispatchModelMatrix(rModelMatrix, opId, comp, matIdx, bcType, this->res(), this->couplingInfo(FieldComponents::Spectral::SCALAR).couplingTools().getIndexes(this->res(), matIdx));
+      const auto& cinfo = this->couplingInfo(FieldComponents::Spectral::SCALAR);
+      dispatchModelMatrix(rModelMatrix, opId, comp, matIdx, bcType, this->res(), this->backend(), cinfo, this->bcIds().map(), this->eqParams().map());
    }
 
    void IScalarEquation::setGalerkinStencil(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx) const
    {
-      this->dispatchGalerkinStencil(comp, mat, matIdx, this->res(), this->couplingInfo(FieldComponents::Spectral::SCALAR).couplingTools().getIndexes(this->res(), matIdx));
+      const auto& cinfo = this->couplingInfo(FieldComponents::Spectral::SCALAR);
+      dispatchGalerkinStencil(this->name(), comp, mat, matIdx, this->res(), false, this->backend(), cinfo, this->bcIds().map(), this->eqParams().map());
    }
 
    void IScalarEquation::setExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::size_t opId, const SpectralFieldId fieldId, const int matIdx) const
    {
-      this->dispatchExplicitBlock(compId, mat, opId, fieldId, matIdx, this->res(), this->couplingInfo(FieldComponents::Spectral::SCALAR).couplingTools().getIndexes(this->res(), matIdx));
+      const auto& cinfo = this->couplingInfo(FieldComponents::Spectral::SCALAR);
+      dispatchExplicitBlock(this->name(), compId, mat, opId, fieldId, matIdx, this->res(), this->backend(), cinfo, this->bcIds().map(), this->eqParams().map());
    }
 
    void IScalarEquation::setNLComponents()

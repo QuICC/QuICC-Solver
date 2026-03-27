@@ -17,7 +17,6 @@
 //
 #include "Arithmetics/Basic.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Equations/IFieldEquation_decl.hpp"
 #include "QuICC/Equations/details/StoreSolutionFunctor.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "Types/Typedefs.hpp"
@@ -34,9 +33,9 @@ void StoreSolutionFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(
    TField& field, const TData& storage, const int start)
 {
    int solStart;
-   auto solution = init(solStart, storage, start, eq->couplingInfo(compId));
+   auto solution = init(solStart, storage, start);
 
-   const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
+   const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
    int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
 
 #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
@@ -69,7 +68,7 @@ void StoreSolutionFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(
 
          // Copy timestep output into field
          MHDVariant dataPoint = Arithmetics::getScalar(*solution.ptr, l);
-         dataPoint = eq->updateStoredSolution(dataPoint, compId, i, j, matIdx);
+         dataPoint = (*spUp)(dataPoint, i, j, matIdx);
          field.rComp(compId).setPoint(dataPoint, i, j, matIdx);
       }
    }
@@ -85,7 +84,7 @@ void StoreSolutionFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(
       {
          // Copy timestep output into field
          MHDVariant dataPoint = Arithmetics::getScalar(*solution.ptr, k);
-         dataPoint = eq->updateStoredSolution(dataPoint, compId, i, j, matIdx);
+         dataPoint = (*spUp)(dataPoint, i, j, matIdx);
          field.rComp(compId).setPoint(dataPoint, i, j, matIdx);
 
          // increase linear storage counter

@@ -85,16 +85,6 @@ namespace Equations {
          SpectralComponent_range spectralRange() const final;
 
          /**
-          * @brief Transfer solver solution to equation unknown
-          *
-          * @param compId  Component ID
-          * @param storage Solver solution
-          * @param matIdx  Index of the given data
-          * @param start   Start index for the storage
-          */
-         template <typename TData> void storeSolution(FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start);
-
-         /**
           * @brief Initialise the spectral equation matrices
           *
           * @param spBcIds   List of boundary condition IDs
@@ -160,11 +150,6 @@ namespace Equations {
 
    /// Templated typedef for shared IVectorEquation
    typedef std::shared_ptr<IVectorEquation> SharedIVectorEquation;
-
-   template <typename TData> void IVectorEquation::storeSolution(FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start)
-   {
-      std::visit([&](auto&& p){this->storeSolutionImpl(p->rDom(0).rPerturbation(), compId, storage, matIdx, start);}, this->spUnknown());
-   }
 
 } // Equations
 } // QuICC

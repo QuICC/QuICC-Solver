@@ -25,6 +25,7 @@
 #include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/Equations/IScalarEquation.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
+#include "QuICC/Equations/StoreSolution.hpp"
 #include "QuICC/Equations/AddSource.hpp"
 #include "QuICC/Equations/SetBoundaryValue.hpp"
 #include "QuICC/Equations/ExplicitTerm.hpp"
@@ -372,9 +373,19 @@ namespace Solver {
 #ifdef QUICC_DEBUG
       spEq->corruptUnknown(id.second);
 #endif //QUICC_DEBUG
+      const auto& cinfo = spEq->couplingInfo(id.second);
+      const SparseMatrix* pOp;
       for(std::size_t i = 0; i < (*solIt)->nSystem(); i++)
       {
-         spEq->storeSolution(id.second, (*solIt)->solution(i), i, (*solIt)->startRow(id,i));
+         if(cinfo.isGalerkin())
+         {
+            pOp = &spEq->galerkinStencil(id.second, i);
+         }
+         std::visit(
+               [&](auto&& p)
+               {
+                  Equations::storeSolution(p->rDom(0).rPerturbation(), spEq->res(), cinfo, pOp, spEq->solutionUpdater(id.second), id.second, (*solIt)->solution(i), i, (*solIt)->startRow(id,i));
+               }, spEq->spUnknown());
       }
 
       // Apply constraint on solution
@@ -492,14 +503,18 @@ namespace Solver {
       {
          if(spEq->couplingInfo(id.second).isGalerkin())
          {
-            Equations::solveStencilUnknown(*spEq, id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i));
+            std::visit(
+                  [&](auto&& p)
+                  {
+                     Equations::solveStencilUnknown(spEq->res(), spEq->couplingInfo(id.second), id.first, p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), spEq->backend(), spEq->bcIds().map(), spEq->eqParams().map());
+                  }, spEq->spUnknown());
          }
          else
          {
             std::visit(
                   [&](auto&& p)
                   {
-                     Equations::copyUnknown(*spEq, p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true, true);
+                     Equations::copyUnknown(spEq->res(), spEq->couplingInfo(id.second), p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true, true);
                   }, spEq->spUnknown());
          }
       }
@@ -579,27 +594,62 @@ namespace Solver {
 
    template <typename TSolverIt,typename TEq> void computeSolverInput(const TEq spEq, const SpectralFieldId id, const TSolverIt solveIt, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>&, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>&)
    {
+      const auto& cinfo = spEq->couplingInfo(id.second);
+      const bool hasQI  = (cinfo.hasNonlinear() && cinfo.hasQuasiInverse());
+      const auto compId = id.second;
+
       // Get timestep input
       for(std::size_t i = 0; i < (*solveIt)->nSystem(); i++)
       {
-         // Copy field values into solver input
-         Equations::copyNonlinear(*spEq, id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+         if(hasQI)
+         {
+            if(spEq->hasQID(compId))
+            {
+               const SparseMatrix& op = spEq->template quasiInverse<SparseMatrix>(compId, i);
+               std::visit(
+                     [&](auto&& p)
+                     {
+                        Equations::copyNonlinear(spEq->res(), cinfo, p->dom(0).perturbation(), id.second, op, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+                     }, spEq->spUnknown());
+            }
+            else if(spEq->hasQIZ(compId))
+            {
+               const SparseMatrixZ& op = spEq->template quasiInverse<SparseMatrixZ>(compId, i);
+               std::visit(
+                     [&](auto&& p)
+                     {
+                        Equations::copyNonlinear(spEq->res(), cinfo, p->dom(0).perturbation(), id.second, op, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+                     }, spEq->spUnknown());
+            }
+         }
+         else
+         {
+            // Copy field values into solver input
+            std::visit(
+                  [&](auto&& p)
+                  {
+                     Equations::copyNonlinear(spEq->res(), cinfo, p->dom(0).perturbation(), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+                  }, spEq->spUnknown());
+         }
 
          // Add source term
-         std::visit(
-               [&](auto&& p)
-               {
-                  Equations::addSource(*spEq, p->dom(0).perturbation(), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
-               }, spEq->spUnknown());
+         if(cinfo.hasSource())
+         {
+            std::visit(
+                  [&](auto&& p)
+                  {
+                     Equations::addSource(spEq->res(), cinfo, spEq->sourceKernel(id.second), p->dom(0).perturbation(), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+                  }, spEq->spUnknown());
+         }
 
          // If required set inhomogenous boundary condition value
-         if(spEq->couplingInfo(id.second).hasBoundaryValue())
+         if(cinfo.hasBoundaryValue())
          {
             // Set boundary value
             std::visit(
                   [&](auto&& p)
                   {
-                     Equations::setBoundaryValue(*spEq, p->dom(0).perturbation(), id.second, (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
+                     Equations::setBoundaryValue(spEq->res(), cinfo, spEq->boundaryKernel(id.second), p->dom(0).perturbation(), id.second, (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
                   }, spEq->spUnknown());
          }
       }

@@ -15,6 +15,7 @@
 #include "Profiler/Interface.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
+#include "QuICC/Equations/StoreSolution.hpp"
 #include "Timestep/Exponential/TimestepperInfo.hpp"
 #include "View/Attributes.hpp"
 #include "View/ViewDense.hpp"
@@ -61,7 +62,16 @@ void TransferOutputFunctor<TTsFunc>::operator()(ViewType tmpView, const Spectral
    DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
    details::computeSet(tmp, tmpView, 0);
 
-   eqIt->storeSolution(myId.second, tmp, i, 0);
+   const SparseMatrix* pOp;
+   if(cinfo.isGalerkin())
+   {
+      pOp = &eqIt->galerkinStencil(myId.second, i);
+   }
+   std::visit(
+         [&](auto&& p)
+         {
+            Equations::storeSolution(p->rDom(0).rPerturbation(), eqIt->res(), cinfo, pOp, eqIt->solutionUpdater(myId.second), myId.second, tmp, i, 0);
+         }, eqIt->spUnknown());
 }
 
 

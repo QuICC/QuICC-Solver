@@ -13,7 +13,6 @@
 // Project includes
 //
 #include "Arithmetics/Basic.hpp"
-#include "QuICC/Equations/IFieldEquation_decl.hpp"
 #include "QuICC/Equations/details/StoreSolutionFunctor.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "Types/Typedefs.hpp"
@@ -30,9 +29,9 @@ void StoreSolutionFunctor<CouplingIndexType::MODE>::apply(TField& field,
    const TData& storage, const int start)
 {
    int solStart;
-   auto solution = init(solStart, storage, start, eq->couplingInfo(compId));
+   auto solution = init(solStart, storage, start);
 
-   const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
+   const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
    // Get mode indexes
    ArrayI mode = tRes.mode(matIdx);
    int rows = field.comp(compId).slice(mode(0)).rows();
@@ -44,7 +43,7 @@ void StoreSolutionFunctor<CouplingIndexType::MODE>::apply(TField& field,
       // Copy timestep output into field
       MHDVariant dataPoint = Arithmetics::getScalar(*solution.ptr, k);
       dataPoint =
-         eq->updateStoredSolution(dataPoint, compId, i, mode(1), mode(0));
+         (*spUp)(dataPoint, i, mode(1), mode(0));
       field.rComp(compId).setPoint(dataPoint, i, mode(1), mode(0));
 
       // increase linear storage counter

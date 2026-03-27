@@ -12,8 +12,11 @@
 // Project includes
 //
 #include "QuICC/Enums/FieldIds.hpp"
+#include "QuICC/Equations/CouplingFeature.hpp"
 #include "QuICC/Equations/CouplingIndexType.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
+#include "QuICC/Equations/CouplingInformation.hpp"
+#include "QuICC/Resolutions/Resolution.hpp"
+#include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
 namespace QuICC {
 
@@ -27,7 +30,7 @@ public:
    /**
     * @brief ctor
     */
-   CopyUnknownFunctor(const IFieldEquation& eq,
+   CopyUnknownFunctor(const Resolution& res, const Equations::CouplingInformation& cinfo,
       FieldComponents::Spectral::Id compId, const int matIdx,
       const bool useShift, const bool shiftTop);
 
@@ -54,9 +57,14 @@ private:
    void init(const bool shiftTop);
 
    /**
-    * @brief Reference to equation
+    * @brief Resolution
     */
-   const IFieldEquation* eq;
+   const Resolution& res;
+
+   /**
+    * @brief Coupling information
+    */
+   const Equations::CouplingInformation& cinfo;
 
    /**
     * @brief Field component ID
@@ -92,15 +100,14 @@ private:
 template <CouplingIndexType IndexType>
 void CopyUnknownFunctor<IndexType>::init(const bool shiftTop)
 {
-   const auto& info = eq->couplingInfo(compId);
-   zeroRow = info.galerkinShift(matIdx, 0);
-   if (eq->res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
+   zeroRow = cinfo.galerkinShift(matIdx, 0);
+   if (res.sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
    {
-      zeroCol = info.galerkinShift(matIdx, 2);
+      zeroCol = cinfo.galerkinShift(matIdx, 2);
    }
    else
    {
-      zeroCol = info.galerkinShift(matIdx, 1);
+      zeroCol = cinfo.galerkinShift(matIdx, 1);
    }
    shiftMaxRow = 0;
    shiftMaxCol = 0;
@@ -113,10 +120,10 @@ void CopyUnknownFunctor<IndexType>::init(const bool shiftTop)
 }
 
 template <CouplingIndexType IndexType>
-CopyUnknownFunctor<IndexType>::CopyUnknownFunctor(const IFieldEquation& eq,
+CopyUnknownFunctor<IndexType>::CopyUnknownFunctor(const Resolution& res, const Equations::CouplingInformation& cinfo,
    FieldComponents::Spectral::Id compId, const int matIdx,
    const bool useShift, const bool shiftTop) :
-    eq(&eq), compId(compId), matIdx(matIdx), zeroRow(0), zeroCol(0), shiftMaxRow(0), shiftMaxCol(0)
+    res(res), cinfo(cinfo), compId(compId), matIdx(matIdx), zeroRow(0), zeroCol(0), shiftMaxRow(0), shiftMaxCol(0)
 {
    if (useShift)
    {

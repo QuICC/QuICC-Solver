@@ -12,7 +12,6 @@
 // Project includes
 //
 #include "Arithmetics/Basic.hpp"
-#include "QuICC/Equations/IFieldEquation_decl.hpp"
 #include "QuICC/Equations/details/StoreSolutionFunctor.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "Types/Typedefs.hpp"
@@ -29,9 +28,9 @@ void StoreSolutionFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::apply(
    TField& field, const TData& storage, const int start)
 {
    int solStart;
-   auto solution = init(solStart, storage, start, eq->couplingInfo(compId));
+   auto solution = init(solStart, storage, start);
 
-   const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
+   const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
    const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
 
    // Copy data
@@ -43,7 +42,7 @@ void StoreSolutionFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::apply(
          // Copy timestep output into field
          MHDVariant dataPoint =
             Arithmetics::getScalar(*solution.ptr, i + solStart, j);
-         dataPoint = eq->updateStoredSolution(dataPoint, compId, i, j, matIdx);
+         dataPoint = (*spUp)(dataPoint, i, j, matIdx);
          field.rComp(compId).setPoint(dataPoint, i, j, matIdx);
       }
    }
