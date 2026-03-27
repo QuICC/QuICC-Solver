@@ -173,7 +173,8 @@ void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks,
                comps = {FieldComponents::Spectral::TOR,
                   FieldComponents::Spectral::POL};
             }
-            else if (fId == PhysicalNames::Temperature::id())
+            else if (fId == PhysicalNames::Temperature::id() || 
+                  fId == PhysicalNames::Entropy::id())
             {
                comps = {FieldComponents::Spectral::SCALAR};
             }
