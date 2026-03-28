@@ -63,7 +63,7 @@ void TransferCorrectionFunctor<TTsFunc>::operator()(const SpectralFieldId& myId,
          matStart += info.blockN;
 
          // Get effective corrections
-         auto corr = Equations::correctSolution(*eqIt, myId.second, corr_, i, 0);
+         auto corr = Equations::correctSolution(eqIt->res(), cinfo, myId.second, corr_, i, 0);
 
          auto tsData = (*tsFunc)(info);
          auto&& pStepper = tsData.first;

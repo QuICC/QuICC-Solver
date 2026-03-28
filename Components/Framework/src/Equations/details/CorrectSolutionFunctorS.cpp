@@ -9,6 +9,7 @@
 // Project includes
 //
 #include "QuICC/Equations/details/CorrectSolutionFunctorS.hpp"
+#include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
 namespace QuICC {
 
@@ -23,8 +24,8 @@ void CorrectSolutionFunctor<CouplingIndexType::SINGLE>::init(const std::vector<s
    {
       assert(matIdx == 0);
 
-      const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-      const auto& sRes = eq->res().sim();
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+      const auto& sRes = res.sim();
 
       // Copy data
       int l, k_, j_, dimK, dimJ;

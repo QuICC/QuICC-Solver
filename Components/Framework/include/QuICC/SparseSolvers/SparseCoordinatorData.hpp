@@ -397,7 +397,7 @@ namespace Solver {
          auto corr = spEq->correctionConstraint(id.second, SolveTiming::After::id());
          for(std::size_t i = 0; i < (*solIt)->nSystem(); i++)
          {
-            Equations::correctSolution(*spEq, id.second, corr, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i));
+            Equations::correctSolution(spEq->res(), cinfo, id.second, corr, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i));
          }
 
          (*solIt)->updateSolutions();

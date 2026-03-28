@@ -21,7 +21,7 @@ void CorrectSolutionFunctor<CouplingIndexType::MODE>::init(const std::vector<std
 {
    for (auto&& c: corrections)
    {
-      const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
       ArrayI mode = tRes.mode(matIdx);
       if (mode(1) == std::get<2>(c) && mode(0) == std::get<3>(c))
       {

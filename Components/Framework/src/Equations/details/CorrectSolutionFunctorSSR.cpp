@@ -19,7 +19,7 @@ namespace details {
 template <>
 void CorrectSolutionFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::init(const std::vector<std::tuple<MHDVariant, int, int, int>>& corrections)
 {
-   const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
+   const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
 
    for (auto&& c: corrections)
    {

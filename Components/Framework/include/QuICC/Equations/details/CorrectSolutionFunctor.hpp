@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "QuICC/Equations/CouplingIndexType.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
+#include "QuICC/Equations/CouplingInformation.hpp"
 #include "Types/Typedefs.hpp"
 
 namespace QuICC {
@@ -27,8 +27,7 @@ public:
    /**
     * @brief ctor
     */
-   CorrectSolutionFunctor(const IFieldEquation& eq,
-      const std::vector<std::tuple<MHDVariant, int, int, int>>& corrections,
+   CorrectSolutionFunctor(const Resolution& res, const CouplingInformation& cinfo, const std::vector<std::tuple<MHDVariant, int, int, int>>& corrections,
       const int matIdx);
 
    /**
@@ -59,9 +58,14 @@ private:
       const std::vector<std::tuple<MHDVariant, int, int, int>>& corrections);
 
    /**
-    * @brief Reference to equation
+    * @brief Resolution
     */
-   const IFieldEquation* eq;
+   const Resolution& res;
+
+   /**
+    * @brief Coupling information
+    */
+   const CouplingInformation& cinfo;
 
    /**
     * @brief Matrix index
@@ -71,10 +75,10 @@ private:
 
 template <CouplingIndexType IndexType>
 CorrectSolutionFunctor<IndexType>::CorrectSolutionFunctor(
-   const IFieldEquation& eq,
+   const Resolution& res, const CouplingInformation& cinfo,
    const std::vector<std::tuple<MHDVariant, int, int, int>>& corrections,
    const int matIdx) :
-    eq(&eq), matIdx(matIdx)
+    res(res), cinfo(cinfo), matIdx(matIdx)
 {
    this->init(corrections);
 }

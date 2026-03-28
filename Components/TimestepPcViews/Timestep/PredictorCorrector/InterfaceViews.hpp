@@ -663,7 +663,7 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                      auto info = createInfo(cinfo, i);
 
                      // Get effective corrections
-                     auto corr = Equations::correctSolution(*eqIt, myId.second, corr_, i, 0);
+                     auto corr = Equations::correctSolution(eqIt->res(), cinfo, myId.second, corr_, i, 0);
 
                      this->mSolverCoord.updateSolution(info, corr);
                   }
