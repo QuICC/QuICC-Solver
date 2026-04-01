@@ -220,7 +220,7 @@ namespace Equations {
       std::visit(
             [&](auto&& p)
             {
-               p->rDom(0).rPerturbation().rComp(compId).rData().setConstant(42.42);
+               p->rDom(0).rPerturbation().rComp(compId).setConstant(42.42);
             }, this->spUnknown());
    }
 

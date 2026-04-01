@@ -15,6 +15,7 @@
 //
 #include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
+#include "QuICC/Resolutions/CscMetadata.hpp"
 
 namespace QuICC {
 
@@ -29,12 +30,13 @@ namespace QuICC {
          /**
           * @brief Constructor for full resolution
           *
+          * @param globalDims Global dimensions
           * @param fwd Set of indexes for 1D (forward direction)
           * @param bwd Set of indexes for 1D (backward direction)
           * @param idx2D Set of indexes for 2D
           * @param idx3D Set of indexes for 3D
           */
-         TransformResolution(const std::vector<std::vector<std::vector<int> > >& fwd, const std::vector<std::vector<std::vector<int> > >& bwd, const std::vector<std::vector<int> >& idx2D, const std::vector<int>& idx3D);
+         TransformResolution(const std::vector<int>& globalDims, const std::vector<std::vector<std::vector<int> > >& fwd, const std::vector<std::vector<std::vector<int> > >& bwd, const std::vector<std::vector<int> >& idx2D, const std::vector<int>& idx3D);
 
          /**
           * @brief Empty Destructor
@@ -102,6 +104,11 @@ namespace QuICC {
           */
          bool isCleared() const;
 
+         /**
+          * @brief Create compressed metadata
+          */
+         std::shared_ptr<CscMetadata> viewMeta(const Dimensions::Data::Id id) const;
+
       protected:
 
       private:
@@ -109,6 +116,11 @@ namespace QuICC {
           * @brief Initialise the dimensions from the indexes
           */
          void initDimensions();
+
+         /**
+          * @brief Global dimensions
+          */
+         std::vector<int> mGlobalDims;
 
          /**
           * @brief Set of indexes describing the first dimensions (forward direction)

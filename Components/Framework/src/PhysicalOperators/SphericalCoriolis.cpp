@@ -3,21 +3,12 @@
  * @brief Source of the implementation of the spherical Coriolis term
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/PhysicalOperators/SphericalCoriolis.hpp"
-
 // Project includes
 //
+#include "QuICC/PhysicalOperators/SphericalCoriolis.hpp"
 
 namespace QuICC {
 

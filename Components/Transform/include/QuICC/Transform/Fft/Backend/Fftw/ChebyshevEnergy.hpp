@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_CHEBYSHEVENERGY_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_FFTW_CHEBYSHEVENERGY_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -48,12 +39,12 @@ namespace Fftw {
          /**
           * @brief Constructor
           */
-         ChebyshevEnergy();
+         ChebyshevEnergy() = default;
 
          /**
           * @brief Destructor
           */
-         ~ChebyshevEnergy();
+         ~ChebyshevEnergy() = default;
 
          /**
           * @brief Initialise the FFTW transforms
@@ -83,22 +74,22 @@ namespace Fftw {
          /**
           * @brief Set output
           */
-         void output(Matrix& rOut, const Matrix& tmp) const;
+         void output(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const;
 
          /**
           * @brief Set output on grid
           */
-         void outputGrid(Matrix& rOut, const Matrix& tmp) const;
+         void outputGrid(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const;
 
          /**
           * @brief Set output mutliplied by scalar operator
           */
-         void outputSpectral(Matrix& rOut, const Matrix& tmp) const;
+         void outputSpectral(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const;
 
          /**
           * @brief Apply forward FFT
           */
-         void applyFwdFft(Matrix& mods, const Matrix& phys) const;
+         void applyFwdFft(Eigen::Ref<Matrix> mods, const Eigen::Ref<const Matrix>& phys) const;
 
          /**
           * @brief Add new linear solver
@@ -128,7 +119,7 @@ namespace Fftw {
          /**
           * @brief Apply padding
           */
-         void applyPadding(Matrix& rData, const int extraRows = 0) const final;
+         void applyPadding(Eigen::Ref<Matrix> rData, const int extraRows = 0) const final;
 
          /**
           * @brief Get the energy grid

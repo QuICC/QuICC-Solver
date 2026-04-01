@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_INTEGRATOR_D2BASE_HPP
 #define QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_INTEGRATOR_D2BASE_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -54,7 +45,7 @@ namespace Integrator {
           *
           * @param rOut Output values
           */
-         void applyPostOperator(MatrixZ& rOut) const final;
+         void applyPostOperator(Eigen::Ref<MatrixZ> rOut) const final;
    };
 
 }

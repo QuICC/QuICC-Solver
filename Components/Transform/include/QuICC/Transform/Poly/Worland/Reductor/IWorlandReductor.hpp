@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_IWORLANDREDUCTOR_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_IWORLANDREDUCTOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes

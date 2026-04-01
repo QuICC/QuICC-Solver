@@ -167,70 +167,16 @@ void ALegendreTransform::initOperators()
       Forward::LaplhOversinDphi::id());
 }
 
-void ALegendreTransform::forward(MatrixZ& rOut, const MatrixZ& in,
+void ALegendreTransform::forward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in,
    const std::size_t id)
 {
    this->mImpl.transform(rOut, in, id);
 }
 
-void ALegendreTransform::backward(MatrixZ& rOut, const MatrixZ& in,
+void ALegendreTransform::backward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in,
    const std::size_t id)
 {
    this->mImpl.transform(rOut, in, id);
-}
-
-//
-// Disabled transforms
-//
-
-void ALegendreTransform::forward(Matrix&, const MatrixZ&, const std::size_t)
-{
-   this->unimplemented();
-}
-
-void ALegendreTransform::forward(MatrixZ&, const Matrix&, const std::size_t)
-{
-   this->unimplemented();
-}
-
-void ALegendreTransform::forward(Matrix&, const Matrix&, const std::size_t)
-{
-   this->unimplemented();
-}
-
-void ALegendreTransform::backward(Matrix&, const MatrixZ&, const std::size_t)
-{
-   this->unimplemented();
-}
-
-void ALegendreTransform::backward(MatrixZ&, const Matrix&, const std::size_t)
-{
-   this->unimplemented();
-}
-
-void ALegendreTransform::backward(Matrix&, const Matrix&, const std::size_t)
-{
-   this->unimplemented();
-}
-
-void ALegendreTransform::reduce(MatrixZ&, const MatrixZ&, const std::size_t)
-{
-   this->unimplemented();
-}
-
-void ALegendreTransform::reduce(MatrixZ&, const Matrix&, const std::size_t)
-{
-   this->unimplemented();
-}
-
-void ALegendreTransform::reduce(Matrix&, const MatrixZ&, const std::size_t)
-{
-   this->unimplemented();
-}
-
-void ALegendreTransform::reduce(Matrix&, const Matrix&, const std::size_t)
-{
-   this->unimplemented();
 }
 
 MHDFloat ALegendreTransform::requiredStorage() const

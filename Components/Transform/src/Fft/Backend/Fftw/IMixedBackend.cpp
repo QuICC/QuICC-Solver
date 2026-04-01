@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/IMixedBackend.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/Fftw/IMixedBackend.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 
 namespace QuICC {
@@ -28,14 +22,6 @@ namespace Fft {
 namespace Backend {
 
 namespace Fftw {
-
-   IMixedBackend::IMixedBackend()
-   {
-   }
-
-   IMixedBackend::~IMixedBackend()
-   {
-   }
 
    void IMixedBackend::init(const SetupType& setup) const
    {

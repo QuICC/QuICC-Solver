@@ -6,15 +6,9 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/ALegendre/Integrator/Base/D1.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/ALegendre/Integrator/Base/D1.hpp"
 #include "QuICC/Polynomial/ALegendre/dPlm.hpp"
 #include "QuICC/Polynomial/ALegendre/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/ALegendre/Evaluator/InnerProduct.hpp"

@@ -74,7 +74,7 @@ namespace Transform {
           * @param physVal    Input physical values
           * @param integrator Integrator to use
           */
-         void forward(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::size_t integrator) override;
+         void forward(Eigen::Ref<MatrixZ> rSpecVal, const Eigen::Ref<const MatrixZ>& physVal, const std::size_t integrator) override;
 
          /**
           * @brief Compute polynomial projection
@@ -83,7 +83,7 @@ namespace Transform {
           * @param specVal    Input spectral coefficients
           * @param projector  Projector to use
           */
-         void backward(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::size_t projector) override;
+         void backward(Eigen::Ref<MatrixZ> rPhysVal, const Eigen::Ref<const MatrixZ>& specVal, const std::size_t projector) override;
 
          /**
           * @brief Get the memory requirements
@@ -107,60 +107,6 @@ namespace Transform {
           * @brief Transform implementation
           */
          Poly::ALegendre::Transform mImpl;
-
-         //
-         // Disabled transforms
-         //
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(Matrix& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(Matrix& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(Matrix& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(Matrix& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(MatrixZ& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(Matrix& rOut, const Matrix& in, const std::size_t id) override;
    };
 
 }

@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_COMPLEXINTEGRATOR_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_FFTW_COMPLEXINTEGRATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -43,12 +34,12 @@ namespace Fftw {
          /**
           * @brief Constructor
           */
-         ComplexIntegrator();
+         ComplexIntegrator() = default;
 
          /**
           * @brief Destructor
           */
-         ~ComplexIntegrator();
+         ~ComplexIntegrator() = default;
 
          /**
           * @brief Initialise the FFT transforms
@@ -58,24 +49,24 @@ namespace Fftw {
          /**
           * @brief Scale field
           */
-         void output(MatrixZ& rOut) const;
+         void output(Eigen::Ref<MatrixZ> rOut) const;
 
          /**
           * @brief Copy mean of field out of backend
           *
           * @param rOut dims: N_k1 x (N_k2 x N_r)
           */
-         void outputMean(MatrixZ& rOut) const;
+         void outputMean(Eigen::Ref<MatrixZ> rOut) const;
 
          /**
           * @brief Zero the mean
           */
-         void zeroMean(MatrixZ& rOut) const;
+         void zeroMean(Eigen::Ref<MatrixZ> rOut) const;
 
          /**
           * @brief Scale with fast index dependent function
           */
-         void outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale) const;
+         void outputDiff(Eigen::Ref<MatrixZ> rOut, const int order, const MHDFloat scale) const;
 
          /**
           * @brief Extract the mean
@@ -85,12 +76,7 @@ namespace Fftw {
          /**
           * @brief Set the mean
           */
-         void setMean(MatrixZ& rOut, const MHDFloat scale) const;
-
-         /**
-          * @brief Apply FFT
-          */
-         void applyFft(MatrixZ& mods, const MatrixZ& phys) const final;
+         void setMean(Eigen::Ref<MatrixZ> rOut, const MHDFloat scale) const;
 
          /**
           * @brief Compute 2D derivative operator
@@ -105,7 +91,7 @@ namespace Fftw {
          /**
           * @brief Apply 2D derivative operator
           */
-         void applyDiff2D(MatrixZ& rOut, const int id) const;
+         void applyDiff2D(Eigen::Ref<MatrixZ> rOut, const int id) const;
 
          /**
           * @brief Destroy 2D derivative operator

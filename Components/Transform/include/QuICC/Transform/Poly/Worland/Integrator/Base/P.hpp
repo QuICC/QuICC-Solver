@@ -6,7 +6,7 @@
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_BASE_P_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_BASE_P_HPP
 
-// External includes
+// System includes
 //
 
 // Project includes

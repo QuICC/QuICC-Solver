@@ -33,7 +33,7 @@ namespace SpatialScheme {
       return space;
    }
 
-   int IRegular2DBuilder::fillIndexes(const Dimensions::Transform::Id transId, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, std::vector<std::vector<int> >& idx2D, std::vector<int>& idx3D, const std::vector<int>& id, const std::vector<int>& bins)
+   int IRegular2DBuilder::fillIndexes(const Dimensions::Transform::Id transId, std::vector<int>& globalDims, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, std::vector<std::vector<int> >& idx2D, std::vector<int>& idx3D, const std::vector<int>& id, const std::vector<int>& bins)
    {
       throw std::logic_error("2D scheme splitting not fully implemented");
 
@@ -41,6 +41,11 @@ namespace SpatialScheme {
       assert( id.size() > 0 );
       assert( bins.size() > 0 );
       assert( id.size() == bins.size() );
+
+      // Global dimensions
+      globalDims.push_back(this->dim(transId, Dimensions::Data::DATF1D));
+      globalDims.push_back(this->dim(transId, Dimensions::Data::DATB1D));
+      globalDims.push_back(this->dim(transId, Dimensions::Data::DAT2D));
 
       // Make sure we start with empty indexes
       fwd1D.clear();

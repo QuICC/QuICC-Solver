@@ -28,7 +28,7 @@ namespace Integrator {
       this->mBackend.initMeanBlocks(this->mspSetup->idBlocks());
    }
 
-   void D1_P<base_t>::applyPostOperator(MatrixZ& rOut) const
+   void D1_P<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut) const
    {
       this->mBackend.extractMean(rOut);
 

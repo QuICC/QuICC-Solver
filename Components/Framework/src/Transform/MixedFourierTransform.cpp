@@ -39,14 +39,6 @@ namespace QuICC {
 
 namespace Transform {
 
-   MixedFourierTransform::MixedFourierTransform()
-   {
-   }
-
-   MixedFourierTransform::~MixedFourierTransform()
-   {
-   }
-
    void MixedFourierTransform::requiredOptions(std::set<std::size_t>& list, const Dimensions::Transform::Id dimId) const
    {
       this->mImpl.requiredOptions(list, dimId);
@@ -97,69 +89,15 @@ namespace Transform {
       this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::D2<backend_t>>(Forward::D2::id());
    }
 
-   void MixedFourierTransform::forward(MatrixZ& rOut, const Matrix& in, const std::size_t id)
+   void MixedFourierTransform::forward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
-   void MixedFourierTransform::backward(Matrix& rOut, const MatrixZ& in, const std::size_t id)
+   void MixedFourierTransform::backward(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       Profiler::RegionFixture<3> fix("MixedFourierTransform::backward");
       this->mImpl.transform(rOut, in, id);
-   }
-
-   //
-   // Disabled transforms
-   //
-
-   void MixedFourierTransform::forward(MatrixZ&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void MixedFourierTransform::forward(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void MixedFourierTransform::forward(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void MixedFourierTransform::backward(MatrixZ&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void MixedFourierTransform::backward(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void MixedFourierTransform::backward(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void MixedFourierTransform::reduce(MatrixZ&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void MixedFourierTransform::reduce(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void MixedFourierTransform::reduce(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void MixedFourierTransform::reduce(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
    }
 
    MHDFloat MixedFourierTransform::requiredStorage() const

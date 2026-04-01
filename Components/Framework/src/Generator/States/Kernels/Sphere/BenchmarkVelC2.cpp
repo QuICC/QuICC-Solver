@@ -43,7 +43,7 @@ namespace Sphere {
    void BenchmarkVelC2::compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Initialize to zero
-      rNLComp.rData().setZero();
+      rNLComp.setZeros();
 
       int nR = this->spRes()->sim().dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
       int nTh = this->spRes()->sim().dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);

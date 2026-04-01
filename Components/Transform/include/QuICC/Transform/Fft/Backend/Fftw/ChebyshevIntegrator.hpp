@@ -33,12 +33,12 @@ public:
    /**
     * @brief Constructor
     */
-   ChebyshevIntegrator();
+   ChebyshevIntegrator() = default;
 
    /**
     * @brief Destructor
     */
-   ~ChebyshevIntegrator();
+   ~ChebyshevIntegrator() = default;
 
    /**
     * @brief Initialise the FFTW transforms
@@ -48,22 +48,22 @@ public:
    /**
     * @brief Set output
     */
-   void output(Matrix& rOut) const;
+   void output(Eigen::Ref<Matrix> rOut) const;
 
    /**
     * @brief Set output
     */
-   void output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
+   void output(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp, const bool useReal) const;
 
    /**
     * @brief Set output multiplied by spectral operator
     */
-   void outputSpectral(Matrix& rOut) const;
+   void outputSpectral(Eigen::Ref<Matrix> rOut) const;
 
    /**
     * @brief Set output multiplied by spectral operator
     */
-   void outputSpectral(MatrixZ& rOut, const Matrix& tmp,
+   void outputSpectral(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp,
       const bool useReal) const;
 
    /**

@@ -6,15 +6,9 @@
 #ifndef QUICC_DATATYPES_TENSORFIELD_HPP
 #define QUICC_DATATYPES_TENSORFIELD_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <map>
-
-// External includes
-//
 
 // Project includes
 //
@@ -31,6 +25,9 @@ namespace Datatypes {
    template <typename TScalar, typename TType> class TensorField
    {
       public:
+         ///
+         typedef TScalar ScalarFieldType;
+
          /**
           * @brief Constructor with simplified interface
           *
@@ -84,7 +81,7 @@ namespace Datatypes {
           *
           * \warning This routine should only be used in exceptional cases. Use setData, addData, subData when you can!
          */
-         std::map<std::pair<TType,TType>,TScalar>& rData();
+         std::map<std::pair<TType,TType>,TScalar>& rComps();
 
       protected:
          /**
@@ -120,7 +117,7 @@ namespace Datatypes {
       return this->mComponents;
    }
 
-   template <typename TScalar, typename TType> inline std::map<std::pair<TType,TType>,TScalar>& TensorField<TScalar,TType>::rData()
+   template <typename TScalar, typename TType> inline std::map<std::pair<TType,TType>,TScalar>& TensorField<TScalar,TType>::rComps()
    {
       return this->mComponents;
    }
@@ -172,7 +169,7 @@ namespace Datatypes {
       return mem;
    }
 
-}
-}
+} // namespace Datatypes
+} // namespace QuICC
 
 #endif // QUICC_DATATYPES_TENSORFIELD_HPP

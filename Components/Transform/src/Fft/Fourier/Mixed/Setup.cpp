@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Mixed/Setup.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Mixed/Setup.hpp"
 
 namespace QuICC {
 
@@ -35,11 +29,6 @@ namespace Mixed {
 
    Setup::Setup(const int size, const int specSize, const GridPurpose::Id purpose)
       : ::QuICC::Transform::Fft::Setup(size, specSize, purpose)
-   {
-   }
-
-
-   Setup::~Setup()
    {
    }
 

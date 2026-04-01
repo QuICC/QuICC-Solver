@@ -6,7 +6,6 @@
 // System includes
 //
 
-
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Reductor/IWorlandPower.hpp"
@@ -64,7 +63,7 @@ namespace Reductor {
       wquad.computeQuadrature(igrid, iweights, nrgSize);
    }
 
-   void IWorlandPower::applyOperators(Matrix& rOut, const MatrixZ& in) const
+   void IWorlandPower::applyOperators(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<3> fix(this->mProfileTag);
 
@@ -86,7 +85,7 @@ namespace Reductor {
       }
    }
 
-   void IWorlandPower::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+   void IWorlandPower::applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       throw std::logic_error("Unused interface");
    }

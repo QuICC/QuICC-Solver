@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_MIXEDINTEGRATOR_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_MIXEDINTEGRATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -51,7 +42,7 @@ namespace Backend {
          /**
           * @brief Destructor
           */
-         ~MixedIntegrator();
+         ~MixedIntegrator() = default;
 
          /**
           * @brief Initialise the FFT transforms
@@ -64,22 +55,22 @@ namespace Backend {
           * @param phys FFT input
           * @param mods FFT output
           */
-         void applyFft(MatrixZ& mods, const Matrix& phys) const;
+         void applyFft(Eigen::Ref<MatrixZ> mods, const Eigen::Ref<const Matrix>& phys) const;
 
          /**
           * @brief Set input and output data pointers for FFT
           */
-         void output(MatrixZ& out) const;
+         void output(Eigen::Ref<MatrixZ> out) const;
 
          /**
           * @brief Apply derivative to ouput of given order
           */
-         void outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale) const;
+         void outputDiff(Eigen::Ref<MatrixZ> rOut, const int order, const MHDFloat scale) const;
 
          /**
           * @brief Apply derivative to ouput of given order, modified values can be specified for mixed operators
           */
-         void outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale, const std::map<int,MHDComplex>& mod) const;
+         void outputDiff(Eigen::Ref<MatrixZ> rOut, const int order, const MHDFloat scale, const std::map<int,MHDComplex>& mod) const;
 
          /**
           * @brief Get the memory requirements

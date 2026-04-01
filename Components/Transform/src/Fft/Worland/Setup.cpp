@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Worland/Setup.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Worland/Setup.hpp"
 
 namespace QuICC {
 
@@ -30,10 +24,6 @@ namespace Worland {
       : ::QuICC::Transform::Fft::Setup(size, specSize, purpose)
    {
       this->setBoxScale(1.0);
-   }
-
-   Setup::~Setup()
-   {
    }
 
    void Setup::setBackwardSize()

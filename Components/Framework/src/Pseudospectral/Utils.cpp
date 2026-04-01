@@ -11,6 +11,7 @@
 
 // Project includes
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Pseudospectral/Utils.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 
@@ -32,50 +33,26 @@ ptrAndIdxBlock getMeta(const TransformResolution& res,
 {
    std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
 
+   auto meta = res.viewMeta(Dimensions::Data::DATB1D);
+   assert(maxLayers != meta->global3D);
+
    // ptr
-   Memory::MemBlock<std::uint32_t> ptrBlock(maxLayers + 1, mem.get());
+   Memory::MemBlock<std::uint32_t> ptrBlock(meta->ptr2D.size(), mem.get());
    View::ViewBase<std::uint32_t> ptr(ptrBlock.data(), ptrBlock.size());
 
    using namespace QuICC::Memory;
    tempOnHostMemorySpace ConverterP(ptr,
       TransferMode::write | TransferMode::block);
 
-   std::uint32_t cumLayerSize = 0;
-   std::uint32_t layerCounter = 0;
-   ptr[0] = 0;
-   for (std::uint32_t l = 0; l < maxLayers; ++l)
-   {
-      std::uint32_t layerSize = 0;
-      if (layerCounter < nLayers)
-      {
-         auto layerIndex = static_cast<std::uint32_t>(
-            res.idx<QuICC::Dimensions::Data::DAT3D>(layerCounter));
-         if (l == layerIndex)
-         {
-            layerSize = res.dim<QuICC::Dimensions::Data::DAT2D>(layerCounter);
-            ++layerCounter;
-         }
-      }
-      ptr[l + 1] = ptr[l] + layerSize;
-      cumLayerSize += layerSize;
-   }
+   std::copy(meta->ptr2D.begin(), meta->ptr2D.end(), ptr.data());
 
    // idx
-   Memory::MemBlock<std::uint32_t> idxBlock(cumLayerSize, mem.get());
+   Memory::MemBlock<std::uint32_t> idxBlock(meta->idx2D.size(), mem.get());
    View::ViewBase<std::uint32_t> idx(idxBlock.data(), idxBlock.size());
 
    tempOnHostMemorySpace ConverterI(idx, TransferMode::write);
 
-   std::uint32_t l = 0;
-   for (std::uint32_t k = 0; k < nLayers; ++k)
-   {
-      for (int j = 0; j < res.dim<QuICC::Dimensions::Data::DAT2D>(k); ++j)
-      {
-         auto columnIndex = res.idx<QuICC::Dimensions::Data::DAT2D>(j, k);
-         idx[l] = columnIndex;
-         ++l;
-      }
-   }
+   std::copy(meta->idx2D.begin(), meta->idx2D.end(), idx.data());
 
    ptrAndIdxBlock ret;
    ret.ptr = std::move(ptrBlock);
@@ -83,17 +60,11 @@ ptrAndIdxBlock getMeta(const TransformResolution& res,
    return ret;
 }
 
-template <class SCALAROUT, class SCALARIN, class VIEWATT>
-void copyEig2View(QuICC::View::View<SCALAROUT, VIEWATT> view,
-   const Eigen::Matrix<SCALARIN, -1, -1>& eig, const TransformResolution& res)
+template <class DERIVED, class VIEWATT>
+void copyEig2ViewImpl(QuICC::View::View<typename DERIVED::Scalar, VIEWATT> view,
+   const Eigen::MatrixBase<DERIVED>& eig, const TransformResolution& res)
 {
-   throw std::logic_error("trying to copy different types");
-}
-
-template <class SCALAR, class VIEWATT>
-void copyEig2View(QuICC::View::View<SCALAR, VIEWATT> view,
-   const Eigen::Matrix<SCALAR, -1, -1>& eig, const TransformResolution& res)
-{
+   using SCALAR = typename DERIVED::Scalar;
    std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
 
    auto pointers = view.pointers()[1];
@@ -168,19 +139,28 @@ void copyEig2View(QuICC::View::View<SCALAR, VIEWATT> view,
    }
 }
 
-template <class SCALAROUT, class SCALARIN, class VIEWATT>
-void copyView2Eig(Eigen::Matrix<SCALAROUT, -1, -1>& eig,
-   const QuICC::View::View<SCALARIN, VIEWATT> view,
-   const TransformResolution& res)
+template <class SCALAROUT, class DERIVED, class VIEWATT>
+void copyEig2View(QuICC::View::View<SCALAROUT, VIEWATT> view,
+   const Eigen::MatrixBase<DERIVED>& eig, const TransformResolution& res)
 {
-   throw std::logic_error("trying to copy different types");
+   if constexpr(std::is_same_v<SCALAROUT, typename DERIVED::Scalar>)
+   {
+      copyEig2ViewImpl(view, eig, res);
+   }
+   else
+   {
+      throw std::logic_error("trying to copy different types");
+   }
 }
 
-template <class SCALAR, class VIEWATT>
-void copyView2Eig(Eigen::Matrix<SCALAR, -1, -1>& eig,
-   const QuICC::View::View<SCALAR, VIEWATT> view,
+template <class DERIVED, class VIEWATT>
+void copyView2EigImpl(Eigen::MatrixBase<DERIVED> const& eig_,
+   const QuICC::View::View<typename DERIVED::Scalar, VIEWATT> view,
    const TransformResolution& res)
 {
+   using SCALAR = typename DERIVED::Scalar;
+   Eigen::MatrixBase<DERIVED>& eig = const_cast< Eigen::MatrixBase<DERIVED>& >(eig_);
+
    std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
 
    auto pointers = view.pointers()[1];
@@ -252,10 +232,26 @@ void copyView2Eig(Eigen::Matrix<SCALAR, -1, -1>& eig,
    }
 }
 
+template <class DERIVED, class SCALARIN, class VIEWATT>
+void copyView2Eig(Eigen::MatrixBase<DERIVED> const& eig,
+   const QuICC::View::View<SCALARIN, VIEWATT> view,
+   const TransformResolution& res)
+{
+   if constexpr(std::is_same_v<typename DERIVED::Scalar, SCALARIN>)
+   {
+      copyView2EigImpl(eig, view, res);
+   }
+   else
+   {
+      throw std::logic_error("trying to copy different types");
+   }
+}
+
 void copyScalar2View(Graph::varData_t vVar,
    Framework::Selector::VariantSharedScalarVariable sVar,
    const TransformResolution& res)
 {
+#if 0
    std::visit(
       [&](auto& Tv, auto&& p)
       {
@@ -263,12 +259,14 @@ void copyScalar2View(Graph::varData_t vVar,
          details::copyEig2View(Tv, ptrTemp.data(), res);
       },
       vVar, sVar);
+#endif
 }
 
 void copyVector2View(Graph::varData_t vVar0, Graph::varData_t vVar1,
    Framework::Selector::VariantSharedVectorVariable vecVar,
    const TransformResolution& res)
 {
+#if 0
    std::visit(
       [&](auto& Torv, auto& Polv, auto&& p)
       {
@@ -280,11 +278,13 @@ void copyVector2View(Graph::varData_t vVar0, Graph::varData_t vVar1,
          details::copyEig2View(Polv, ptrPol.data(), res);
       },
       vVar0, vVar1, vecVar);
+#endif
 }
 
 void copyView2Scalar(Framework::Selector::VariantSharedScalarVariable sVar,
    Graph::varData_t vVar, const TransformResolution& res)
 {
+#if 0
    std::visit(
       [&](auto&& p, auto& Tv)
       {
@@ -292,12 +292,14 @@ void copyView2Scalar(Framework::Selector::VariantSharedScalarVariable sVar,
          details::copyView2Eig(ptrTemp.rData(), Tv, res);
       },
       sVar, vVar);
+#endif
 }
 
 void copyView2Vector(Framework::Selector::VariantSharedVectorVariable vecVar,
    Graph::varData_t vVar0, Graph::varData_t vVar1,
    const TransformResolution& res)
 {
+#if 0
    std::visit(
       [&](auto&& p, auto& Torv, auto& Polv)
       {
@@ -309,12 +311,14 @@ void copyView2Vector(Framework::Selector::VariantSharedVectorVariable vecVar,
          details::copyView2Eig(ptrPol.rData(), Polv, res);
       },
       vecVar, vVar0, vVar1);
+#endif
 }
 
 void copyView2Vector(Framework::Selector::VariantSharedVectorVariable vecVar,
    Graph::varData_t vVar0, Graph::varData_t vVar1, Graph::varData_t vVar2,
    const TransformResolution& res)
 {
+#if 0
    std::visit(
       [&](auto&& p, auto& Urv, auto& Uthetav, auto& Uphiv)
       {
@@ -328,6 +332,7 @@ void copyView2Vector(Framework::Selector::VariantSharedVectorVariable vecVar,
          details::copyView2Eig(ptrUphi.rData(), Uphiv, res);
       },
       vecVar, vVar0, vVar1, vVar2);
+#endif
 }
 
 

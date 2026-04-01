@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/WorlandIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/Fftw/WorlandIntegrator.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/SparseSM/Worland/I2.hpp"
 #include "QuICC/SparseSM/Worland/I4.hpp"
@@ -30,14 +24,6 @@ namespace Fft {
 namespace Backend {
 
 namespace Fftw {
-
-   WorlandIntegrator::WorlandIntegrator()
-   {
-   }
-
-   WorlandIntegrator::~WorlandIntegrator()
-   {
-   }
 
    void WorlandIntegrator::init(const SetupType& setup, const int lshift, const int extraN, const bool lshiftOnlyParity, const bool alwaysZeroNegative) const
    {
@@ -120,7 +106,7 @@ namespace Fftw {
       this->io(this->mOutTmp.at(0).data(), this->mInTmp.at(0).data());
    }
 
-   void WorlandIntegrator::input(const Matrix& in, const bool isEven) const
+   void WorlandIntegrator::input(const Eigen::Ref<const Matrix>& in, const bool isEven) const
    {
       Matrix& inTmp = this->mInTmp.at(0);
       int start = 0;
@@ -131,7 +117,7 @@ namespace Fftw {
       }
    }
 
-   void WorlandIntegrator::input(const MatrixZ& in, const bool isEven, const bool useReal) const
+   void WorlandIntegrator::input(const Eigen::Ref<const MatrixZ>& in, const bool isEven, const bool useReal) const
    {
       Matrix& inTmp = this->mInTmp.at(0);
       int start = 0;
@@ -376,7 +362,7 @@ namespace Fftw {
       }
    }
 
-   void WorlandIntegrator::output(Matrix& rOut, const bool isEven) const
+   void WorlandIntegrator::output(Eigen::Ref<Matrix> rOut, const bool isEven) const
    {
       Matrix& outTmp = this->mOutTmp.at(0);
       int start = 0;
@@ -396,7 +382,7 @@ namespace Fftw {
       }
    }
 
-   void WorlandIntegrator::output(MatrixZ& rOut, const bool isEven, const bool useReal) const
+   void WorlandIntegrator::output(Eigen::Ref<MatrixZ> rOut, const bool isEven, const bool useReal) const
    {
       Matrix& outTmp = this->mOutTmp.at(0);
       int start = 0;

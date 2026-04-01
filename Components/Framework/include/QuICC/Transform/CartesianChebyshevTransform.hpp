@@ -74,28 +74,28 @@ namespace Transform {
           *
           * Compute the FFT from real physical space to Chebyshev spectral space
           */
-         void forward(Matrix& rOut, const Matrix& in, const std::size_t integrator) override;
+         void forward(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t integrator) override;
 
          /**
           * @brief Compute forward transform (C2C)
           *
           * Compute the FFT from real physical space to Chebyshev spectral space
           */
-         void forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t integrator) override;
+         void forward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t integrator) override;
 
          /**
           * @brief Compute backward transform (R2R)
           *
           * Compute the FFT from Chebyshev spectral space to real physical space
           */
-         void backward(Matrix& rOut, const Matrix& in, const std::size_t projector) override;
+         void backward(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t projector) override;
 
          /**
           * @brief Compute backward transform (C2C)
           *
           * Compute the FFT from Chebyshev spectral space to real physical space
           */
-         void backward(MatrixZ& rOut, const MatrixZ& in, const std::size_t projector) override;
+         void backward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t projector) override;
 
          /**
           * @brief Compute energy reduction operation
@@ -106,7 +106,7 @@ namespace Transform {
           * @param in         Input spectral coefficients
           * @param reductor   Energy reductor to use
           */
-         void reduce(Matrix& spectrum, const MatrixZ& in, const std::size_t reductor) override;
+         void reduce(Eigen::Ref<Matrix> spectrum, const Eigen::Ref<const MatrixZ>& in, const std::size_t reductor) override;
 
          /**
           * @brief Compute energy reduction operation
@@ -117,7 +117,7 @@ namespace Transform {
           * @param in         Input spectral coefficients
           * @param reductor   Energy reductor to use
           */
-         void reduce(Matrix& spectrum, const Matrix& in, const std::size_t reductor) override;
+         void reduce(Eigen::Ref<Matrix> spectrum, const Eigen::Ref<const Matrix>& in, const std::size_t reductor) override;
 
          /**
           * @brief Get the memory requirements
@@ -141,40 +141,6 @@ namespace Transform {
           * @brief Transform implementation
           */
          Fft::Chebyshev::LinearMap::Transform mImpl;
-
-         //
-         // Disabled transforms
-         //
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(Matrix& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(Matrix& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(MatrixZ& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
    };
 
 }

@@ -7,15 +7,9 @@
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Mixed/Transform.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Mixed/Transform.hpp"
 #include "Types/Math.hpp"
 
 namespace QuICC {
@@ -40,14 +34,6 @@ namespace Mixed {
       }
 
       return grid;
-   }
-
-   Transform::Transform()
-   {
-   }
-
-   Transform::~Transform()
-   {
    }
 
    void Transform::init(Transform::SharedSetupType spSetup)
@@ -78,7 +64,7 @@ namespace Mixed {
       return Transform::generateGrid(this->mspSetup->fwdSize());
    }
 
-   void Transform::transform(MatrixZ& rOut, const Matrix& in, const Mixed::IMixedOperator& op)
+   void Transform::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in, const Mixed::IMixedOperator& op)
    {
       if(!op.isInitialized())
       {
@@ -88,7 +74,7 @@ namespace Mixed {
       op.transform(rOut, in);
    }
 
-   void Transform::transform(Matrix& rOut, const MatrixZ& in, const Mixed::IMixedOperator& op)
+   void Transform::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const Mixed::IMixedOperator& op)
    {
       if(!op.isInitialized())
       {
@@ -98,7 +84,7 @@ namespace Mixed {
       op.transform(rOut, in);
    }
 
-   void Transform::transform(MatrixZ& rOut, const Matrix& in, const std::size_t id)
+   void Transform::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id)
    {
       auto it = this->mOps.find(id);
 
@@ -111,7 +97,7 @@ namespace Mixed {
       }
    }
 
-   void Transform::transform(Matrix& rOut, const MatrixZ& in, const std::size_t id)
+   void Transform::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       auto it = this->mOps.find(id);
 

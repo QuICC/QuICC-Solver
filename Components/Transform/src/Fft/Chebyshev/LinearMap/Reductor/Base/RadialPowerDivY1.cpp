@@ -36,17 +36,17 @@ void RadialPowerDivY1<base_t>::initOperator() const
    this->mBackend.setScaler(igrid.array().pow(-1).cast<MHDFloat>().matrix());
 }
 
-void RadialPowerDivY1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+void RadialPowerDivY1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
 {
    this->mBackend.input(tmp, in);
 }
 
-void RadialPowerDivY1<base_t>::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
+void RadialPowerDivY1<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const
 {
    this->mBackend.outputGrid(rOut, tmp);
 }
 
-void RadialPowerDivY1<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void RadialPowerDivY1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, useReal);

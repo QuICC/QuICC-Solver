@@ -84,12 +84,12 @@ private:
     /// @brief
     /// @param rOut
     /// @param in
-    void applyOperators(Matrix& rOut, const MatrixZ& in) const final;
+    void applyOperators(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const final;
 
     /// @brief
     /// @param rOut
     /// @param in
-    void applyOperators(MatrixZ& rOut, const MatrixZ& in) const final;
+    void applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const final;
 
     /// @brief Apply ith operator
     /// this is not used in the view implementations

@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/MixedIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/Fftw/MixedIntegrator.hpp"
 #include "Types/Math.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -29,14 +23,6 @@ namespace Fft {
 namespace Backend {
 
 namespace Fftw {
-
-   MixedIntegrator::MixedIntegrator()
-   {
-   }
-
-   MixedIntegrator::~MixedIntegrator()
-   {
-   }
 
    void MixedIntegrator::init(const SetupType& setup) const
    {
@@ -69,12 +55,12 @@ namespace Fftw {
       }
    }
 
-   void MixedIntegrator::output(MatrixZ& rOut) const
+   void MixedIntegrator::output(Eigen::Ref<MatrixZ> rOut) const
    {
       rOut *= this->mFftScaling;
    }
 
-   void MixedIntegrator::outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale) const
+   void MixedIntegrator::outputDiff(Eigen::Ref<MatrixZ> rOut, const int order, const MHDFloat scale) const
    {
       // Odd order is complex
       if(order%2 == 1)
@@ -88,7 +74,7 @@ namespace Fftw {
       }
    }
 
-   void MixedIntegrator::outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale, const std::map<int,MHDComplex>& mod) const
+   void MixedIntegrator::outputDiff(Eigen::Ref<MatrixZ> rOut, const int order, const MHDFloat scale, const std::map<int,MHDComplex>& mod) const
    {
       // Odd order is complex
       if(order%2 == 1)
@@ -111,13 +97,6 @@ namespace Fftw {
          }
          rOut.topRows(this->mSpecSize) = factor.asDiagonal()*rOut.topRows(this->mSpecSize);
       }
-   }
-
-   void MixedIntegrator::applyFft(MatrixZ& mods, const Matrix& phys) const
-   {
-      Profiler::RegionFixture<4> fix("MixedIntegrator::applyFft");
-      fftw_execute_dft_r2c(this->mPlan, const_cast<MHDFloat*>(phys.data()), reinterpret_cast<fftw_complex* >(mods.data()));
-
    }
 
 } // namespace Fftw

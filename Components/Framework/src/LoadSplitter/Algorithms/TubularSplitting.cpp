@@ -86,12 +86,14 @@ namespace Parallel {
       std::vector<std::vector<int> >  idx2D;
       // Storage for the 3D indexes
       std::vector<int>  idx3D;
+      // Global dimension
+      std::vector<int>  globalDims;
 
       // Compute the indexes
-      status = this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, bins);
+      status = this->mspScheme->fillIndexes(transId, globalDims, fwd1D, bwd1D, idx2D, idx3D, ids, bins);
 
       // Create TransformResolution object
-      auto spTraRes = std::make_shared<TransformResolution>(fwd1D, bwd1D, idx2D, idx3D);
+      auto spTraRes = std::make_shared<TransformResolution>(globalDims, fwd1D, bwd1D, idx2D, idx3D);
       return spTraRes;
    }
 

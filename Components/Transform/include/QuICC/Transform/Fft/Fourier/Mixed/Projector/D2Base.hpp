@@ -56,7 +56,7 @@ namespace Projector {
           * @param in   Input values
           * @param out  Scaled input
           */
-         void applyPreOperator(MatrixZ& out, const MatrixZ& in) const final;
+         void applyPreOperator(MatrixZ& tmp, const Eigen::Ref<const MatrixZ>& in) const final;
    };
 
 }

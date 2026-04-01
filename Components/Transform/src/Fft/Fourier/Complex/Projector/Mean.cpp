@@ -23,7 +23,7 @@ namespace Complex {
 
 namespace Projector {
 
-   void Mean<base_t>::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
+   void Mean<base_t>::applyPreOperator(MatrixZ& tmp, const Eigen::Ref<const MatrixZ>& in) const
    {
       this->mBackend.inputMean(tmp, in);
    }

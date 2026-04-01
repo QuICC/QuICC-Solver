@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_KOKKOS_LLM1DIVS1DP_HPP
 #define QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_KOKKOS_LLM1DIVS1DP_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes

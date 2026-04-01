@@ -26,20 +26,12 @@ namespace Complex {
 
 namespace Projector {
 
-   IComplexProjector::IComplexProjector()
-   {
-   }
-
-   IComplexProjector::~IComplexProjector()
-   {
-   }
-
    void IComplexProjector::initBackend() const
    {
       this->mBackend.init(*this->mspSetup);
    }
 
-   void IComplexProjector::transform(MatrixZ& rOut, const MatrixZ& in) const
+   void IComplexProjector::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<2> fix("IComplexProjector::transform");
 
@@ -53,17 +45,17 @@ namespace Projector {
       this->mBackend.applyFft(rOut, tmp);
    }
 
-   void IComplexProjector::transform(Matrix&, const Matrix&) const
+   void IComplexProjector::transform(Eigen::Ref<Matrix>, const Eigen::Ref<const Matrix>&) const
    {
       throw std::logic_error("Data is not compatible with Complex FFT projector");
    }
 
-   void IComplexProjector::transform(Matrix&, const MatrixZ&) const
+   void IComplexProjector::transform(Eigen::Ref<Matrix>, const Eigen::Ref<const MatrixZ>&) const
    {
       throw std::logic_error("Data is not compatible with Complex FFT projector");
    }
 
-   void IComplexProjector::transform(MatrixZ&, const Matrix&) const
+   void IComplexProjector::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const Matrix>&) const
    {
       throw std::logic_error("Data is not compatible with Complex FFT projector");
    }
