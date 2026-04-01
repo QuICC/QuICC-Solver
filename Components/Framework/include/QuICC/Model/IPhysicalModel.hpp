@@ -104,18 +104,12 @@ namespace Model {
          /**
           * @brief Interface to adding a one-time ASCII output file (anelastic case)
           */
-         template <typename T, typename TApp> std::shared_ptr<T> enableOneTimeAsciiFile(const std::string tag, 
-                                                                                 const std::string prefix, 
-                                                                                 const std::size_t id, 
-                                                                                 std::shared_ptr<TApp> spSim,
-                                                                                 std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF);
-         /*
-         template <typename T, typename TApp> std::shared_ptr<T> enableStabilityAsciiFile(const std::string tag, 
-                                                                                 const std::string prefix, 
-                                                                                 const std::size_t id, 
-                                                                                 std::shared_ptr<TApp> spSim,
-                                                                                 std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF);
-            */
+         template <typename T, typename TApp, typename TFunc> std::shared_ptr<T> enableOneTimeAsciiFile(const std::string tag, 
+                                                                                                        const std::string prefix, 
+                                                                                                        const std::size_t id, 
+                                                                                                        std::shared_ptr<TApp> spSim,
+                                                                                                        std::vector<std::shared_ptr<TFunc>> pF);
+
       protected:
          /**
           * @brief Register Named IDs needed for simulation
@@ -184,11 +178,11 @@ namespace Model {
       }
    }
 
-template <typename T, typename TApp> std::shared_ptr<T> IPhysicalModel::enableOneTimeAsciiFile(const std::string tag, 
-                                                                                           const std::string prefix, 
-                                                                                           const std::size_t id, 
-                                                                                           std::shared_ptr<TApp> spSim,
-                                                                                           std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
+template <typename T, typename TApp, typename TFunc> std::shared_ptr<T> IPhysicalModel::enableOneTimeAsciiFile(const std::string tag, 
+                                                                                                               const std::string prefix, 
+                                                                                                               const std::size_t id, 
+                                                                                                               std::shared_ptr<TApp> spSim,
+                                                                                                               std::vector<std::shared_ptr<TFunc>> pF)
    {
       if(spSim->config().model(tag).at("enable"))
       {
@@ -211,28 +205,7 @@ template <typename T, typename TApp> std::shared_ptr<T> IPhysicalModel::enableOn
          return nullptr;
       }
    }
-/*
-template <typename T, typename TApp> std::shared_ptr<T> IPhysicalModel::enableStabilityAsciiFile(const std::string tag, 
-                                                                                           const std::string prefix, 
-                                                                                           const std::size_t id, 
-                                                                                           std::shared_ptr<TApp> spSim,
-                                                                                           std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
-   {
-      if(spSim->config().model(tag).at("enable"))
-      {
-         
-         auto spFile = std::make_shared<T>(prefix, spSim->ss().tag(), pF);
-         spFile->expect(id);
-         spSim->addOneTimeAsciiOutputFile(spFile);
-         return spFile;
-         
-      }
-      else
-      {
-         return nullptr;
-      }
-   }
-*/
+
 }
 }
 
