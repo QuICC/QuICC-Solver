@@ -18,6 +18,7 @@
 #include "Memory/MemoryResource.hpp"
 #include "Timestep/Exponential/CreateInfo.hpp"
 #include "Timestep/Exponential/Functors/BaseFunctor.hpp"
+#include "Timestep/Exponential/Functors/FunctorData.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 #ifdef QUICC_DEBUG
 #include "QuICC/PhysicalNames/Coordinator.hpp"
@@ -39,19 +40,20 @@ template <typename TFunc>
 class InputFunctor: public BaseFunctor
 {
    public:
-      InputFunctor(std::shared_ptr<TFunc> vFunc, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem) : BaseFunctor(idMap, mem), vFunc(vFunc){};
+      InputFunctor(std::shared_ptr<FunctorData> spData, std::shared_ptr<TFunc> vFunc, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem) : BaseFunctor(idMap, mem), spData(spData), vFunc(vFunc){};
       virtual ~InputFunctor() = default;
-      template <typename TEqIt>
-      void operator()(const SpectralFieldId& id, TEqIt& eqIt);
+      void operator()(const SpectralFieldId& id);
    protected:
+      std::shared_ptr<FunctorData> spData; 
       std::shared_ptr<TFunc> vFunc;
 };
 
 template <typename TFunc>
-template <typename TEqIt>
-void InputFunctor<TFunc>::operator()(const SpectralFieldId& myId, TEqIt& eqIt)
+void InputFunctor<TFunc>::operator()(const SpectralFieldId& myId)
 {
-   const auto& cinfo = eqIt->couplingInfo(myId.second);
+   const auto& eqData = *spData;
+   assert(eqData.cInfos.count(myId) > 0);
+   const auto& cinfo = eqData.cInfos.at(myId);
    const auto& idMap = *this->mpIdMap;
 
    // Allocate temporary storage
@@ -78,7 +80,7 @@ void InputFunctor<TFunc>::operator()(const SpectralFieldId& myId, TEqIt& eqIt)
       std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
       View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
 
-      (*vFunc)(tmpView, myId, eqIt, cinfo, info, i);
+      (*vFunc)(tmpView, myId, cinfo, info, i);
    }
 }
 

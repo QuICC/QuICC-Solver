@@ -109,12 +109,12 @@ namespace Equations {
       this->mspBackend.reset();
    }
 
-   const SparseMatrix& EquationData::galerkinStencil(const FieldComponents::Spectral::Id compId, const int j) const
+   const std::vector<SparseMatrix>& EquationData::galerkinStencils(const FieldComponents::Spectral::Id compId) const
    {
       // Safety assert
       assert(this->mGStencils.count(compId) > 0);
 
-      return this->mGStencils.find(compId)->second.at(j);
+      return this->mGStencils.find(compId)->second;
    }
 
    bool EquationData::hasQID(const FieldComponents::Spectral::Id compId) const
@@ -189,7 +189,7 @@ namespace Equations {
       return this->mQIZMatrices.find(compId)->second.at(j);
    }
 
-   template <> const SparseMatrix& EquationData::explicitOperator<SparseMatrix>(const std::size_t opId, const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const
+   template <> const std::vector<SparseMatrix>& EquationData::explicitOperators<SparseMatrix>(const std::size_t opId, const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const
    {
       // Make key
       std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
@@ -199,21 +199,21 @@ namespace Equations {
          // Safety assert
          assert(this->mELDMatrices.count(key) > 0);
 
-         return this->mELDMatrices.find(key)->second.at(j);
+         return this->mELDMatrices.find(key)->second;
 
       } else if(opId == ModelOperator::ExplicitNonlinear::id())
       {
          // Safety assert
          assert(this->mENLDMatrices.count(key) > 0);
 
-         return this->mENLDMatrices.find(key)->second.at(j);
+         return this->mENLDMatrices.find(key)->second;
 
       } else if(opId == ModelOperator::ExplicitNextstep::id())
       {
          // Safety assert
          assert(this->mENSDMatrices.count(key) > 0);
 
-         return this->mENSDMatrices.find(key)->second.at(j);
+         return this->mENSDMatrices.find(key)->second;
 
       } else
       {
@@ -221,7 +221,7 @@ namespace Equations {
       }
    }
 
-   template <> const SparseMatrixZ& EquationData::explicitOperator<SparseMatrixZ>(const std::size_t opId, const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const
+   template <> const std::vector<SparseMatrixZ>& EquationData::explicitOperators<SparseMatrixZ>(const std::size_t opId, const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const
    {
       // Make key
       std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
@@ -231,21 +231,21 @@ namespace Equations {
          // Safety assert
          assert(this->mELZMatrices.count(key) > 0);
 
-         return this->mELZMatrices.find(key)->second.at(j);
+         return this->mELZMatrices.find(key)->second;
 
       } else if(opId == ModelOperator::ExplicitNonlinear::id())
       {
          // Safety assert
          assert(this->mENLZMatrices.count(key) > 0);
 
-         return this->mENLZMatrices.find(key)->second.at(j);
+         return this->mENLZMatrices.find(key)->second;
 
       } else if(opId == ModelOperator::ExplicitNextstep::id())
       {
          // Safety assert
          assert(this->mENSZMatrices.count(key) > 0);
 
-         return this->mENSZMatrices.find(key)->second.at(j);
+         return this->mENSZMatrices.find(key)->second;
 
       } else
       {

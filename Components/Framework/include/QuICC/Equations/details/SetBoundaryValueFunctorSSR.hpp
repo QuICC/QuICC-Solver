@@ -73,7 +73,7 @@ void SetBoundaryValueFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(
 
          // Add source term
          Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, l,
-            eq->boundaryValue(compId, i, j, matIdx));
+            spBoundary->compute(i, j, matIdx));
       }
    }
 #else

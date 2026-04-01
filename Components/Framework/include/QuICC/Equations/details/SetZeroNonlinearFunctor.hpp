@@ -27,7 +27,7 @@ public:
     * @brief ctor
     */
    SetZeroNonlinearFunctor(const Resolution& res, const CouplingInformation& cinfo,
-      FieldComponents::Spectral::Id compId, const int matIdx);
+      const int matIdx);
 
    /**
     * @brief deleted default ctor
@@ -42,7 +42,6 @@ public:
    /**
     * @brief Set nonlinear spectral values to zero
     *
-    * @param compId  Component ID
     * @param storage Storage for the equation values
     * @param matIdx  Index of the given data
     * @param start   Start index for the storage
@@ -62,11 +61,6 @@ private:
    const Equations::CouplingInformation& cinfo;
 
    /**
-    * @brief Field component ID
-    */
-   FieldComponents::Spectral::Id compId;
-
-   /**
     * @brief Matrix index
     */
    const int matIdx;
@@ -74,9 +68,9 @@ private:
 
 template <CouplingIndexType IndexType>
 SetZeroNonlinearFunctor<IndexType>::SetZeroNonlinearFunctor(
-   const Resolution& res, const CouplingInformation& cinfo, FieldComponents::Spectral::Id compId,
+   const Resolution& res, const CouplingInformation& cinfo,
    const int matIdx) :
-    res(res), cinfo(cinfo), compId(compId), matIdx(matIdx)
+    res(res), cinfo(cinfo), matIdx(matIdx)
 {}
 
 } // namespace details

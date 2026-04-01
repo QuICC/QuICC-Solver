@@ -15,9 +15,15 @@
 #include "Profiler/Interface.hpp"
 #include "Timestep/Exponential/CreateInfo.hpp"
 #include "Timestep/Exponential/Functors/BaseFunctor.hpp"
+#include "Timestep/Exponential/Functors/FunctorData.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
 #include "QuICC/Equations/CorrectSolution.hpp"
 #include "QuICC/SolveTiming/After.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
+#ifdef QUICC_DEBUG
+#include "QuICC/PhysicalNames/Coordinator.hpp"
+#include "QuICC/Tools/IdToHuman.hpp"
+#endif //QUICC_DEBUG
 
 namespace QuICC {
 
@@ -34,27 +40,45 @@ template <typename TTsFunc>
 class TransferCorrectionFunctor
 {
    public:
-      TransferCorrectionFunctor(std::shared_ptr<TTsFunc> tsFunc, const std::size_t regId, const std::size_t col): regId(regId), col(col), tsFunc(tsFunc){};
+      TransferCorrectionFunctor(std::shared_ptr<FunctorData> spData, std::shared_ptr<TTsFunc> tsFunc, const std::size_t regId, const std::size_t col): regId(regId), col(col), spData(spData), tsFunc(tsFunc){};
       ~TransferCorrectionFunctor() = default;
-      template <typename TEqIt>
-      void operator()(const SpectralFieldId& id, TEqIt& eqIt, const Equations::CouplingInformation& cinfo, const BaseFunctor::IdMap& idMap);
+      void operator()(const SpectralFieldId& id, const Equations::CouplingInformation& cinfo, const BaseFunctor::IdMap& idMap);
    protected:
       const std::size_t regId;
       const std::size_t col;
+      std::shared_ptr<FunctorData> spData;
       std::shared_ptr<TTsFunc> tsFunc;
 };
 
 template <typename TTsFunc>
-template <typename TEqIt>
-void TransferCorrectionFunctor<TTsFunc>::operator()(const SpectralFieldId& myId, TEqIt& eqIt, const Equations::CouplingInformation& cinfo, const BaseFunctor::IdMap& idMap)
+void TransferCorrectionFunctor<TTsFunc>::operator()(const SpectralFieldId& myId, const Equations::CouplingInformation& cinfo, const BaseFunctor::IdMap& idMap)
 {
+   const auto& data = *spData;
+
+   const auto timeId = SolveTiming::After::id();
+   bool changedSolution = false;
+
    // Apply constraint on solution
-   auto changedSolution = eqIt->applyConstraint(myId.second, SolveTiming::After::id());
+   if(data.constraints.count(myId) > 0)
+   {
+      DebuggerMacro_msg("Apply constraint kernel for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + QuICC::Tools::IdToHuman::toString(myId.second) + ") at " + SolveTiming::Coordinator::tag(timeId) , 6);
+
+      changedSolution = true;
+      data.constraints.at(myId)->apply(timeId);
+   }
 
    // Update timestepper solver solution if constraint modified it
    if(changedSolution)
    {
-      auto corr_ = eqIt->correctionConstraint(myId.second, SolveTiming::After::id());
+      std::vector<std::tuple<MHDVariant,int,int,int>> corr_;
+
+      if(data.constraints.count(myId) > 0)
+      {
+         DebuggerMacro_msg("Correction from constraint kernel for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + QuICC::Tools::IdToHuman::toString(myId.second) + ") at " + SolveTiming::Coordinator::tag(timeId) , 6);
+
+         corr_ = data.constraints.at(myId)->correction(timeId);
+      }
+
       std::size_t matStart = 0;
       for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
       {
@@ -63,7 +87,7 @@ void TransferCorrectionFunctor<TTsFunc>::operator()(const SpectralFieldId& myId,
          matStart += info.blockN;
 
          // Get effective corrections
-         auto corr = Equations::correctSolution(eqIt->res(), cinfo, myId.second, corr_, i, 0);
+         auto corr = Equations::correctSolution(data.res(), cinfo, corr_, i, 0);
 
          auto tsData = (*tsFunc)(info);
          auto&& pStepper = tsData.first;
@@ -73,7 +97,6 @@ void TransferCorrectionFunctor<TTsFunc>::operator()(const SpectralFieldId& myId,
       }
    }
 }
-
 
 } // namespace Functors
 } // namespace Exponential

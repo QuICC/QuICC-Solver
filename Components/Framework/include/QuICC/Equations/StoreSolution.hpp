@@ -28,29 +28,29 @@ namespace QuICC {
 namespace Equations {
 
    template<typename TData, typename TField>
-      void storeSolution(TField& field, const Resolution& res, const CouplingInformation& cinfo, const SparseMatrix* pOp, std::shared_ptr<SolutionUpdater> spUp, FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start);
+      void storeSolution(TField& field, const Resolution& res, const CouplingInformation& cinfo, const SparseMatrix* pOp, std::shared_ptr<SolutionUpdater> spUp, const TData& storage, const int matIdx, const int start);
 
    template<typename TData, typename TField>
-      void storeSolution(TField& field, const Resolution& res, const CouplingInformation& cinfo, const SparseMatrix* pOp, std::shared_ptr<SolutionUpdater> spUp, FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start)
+      void storeSolution(TField& field, const Resolution& res, const CouplingInformation& cinfo, const SparseMatrix* pOp, std::shared_ptr<SolutionUpdater> spUp, const TData& storage, const int matIdx, const int start)
    {
       if(cinfo.indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
-         details::StoreSolutionFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(res, cinfo, pOp, spUp, compId, matIdx);
+         details::StoreSolutionFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(res, cinfo, pOp, spUp, matIdx);
          func.apply(field, storage, start);
       }
       else if(cinfo.indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
       {
-         details::StoreSolutionFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(res, cinfo, pOp, spUp, compId, matIdx);
+         details::StoreSolutionFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(res, cinfo, pOp, spUp, matIdx);
          func.apply(field, storage, start);
       }
       else if(cinfo.indexType() == CouplingIndexType::MODE)
       {
-         details::StoreSolutionFunctor<CouplingIndexType::MODE> func(res, cinfo, pOp, spUp, compId, matIdx);
+         details::StoreSolutionFunctor<CouplingIndexType::MODE> func(res, cinfo, pOp, spUp, matIdx);
          func.apply(field, storage, start);
       }
       else if(cinfo.indexType() == CouplingIndexType::SINGLE)
       {
-         details::StoreSolutionFunctor<CouplingIndexType::SINGLE> func(res, cinfo, pOp, spUp, compId, matIdx);
+         details::StoreSolutionFunctor<CouplingIndexType::SINGLE> func(res, cinfo, pOp, spUp, matIdx);
          func.apply(field, storage, start);
       }
    }

@@ -43,7 +43,7 @@ void StoreSolutionFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::apply(
          MHDVariant dataPoint =
             Arithmetics::getScalar(*solution.ptr, i + solStart, j);
          dataPoint = (*spUp)(dataPoint, i, j, matIdx);
-         field.rComp(compId).setPoint(dataPoint, i, j, matIdx);
+         field.setPoint(dataPoint, i, j, matIdx);
       }
    }
 }

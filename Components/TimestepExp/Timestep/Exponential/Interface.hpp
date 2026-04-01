@@ -32,6 +32,7 @@
 #include "QuICC/Timestep/IScheme.hpp"
 #include "QuICC/Timestep/Interface.hpp"
 #include "QuICC/Model/IModelBackend.hpp"
+#include "Timestep/Exponential/Functors/FunctorData.hpp"
 #include "Timestep/Exponential/TimestepperInfo.hpp"
 #include "Timestep/Exponential/TimestepperCoordinator.hpp"
 #include "Timestep/Exponential/EpirkTimestepper.hpp"
@@ -39,6 +40,7 @@
 #include "Timestep/Exponential/Functors/DoNothingFunctor.hpp"
 #include "Timestep/Exponential/Functors/ProcessRangeFunctor.hpp"
 #include "Timestep/Exponential/Functors/TranslateInfoFunctor.hpp"
+#include "Timestep/Exponential/Functors/TranslateDataFunctor.hpp"
 #include "Timestep/Exponential/Functors/GetStepperFunctor.hpp"
 #include "Timestep/Exponential/Functors/InitSolutionFunctor.hpp"
 #include "Timestep/Exponential/Functors/CallExplicitPrognosticFunctor.hpp"
@@ -134,60 +136,39 @@ protected:
 
    /**
     * @brief Initialize solution
-    *
-    * @param scalEq Scalar equations
-    * @param vectEq Vector equations
     */
-   void initSolution(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+   void initSolution();
 
    /**
     * @brief Update equation input to solver
-    *
-    * @param scalEq Scalar equations
-    * @param vectEq Vector equations
     */
-   void getInput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+   void getInput();
 
    /**
     * @brief Transfer solution from solver
-    *
-    * @param scalEq Scalar equations
-    * @param vectEq Vector equations
     */
-   void transferOutput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+   void transferOutput();
+
+   /**
+    * @brief Translate equations to functor data
+    */
+   void translateData(const ScalarEquation_range& scalEq,
+   const VectorEquation_range& vectEq);
 
    /**
     * @brief Translate equations to timestepper info
     *
     * @param infos  Vector of information
-    * @param scalEq Scalar equations
-    * @param vectEq Vector equations
     */
-   void translate(std::vector<TimestepperInfo>& infos,
-      const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+   void translateInfo(std::vector<TimestepperInfo>& infos);
 
 private:
    std::set<int>  mBaseItIds;
 
    /**
-    * @brief Model backend
+    * @brief Functor data
     */
-   std::shared_ptr<Resolution> mspRes;
-
-   /**
-    * @brief Boundary condition map
-    */
-   std::shared_ptr<std::map<std::size_t, std::size_t>> mspBcIdMap;
-
-   /**
-    * @brief Equation parameters map
-    */
-   std::shared_ptr<std::map<std::size_t, NonDimensional::SharedINumber>> mspEqParamsMap;
-
-   /**
-    * @brief Model backend
-    */
-   std::shared_ptr<Model::IModelBackend> mspBackend;
+   std::shared_ptr<Functors::FunctorData> mspData;
 
    /**
     * @brief Interface to timestepping scheme
@@ -203,11 +184,6 @@ private:
     * @brief
     */
    std::shared_ptr<Memory::memory_resource> _mem;
-
-   /**
-    * @brief Shared field ID to coupling information
-    */
-   std::shared_ptr<std::map<SpectralFieldId, Equations::CouplingInformation>> mpCInfoMap;
 
    /**
     * @brief Shared field ID to solver field id
@@ -244,15 +220,17 @@ Interface<TScheme>::Interface(const MHDFloat time, const Matrix& cfl,
    // Init functors
    this->initFunctors();
 
+   this->translateData(scalEq, vectEq);
+
    std::vector<TimestepperInfo> infos;
-   this->translate(infos, scalEq, vectEq);
+   this->translateInfo(infos);
 
    assert(this->mpFieldIdMap);
-   this->mpJac = std::make_shared<AugmentedJacobianFunctor>(-1.0, Register::Temporary::id(), 0, 1, this->mpPseudo, this->mpFieldIdMap, _mem);
+   this->mpJac = std::make_shared<AugmentedJacobianFunctor>(this->mspData, -1.0, Register::Temporary::id(), 0, 1, this->mpPseudo, this->mpFieldIdMap, _mem);
 
    this->mSolverCoord.init(this->timestep(), infos, spScheme, this->mpJac);
 
-   this->initSolution(scalEq, vectEq);
+   this->initSolution();
 }
 
 template <typename TScheme>
@@ -262,22 +240,28 @@ void Interface<TScheme>::initFunctors()
 }
 
 template <typename TScheme>
-void Interface<TScheme>::translate(std::vector<TimestepperInfo>& infos, const ScalarEquation_range& scalEq,
+void Interface<TScheme>::translateData(const ScalarEquation_range& scalEq,
    const VectorEquation_range& vectEq)
 {
-   this->mpCInfoMap = std::make_shared<std::map<SpectralFieldId, Equations::CouplingInformation>>();
-   this->mpFieldIdMap = std::make_shared<std::map<SpectralFieldId, std::size_t>>();
+   this->mspData = std::make_shared<Functors::FunctorData>();
    auto bFunc = std::make_shared<Functors::DoNothingFunctor>();
-   auto pFunc = std::make_shared<Functors::TranslateInfoFunctor>(infos, this->mpCInfoMap, this->mpFieldIdMap, this->_mem);
+   auto pFunc = std::make_shared<Functors::TranslateDataFunctor>(this->mspData);
    auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
-   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, -1);
    processor(scalEq);
    processor(vectEq);
+}
 
-   this->mspBackend = pFunc->spBackend();
-   this->mspBcIdMap = pFunc->spBcIdMap();
-   this->mspEqParamsMap = pFunc->spEqParamsMap();
-   this->mspRes = pFunc->spRes();
+template <typename TScheme>
+void Interface<TScheme>::translateInfo(std::vector<TimestepperInfo>& infos)
+{
+   assert(this->mspData);
+   this->mpFieldIdMap = std::make_shared<std::map<SpectralFieldId, std::size_t>>();
+   auto bFunc = std::make_shared<Functors::DoNothingFunctor>();
+   auto pFunc = std::make_shared<Functors::TranslateInfoFunctor>(infos, this->mspData, this->mpFieldIdMap, this->_mem);
+   auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
+   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   processor(this->mspData->eqInfos);
 
    // Update system size
    std::size_t sysN = 0;
@@ -319,18 +303,17 @@ void Interface<TScheme>::tuneAdaptive(const MHDFloat time)
 }
 
 template <typename TScheme>
-void Interface<TScheme>::initSolution(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+void Interface<TScheme>::initSolution()
 {
    DebuggerMacro_msg("Initialize timestepper solutions", 6);
 
    auto bFunc = std::make_shared<Functors::DoNothingFunctor>();
    using OpFunctor = Functors::InitSolutionFunctor<TSFunctor>;
-   auto pvFunc = std::make_shared<OpFunctor>(this->mpTsFunc);
-   auto pFunc = std::make_shared<Functors::InputFunctor<OpFunctor>>(pvFunc, this->mpFieldIdMap, this->_mem);
+   auto pvFunc = std::make_shared<OpFunctor>(this->mspData, this->mpTsFunc);
+   auto pFunc = std::make_shared<Functors::InputFunctor<OpFunctor>>(this->mspData, pvFunc, this->mpFieldIdMap, this->_mem);
    auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
    Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
-   processor(scalEq);
-   processor(vectEq);
+   processor(this->mspData->eqInfos);
 }
 
 template <typename TScheme>
@@ -343,35 +326,33 @@ void Interface<TScheme>::getExplicitInput(const std::size_t opId,
 }
 
 template <typename TScheme>
-void Interface<TScheme>::getInput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+void Interface<TScheme>::getInput()
 {
    Profiler::RegionFixture<2> fix("Timestep-input");
 
-   auto bFunc = std::make_shared<Functors::ApplyConstraintFunctor>(SolveTiming::Before::id());
+   auto bFunc = std::make_shared<Functors::ApplyConstraintFunctor>(this->mspData, SolveTiming::Before::id());
    using OpFunctor = Functors::GetInputFunctor<TSFunctor>;
-   auto pvFunc = std::make_shared<OpFunctor>(this->mpTsFunc, Register::Rhs::id(), 1);
-   auto pFunc = std::make_shared<Functors::InputFunctor<OpFunctor>>(pvFunc, this->mpFieldIdMap, this->_mem);
+   auto pvFunc = std::make_shared<OpFunctor>(this->mspData, this->mpTsFunc, Register::Rhs::id(), 1);
+   auto pFunc = std::make_shared<Functors::InputFunctor<OpFunctor>>(this->mspData, pvFunc, this->mpFieldIdMap, this->_mem);
    auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
    Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
-   processor(scalEq);
-   processor(vectEq);
+   processor(this->mspData->eqInfos);
 }
 
 template <typename TScheme>
-void Interface<TScheme>::transferOutput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+void Interface<TScheme>::transferOutput()
 {
    Profiler::RegionFixture<2> fix("Timestep-output");
 
    auto bFunc = std::make_shared<Functors::DoNothingFunctor>();
    using OpFunctor = Functors::TransferOutputFunctor<TSFunctor>;
-   auto pvFunc = std::make_shared<OpFunctor>(this->mpTsFunc, Register::Solution::id(), 0);
+   auto pvFunc = std::make_shared<OpFunctor>(this->mspData, this->mpTsFunc, Register::Solution::id(), 0);
    using CorrFunctor = Functors::TransferCorrectionFunctor<TSFunctor>;
-   auto cvFunc = std::make_shared<CorrFunctor>(this->mpTsFunc, Register::Solution::id(), 0);
-   auto pFunc = std::make_shared<Functors::OutputFunctor<OpFunctor, CorrFunctor>>(pvFunc, cvFunc, this->mpFieldIdMap, this->_mem);
+   auto cvFunc = std::make_shared<CorrFunctor>(this->mspData, this->mpTsFunc, Register::Solution::id(), 0);
+   auto pFunc = std::make_shared<Functors::OutputFunctor<OpFunctor, CorrFunctor>>(this->mspData, pvFunc, cvFunc, this->mpFieldIdMap, this->_mem);
    auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
    Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
-   processor(scalEq);
-   processor(vectEq);
+   processor(this->mspData->eqInfos);
 }
 
 template <typename TScheme>
@@ -409,27 +390,19 @@ void Interface<TScheme>::stepForward(const ScalarEquation_range& scalEq_ignore,
 {
    DebuggerMacro_msg("Time integration sub-step", 2);
 
-   int curIt = *this->mBaseItIds.begin();
-   auto scalEq = this->mpPseudo->scalarRange(PseudospectralTag::Prognostic::id(), curIt);
-   auto vectEq = this->mpPseudo->vectorRange(PseudospectralTag::Prognostic::id(), curIt);
-
-   auto progFunc = std::make_shared<Functors::CallExplicitPrognosticFunctor<TSFunctor>>(this->mpTsFunc, Register::Rhs::id(), 1, *this->mBaseItIds.begin(), this->mpFieldIdMap, this->_mem);
+   auto progFunc = std::make_shared<Functors::CallExplicitPrognosticFunctor<TSFunctor>>(this->mspData, this->mpTsFunc, Register::Rhs::id(), 1, *this->mBaseItIds.begin(), this->mpFieldIdMap, this->_mem);
    this->mpPseudo->evolveUntilPrognostic(this->mBaseItIds, false, progFunc);
 
    // Update the equation input to the timestepper
-   this->getInput(scalEq, vectEq);
+   this->getInput();
 
-   Profiler::RegionStart<2>("Timestep-solve");
-   int jacIt = 1;
-   auto jscalEq = this->mpPseudo->scalarRange(PseudospectralTag::Prognostic::id(), jacIt);
-   auto jvectEq = this->mpPseudo->vectorRange(PseudospectralTag::Prognostic::id(), jacIt);
-   this->mpJac->setEquations(jscalEq, jvectEq);
    // Solve all the linear systems
+   Profiler::RegionStart<2>("Timestep-solve");
    this->mSolverCoord.stepForward();
    Profiler::RegionStop<2>("Timestep-solve");
 
    // Transfer timestep output back to equations
-   this->transferOutput(scalEq, vectEq);
+   this->transferOutput();
 
    // Reset solvers
    this->mSolverCoord.resetSolvers();

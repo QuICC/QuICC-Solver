@@ -33,7 +33,7 @@ void SetZeroNonlinearFunctor<CouplingIndexType::SINGLE>::apply(
    assert(start >= 0);
 
 #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
-   for (int k = 0; k < eq->couplingInfo(compId).galerkinN(matIdx); ++k)
+   for (int k = 0; k < cinfo.galerkinN(matIdx); ++k)
    {
       // Set field to zero
       Arithmetics::setZero(storage, k + start);

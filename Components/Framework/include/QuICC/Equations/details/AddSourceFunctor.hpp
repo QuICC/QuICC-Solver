@@ -29,7 +29,7 @@ public:
     * @brief ctor
     */
    AddSourceFunctor(const Resolution& res, const CouplingInformation& cinfo, Spectral::Kernel::SharedISpectralKernel spSrc,
-      FieldComponents::Spectral::Id compId, const int matIdx);
+      const int matIdx);
 
    /**
     * @brief deleted default ctor
@@ -68,11 +68,6 @@ private:
    Spectral::Kernel::SharedISpectralKernel spSrc;
 
    /**
-    * @brief Field component ID
-    */
-   FieldComponents::Spectral::Id compId;
-
-   /**
     * @brief Matrix index
     */
    const int matIdx;
@@ -80,8 +75,8 @@ private:
 
 template <CouplingIndexType IndexType>
 AddSourceFunctor<IndexType>::AddSourceFunctor(const Resolution& res, const CouplingInformation& cinfo, Spectral::Kernel::SharedISpectralKernel spSrc,
-   FieldComponents::Spectral::Id compId, const int matIdx) :
-    res(res), cinfo(cinfo), spSrc(spSrc), compId(compId), matIdx(matIdx)
+   const int matIdx) :
+    res(res), cinfo(cinfo), spSrc(spSrc), matIdx(matIdx)
 {}
 
 } // namespace details

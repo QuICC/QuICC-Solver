@@ -209,11 +209,6 @@ namespace Views {
          virtual void postSolverUpdate();
 
          /**
-          * @brief Correct solution obtained from linear solver
-          */
-         virtual int correctSolution(const int iteration);
-
-         /**
           * @brief Flag for operator initialization
           */
          bool mIsInitialized;
@@ -304,30 +299,17 @@ namespace Views {
 
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::solve()
    {
-      int iteration = 0;
+      // Solve other modes
+      assert(this->mSolver.count(this->mOpId) > 0);
+      assert(this->mSolver.at(this->mOpId).count(this->mId) > 0);
+      auto&& spSolver = this->mSolver.at(this->mOpId).find(this->mId)->second;
+      details::solveWrapper(this->reg(Register::Solution::id()), spSolver, this->reg(Register::Rhs::id()));
 
-      while(iteration >= 0)
+      // Stop simulation if solve failed
+      if(spSolver->info() != Eigen::Success)
       {
-         // Solve other modes
-         assert(this->mSolver.count(this->mOpId) > 0);
-         assert(this->mSolver.at(this->mOpId).count(this->mId) > 0);
-         auto&& spSolver = this->mSolver.at(this->mOpId).find(this->mId)->second;
-         details::solveWrapper(this->reg(Register::Solution::id()), spSolver, this->reg(Register::Rhs::id()));
-
-         // Stop simulation if solve failed
-         if(spSolver->info() != Eigen::Success)
-         {
-            throw std::logic_error("Sparse direct solve failed!");
-         }
-
-         // Callback site for correcting solve solution (for example for influence matrix approach)
-         iteration = this->correctSolution(iteration);
+         throw std::logic_error("Sparse direct solve failed!");
       }
-   }
-
-   template <typename TOperator,typename TData,typename TImpl> int ITimestepperBase<TOperator,TData,TImpl>::correctSolution(const int iteration)
-   {
-      return -1;
    }
 
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::zeroSolver()

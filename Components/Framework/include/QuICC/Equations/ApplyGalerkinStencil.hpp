@@ -25,16 +25,14 @@ namespace Equations {
    /**
     * @brief Apply the galerkin stencil operator
     *
-    * @param eq         Equation
-    * @param compId     Equation field component ID
     * @param rField     Output field
     * @param start      Start index in linear storage
     * @param matIdx     System index
     * @param rhs        RHS field data
     */
-   template <typename TData> void applyGalerkinStencil(const SparseMatrix& op, FieldComponents::Spectral::Id compId, TData& rField, const int start, const int matIdx, const TData& rhs);
+   template <typename TData> void applyGalerkinStencil(const SparseMatrix& op, TData& rField, const int start, const int matIdx, const TData& rhs);
 
-   template <typename TData> inline void applyGalerkinStencil(const SparseMatrix& op, FieldComponents::Spectral::Id compId, TData& rField, const int start, const int matIdx, const TData& rhs)
+   template <typename TData> inline void applyGalerkinStencil(const SparseMatrix& op, TData& rField, const int start, const int matIdx, const TData& rhs)
    {
       auto outBlk = std::make_tuple(0, 0, op.rows(), Arithmetics::getCols(rhs));
       auto inBlk = std::make_tuple(start, 0, op.cols(), Arithmetics::getCols(rhs));

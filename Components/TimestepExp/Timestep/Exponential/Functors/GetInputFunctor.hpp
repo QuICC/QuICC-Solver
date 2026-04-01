@@ -19,6 +19,7 @@
 #include "QuICC/Equations/CopyUnknown.hpp"
 #include "QuICC/Equations/AddSource.hpp"
 #include "Timestep/Exponential/TimestepperInfo.hpp"
+#include "Timestep/Exponential/Functors/FunctorData.hpp"
 
 namespace QuICC {
 
@@ -35,39 +36,33 @@ class GetInputFunctor
       using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
       typedef View::View<MHDComplex, View::Attributes<dense2D>> ViewType;
 
-      GetInputFunctor(std::shared_ptr<TTsFunc> tsFunc, const std::size_t regId, const std::size_t col): regId(regId), col(col), tsFunc(tsFunc){};
+      GetInputFunctor(std::shared_ptr<FunctorData> spData, std::shared_ptr<TTsFunc> tsFunc, const std::size_t regId, const std::size_t col): regId(regId), col(col), spData(spData), tsFunc(tsFunc){};
       ~GetInputFunctor() = default;
-      template <typename TEqIt>
-      void operator()(ViewType tmpView, const SpectralFieldId& id, TEqIt& eqIt, const Equations::CouplingInformation& cinfo, const TimestepperInfo& info, const std::size_t i);
+      void operator()(ViewType tmpView, const SpectralFieldId& id, const Equations::CouplingInformation& cinfo, const TimestepperInfo& info, const std::size_t i);
 
    protected:
       const std::size_t regId;
       const std::size_t col;
+      std::shared_ptr<FunctorData> spData;
       std::shared_ptr<TTsFunc> tsFunc;
 };
 
 template <typename TTsFunc>
-template <typename TEqIt>
-void GetInputFunctor<TTsFunc>::operator()(ViewType tmpView, const SpectralFieldId& myId, TEqIt& eqIt, const Equations::CouplingInformation& cinfo, const TimestepperInfo& info, const std::size_t i)
+void GetInputFunctor<TTsFunc>::operator()(ViewType tmpView, const SpectralFieldId& myId, const Equations::CouplingInformation&, const TimestepperInfo& info, const std::size_t i)
 {
+   const auto& data = *spData;
+   const auto& cinfo = data.cInfos.at(myId);
+
    // Copy field values into timestepper input
    if(cinfo.hasNonlinear())
    {
-      std::visit(
-            [&](auto&& p)
-            {
-            Equations::copyUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, false);
-            }, eqIt->spUnknown());
+      Equations::copyUnknown(data.res(), cinfo, *data.fields.at(myId), tmpView, i, 0, true, true, false);
    }
 
    // Add source term
    if(cinfo.hasSource())
    {
-      std::visit(
-            [&](auto&& p)
-            {
-            Equations::addSource(eqIt->res(), cinfo, eqIt->sourceKernel(myId.second), p->dom(0).perturbation(), myId.second, tmpView, i, 0);
-            }, eqIt->spUnknown());
+      Equations::addSource(data.res(), cinfo, data.sources.at(myId), *data.fields.at(myId), tmpView, i, 0);
    }
 
    // Add value to RHS

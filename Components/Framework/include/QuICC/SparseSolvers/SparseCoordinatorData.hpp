@@ -379,12 +379,12 @@ namespace Solver {
       {
          if(cinfo.isGalerkin())
          {
-            pOp = &spEq->galerkinStencil(id.second, i);
+            pOp = &spEq->galerkinStencils(id.second).at(i);
          }
          std::visit(
                [&](auto&& p)
                {
-                  Equations::storeSolution(p->rDom(0).rPerturbation(), spEq->res(), cinfo, pOp, spEq->solutionUpdater(id.second), id.second, (*solIt)->solution(i), i, (*solIt)->startRow(id,i));
+                  Equations::storeSolution(p->rDom(0).rPerturbation().rComp(id.second), spEq->res(), cinfo, pOp, spEq->spSolutionUpdater(id.second), (*solIt)->solution(i), i, (*solIt)->startRow(id,i));
                }, spEq->spUnknown());
       }
 
@@ -397,7 +397,7 @@ namespace Solver {
          auto corr = spEq->correctionConstraint(id.second, SolveTiming::After::id());
          for(std::size_t i = 0; i < (*solIt)->nSystem(); i++)
          {
-            Equations::correctSolution(spEq->res(), cinfo, id.second, corr, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i));
+            Equations::correctSolution(spEq->res(), cinfo, corr, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i));
          }
 
          (*solIt)->updateSolutions();
@@ -506,7 +506,7 @@ namespace Solver {
             std::visit(
                   [&](auto&& p)
                   {
-                     Equations::solveStencilUnknown(spEq->res(), spEq->couplingInfo(id.second), id.first, p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), spEq->backend(), spEq->bcIds().map(), spEq->eqParams().map());
+                     Equations::solveStencilUnknown(spEq->res(), spEq->couplingInfo(id.second), id, p->dom(0).perturbation().comp(id.second), (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), spEq->backend(), spEq->bcIds().map(), spEq->eqParams().map());
                   }, spEq->spUnknown());
          }
          else
@@ -514,7 +514,7 @@ namespace Solver {
             std::visit(
                   [&](auto&& p)
                   {
-                     Equations::copyUnknown(spEq->res(), spEq->couplingInfo(id.second), p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true, true);
+                     Equations::copyUnknown(spEq->res(), spEq->couplingInfo(id.second), p->dom(0).perturbation().comp(id.second), (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true, true);
                   }, spEq->spUnknown());
          }
       }
@@ -565,6 +565,33 @@ namespace Solver {
       }
 #endif // QUICC_DEBUG
 
+      auto addExp = [&](auto&& spEq, auto&& fIt, auto&& i, auto&& field)
+      {
+         std::variant<const SparseMatrix*,const SparseMatrixZ*> pOp;
+
+         // Compute with complex linear operator
+         if (spEq->hasExplicitZTerm(opId, id.second, fIt))
+         {
+            // Create pointer to sparse operator
+            pOp = &spEq->template explicitOperators<SparseMatrixZ>(opId,
+                  id.second, fIt).at(i);
+         }
+
+         // Compute with real linear operator
+         if (spEq->hasExplicitDTerm(opId, id.second, fIt))
+         {
+            // Create pointer to sparse operator
+            pOp = &spEq->template explicitOperators<SparseMatrix>(opId,
+                  id.second, fIt).at(i);
+         }
+
+         std::visit(
+               [&](auto& p)
+               {
+                  Equations::addExplicitTerm(spEq->res(), spEq->couplingInfo(id.second), *p, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), field, i);
+                  }, pOp);
+      };
+
       // Loop over explicit fields
       for(auto& fIt: r)
       {
@@ -578,14 +605,14 @@ namespace Solver {
                std::visit(
                      [&](auto&& p)
                      {
-                        Equations::addExplicitTerm(*spEq, opId, id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), fIt, p->dom(0).perturbation(), i);
+                        addExp(spEq, fIt, i, p->dom(0).perturbation());
                      }, scalVar.find(fIt.first)->second);
             } else
             {
                std::visit(
                      [&](auto&& p)
                      {
-                        Equations::addExplicitTerm(*spEq, opId, id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), fIt, p->dom(0).perturbation().comp(fIt.second), i);
+                        addExp(spEq, fIt, i, p->dom(0).perturbation().comp(fIt.second));
                      }, vectVar.find(fIt.first)->second);
             }
          }
@@ -609,7 +636,7 @@ namespace Solver {
                std::visit(
                      [&](auto&& p)
                      {
-                        Equations::copyNonlinear(spEq->res(), cinfo, p->dom(0).perturbation(), id.second, op, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+                        Equations::copyNonlinear(spEq->res(), cinfo, p->dom(0).perturbation().comp(id.second), op, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
                      }, spEq->spUnknown());
             }
             else if(spEq->hasQIZ(compId))
@@ -618,7 +645,7 @@ namespace Solver {
                std::visit(
                      [&](auto&& p)
                      {
-                        Equations::copyNonlinear(spEq->res(), cinfo, p->dom(0).perturbation(), id.second, op, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+                        Equations::copyNonlinear(spEq->res(), cinfo, p->dom(0).perturbation().comp(id.second), op, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
                      }, spEq->spUnknown());
             }
          }
@@ -628,7 +655,7 @@ namespace Solver {
             std::visit(
                   [&](auto&& p)
                   {
-                     Equations::copyNonlinear(spEq->res(), cinfo, p->dom(0).perturbation(), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+                     Equations::copyNonlinear(spEq->res(), cinfo, p->dom(0).perturbation().comp(id.second), (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
                   }, spEq->spUnknown());
          }
 
@@ -638,7 +665,7 @@ namespace Solver {
             std::visit(
                   [&](auto&& p)
                   {
-                     Equations::addSource(spEq->res(), cinfo, spEq->sourceKernel(id.second), p->dom(0).perturbation(), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+                     Equations::addSource(spEq->res(), cinfo, spEq->spSourceKernel(id.second), p->dom(0).perturbation().comp(id.second), (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
                   }, spEq->spUnknown());
          }
 
@@ -649,7 +676,7 @@ namespace Solver {
             std::visit(
                   [&](auto&& p)
                   {
-                     Equations::setBoundaryValue(spEq->res(), cinfo, spEq->boundaryKernel(id.second), p->dom(0).perturbation(), id.second, (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
+                     Equations::setBoundaryValue(spEq->res(), cinfo, spEq->spBoundaryKernel(id.second), p->dom(0).perturbation().comp(id.second), (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
                   }, spEq->spUnknown());
          }
       }

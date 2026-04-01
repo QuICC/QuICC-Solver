@@ -28,20 +28,19 @@ namespace Equations {
    /**
     * @brief Solve for galerkin unknown using the stencil
     *
-    * @param compId     Component ID
     * @param storage    Storage for the equation values
     * @param matIdx     Index of the given data
     * @param start      Start index for the storage
     */
-   template <typename TField, typename TData> void solveStencilUnknown(const Resolution& res, const CouplingInformation& cinfo, std::size_t fieldName, const TField& field, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const Model::IModelBackend& backend, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams);
+   template <typename TField, typename TData> void solveStencilUnknown(const Resolution& res, const CouplingInformation& cinfo, const SpectralFieldId fieldId, const TField& field, TData& storage, const int matIdx, const int start, const Model::IModelBackend& backend, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams);
 
-   template <typename TField, typename TData> void solveStencilUnknown(const Resolution& res, const CouplingInformation& cinfo, std::size_t fieldName, const TField& field, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const Model::IModelBackend& backend, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams)
+   template <typename TField, typename TData> void solveStencilUnknown(const Resolution& res, const CouplingInformation& cinfo, const SpectralFieldId fieldId, const TField& field, TData& storage, const int matIdx, const int start, const Model::IModelBackend& backend, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams)
    {
       using TmpDataType = typename std::conditional<std::is_same_v<TData, DecoupledZMatrix>, DecoupledZMatrix, Eigen::Matrix<typename Arithmetics::GetScalarType<TData>::ScalarType, Eigen::Dynamic, Eigen::Dynamic>>::type;
 
       // Create temporary storage for tau data
       TmpDataType tmp(cinfo.tauN(matIdx), cinfo.rhsCols(matIdx));
-      Equations::copyUnknown(res, cinfo, field, compId, tmp, matIdx, 0, false, true, true);
+      Equations::copyUnknown(res, cinfo, field, tmp, matIdx, 0, false, true, true);
       TmpDataType rhs(cinfo.galerkinN(matIdx), cinfo.rhsCols(matIdx));
       if(res.sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
       {
@@ -54,7 +53,7 @@ namespace Equations {
 
       // Get a restricted stencil matrix
       SparseMatrix stencil(cinfo.galerkinN(matIdx),cinfo.galerkinN(matIdx));
-      dispatchGalerkinStencil(fieldName, compId, stencil, matIdx, res, true, backend, cinfo, bcIds, eqParams);
+      dispatchGalerkinStencil(fieldId, stencil, matIdx, res, true, backend, cinfo, bcIds, eqParams);
       stencil.makeCompressed();
 
       // Check that square stencil was generated. Setup is wrong if matrix is not square

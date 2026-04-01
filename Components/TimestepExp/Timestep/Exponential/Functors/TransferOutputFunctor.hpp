@@ -20,6 +20,7 @@
 #include "View/Attributes.hpp"
 #include "View/ViewDense.hpp"
 #include "Timestep/Exponential/details/TimesteppperTools.hpp"
+#include "Timestep/Exponential/Functors/FunctorData.hpp"
 
 namespace QuICC {
 
@@ -39,21 +40,29 @@ class TransferOutputFunctor
       using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
       typedef View::View<MHDComplex, View::Attributes<dense2D>> ViewType;
 
-      TransferOutputFunctor(std::shared_ptr<TTsFunc> tsFunc, const std::size_t regId, const std::size_t col) : regId(regId), col(col), tsFunc(tsFunc){};
+      /**
+       * @brief ctor
+       */
+      TransferOutputFunctor(std::shared_ptr<FunctorData> spData, std::shared_ptr<TTsFunc> tsFunc, const std::size_t regId, const std::size_t col) : regId(regId), col(col), spData(spData), tsFunc(tsFunc){};
+
+      /**
+       * @brief dtor
+       */
       ~TransferOutputFunctor() = default;
-      template <typename TEqIt>
-      void operator()(ViewType tmpView, const SpectralFieldId& id, TEqIt& eqIt, const Equations::CouplingInformation& cinfo, const TimestepperInfo& info, const std::size_t i);
+
+      void operator()(ViewType tmpView, const SpectralFieldId& id, const Equations::CouplingInformation& cinfo, const TimestepperInfo& info, const std::size_t i);
 
    protected:
       const std::size_t regId;
       const std::size_t col;
+      std::shared_ptr<FunctorData> spData;
       std::shared_ptr<TTsFunc> tsFunc;
 };
 
 template <typename TTsFunc>
-template <typename TEqIt>
-void TransferOutputFunctor<TTsFunc>::operator()(ViewType tmpView, const SpectralFieldId& myId, TEqIt& eqIt, const Equations::CouplingInformation& cinfo, const TimestepperInfo& info, const std::size_t i)
+void TransferOutputFunctor<TTsFunc>::operator()(ViewType tmpView, const SpectralFieldId& myId, const Equations::CouplingInformation& cinfo, const TimestepperInfo& info, const std::size_t i)
 {
+   auto& eqData = *spData;
    auto tsData = (*tsFunc)(info);
    auto&& pStepper = tsData.first;
    auto&& start = tsData.second;
@@ -65,15 +74,13 @@ void TransferOutputFunctor<TTsFunc>::operator()(ViewType tmpView, const Spectral
    const SparseMatrix* pOp;
    if(cinfo.isGalerkin())
    {
-      pOp = &eqIt->galerkinStencil(myId.second, i);
+      assert(eqData.stencils.count(myId) > 0);
+      pOp = &eqData.stencils.at(myId).at(i);
    }
-   std::visit(
-         [&](auto&& p)
-         {
-            Equations::storeSolution(p->rDom(0).rPerturbation(), eqIt->res(), cinfo, pOp, eqIt->solutionUpdater(myId.second), myId.second, tmp, i, 0);
-         }, eqIt->spUnknown());
+   assert(eqData.fields.count(myId) > 0);
+   assert(eqData.solups.count(myId) > 0);
+   Equations::storeSolution(*eqData.fields.at(myId), eqData.res(), cinfo, pOp, eqData.solups.at(myId), tmp, i, 0);
 }
-
 
 } // namespace Functors
 } // namespace Exponential

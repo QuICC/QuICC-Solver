@@ -31,7 +31,7 @@ public:
     * @brief ctor
     */
    CopyUnknownFunctor(const Resolution& res, const Equations::CouplingInformation& cinfo,
-      FieldComponents::Spectral::Id compId, const int matIdx,
+      const int matIdx,
       const bool useShift, const bool shiftTop);
 
    /**
@@ -65,11 +65,6 @@ private:
     * @brief Coupling information
     */
    const Equations::CouplingInformation& cinfo;
-
-   /**
-    * @brief Field component ID
-    */
-   FieldComponents::Spectral::Id compId;
 
    /**
     * @brief Matrix index
@@ -121,9 +116,9 @@ void CopyUnknownFunctor<IndexType>::init(const bool shiftTop)
 
 template <CouplingIndexType IndexType>
 CopyUnknownFunctor<IndexType>::CopyUnknownFunctor(const Resolution& res, const Equations::CouplingInformation& cinfo,
-   FieldComponents::Spectral::Id compId, const int matIdx,
+   const int matIdx,
    const bool useShift, const bool shiftTop) :
-    res(res), cinfo(cinfo), compId(compId), matIdx(matIdx), zeroRow(0), zeroCol(0), shiftMaxRow(0), shiftMaxCol(0)
+    res(res), cinfo(cinfo), matIdx(matIdx), zeroRow(0), zeroCol(0), shiftMaxRow(0), shiftMaxCol(0)
 {
    if (useShift)
    {

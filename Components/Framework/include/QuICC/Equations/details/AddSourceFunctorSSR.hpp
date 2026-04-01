@@ -77,7 +77,7 @@ void AddSourceFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(
 
             // Add source term
             Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage, l,
-               eq->sourceTerm(compId, i, j, matIdx));
+               spSrc->compute(i, j, matIdx));
          }
       }
 #else

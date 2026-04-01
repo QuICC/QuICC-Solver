@@ -62,11 +62,10 @@ void dispatchModelMatrix(DecoupledZSparse& rModelMatrix, const std::size_t opId,
 #endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
 }
 
-void dispatchGalerkinStencil(std::size_t fieldName, FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx, const Resolution& res, const bool makeSquare, const Model::IModelBackend& backend, const Equations::CouplingInformation& cinfo, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams)
+void dispatchGalerkinStencil(const SpectralFieldId fieldId, SparseMatrix &mat, const int matIdx, const Resolution& res, const bool makeSquare, const Model::IModelBackend& backend, const Equations::CouplingInformation& cinfo, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams)
 {
-   auto fId = std::make_pair(fieldName, compId);
    auto&& eigs = cinfo.couplingTools().getIndexes(res, matIdx);
-   backend.galerkinStencil(mat, fId, matIdx, res, eigs, makeSquare, bcIds, eqParams);
+   backend.galerkinStencil(mat, fieldId, matIdx, res, eigs, makeSquare, bcIds, eqParams);
 
 #ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    std::string opName = "galerkin_stencil";
@@ -74,7 +73,7 @@ void dispatchGalerkinStencil(std::size_t fieldName, FieldComponents::Spectral::I
    {
       opName += "_sq";
    }
-   std::vector<SpectralFieldId> tags = {fId};
+   std::vector<SpectralFieldId> tags = {fieldId};
 
    std::vector<int> fileIdx;
    const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
@@ -92,15 +91,14 @@ void dispatchGalerkinStencil(std::size_t fieldName, FieldComponents::Spectral::I
 #endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
 }
 
-void dispatchExplicitBlock(std::size_t fieldName, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::size_t opId,  const SpectralFieldId fieldId, const int matIdx, const Resolution& res, const Model::IModelBackend& backend, const Equations::CouplingInformation& cinfo, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams)
+void dispatchExplicitBlock(const SpectralFieldId fieldId, DecoupledZSparse& mat, const std::size_t opId,  const SpectralFieldId exId, const int matIdx, const Resolution& res, const Model::IModelBackend& backend, const Equations::CouplingInformation& cinfo, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams)
 {
-   auto fId = std::make_pair(fieldName, compId);
    auto&& eigs = cinfo.couplingTools().getIndexes(res, matIdx);
-   backend.explicitBlock(mat, fId, opId, fieldId, matIdx, res, eigs, bcIds, eqParams);
+   backend.explicitBlock(mat, fieldId, opId, exId, matIdx, res, eigs, bcIds, eqParams);
 
 #ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    auto opName = ModelOperator::Coordinator::tag(opId);
-   std::vector<SpectralFieldId> tags = {fId, fieldId};
+   std::vector<SpectralFieldId> tags = {fieldId, exId};
 
    std::vector<int> fileIdx;
    const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
@@ -118,7 +116,7 @@ void dispatchExplicitBlock(std::size_t fieldName, FieldComponents::Spectral::Id 
 #endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
 }
 
-void dispatchCoupling(Equations::CouplingInformation& cinfo, std::size_t fieldName, FieldComponents::Spectral::Id compId, CouplingInformation::EquationTypeId eqType, const int iZero, const std::map<CouplingFeature,bool>& features, const Resolution& res, const Model::IModelBackend& backend, const std::map<std::size_t, std::size_t>& bcIds)
+void dispatchCoupling(Equations::CouplingInformation& cinfo, const SpectralFieldId fieldId, CouplingInformation::EquationTypeId eqType, const int iZero, const std::map<CouplingFeature,bool>& features, const Resolution& res, const Model::IModelBackend& backend, const std::map<std::size_t, std::size_t>& bcIds)
 {
    bool hasNL = features.at(CouplingFeature::Nonlinear);
    bool hasSource = features.at(CouplingFeature::Source);
@@ -126,11 +124,7 @@ void dispatchCoupling(Equations::CouplingInformation& cinfo, std::size_t fieldNa
    bool allowExplicit = features.at(CouplingFeature::AllowExplicit);
 
    Model::EquationInfo eqInfo;
-   auto fId = std::make_pair(fieldName, compId);
-   backend.equationInfo(eqInfo, fId, res);
-
-   // Initialise coupling information
-   SpectralFieldId eqId = std::make_pair(fieldName, compId);
+   backend.equationInfo(eqInfo, fieldId, res);
 
    // Compute effective starting index for local CPU
    int cpuIZero = iZero;
@@ -183,7 +177,7 @@ void dispatchCoupling(Equations::CouplingInformation& cinfo, std::size_t fieldNa
       // explicit nonlinear
       for(auto fIt = eqInfo.exNL.cbegin(); fIt != eqInfo.exNL.cend(); ++fIt)
       {
-         if(!(fIt->first == fieldName && fIt->second == compId))
+         if(!(fIt->first == fieldId.first && fIt->second == fieldId.second))
          {
             cinfo.addExplicitField(fIt->first, fIt->second, ModelOperator::ExplicitNonlinear::id());
          }
@@ -196,7 +190,7 @@ void dispatchCoupling(Equations::CouplingInformation& cinfo, std::size_t fieldNa
       }
 
       // Extract quasi inverse
-      auto fIt = std::find(eqInfo.exNL.begin(), eqInfo.exNL.end(), std::make_pair(fieldName, compId));
+      auto fIt = std::find(eqInfo.exNL.begin(), eqInfo.exNL.end(), fieldId);
       if(fIt != eqInfo.exNL.end())
       {
          hasQI = true;
@@ -207,14 +201,14 @@ void dispatchCoupling(Equations::CouplingInformation& cinfo, std::size_t fieldNa
    cinfo.setNonlinear(hasNL, hasNL && hasQI);
 
    // Sort implicit fields
-   cinfo.sortImplicitFields(eqId.first, eqId.second);
+   cinfo.sortImplicitFields(fieldId.first, fieldId.second);
 
    // Get number of matrices
    int nMat = cinfo.couplingTools().nMat(res);
 
    // Set field coupling information
    Model::OperatorInfo opInfo(nMat);
-   backend.operatorInfo(opInfo, fId, res, cinfo.couplingTools(), bcIds);
+   backend.operatorInfo(opInfo, fieldId, res, cinfo.couplingTools(), bcIds);
 
    cinfo.couplingTools().setTauN(opInfo.tauN, res);
    cinfo.couplingTools().setGalerkinN(opInfo.galN, res);

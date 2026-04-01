@@ -18,6 +18,7 @@
 #include "Memory/Memory.hpp"
 #include "Memory/MemoryResource.hpp"
 #include "Timestep/Exponential/Functors/BaseFunctor.hpp"
+#include "Timestep/Exponential/Functors/FunctorData.hpp"
 #include "QuICC/Equations/StoreSolution.hpp"
 
 namespace QuICC {
@@ -35,20 +36,20 @@ template <typename TFunc, typename TCorrFunc>
 class OutputFunctor: public BaseFunctor
 {
    public:
-      OutputFunctor(std::shared_ptr<TFunc> vFunc, std::shared_ptr<TCorrFunc> cFunc, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem) : BaseFunctor(idMap, mem), vFunc(vFunc), cFunc(cFunc){};
+      OutputFunctor(std::shared_ptr<FunctorData> spData, std::shared_ptr<TFunc> vFunc, std::shared_ptr<TCorrFunc> cFunc, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem) : BaseFunctor(idMap, mem), spData(spData), vFunc(vFunc), cFunc(cFunc){};
       virtual ~OutputFunctor() = default;
-      template <typename TEqIt>
-      void operator()(const SpectralFieldId& id, TEqIt& eqIt);
+      void operator()(const SpectralFieldId& id);
    protected:
+      std::shared_ptr<FunctorData> spData;
       std::shared_ptr<TFunc> vFunc;
       std::shared_ptr<TCorrFunc> cFunc;
 };
 
 template <typename TFunc, typename TCorrFunc>
-template <typename TEqIt>
-void OutputFunctor<TFunc, TCorrFunc>::operator()(const SpectralFieldId& myId, TEqIt& eqIt)
+void OutputFunctor<TFunc, TCorrFunc>::operator()(const SpectralFieldId& myId)
 {
-   const auto& cinfo = eqIt->couplingInfo(myId.second);
+   const auto& eqData = *spData;
+   const auto& cinfo = eqData.cInfos.at(myId);
    const auto& idMap = *this->mpIdMap;
 
    DebuggerMacro_msg("Get timestepper solution for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
@@ -62,13 +63,9 @@ void OutputFunctor<TFunc, TCorrFunc>::operator()(const SpectralFieldId& myId, TE
       const SparseMatrix* pOp;
       if(cinfo.isGalerkin())
       {
-         pOp = &eqIt->galerkinStencil(myId.second, i);
+         pOp = &eqData.stencils.at(myId).at(i);
       }
-      std::visit(
-            [&](auto&& p)
-            {
-               Equations::storeSolution(p->rDom(0).rPerturbation(), eqIt->res(), cinfo, pOp, eqIt->solutionUpdater(myId.second), myId.second, tmp, i, 0);
-            }, eqIt->spUnknown());
+      Equations::storeSolution(*eqData.fields.at(myId), eqData.res(), cinfo, pOp, eqData.solups.at(myId), tmp, i, 0);
    }
 
    // Allocate temporary storage
@@ -92,11 +89,11 @@ void OutputFunctor<TFunc, TCorrFunc>::operator()(const SpectralFieldId& myId, TE
       std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
       View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions);
 
-      (*vFunc)(tmpView, myId, eqIt, cinfo, info, i);
+      (*vFunc)(tmpView, myId, cinfo, info, i);
    }
 
    // Feedback for correcting timestepper solutions
-   (*cFunc)(myId, eqIt, cinfo, idMap);
+   (*cFunc)(myId, cinfo, idMap);
 }
 
 } // namespace Functors

@@ -55,13 +55,13 @@ void CopyUnknownFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(
          {
             // Copy field value into storage
             Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, k,
-               field.comp(compId).point(i, j, matIdx));
+               field.point(i, j, matIdx));
          }
          else
          {
             // Add field value to storage
             Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage, k,
-               field.comp(compId).point(i, j, matIdx));
+               field.point(i, j, matIdx));
          }
 
          // increase storage counter

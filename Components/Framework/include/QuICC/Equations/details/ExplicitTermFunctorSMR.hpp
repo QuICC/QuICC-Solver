@@ -28,9 +28,8 @@ namespace details {
 
 template <>
 template <typename T, typename TOperator, typename TData>
-void ExplicitTermFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::compute(
-   const std::size_t opId, TData& rSolverField, const int eqStart,
-   SpectralFieldId fieldId,
+void ExplicitTermFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::apply(
+   TData& rSolverField, const TOperator& op, const int eqStart, 
    const typename Framework::Selector::ScalarField<T>& explicitField)
 {
    if constexpr ((std::is_same<T, MHDFloat>::value ||
@@ -40,15 +39,11 @@ void ExplicitTermFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::compute(
    {}
    else
    {
-      // Create pointer to sparse operator
-      const TOperator* op = &eq->template explicitOperator<TOperator>(opId,
-         compId, fieldId, matIdx);
-
       // Apply operator to field
       std::tuple<int, int, int, int> outBlk = std::make_tuple(eqStart, 0,
-         op->rows(), Arithmetics::getCols(explicitField.slice(matIdx)));
+         op.rows(), Arithmetics::getCols(explicitField.slice(matIdx)));
       Arithmetics::computeAx<Arithmetics::Operation::Plus>(rSolverField, outBlk,
-         *op, explicitField.slice(matIdx).eval());
+         op, explicitField.slice(matIdx).eval());
    }
 }
 

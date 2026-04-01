@@ -69,7 +69,7 @@ void StoreSolutionFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(
          // Copy timestep output into field
          MHDVariant dataPoint = Arithmetics::getScalar(*solution.ptr, l);
          dataPoint = (*spUp)(dataPoint, i, j, matIdx);
-         field.rComp(compId).setPoint(dataPoint, i, j, matIdx);
+         field.setPoint(dataPoint, i, j, matIdx);
       }
    }
 #else
@@ -85,7 +85,7 @@ void StoreSolutionFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(
          // Copy timestep output into field
          MHDVariant dataPoint = Arithmetics::getScalar(*solution.ptr, k);
          dataPoint = (*spUp)(dataPoint, i, j, matIdx);
-         field.rComp(compId).setPoint(dataPoint, i, j, matIdx);
+         field.setPoint(dataPoint, i, j, matIdx);
 
          // increase linear storage counter
          k++;

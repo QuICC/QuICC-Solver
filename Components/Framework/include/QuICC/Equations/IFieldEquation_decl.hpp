@@ -77,14 +77,14 @@ namespace Equations {
           *
           * @param compId  ID of the spectral component
           */
-         std::shared_ptr<SolutionUpdater> solutionUpdater(FieldComponents::Spectral::Id compId) const;
+         std::shared_ptr<SolutionUpdater> spSolutionUpdater(FieldComponents::Spectral::Id compId) const;
 
          /**
           * @brief Get source term kernel
           *
           * @param compId  ID of the spectral component
           */
-         Spectral::Kernel::SharedISpectralKernel sourceKernel(FieldComponents::Spectral::Id compId) const;
+         Spectral::Kernel::SharedISpectralKernel spSourceKernel(FieldComponents::Spectral::Id compId) const;
 
          /**
           * @brief Generic source term implementation
@@ -101,7 +101,7 @@ namespace Equations {
           *
           * @param compId  ID of the spectral component
           */
-         Spectral::Kernel::SharedISpectralKernel boundaryKernel(FieldComponents::Spectral::Id compId) const;
+         Spectral::Kernel::SharedISpectralKernel spBoundaryKernel(FieldComponents::Spectral::Id compId) const;
 
          /**
           * @brief Generic boundary value implementation

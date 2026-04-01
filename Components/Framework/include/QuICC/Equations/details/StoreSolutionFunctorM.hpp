@@ -34,7 +34,7 @@ void StoreSolutionFunctor<CouplingIndexType::MODE>::apply(TField& field,
    const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
    // Get mode indexes
    ArrayI mode = tRes.mode(matIdx);
-   int rows = field.comp(compId).slice(mode(0)).rows();
+   int rows = field.slice(mode(0)).rows();
 
    // Copy data
    int k = solStart;
@@ -44,7 +44,7 @@ void StoreSolutionFunctor<CouplingIndexType::MODE>::apply(TField& field,
       MHDVariant dataPoint = Arithmetics::getScalar(*solution.ptr, k);
       dataPoint =
          (*spUp)(dataPoint, i, mode(1), mode(0));
-      field.rComp(compId).setPoint(dataPoint, i, mode(1), mode(0));
+      field.setPoint(dataPoint, i, mode(1), mode(0));
 
       // increase linear storage counter
       k++;

@@ -28,7 +28,7 @@ public:
     * @brief ctor
     */
    SetBoundaryValueFunctor(const Resolution& res, const CouplingInformation& cinfo, Spectral::Kernel::SharedISpectralKernel spBoundary,
-      FieldComponents::Spectral::Id compId, const int matIdx);
+      const int matIdx);
 
    /**
     * @brief deleted default ctor
@@ -43,8 +43,6 @@ public:
    /**
     * @brief Set boundary value
     *
-    * @param eq      Equation to work on
-    * @param compId  Component ID
     * @param storage Storage for the equation values
     * @param matIdx  Index of the given data
     * @param start   Start index for the storage
@@ -69,11 +67,6 @@ private:
    Spectral::Kernel::SharedISpectralKernel spBoundary;
 
    /**
-    * @brief Field component ID
-    */
-   FieldComponents::Spectral::Id compId;
-
-   /**
     * @brief Matrix index
     */
    const int matIdx;
@@ -81,9 +74,9 @@ private:
 
 template <CouplingIndexType IndexType>
 SetBoundaryValueFunctor<IndexType>::SetBoundaryValueFunctor(
-   const Resolution& res, const CouplingInformation& cinfo, Spectral::Kernel::SharedISpectralKernel spBoundary, FieldComponents::Spectral::Id compId,
+   const Resolution& res, const CouplingInformation& cinfo, Spectral::Kernel::SharedISpectralKernel spBoundary,
    const int matIdx) :
-    res(res), cinfo(cinfo), spBoundary(spBoundary), compId(compId), matIdx(matIdx)
+    res(res), cinfo(cinfo), spBoundary(spBoundary), matIdx(matIdx)
 {}
 
 } // namespace details

@@ -60,7 +60,7 @@ namespace Equations {
       return corr;
    }
 
-   std::shared_ptr<SolutionUpdater> IFieldEquation::solutionUpdater(FieldComponents::Spectral::Id compId) const
+   std::shared_ptr<SolutionUpdater> IFieldEquation::spSolutionUpdater(FieldComponents::Spectral::Id compId) const
    {
       if(this->mSolUps.count(compId) == 0)
       {
@@ -70,7 +70,7 @@ namespace Equations {
       return this->mSolUps.at(compId);
    }
 
-   Spectral::Kernel::SharedISpectralKernel IFieldEquation::sourceKernel(FieldComponents::Spectral::Id compId) const
+   Spectral::Kernel::SharedISpectralKernel IFieldEquation::spSourceKernel(FieldComponents::Spectral::Id compId) const
    {
       // Get source kernel
       if(this->mSrcKernel.count(compId) > 0)
@@ -99,7 +99,7 @@ namespace Equations {
       }
    }
 
-   Spectral::Kernel::SharedISpectralKernel IFieldEquation::boundaryKernel(FieldComponents::Spectral::Id compId) const
+   Spectral::Kernel::SharedISpectralKernel IFieldEquation::spBoundaryKernel(FieldComponents::Spectral::Id compId) const
    {
       // Get boundary kernel
       if(this->mBoundaryKernel.count(compId) > 0)

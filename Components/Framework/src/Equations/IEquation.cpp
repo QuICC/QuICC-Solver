@@ -330,9 +330,14 @@ namespace Equations {
 
    Spectral::Kernel::SharedISpectralKernel IEquation::spConstraintKernel(FieldComponents::Spectral::Id compId) const
    {
-      assert(this->mConstraintKernel.count(compId) > 0);
-
-      return this->mConstraintKernel.find(compId)->second;
+      if(this->mConstraintKernel.count(compId) > 0)
+      {
+         return this->mConstraintKernel.at(compId);
+      }
+      else
+      {
+         return nullptr;
+      }
    }
 
    void IEquation::initSrcKernel()

@@ -40,7 +40,7 @@ void CopyUnknownFunctor<CouplingIndexType::MODE>::apply(const TField& field,
 
    // Get mode indexes
    ArrayI mode = tRes.mode(matIdx);
-   int rows = field.comp(compId).slice(mode(0)).rows();
+   int rows = field.slice(mode(0)).rows();
 
    bool isUsed;
    if (sRes.ss().has(SpatialScheme::Feature::FourierIndex23))
@@ -66,13 +66,13 @@ void CopyUnknownFunctor<CouplingIndexType::MODE>::apply(const TField& field,
          {
             // Copy field value into storage
             Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage, k,
-               field.comp(compId).point(i, mode(1), mode(0)));
+               field.point(i, mode(1), mode(0)));
          }
          else
          {
             // Add field value to storage
             Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage, k,
-               field.comp(compId).point(i, mode(1), mode(0)));
+               field.point(i, mode(1), mode(0)));
          }
 
          // increase storage counter
@@ -81,7 +81,7 @@ void CopyUnknownFunctor<CouplingIndexType::MODE>::apply(const TField& field,
    }
    else
    {
-      setZeroNonlinear(res, cinfo, field, compId, storage, matIdx, start);
+      setZeroNonlinear(res, cinfo, field, storage, matIdx, start);
    }
 }
 

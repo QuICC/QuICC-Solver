@@ -20,6 +20,7 @@
 #include "QuICC/Timestep/Interface.hpp"
 #include "Timestep/Exponential/TimestepperInfo.hpp"
 #include "Timestep/Exponential/details/TimesteppperTools.hpp"
+#include "Timestep/Exponential/Functors/FunctorData.hpp"
 #include "View/Attributes.hpp"
 #include "View/ViewDense.hpp"
 #include "QuICC/IteratorRange.hpp"
@@ -42,50 +43,47 @@ class GetLinearInputFunctor
       using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
       typedef View::View<MHDComplex, View::Attributes<dense2D>> ViewType;
 
-      GetLinearInputFunctor(std::shared_ptr<TTsFunc> tsFunc, const std::size_t opId, const std::size_t regId, const std::size_t col, const Timestep::Interface::ScalarVariable_map& scalVar, const Timestep::Interface::VectorVariable_map& vectVar) : opId(opId), regId(regId), col(col), scalVar(scalVar), vectVar(vectVar), tsFunc(tsFunc){};
+      GetLinearInputFunctor(std::shared_ptr<FunctorData> pData, std::shared_ptr<TTsFunc> tsFunc, const std::size_t opId, const std::size_t regId, const std::size_t col, const Timestep::Interface::ScalarVariable_map& scalVar, const Timestep::Interface::VectorVariable_map& vectVar) : opId(opId), regId(regId), col(col), scalVar(scalVar), vectVar(vectVar), pData(pData), tsFunc(tsFunc){};
       ~GetLinearInputFunctor() = default;
-      template <typename TEqIt>
-      void operator()(ViewType tmpView, const SpectralFieldId& id, TEqIt& eqIt, const Equations::CouplingInformation& cinfo, const TimestepperInfo& info, const std::size_t i);
+      void operator()(ViewType tmpView, const SpectralFieldId& id, const Equations::CouplingInformation& cinfo, const TimestepperInfo& info, const std::size_t i);
    private:
       const std::size_t opId;
       const std::size_t regId;
       const std::size_t col;
       const Timestep::Interface::ScalarVariable_map& scalVar;
       const Timestep::Interface::VectorVariable_map& vectVar;
+      std::shared_ptr<FunctorData> pData;
       std::shared_ptr<TTsFunc> tsFunc;
 };
 
 template <typename TTsFunc>
-template <typename TEqIt>
-void GetLinearInputFunctor<TTsFunc>::operator()(ViewType tmpView, const SpectralFieldId& myId, TEqIt& eqIt, const Equations::CouplingInformation& cinfo, const TimestepperInfo& info, const std::size_t i)
+void GetLinearInputFunctor<TTsFunc>::operator()(ViewType tmpView, const SpectralFieldId& myId, const Equations::CouplingInformation&, const TimestepperInfo& info, const std::size_t i)
 {
+   const auto& data = *pData;
+   assert(data.cInfos.count(myId) > 0);
+   const auto& cinfo = data.cInfos.at(myId);
+
    // Copy field values into timestepper input
    DecoupledZMatrix tmp(cinfo.tauN(i), cinfo.rhsCols(i));
    tmp.setZero();
 
-   // Build range of operator
-   auto r = make_range(cinfo.explicitRange(opId));
-
-   // Loop over explicit fields
-   for(auto& fIt: r)
+   if(data.exDTerm.count(opId) > 0 && data.exDTerm.at(opId).count(myId) > 0)
    {
-      DebuggerMacro_msg("Add " + ModelOperator::Coordinator::tag(opId) + " term from " + PhysicalNames::Coordinator::tag(fIt.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(fIt.second)) + ")", 7);
+      for(auto&& [exId, mats]: data.exDTerm.at(opId).at(myId))
+      {
+         DebuggerMacro_msg("Add real " + ModelOperator::Coordinator::tag(opId) + " term from " + PhysicalNames::Coordinator::tag(exId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(exId.second)) + ")", 7);
 
-      // Get explicit input
-      if(fIt.second == FieldComponents::Spectral::SCALAR)
+         Equations::addExplicitTerm(data.res(), cinfo, mats.at(i), tmp, 0, *data.fields.at(exId), i);
+      }
+   }
+
+   if(data.exZTerm.count(opId) > 0 && data.exZTerm.at(opId).count(myId) > 0)
+   {
+      for(auto&& [exId, mats]: data.exZTerm.at(opId).at(myId))
       {
-         std::visit(
-               [&](auto&& p)
-               {
-               Equations::addExplicitTerm(*eqIt, opId, myId.second, tmp, 0, fIt, p->dom(0).perturbation(), i);
-               }, scalVar.find(fIt.first)->second);
-      } else
-      {
-         std::visit(
-               [&](auto&& p)
-               {
-               Equations::addExplicitTerm(*eqIt, opId, myId.second, tmp, 0, fIt, p->dom(0).perturbation().comp(fIt.second), i);
-               }, vectVar.find(fIt.first)->second);
+         DebuggerMacro_msg("Add complex " + ModelOperator::Coordinator::tag(opId) + " term from " + PhysicalNames::Coordinator::tag(exId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(exId.second)) + ")", 7);
+
+         Equations::addExplicitTerm(data.res(), cinfo, mats.at(i), tmp, 0, *data.fields.at(exId), i);
       }
    }
 

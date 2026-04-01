@@ -11,6 +11,7 @@
 #include "QuICC/Register/Intermediate.hpp"
 #include "QuICC/Register/Temporary.hpp"
 #include "Timestep/Exponential/AugmentedJacobianFunctor.hpp"
+#include "Timestep/Exponential/Functors/FunctorData.hpp"
 #include "Timestep/Exponential/Functors/DoNothingFunctor.hpp"
 #include "Timestep/Exponential/Functors/ProcessRangeFunctor.hpp"
 #include "Timestep/Exponential/Functors/InputFunctor.hpp"
@@ -27,8 +28,8 @@ namespace Timestep {
 
 namespace Exponential {
 
-AugmentedJacobianFunctor::AugmentedJacobianFunctor(const MHDFloat dt, const std::size_t regId, const std::size_t regCol, const int fixedIt, Pseudospectral::Coordinator* pPseudo, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem)
-   : mcFixedIt(fixedIt), mcEps(1e-8), mAn(0), mBn(0), mN(0), mDt(dt), mRegId(regId), mRegCol(regCol), mpHandle(nullptr), mpPseudo(pPseudo), matB(0,0), mpIdMap(idMap), _mem(mem), mpScalEq(nullptr), mpVectEq(nullptr)
+AugmentedJacobianFunctor::AugmentedJacobianFunctor(std::shared_ptr<Functors::FunctorData> spData, const MHDFloat dt, const std::size_t regId, const std::size_t regCol, const int fixedIt, Pseudospectral::Coordinator* pPseudo, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem)
+   : mcFixedIt(fixedIt), mcEps(1e-8), mAn(0), mBn(0), mN(0), mspData(spData), mDt(dt), mRegId(regId), mRegCol(regCol), mpHandle(nullptr), mpPseudo(pPseudo), matB(0,0), mpIdMap(idMap), _mem(mem)
 {
    this->mpNFunc = std::make_shared<Functors::DoNothingFunctor>();
 
@@ -81,28 +82,22 @@ void AugmentedJacobianFunctor::applyJacobian() const
    std::set<int> itIds = {this->mcFixedIt};
 
    DebuggerMacro_msg("Applying Jacobian to stepper handle", 3);
-   assert(this->mpScalEq);
-   auto scalEq = *mpScalEq;
-   assert(this->mpVectEq);
-   auto vectEq = *mpVectEq;
 
    // Transfer timestep output back to equations
    Functors::ProcessRangeFunctor processOut(this->mpNFunc, this->mpOutFunc, this->mpNFunc, this->mcFixedIt);
-   processOut(scalEq);
-   processOut(vectEq);
+   processOut(this->mspData->eqInfos);
 
    // Clear RHS
    this->mpHandle->setZero();
 
    this->mpPseudo->evolveAfterPrognostic(itIds, false);
 
-   auto progFunc = std::make_shared<Functors::CallExplicitPrognosticFunctor<TsFunctor>>(this->mpTsFunc, this->mRegId, this->mRegCol, this->mcFixedIt, this->mpIdMap, this->_mem);
+   auto progFunc = std::make_shared<Functors::CallExplicitPrognosticFunctor<TsFunctor>>(this->mspData, this->mpTsFunc, this->mRegId, this->mRegCol, this->mcFixedIt, this->mpIdMap, this->_mem);
    this->mpPseudo->evolveUntilPrognostic(itIds, false, progFunc);
 
    // Update the equation input to the timestepper
    Functors::ProcessRangeFunctor processIn(this->mpIbefFunc, this->mpInFunc, this->mpNFunc, this->mcFixedIt);
-   processIn(scalEq);
-   processIn(vectEq);
+   processIn(this->mspData->eqInfos);
 }
 
 void AugmentedJacobianFunctor::setStepper(std::shared_ptr<TsFunctor> pStepper)
@@ -111,20 +106,14 @@ void AugmentedJacobianFunctor::setStepper(std::shared_ptr<TsFunctor> pStepper)
    this->mpTsFunc = pStepper;
 
    // Output functors
-   this->mpOviewFunc = std::make_shared<OviewFunctor>(this->mpTsFunc, this->mRegId, this->mRegCol);
-   this->mpOcorrFunc = std::make_shared<OcorrFunctor>(this->mpTsFunc, this->mRegId, this->mRegCol);
-   this->mpOutFunc = std::make_shared<Functors::OutputFunctor<OviewFunctor, OcorrFunctor>>(this->mpOviewFunc, this->mpOcorrFunc, this->mpIdMap, this->_mem);
+   this->mpOviewFunc = std::make_shared<OviewFunctor>(this->mspData, this->mpTsFunc, this->mRegId, this->mRegCol);
+   this->mpOcorrFunc = std::make_shared<OcorrFunctor>(this->mspData, this->mpTsFunc, this->mRegId, this->mRegCol);
+   this->mpOutFunc = std::make_shared<Functors::OutputFunctor<OviewFunctor, OcorrFunctor>>(this->mspData, this->mpOviewFunc, this->mpOcorrFunc, this->mpIdMap, this->_mem);
 
    // Input functors
-   this->mpIbefFunc = std::make_shared<Functors::ApplyConstraintFunctor>(SolveTiming::Before::id());
-   this->mpIviewFunc = std::make_shared<IviewFunctor>(this->mpTsFunc, this->mRegId, this->mRegCol);
-   this->mpInFunc = std::make_shared<Functors::InputFunctor<IviewFunctor>>(this->mpIviewFunc, this->mpIdMap, this->_mem);
-}
-
-void AugmentedJacobianFunctor::setEquations(const Timestep::Interface::ScalarEquation_range& scalEq, const Timestep::Interface::VectorEquation_range& vectEq)
-{
-   this->mpScalEq = &scalEq;
-   this->mpVectEq = &vectEq;
+   this->mpIbefFunc = std::make_shared<Functors::ApplyConstraintFunctor>(this->mspData, SolveTiming::Before::id());
+   this->mpIviewFunc = std::make_shared<IviewFunctor>(this->mspData, this->mpTsFunc, this->mRegId, this->mRegCol);
+   this->mpInFunc = std::make_shared<Functors::InputFunctor<IviewFunctor>>(this->mspData, this->mpIviewFunc, this->mpIdMap, this->_mem);
 }
 
 void AugmentedJacobianFunctor::setMatrixHandle(Matrix& mat)

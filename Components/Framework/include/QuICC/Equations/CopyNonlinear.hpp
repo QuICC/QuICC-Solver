@@ -22,16 +22,15 @@ namespace Equations {
    /**
     * @brief Transfer nonlinear spectral values from unknown to solver
     *
-    * @param compId  Component ID
     * @param storage Storage for the equation values
     * @param matIdx  Index of the given data
     * @param start   Start index for the storage
     * @param isSet   Set field? (or add)
     */
-   template <typename TField, typename TData> void copyNonlinear(const Resolution& res, const CouplingInformation& cinfo, const TField& field, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const bool isSet = false);
-   template <typename TField, typename TOperator, typename TData> void copyNonlinear(const Resolution& res, const CouplingInformation& cinfo, const TField& field, FieldComponents::Spectral::Id compId, const TOperator& op, TData& storage, const int matIdx, const int start, const bool isSet = false);
+   template <typename TField, typename TData> void copyNonlinear(const Resolution& res, const CouplingInformation& cinfo, const TField& field, TData& storage, const int matIdx, const int start, const bool isSet = false);
+   template <typename TField, typename TOperator, typename TData> void copyNonlinear(const Resolution& res, const CouplingInformation& cinfo, const TField& field, const TOperator& op, TData& storage, const int matIdx, const int start, const bool isSet = false);
 
-   template <typename TField, typename TOperator, typename TData> void copyNonlinear(const Resolution& res, const CouplingInformation& cinfo, const TField& field, FieldComponents::Spectral::Id compId, const TOperator& op, TData& storage, const int matIdx, const int start, const bool isSet)
+   template <typename TField, typename TOperator, typename TData> void copyNonlinear(const Resolution& res, const CouplingInformation& cinfo, const TField& field, const TOperator& op, TData& storage, const int matIdx, const int start, const bool isSet)
    {
       assert((!cinfo.isGalerkin() || cinfo.indexType() != CouplingIndexType::SINGLE) && "Current version does not support galerkin basis");
 
@@ -46,14 +45,14 @@ namespace Equations {
          tmp = TData(cinfo.tauN(matIdx), cinfo.rhsCols(matIdx));
 
          // simply copy values from unknown
-         copyUnknown(res, cinfo, field, compId, tmp, matIdx, 0, false, true, true);
+         copyUnknown(res, cinfo, field, tmp, matIdx, 0, false, true, true);
 
          // Multiply nonlinear term by quasi-inverse
-         applyQuasiInverse(op, compId, storage, start, matIdx, 0, tmp, isSet);
+         applyQuasiInverse(op, storage, start, matIdx, 0, tmp, isSet);
       }
    }
 
-   template <typename TField, typename TData> void copyNonlinear(const Resolution& res, const CouplingInformation& cinfo, const TField& field, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const bool isSet)
+   template <typename TField, typename TData> void copyNonlinear(const Resolution& res, const CouplingInformation& cinfo, const TField& field, TData& storage, const int matIdx, const int start, const bool isSet)
    {
       assert((!cinfo.isGalerkin() || cinfo.indexType() != CouplingIndexType::SINGLE) && "Current version does not support galerkin basis");
 
@@ -61,7 +60,7 @@ namespace Equations {
       if(cinfo.hasNonlinear())
       {
          // simply copy values from unknown
-         copyUnknown(res, cinfo, field, compId, storage, matIdx, start, true, isSet, false);
+         copyUnknown(res, cinfo, field, storage, matIdx, start, true, isSet, false);
       }
    }
 

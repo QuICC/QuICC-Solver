@@ -78,7 +78,7 @@ void StoreSolutionFunctor<CouplingIndexType::SINGLE>::apply(TField& field,
             // Copy timestep output into field
             MHDVariant dataPoint = Arithmetics::getScalar(*solution.ptr, l);
             dataPoint = (*spUp)(dataPoint, i, j, k);
-            field.rComp(compId).setPoint(dataPoint, i, j, k);
+            field.setPoint(dataPoint, i, j, k);
          }
       }
    }

@@ -49,14 +49,14 @@ void CopyUnknownFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::apply(
             // Copy field value into storage
             Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage,
                i - zeroRow + start, j - zeroCol,
-               field.comp(compId).point(i, j, matIdx));
+               field.point(i, j, matIdx));
          }
          else
          {
             // Add field value to storage
             Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage,
                i - zeroRow + start, j - zeroCol,
-               field.comp(compId).point(i, j, matIdx));
+               field.point(i, j, matIdx));
          }
       }
    }

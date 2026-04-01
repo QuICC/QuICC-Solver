@@ -31,7 +31,7 @@ public:
     * @brief ctor
     */
    StoreSolutionFunctor(const Resolution& res, const CouplingInformation& cinfo, const SparseMatrix* op, std::shared_ptr<SolutionUpdater> spUp,
-      FieldComponents::Spectral::Id compId, const int matIdx);
+      const int matIdx);
 
    /**
     * @brief deleted default ctor
@@ -47,7 +47,6 @@ public:
     * @brief Transfer solver solution to equation unknown
     *
     * @param field   Scalar or vector field
-    * @param compId  Component ID
     * @param storage Solver solution
     * @param matIdx  Index of the given data
     * @param start   Start index for the storage
@@ -81,11 +80,6 @@ private:
    std::shared_ptr<SolutionUpdater> spUp;
 
    /**
-    * @brief Field component ID
-    */
-   FieldComponents::Spectral::Id compId;
-
-   /**
     * @brief Matrix index
     */
    const int matIdx;
@@ -93,8 +87,8 @@ private:
 
 template <CouplingIndexType IndexType>
 StoreSolutionFunctor<IndexType>::StoreSolutionFunctor(const Resolution& res, const CouplingInformation& cinfo, const SparseMatrix* pOp, std::shared_ptr<SolutionUpdater> spUp,
-   FieldComponents::Spectral::Id compId, const int matIdx) :
-    res(res), cinfo(cinfo), pOp(pOp), spUp(spUp), compId(compId), matIdx(matIdx)
+   const int matIdx) :
+    res(res), cinfo(cinfo), pOp(pOp), spUp(spUp), matIdx(matIdx)
 {}
 
 template <CouplingIndexType IndexType>
@@ -124,7 +118,7 @@ Arithmetics::Temporary<TData> StoreSolutionFunctor<IndexType>::init(
       sol.ptr = &sol.data;
 
       // Apply Galerkin stencil
-      applyGalerkinStencil(*pOp, compId, sol.data, start, matIdx, storage);
+      applyGalerkinStencil(*pOp, sol.data, start, matIdx, storage);
    }
    else
    {

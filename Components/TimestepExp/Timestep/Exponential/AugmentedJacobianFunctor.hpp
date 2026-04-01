@@ -12,6 +12,7 @@
 // Project includes
 //
 #include "QuICC/Timestep/Interface.hpp"
+#include "Timestep/Exponential/Functors/FunctorData.hpp"
 #include "Types/Typedefs.hpp"
 #include "Memory/MemoryResource.hpp"
 #include "Timestep/Exponential/Functors/DoNothingFunctor.hpp"
@@ -53,7 +54,7 @@ class AugmentedJacobianFunctor
       /**
        * @brief ctor
        */
-      AugmentedJacobianFunctor(const MHDFloat dt, const std::size_t regId, const std::size_t regCol, const int fixedIt,  Pseudospectral::Coordinator* pPseudo, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem);
+      AugmentedJacobianFunctor(std::shared_ptr<Functors::FunctorData> spData, const MHDFloat dt, const std::size_t regId, const std::size_t regCol, const int fixedIt,  Pseudospectral::Coordinator* pPseudo, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem);
 
       /**
        * @brief ctor
@@ -84,11 +85,6 @@ class AugmentedJacobianFunctor
        * @brief Set timestepper
        */
       void setStepper(std::shared_ptr<TsFunctor> pStepper);
-
-      /**
-       * @brief Set Equations
-       */
-      void setEquations(const Timestep::Interface::ScalarEquation_range& scalEq, const Timestep::Interface::VectorEquation_range& vectEq);
 
    private:
       using OviewFunctor = Functors::TransferOutputFunctor<TsFunctor>;
@@ -125,6 +121,11 @@ class AugmentedJacobianFunctor
        * @brief Total size
        */
       int mN;
+
+      /**
+       * @brief Functor data
+       */
+      std::shared_ptr<Functors::FunctorData> mspData;
 
       /**
        * @brief Timestep
@@ -165,16 +166,6 @@ class AugmentedJacobianFunctor
        * @brief
        */
       std::shared_ptr<Memory::memory_resource> _mem;
-
-      /**
-       * @brief Scalar equation range
-       */
-      const Timestep::Interface::ScalarEquation_range *mpScalEq;
-
-      /**
-       * @brief Scalar equation range
-       */
-      const Timestep::Interface::VectorEquation_range *mpVectEq;
 
       /**
        * @brief Nothing functor

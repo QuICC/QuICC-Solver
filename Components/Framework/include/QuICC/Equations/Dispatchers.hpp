@@ -24,11 +24,11 @@ namespace Equations {
 
 void  dispatchModelMatrix(DecoupledZSparse& rModelMatrix, const std::size_t opId, FieldComponents::Spectral::Id compId, const int matIdx, const std::size_t bcType, const Resolution& res, const Model::IModelBackend& backend, const Equations::CouplingInformation& cinfo, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams);
 
-void dispatchGalerkinStencil(const std::size_t fieldName, FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx, const Resolution& res, const bool makeSquare, const Model::IModelBackend& backend, const Equations::CouplingInformation& cinfo, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams);
+void dispatchGalerkinStencil(const SpectralFieldId fieldId, SparseMatrix &mat, const int matIdx, const Resolution& res, const bool makeSquare, const Model::IModelBackend& backend, const Equations::CouplingInformation& cinfo, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams);
 
-void dispatchExplicitBlock(const std::size_t fieldName, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::size_t opId,  const SpectralFieldId fieldId, const int matIdx, const Resolution& res, const Model::IModelBackend& backend, const Equations::CouplingInformation& cinfo, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams);
+void dispatchExplicitBlock(const SpectralFieldId fieldId, DecoupledZSparse& mat, const std::size_t opId,  const SpectralFieldId exId, const int matIdx, const Resolution& res, const Model::IModelBackend& backend, const Equations::CouplingInformation& cinfo, const std::map<std::size_t, std::size_t>& bcIds, const std::map<std::size_t, NonDimensional::SharedINumber>& eqParams);
 
-void dispatchCoupling(Equations::CouplingInformation& cinfo, std::size_t fieldName, FieldComponents::Spectral::Id compId, CouplingInformation::EquationTypeId eqType, const int iZero, const std::map<CouplingFeature,bool>& features, const Resolution& res, const Model::IModelBackend& backend, const std::map<std::size_t, std::size_t>& bcIds);
+void dispatchCoupling(Equations::CouplingInformation& cinfo, const SpectralFieldId fieldId, CouplingInformation::EquationTypeId eqType, const int iZero, const std::map<CouplingFeature,bool>& features, const Resolution& res, const Model::IModelBackend& backend, const std::map<std::size_t, std::size_t>& bcIds);
 
 #ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
 namespace debug {

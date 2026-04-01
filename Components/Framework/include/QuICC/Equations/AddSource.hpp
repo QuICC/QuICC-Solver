@@ -26,37 +26,36 @@ namespace Equations {
     * @brief Add source term
     *
     * @param eq      Equation to work on
-    * @param compId  Component ID
     * @param storage Storage for the equation values
     * @param matIdx  Index of the given data
     * @param start   Start index for the storage
     */
-   template <typename TData, typename TField> void addSource(const Resolution& res, const CouplingInformation& cinf0, Spectral::Kernel::SharedISpectralKernel spSrc, const TField& field, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start);
+   template <typename TData, typename TField> void addSource(const Resolution& res, const CouplingInformation& cinf0, Spectral::Kernel::SharedISpectralKernel spSrc, const TField& field, TData& storage, const int matIdx, const int start);
 
-   template <typename TData, typename TField> void addSource(const Resolution& res, const CouplingInformation& cinfo, Spectral::Kernel::SharedISpectralKernel spSrc, const TField& field, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
+   template <typename TData, typename TField> void addSource(const Resolution& res, const CouplingInformation& cinfo, Spectral::Kernel::SharedISpectralKernel spSrc, const TField& field, TData& storage, const int matIdx, const int start)
    {
       // matIdx is the index of the slowest varying direction with a single RHS
       if(cinfo.indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
-         details::AddSourceFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(res, cinfo, spSrc, compId, matIdx);
+         details::AddSourceFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(res, cinfo, spSrc, matIdx);
          func.apply(field, storage, start);
       }
       // matIdx is the index of the slowest varying direction with multiple RHS
       else if(cinfo.indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
       {
-         details::AddSourceFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(res, cinfo, spSrc, compId, matIdx);
+         details::AddSourceFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(res, cinfo, spSrc, matIdx);
          func.apply(field, storage, start);
       }
       // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
       else if(cinfo.indexType() == CouplingIndexType::MODE)
       {
-         details::AddSourceFunctor<CouplingIndexType::MODE> func(res, cinfo, spSrc, compId, matIdx);
+         details::AddSourceFunctor<CouplingIndexType::MODE> func(res, cinfo, spSrc, matIdx);
          func.apply(field, storage, start);
       }
       // There is a single matrix
       else if(cinfo.indexType() == CouplingIndexType::SINGLE)
       {
-         details::AddSourceFunctor<CouplingIndexType::SINGLE> func(res, cinfo, spSrc, compId, matIdx);
+         details::AddSourceFunctor<CouplingIndexType::SINGLE> func(res, cinfo, spSrc, matIdx);
          func.apply(field, storage, start);
       }
    }

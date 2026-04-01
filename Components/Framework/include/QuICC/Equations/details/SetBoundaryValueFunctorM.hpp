@@ -33,7 +33,7 @@ void SetBoundaryValueFunctor<CouplingIndexType::MODE>::apply(
 
    // Get mode indexes
    ArrayI mode = tRes.mode(matIdx);
-   int rows = field.comp(compId).slice(mode(0)).rows();
+   int rows = field.slice(mode(0)).rows();
    int zeroRow = cinfo.galerkinShift(matIdx, 0);
 
    // Copy data

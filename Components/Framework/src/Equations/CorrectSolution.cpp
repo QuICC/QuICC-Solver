@@ -14,7 +14,7 @@ namespace QuICC {
 
 namespace Equations {
 
-   std::vector<std::tuple<MHDComplex,int,int>> correctSolution(const Resolution& res, const CouplingInformation& cinfo, FieldComponents::Spectral::Id compId, const std::vector<std::tuple<MHDVariant,int,int,int>>& corr, const int matIdx, const int start)
+   std::vector<std::tuple<MHDComplex,int,int>> correctSolution(const Resolution& res, const CouplingInformation& cinfo, const std::vector<std::tuple<MHDVariant,int,int,int>>& corr, const int matIdx, const int start)
    {
       // matIdx is the index of the slowest varying direction with a single RHS
       if(cinfo.indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)

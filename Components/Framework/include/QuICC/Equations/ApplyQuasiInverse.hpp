@@ -15,7 +15,6 @@
 #include "Arithmetics/Basic.hpp"
 #include "Arithmetics/LinearAlgebra.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Equations/IEquation.hpp"
 
 namespace QuICC {
 
@@ -24,7 +23,6 @@ namespace Equations {
    /**
     * @brief Apply the quasi-inverse operator
     *
-    * @param compId     Equation field component ID
     * @param rField     Output field
     * @param start      Start index in linear storage
     * @param matIdx     System index
@@ -34,7 +32,7 @@ namespace Equations {
    template <typename TOperator, typename TData> void applyQuasiInverse(const TOperator& op, TData& rField, const int start, const int matIdx, const int rhsStart, const TData& rhs, const bool isSet = false);
    template <bool IsSet, typename TOp, typename TData> void applyQuasiInverseImpl(const TOp& op, TData& rField, const int start, const int matIdx, const int rhsStart, const TData& rhs);
 
-   template <typename TOperator, typename TData> inline void applyQuasiInverse(const TOperator& op, FieldComponents::Spectral::Id compId, TData& rField, const int start, const int matIdx, const int rhsStart, const TData& rhs, const bool isSet)
+   template <typename TOperator, typename TData> inline void applyQuasiInverse(const TOperator& op, TData& rField, const int start, const int matIdx, const int rhsStart, const TData& rhs, const bool isSet)
    {
       if(isSet)
       {

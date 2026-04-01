@@ -16,8 +16,6 @@
 #include "Types/Typedefs.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
-#include "QuICC/Equations/IEquation.hpp"
-#include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/Equations/details/CorrectSolutionFunctor.hpp"
 #include "QuICC/Equations/details/CorrectSolutionFunctorM.hpp"
 #include "QuICC/Equations/details/CorrectSolutionFunctorS.hpp"
@@ -33,25 +31,21 @@ namespace Equations {
    /**
     * @brief Correct solution based on constraint correction
     *
-    * @param eq         Equation to work on
-    * @param compId     Component ID
     * @param storage    Storage for the equation values
     * @param matIdx     Index of the given data
     * @param start      Start index for the storage
     */
-   template <typename TData> void correctSolution(const Resolution& res, const CouplingInformation& cinfo, FieldComponents::Spectral::Id compId, const std::vector<std::tuple<MHDVariant,int,int,int>>& corr, TData& storage, const int matIdx, const int start);
+   template <typename TData> void correctSolution(const Resolution& res, const CouplingInformation& cinfo, const std::vector<std::tuple<MHDVariant,int,int,int>>& corr, TData& storage, const int matIdx, const int start);
 
    /**
     * @brief Remap constraint corrections
     *
-    * @param eq         Equation to work on
-    * @param compId     Component ID
     * @param matIdx     Index of the given data
     * @param start      Start index for the storage
     */
-   std::vector<std::tuple<MHDComplex,int,int>> correctSolution(const Resolution& res, const CouplingInformation& cinfo, FieldComponents::Spectral::Id compId, const std::vector<std::tuple<MHDVariant,int,int,int>>& corr, const int matIdx, const int start);
+   std::vector<std::tuple<MHDComplex,int,int>> correctSolution(const Resolution& res, const CouplingInformation& cinfo, const std::vector<std::tuple<MHDVariant,int,int,int>>& corr, const int matIdx, const int start);
 
-   template <typename TData> void correctSolution(const Resolution& res, const CouplingInformation& cinfo, FieldComponents::Spectral::Id compId, const std::vector<std::tuple<MHDVariant,int,int,int>>& corr, TData& storage, const int matIdx, const int start)
+   template <typename TData> void correctSolution(const Resolution& res, const CouplingInformation& cinfo, const std::vector<std::tuple<MHDVariant,int,int,int>>& corr, TData& storage, const int matIdx, const int start)
    {
       // matIdx is the index of the slowest varying direction with a single RHS
       if(cinfo.indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)

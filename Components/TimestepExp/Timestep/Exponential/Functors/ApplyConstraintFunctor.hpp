@@ -11,6 +11,13 @@
 // Project includes
 //
 #include "QuICC/Enums/FieldIds.hpp"
+#include "Timestep/Exponential/Functors/FunctorData.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
+#ifdef QUICC_DEBUG
+#include "QuICC/PhysicalNames/Coordinator.hpp"
+#include "QuICC/SolveTiming/Coordinator.hpp"
+#include "QuICC/Tools/IdToHuman.hpp"
+#endif //QUICC_DEBUG
 
 namespace QuICC {
 
@@ -26,19 +33,25 @@ namespace Functors {
 class ApplyConstraintFunctor
 {
    public:
-      ApplyConstraintFunctor(const std::size_t t): timing(t) {};
+      ApplyConstraintFunctor(std::shared_ptr<FunctorData> spData, const std::size_t t): spData(spData), timeId(t) {};
       ~ApplyConstraintFunctor() = default;
-      template <typename TEqIt>
-      void operator()(const SpectralFieldId& id, TEqIt& eqIt);
+      void operator()(const SpectralFieldId& id);
    private:
-      std::size_t timing;
+      std::shared_ptr<FunctorData> spData;
+      std::size_t timeId;
 };
 
-template <typename TEqIt>
-void ApplyConstraintFunctor::operator()(const SpectralFieldId& myId, TEqIt& eqIt)
+inline void ApplyConstraintFunctor::operator()(const SpectralFieldId& myId)
 {
+   const auto& eqData = *spData;
+
    // Apply constraint on solution
-   eqIt->applyConstraint(myId.second, timing);
+   if(eqData.constraints.count(myId) > 0)
+   {
+      DebuggerMacro_msg("Apply constraint kernel for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + QuICC::Tools::IdToHuman::toString(myId.second) + ") at " + SolveTiming::Coordinator::tag(timeId) , 6);
+
+      eqData.constraints.at(myId)->apply(timeId);
+   }
 }
 
 

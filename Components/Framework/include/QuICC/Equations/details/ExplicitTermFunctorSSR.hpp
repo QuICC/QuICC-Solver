@@ -28,9 +28,8 @@ namespace details {
 
 template <>
 template <typename T, typename TOperator, typename TData>
-void ExplicitTermFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::compute(
-   const std::size_t opId, TData& rSolverField, const int eqStart,
-   SpectralFieldId fieldId,
+void ExplicitTermFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(
+   TData& rSolverField, const TOperator& op, const int eqStart,
    const typename Framework::Selector::ScalarField<T>& explicitField)
 {
    if constexpr ((std::is_same<T, MHDFloat>::value ||
@@ -40,15 +39,11 @@ void ExplicitTermFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::compute(
    {}
    else
    {
-      // Create pointer to sparse operator
-      const TOperator* op = &eq->template explicitOperator<TOperator>(opId,
-         compId, fieldId, matIdx);
-
-      const auto& tRes = *eq->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-      typename Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> tmp(op->cols(),
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+      typename Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> tmp(op.cols(),
          1);
 #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
-      const auto& sRes = eq->res().sim();
+      const auto& sRes = res.sim();
       // Initialise storage to zero
       tmp.setZero();
       int l;
@@ -102,9 +97,9 @@ void ExplicitTermFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::compute(
 
       // Apply operator to field
       std::tuple<int, int, int, int> outBlk =
-         std::make_tuple(eqStart, 0, op->rows(), Arithmetics::getCols(tmp));
+         std::make_tuple(eqStart, 0, op.rows(), Arithmetics::getCols(tmp));
       Arithmetics::computeAx<Arithmetics::Operation::Plus>(rSolverField, outBlk,
-         *op, tmp);
+         op, tmp);
    }
 }
 

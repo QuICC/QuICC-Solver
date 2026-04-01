@@ -84,9 +84,8 @@ namespace Equations {
           * @brief Get the galerkin stencil matrix
           *
           * @param compId  Field component ID
-          * @param j       Matrix index
           */
-         const SparseMatrix& galerkinStencil(const FieldComponents::Spectral::Id compId, const int j) const;
+         const std::vector<SparseMatrix>& galerkinStencils(const FieldComponents::Spectral::Id compId) const;
 
          /**
           * @brief Check if real quasi inverse matrices exist
@@ -136,7 +135,7 @@ namespace Equations {
           * @param fieldId Spectral field ID
           * @param j       Matrix index
           */
-         template <typename TOperator> const TOperator& explicitOperator(const std::size_t opId, const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const;
+         template <typename TOperator> const std::vector<TOperator>& explicitOperators(const std::size_t opId, const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const;
 
          /**
           * @brief Get the coupling information

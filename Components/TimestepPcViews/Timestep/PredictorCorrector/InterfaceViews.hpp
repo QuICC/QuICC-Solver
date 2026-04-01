@@ -342,7 +342,7 @@ void InterfaceViews<TScheme>::initSolution(const ScalarEquation_range& scalEq, c
                         std::visit(
                               [&](auto&& p)
                               {
-                                 Equations::solveStencilUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), myId.first, p->dom(0).perturbation(), myId.second, tmpView, i, 0, eqIt->backend(), eqIt->bcIds().map(), eqIt->eqParams().map());
+                                 Equations::solveStencilUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), myId, p->dom(0).perturbation().comp(myId.second), tmpView, i, 0, eqIt->backend(), eqIt->bcIds().map(), eqIt->eqParams().map());
                               }, eqIt->spUnknown());
                      }
                      else
@@ -350,7 +350,7 @@ void InterfaceViews<TScheme>::initSolution(const ScalarEquation_range& scalEq, c
                         std::visit(
                               [&](auto&& p)
                               {
-                                 Equations::copyUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, true);
+                                 Equations::copyUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), p->dom(0).perturbation().comp(myId.second), tmpView, i, 0, true, true, true);
                               }, eqIt->spUnknown());
                      }
 
@@ -426,21 +426,38 @@ void InterfaceViews<TScheme>::getExplicitInput(const std::size_t opId,
                      {
                         DebuggerMacro_msg("Add " + ModelOperator::Coordinator::tag(opId) + " term from " + PhysicalNames::Coordinator::tag(fIt.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(fIt.second)) + ")", 7);
 
+                        std::variant<const SparseMatrix*,const SparseMatrixZ*> vpOp;
+                        // Compute with complex linear operator
+                        if (eqIt->hasExplicitZTerm(opId, myId.second, fIt))
+                        {
+                           // Create pointer to sparse operator
+                           vpOp = &eqIt->template explicitOperators<SparseMatrixZ>(opId,
+                                 myId.second, fIt).at(i);
+                        }
+
+                        // Compute with real linear operator
+                        if (eqIt->hasExplicitDTerm(opId, myId.second, fIt))
+                        {
+                           // Create pointer to sparse operator
+                           vpOp = &eqIt->template explicitOperators<SparseMatrix>(opId,
+                                 myId.second, fIt).at(i);
+                        }
+
                         // Get explicit input
                         if(fIt.second == FieldComponents::Spectral::SCALAR)
                         {
                            std::visit(
-                                 [&](auto&& p)
+                                 [&](auto&& p, auto pOp)
                                  {
-                                 Equations::addExplicitTerm(*eqIt, opId, myId.second, tmp, 0, fIt, p->dom(0).perturbation(), i);
-                                 }, scalVar.find(fIt.first)->second);
+                                 Equations::addExplicitTerm(eqIt->res(), cinfo, *pOp, tmp, 0, p->dom(0).perturbation(), i);
+                                 }, scalVar.find(fIt.first)->second, vpOp);
                         } else
                         {
                            std::visit(
-                                 [&](auto&& p)
+                                 [&](auto&& p, auto pOp)
                                  {
-                                 Equations::addExplicitTerm(*eqIt, opId, myId.second, tmp, 0, fIt, p->dom(0).perturbation().comp(fIt.second), i);
-                                 }, vectVar.find(fIt.first)->second);
+                                 Equations::addExplicitTerm(eqIt->res(), cinfo, *pOp, tmp, 0, p->dom(0).perturbation().comp(fIt.second), i);
+                                 }, vectVar.find(fIt.first)->second, vpOp);
                         }
                      }
 
@@ -522,7 +539,7 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
                      std::visit(
                            [&](auto&& p)
                            {
-                           Equations::copyUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, false);
+                           Equations::copyUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), p->dom(0).perturbation().comp(myId.second), tmpView, i, 0, true, true, false);
                            }, eqIt->spUnknown());
                   }
    Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-input:copyNonlinear");
@@ -533,7 +550,7 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
                      std::visit(
                            [&](auto&& p)
                            {
-                           Equations::addSource(eqIt->res(), cinfo, eqIt->sourceKernel(myId.second), p->dom(0).perturbation(), myId.second, tmpView, i, 0);
+                           Equations::addSource(eqIt->res(), cinfo, eqIt->spSourceKernel(myId.second), p->dom(0).perturbation().comp(myId.second), tmpView, i, 0);
                            }, eqIt->spUnknown());
                   }
 
@@ -549,7 +566,7 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
                            [&](auto&& p)
                            {
                            throw std::logic_error("NOT YET IMPLEMENTED");
-                           // Equations::setBoundaryValue(spEq->res(), cinfo, spEq->boundaryKernel(id.second), p->dom(0).perturbation(), id.second, (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
+                           // Equations::setBoundaryValue(spEq->res(), cinfo, spEq->spBoundaryKernel(id.second), p->dom(0).perturbation().comp(id.second), (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
                            }, eqIt->spUnknown());
                      //               this->mSolverCoord.updateInhomogeneous(info);
                   }
@@ -597,12 +614,12 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                   const SparseMatrix* pOp;
                   if(cinfo.isGalerkin())
                   {
-                     pOp = &eqIt->galerkinStencil(myId.second, i);
+                     pOp = &eqIt->galerkinStencils(myId.second).at(i);
                   }
                   std::visit(
                         [&](auto&& p)
                         {
-                           Equations::storeSolution(p->rDom(0).rPerturbation(), eqIt->res(), cinfo, pOp, eqIt->solutionUpdater(myId.second), myId.second, tmp, i, 0);
+                           Equations::storeSolution(p->rDom(0).rPerturbation().rComp(myId.second), eqIt->res(), cinfo, pOp, eqIt->spSolutionUpdater(myId.second), tmp, i, 0);
                         }, eqIt->spUnknown());
                }
    Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:setZero");
@@ -641,12 +658,12 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                   const SparseMatrix* pOp;
                   if(cinfo.isGalerkin())
                   {
-                     pOp = &eqIt->galerkinStencil(myId.second, i);
+                     pOp = &eqIt->galerkinStencils(myId.second).at(i);
                   }
                   std::visit(
                         [&](auto&& p)
                         {
-                        Equations::storeSolution(p->rDom(0).rPerturbation(), eqIt->res(), cinfo, pOp, eqIt->solutionUpdater(myId.second), myId.second, tmp, i, 0);
+                        Equations::storeSolution(p->rDom(0).rPerturbation().rComp(myId.second), eqIt->res(), cinfo, pOp, eqIt->spSolutionUpdater(myId.second), tmp, i, 0);
                         }, eqIt->spUnknown());
    Profiler::RegionStop<QUICC_DETAIL_PROF_LVL>("Timestep-output:storeSolution");
                }
@@ -663,7 +680,7 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                      auto info = createInfo(cinfo, i);
 
                      // Get effective corrections
-                     auto corr = Equations::correctSolution(eqIt->res(), cinfo, myId.second, corr_, i, 0);
+                     auto corr = Equations::correctSolution(eqIt->res(), cinfo, corr_, i, 0);
 
                      this->mSolverCoord.updateSolution(info, corr);
                   }

@@ -12,16 +12,17 @@
 // Project includes
 //
 #include "Memory/MemoryResource.hpp"
-#include "QuICC/Diagnostics/Coordinator.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
-#include "QuICC/Model/IModelBackend.hpp"
 #include "Timestep/Exponential/TimestepperInfo.hpp"
 #include "Timestep/Exponential/CreateInfo.hpp"
 #include "Timestep/Exponential/Functors/BaseFunctor.hpp"
+#include "Timestep/Exponential/Functors/FunctorData.hpp"
 #include "Timestep/Exponential/BuildTimestepMatrix.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
+#ifdef QUICC_DEBUG
 #include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "QuICC/Tools/IdToHuman.hpp"
-#include "QuICC/Debug/DebuggerMacro.h"
+#endif //QUICC_DEBUG
 
 namespace QuICC {
 
@@ -37,64 +38,27 @@ namespace Functors {
 class TranslateInfoFunctor: public BaseFunctor
 {
    public:
-      typedef std::map<SpectralFieldId, Equations::CouplingInformation> CInfoMap;
-      TranslateInfoFunctor(std::vector<TimestepperInfo>& infos, std::shared_ptr<CInfoMap> cinfoMap, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem) : BaseFunctor(idMap, mem), mpCInfoMap(cinfoMap), infos(infos), mspRes(nullptr), mspBcIdMap(nullptr), mspEqParamsMap(nullptr), mspBackend(nullptr) {};
+      TranslateInfoFunctor(std::vector<TimestepperInfo>& infos, std::shared_ptr<FunctorData> spData, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem) : BaseFunctor(idMap, mem), infos(infos), mspData(spData) {};
       ~TranslateInfoFunctor() = default;
-      template <typename TEqIt>
-      void operator()(const SpectralFieldId& id, TEqIt& eqIt);
-      std::shared_ptr<Resolution> spRes() const;
-      std::shared_ptr<std::map<std::size_t, std::size_t>> spBcIdMap() const;
-      std::shared_ptr<std::map<std::size_t, NonDimensional::SharedINumber>> spEqParamsMap() const;
-      std::shared_ptr<Model::IModelBackend> spBackend() const;
+      void operator()(const SpectralFieldId& id);
    private:
-      std::shared_ptr<CInfoMap> mpCInfoMap;
       std::vector<TimestepperInfo>& infos;
-      std::shared_ptr<Resolution> mspRes;
-      std::shared_ptr<std::map<std::size_t, std::size_t>> mspBcIdMap;
-      std::shared_ptr<std::map<std::size_t, NonDimensional::SharedINumber>> mspEqParamsMap;
-      std::shared_ptr<Model::IModelBackend> mspBackend;
+      std::shared_ptr<FunctorData> mspData;
 };
 
-template <typename TEqIt>
-void TranslateInfoFunctor::operator()(const SpectralFieldId& myId, TEqIt& eqIt)
+inline void TranslateInfoFunctor::operator()(const SpectralFieldId& myId)
 {
-   auto& fId = *this->mpIdMap;
-   auto& ciMap = *this->mpCInfoMap;
+   assert(this->mspData->spRes);
+   auto&& res = *this->mspData->spRes;
+   auto&& bcIdMap = this->mspData->bcIdMap;
+   auto&& eqParamsMap = this->mspData->eqParamsMap;
+   assert(this->mspData->spBackend);
+   auto&& backend = *this->mspData->spBackend;
+   const auto& cinfo = this->mspData->cInfos.at(myId);
 
-   // Set Resolution
-   if(this->mspRes== nullptr)
-   {
-      this->mspRes = eqIt->spRes();
-   }
-   auto&& res = *this->mspRes;
-
-   // Set BcIdMap
-   if(this->mspBcIdMap== nullptr)
-   {
-      this->mspBcIdMap = std::make_shared<std::map<std::size_t, std::size_t>>();
-      *this->mspBcIdMap = eqIt->bcIds().map();
-   }
-   auto&& bcIdMap = *this->mspBcIdMap;
-
-   // Set EqParamsMap
-   if(this->mspEqParamsMap== nullptr)
-   {
-      this->mspEqParamsMap = std::make_shared<std::map<std::size_t, NonDimensional::SharedINumber>>();
-      *this->mspEqParamsMap = eqIt->eqParams().map();
-   }
-   auto&& eqParamsMap = *this->mspEqParamsMap;
-
-   // Set backend
-   if(this->mspBackend == nullptr)
-   {
-      this->mspBackend = eqIt->spBackend();
-   }
-   auto&& backend = *this->mspBackend;
-
-   ciMap.emplace(myId, eqIt->couplingInfo(myId.second));
-   const auto& cinfo = ciMap.at(myId);
    DebuggerMacro_msg("Creating timesteppers for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 2);
 
+   auto& fId = *this->mpIdMap;
    fId.emplace(myId, fId.size());
 
    auto info = createInfo(cinfo, cinfo.fieldStart(), fId.at(myId));
@@ -125,26 +89,6 @@ void TranslateInfoFunctor::operator()(const SpectralFieldId& myId, TEqIt& eqIt)
       info.blockN += t.blockN;
    }
    infos.push_back(info);
-}
-
-inline std::shared_ptr<Model::IModelBackend> TranslateInfoFunctor::spBackend() const
-{
-   return this->mspBackend;
-}
-
-inline std::shared_ptr<Resolution> TranslateInfoFunctor::spRes() const
-{
-   return this->mspRes;
-}
-
-inline std::shared_ptr<std::map<std::size_t, std::size_t>> TranslateInfoFunctor::spBcIdMap() const
-{
-   return this->mspBcIdMap;
-}
-
-inline std::shared_ptr<std::map<std::size_t, NonDimensional::SharedINumber>> TranslateInfoFunctor::spEqParamsMap() const
-{
-   return this->mspEqParamsMap;
 }
 
 } // namespace Functors

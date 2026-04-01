@@ -28,9 +28,9 @@ class DoNothingFunctor
    public:
       DoNothingFunctor() = default;
       ~DoNothingFunctor() = default;
-      template <typename TEqIt>
-      void operator()(const SpectralFieldId& id, TEqIt& eqIt){};
-      
+      void operator()(const SpectralFieldId& id){};
+      template <typename TEq> 
+      void operator()(const SpectralFieldId& id, const TEq&){};
 };
 
 

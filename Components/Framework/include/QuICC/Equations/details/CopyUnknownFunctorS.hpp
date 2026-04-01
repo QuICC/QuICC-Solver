@@ -83,13 +83,13 @@ void CopyUnknownFunctor<CouplingIndexType::SINGLE>::apply(const TField& field,
             {
                // Copy field value into storage
                Arithmetics::assignScalar<Arithmetics::Operation::Set>(storage,
-                  l, field.comp(compId).point(i, j, k));
+                  l, field.point(i, j, k));
             }
             else
             {
                // Add field value to storage
                Arithmetics::assignScalar<Arithmetics::Operation::Plus>(storage,
-                  l, field.comp(compId).point(i, j, k));
+                  l, field.point(i, j, k));
             }
          }
       }

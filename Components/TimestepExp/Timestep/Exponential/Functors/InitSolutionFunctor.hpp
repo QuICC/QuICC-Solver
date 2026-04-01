@@ -18,6 +18,7 @@
 #include "View/Attributes.hpp"
 #include "View/ViewDense.hpp"
 #include "Timestep/Exponential/TimestepperInfo.hpp"
+#include "Timestep/Exponential/Functors/FunctorData.hpp"
 
 namespace QuICC {
 
@@ -37,33 +38,29 @@ class InitSolutionFunctor
       using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
       typedef View::View<MHDComplex, View::Attributes<dense2D>> ViewType;
 
-      InitSolutionFunctor(std::shared_ptr<TTsFunc> tsFunc): tsFunc(tsFunc){};
+      InitSolutionFunctor(std::shared_ptr<FunctorData> pData, std::shared_ptr<TTsFunc> tsFunc): pData(pData), tsFunc(tsFunc){};
       ~InitSolutionFunctor() = default;
-      template <typename TEqIt>
-      void operator()(ViewType tmpView, const SpectralFieldId& id, TEqIt& eqIt, const Equations::CouplingInformation& cinfo, const TimestepperInfo& info, const std::size_t i);
+      void operator()(ViewType tmpView, const SpectralFieldId& id, const Equations::CouplingInformation& cinfo, const TimestepperInfo& info, const std::size_t i);
    protected:
+      std::shared_ptr<FunctorData> pData;
       std::shared_ptr<TTsFunc> tsFunc;
 };
 
 template <typename TTsFunc>
-template <typename TEqIt>
-void InitSolutionFunctor<TTsFunc>::operator()(ViewType tmpView, const SpectralFieldId& myId, TEqIt& eqIt, const Equations::CouplingInformation& cinfo, const TimestepperInfo& info, const std::size_t i)
+void InitSolutionFunctor<TTsFunc>::operator()(ViewType tmpView, const SpectralFieldId& myId, const Equations::CouplingInformation& , const TimestepperInfo& info, const std::size_t i)
 {
+   const auto& data = *pData;
+   const auto& cinfo = data.cInfos.at(myId);
+
    if(cinfo.isGalerkin())
    {
-      std::visit(
-            [&](auto&& p)
-            {
-               Equations::solveStencilUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), myId.first, p->dom(0).perturbation(), myId.second, tmpView, i, 0, eqIt->backend(), eqIt->bcIds().map(), eqIt->eqParams().map());
-            }, eqIt->spUnknown());
+      assert(data.fields.count(myId) > 0);
+      Equations::solveStencilUnknown(data.res(), data.cInfos.at(myId), myId, *data.fields.at(myId), tmpView, i, 0, data.backend(), data.bcIdMap, data.eqParamsMap);
    }
    else
    {
-      std::visit(
-            [&](auto&& p)
-            {
-               Equations::copyUnknown(eqIt->res(), eqIt->couplingInfo(myId.second), p->dom(0).perturbation(), myId.second, tmpView, i, 0, true, true, true);
-            }, eqIt->spUnknown());
+      assert(data.fields.count(myId) > 0);
+      Equations::copyUnknown(data.res(), data.cInfos.at(myId), *data.fields.at(myId), tmpView, i, 0, true, true, true);
    }
 
    auto tsData = (*tsFunc)(info);
