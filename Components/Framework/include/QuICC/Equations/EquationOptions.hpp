@@ -37,6 +37,14 @@ namespace Equations {
          explicit EquationOptions(const int it);
 
          /**
+          * @brief Simple constructor
+          *
+          * @param it Iteration index
+          * @param nlIsLhs Nonlinear term is LHS?
+          */
+         EquationOptions(const int it, const bool nlIsLhs);
+
+         /**
           * @brief Simple empty destructor
           */
          virtual ~EquationOptions() = default;
@@ -46,8 +54,12 @@ namespace Equations {
           */
          int it() const;
 
-      protected:
+         /**
+          * @brief Nonlinear term is on LHS?
+          */
+        const bool nonlinearIsLhs;
 
+      protected:
          /**
           * @brief Sub-iteration at which equation is active
           */

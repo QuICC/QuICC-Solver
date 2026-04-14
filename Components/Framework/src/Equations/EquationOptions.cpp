@@ -5,7 +5,6 @@
 
 // System includes
 //
-#include <stdexcept>
 
 // Project includes
 //
@@ -16,12 +15,17 @@ namespace QuICC {
 namespace Equations {
 
    EquationOptions::EquationOptions()
-      : EquationOptions(0)
+      : EquationOptions(0, true)
    {
    }
 
    EquationOptions::EquationOptions(const int it)
-      : mIt(it)
+      : EquationOptions(it, true)
+   {
+   }
+
+   EquationOptions::EquationOptions(const int it, const bool nlIsLhs)
+      : nonlinearIsLhs(nlIsLhs), mIt(it)
    {
    }
 
