@@ -259,3 +259,74 @@ TEST_CASE("Serial DCCSC3D to S1CLCSC3D 120", "SerialDCCSC3DtoS1CLCSC3D120")
       CHECK(dataRef[s] == viewOut[s]);
    }
 }
+
+TEST_CASE("Serial DCCSC3D to DCCSC3D 021", "[SerialDCCSC3DtoDCCSC3D021]")
+{
+   // JW out -> JW out m-ordering
+   // Full data and type
+   constexpr size_t M = 4;
+   constexpr size_t N = 2;
+   constexpr size_t K = 3;
+
+   constexpr size_t S = (M + (M - 1) + (M - 2)) * N;
+
+   // clang-format off
+   // N K M
+   std::array<double, S> dataIn = {
+      /*m0*/ 1, 5,
+      /*m1*/ 2, 6,
+      /*m1*/ 9, 12,
+      /*m2*/ 3, 7,
+      /*m2*/ 10, 13,
+      /*m2*/ 15, 17,
+      /*m3*/ 4, 8,
+      /*m3*/ 11, 14,
+      /*m3*/ 16, 18
+   };
+
+   // perm = [0 2 1] -> N M K
+   std::array<double, S> dataRef = {
+      /*k0*/ 1, 5,
+      /*k0*/ 2, 6,
+      /*k0*/ 3, 7,
+      /*k0*/ 4, 8,
+      /*k1*/ 9, 12,
+      /*k1*/ 10, 13,
+      /*k1*/ 11, 14,
+      /*k2*/ 15, 17,
+      /*k2*/ 16, 18,
+   };
+   // clang-format on
+
+   std::array<double, S> dataOut;
+
+   // view
+   constexpr std::uint32_t rank = 3;
+   std::array<std::uint32_t, rank> dimensionsIn{N, K, M};
+   std::array<std::uint32_t, rank> dimensionsOut{N, M, K};
+   // skip setting up pointers and indices
+   // they are not used in the serial aka dense tranpose
+   std::array<std::vector<std::uint32_t>, rank> pointers = {{{}, {}, {}}};
+   std::array<std::vector<std::uint32_t>, rank> indices = {{{}, {}, {}}};
+   using inTy = DCCSC3D;
+   using outTy = DCCSC3D;
+   using VinTy = View<double, inTy>;
+   using VoutTy = View<double, outTy>;
+   VinTy viewIn(dataIn, dimensionsIn, pointers, indices);
+   VoutTy viewOut(dataOut, dimensionsOut, pointers, indices);
+   // Transpose op
+   using namespace QuICC::Transpose::Cpu;
+   using namespace QuICC::Transpose;
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p021_t>>();
+   // Pack views
+   std::vector<VoutTy> viewsOut = {viewOut};
+   std::vector<VinTy> viewsIn = {viewIn};
+   // Apply transpose
+   transposeOp->apply(viewsOut, viewsIn);
+   // check
+   for (std::uint64_t s = 0; s < S; ++s)
+   {
+      CHECK(dataRef[s] == viewOut[s]);
+   }
+}
