@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_CHEBYSHEVPROJECTOR_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_FFTW_CHEBYSHEVPROJECTOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -44,12 +35,12 @@ namespace Fftw {
          /**
           * @brief Constructor
           */
-         ChebyshevProjector();
+         ChebyshevProjector() = default;
 
          /**
           * @brief Destructor
           */
-         ~ChebyshevProjector();
+         ~ChebyshevProjector() = default;
 
          /**
           * @brief Initialise the FFTW transforms
@@ -64,17 +55,17 @@ namespace Fftw {
          /**
           * @brief Set output
           */
-         void output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
+         void output(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& tmp, const bool useReal) const;
 
          /**
           * @brief Set output scaled by array
           */
-         void outputScale(Matrix& rOut) const;
+         void outputScale(Eigen::Ref<Matrix> rOut) const;
 
          /**
           * @brief Set output scaled by array
           */
-         void outputScale(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
+         void outputScale(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp, const bool useReal) const;
 
          /**
           * @brief Add new linear solver
@@ -99,7 +90,7 @@ namespace Fftw {
          /**
           * @brief Apply padding
           */
-         void applyPadding(Matrix& rData, const int extraRows = 0) const final;
+         void applyPadding(Eigen::Ref<Matrix> rData, const int extraRows = 0) const final;
       protected:
 
       private:

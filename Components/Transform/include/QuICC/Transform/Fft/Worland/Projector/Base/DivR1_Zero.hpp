@@ -62,14 +62,14 @@ namespace Projector {
           * @param rOut Output values
           * @param in   Input values
           */
-         void applyPreOperator(const Matrix& in, const bool isEven) const final;
+         void applyPreOperator(const Eigen::Ref<const Matrix>& in, const bool isEven) const final;
 
          /**
           * @brief Apply post FFT operator
           *
           * @param rOut Output values
           */
-         void applyPostOperator(Matrix& rOut, const bool isEven) const final;
+         void applyPostOperator(Eigen::Ref<Matrix> rOut, const bool isEven) const final;
 
          /**
           * @brief Apply pre FFT operator for component wise openerations
@@ -77,7 +77,7 @@ namespace Projector {
           * @param in   Input values
           * @param useReal Real vs Imag flag
           */
-         void applyPreOperator(const MatrixZ& in, const bool isEven, const bool useReal) const final;
+         void applyPreOperator(const Eigen::Ref<const MatrixZ>& in, const bool isEven, const bool useReal) const final;
 
          /**
           * @brief Apply post FFT operator for component wise operations
@@ -85,7 +85,7 @@ namespace Projector {
           * @param rOut Output values
           * @param useReal Real vs Imag flag
           */
-         void applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const final;
+         void applyPostOperator(Eigen::Ref<MatrixZ> rOut, const bool isEven, const bool useReal) const final;
    };
 
 }

@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_COMPLEXPROJECTOR_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_FFTW_COMPLEXPROJECTOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -43,12 +34,12 @@ namespace Fftw {
          /**
           * @brief Constructor
           */
-         ComplexProjector();
+         ComplexProjector() = default;
 
          /**
           * @brief Destructor
           */
-         ~ComplexProjector();
+         ~ComplexProjector() = default;
 
          /**
           * @brief Initialise the FFT transforms
@@ -74,11 +65,6 @@ namespace Fftw {
           * @brief Scale with fast and slow index dependent functin
           */
          void inputDiff2D(MatrixZ& tmp, const MatrixZ& rData, const std::vector<std::pair<int,int> >& orders, const MHDFloat scale, const MatrixI& idBlocks) const;
-
-         /**
-          * @brief Apply FFT
-          */
-         void applyFft(MatrixZ& phys, const MatrixZ& mods) const final;
 
       protected:
 

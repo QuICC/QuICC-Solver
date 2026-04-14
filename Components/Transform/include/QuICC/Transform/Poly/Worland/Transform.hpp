@@ -91,7 +91,7 @@ namespace Worland {
           * @param in   Input values
           * @param op   Transform operator
           */
-         void transform(MatrixZ& rOut, const MatrixZ& in, const IWorlandOperator& op);
+         void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const IWorlandOperator& op);
 
          /**
           * @brief Compute transform (Complex -> Real) using given operator
@@ -100,7 +100,7 @@ namespace Worland {
           * @param in   Input values
           * @param op   Transform operator
           */
-         void transform(Matrix& rOut, const MatrixZ& in, const IWorlandOperator& op);
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const IWorlandOperator& op);
 
          /**
           * @brief Compute transform (Complex -> Complex) mapped to ID
@@ -109,7 +109,7 @@ namespace Worland {
           * @param in   Input values
           * @param id   ID of transform operator
           */
-         void transform(MatrixZ& rOut, const MatrixZ& in, const std::size_t id);
+         void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id);
 
          /**
           * @brief Compute transform (Complex -> Real) mapped to ID
@@ -118,7 +118,7 @@ namespace Worland {
           * @param in   Input values
           * @param id   ID of transform operator
           */
-         void transform(Matrix& rOut, const MatrixZ& in, const std::size_t id);
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id);
 
          /**
           * @brief Get the memory requirements

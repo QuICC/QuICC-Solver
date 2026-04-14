@@ -84,7 +84,7 @@ namespace Datatypes {
           *
           * \warning This routine should only be used in exceptional cases. Use setData, addData, subData when you can!
          */
-         std::map<std::pair<TType,TType>,TScalar>& rData();
+         std::map<std::pair<TType,TType>,TScalar>& rComps();
 
       protected:
          /**
@@ -132,7 +132,7 @@ namespace Datatypes {
       return this->mComponents;
    }
 
-   template <typename TScalar, typename TType> inline std::map<std::pair<TType,TType>,TScalar>& SymmetricTensorField<TScalar,TType>::rData()
+   template <typename TScalar, typename TType> inline std::map<std::pair<TType,TType>,TScalar>& SymmetricTensorField<TScalar,TType>::rComps()
    {
       return this->mComponents;
    }

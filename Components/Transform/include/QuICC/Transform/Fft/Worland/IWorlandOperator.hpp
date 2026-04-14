@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_WORLAND_IWORLANDOPERATOR_HPP
 #define QUICC_TRANSFORM_FFT_WORLAND_IWORLANDOPERATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -52,7 +43,7 @@ namespace Worland {
          /**
           * @brief Destructor
           */
-         virtual ~IWorlandOperator();
+         virtual ~IWorlandOperator() = default;
 
          /**
           * @brief Initialise the transform
@@ -74,7 +65,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const override;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Compute transform
@@ -82,7 +73,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const Matrix& in) const override;
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const override;
 
          /**
           * @brief Compute transform
@@ -90,7 +81,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
       protected:
          /**
@@ -104,12 +95,12 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const Matrix& in) const override;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in) const override;
    };
 
-}
-}
-}
-}
+} // namespace Worland
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC
 
 #endif // QUICC_TRANSFORM_FFT_WORLAND_IWORLANDOPERATOR_HPP

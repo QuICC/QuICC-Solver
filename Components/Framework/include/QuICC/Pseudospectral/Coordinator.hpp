@@ -241,6 +241,14 @@ public:
     */
    void addGraph(const std::string& graphStr,
       const Graph::PhysicalParameters<MHDFloat>& physParams);
+
+   /**
+    * @brief Process graph description with jitter
+    * @param graphStr graph description
+    * @param physParams scaling parameters
+    */
+   void processGraph(const std::string& graphStr,
+      const Graph::PhysicalParameters<MHDFloat>& physParams);
 #endif
 
    /**
@@ -680,6 +688,10 @@ protected:
    Transform::SharedIBackwardGrouper mspImposedBwdGrouper;
 
 #ifdef QUICC_USE_MLIR_GRAPH
+   /// @brief Storage for graph string
+   std::string mGraphStr;
+   /// @brief Physical parameters for graph
+   Graph::PhysicalParameters<MHDFloat> mGraphPhysParams;
    /// @brief storage for mlir graph JIT
    std::unique_ptr<Graph::Jit<3>> mJitter;
    /// @brief memory resource

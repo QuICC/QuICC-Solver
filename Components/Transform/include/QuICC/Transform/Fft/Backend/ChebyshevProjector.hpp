@@ -46,7 +46,7 @@ namespace Backend {
          /**
           * @brief Destructor
           */
-         ~ChebyshevProjector();
+         ~ChebyshevProjector() = default;
 
          /**
           * @brief Initialise the FFT transforms
@@ -64,7 +64,7 @@ namespace Backend {
           * @param tmp temporary storage
           * @param in input spectral coefficients
           */
-         void input(Matrix& tmp, const Matrix& in) const;
+         void input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const Matrix>& in) const;
 
          /**
           * @brief Copy input real or imaginary part and shift
@@ -73,7 +73,7 @@ namespace Backend {
           * @param in input spectral coefficients
           * @param shift
           */
-         void input(Matrix& tmp, const Matrix& in, const int shift) const;
+         void input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const Matrix>& in, const int shift) const;
 
          /**
           * @brief Copy input real or imaginary part and pad
@@ -82,7 +82,7 @@ namespace Backend {
           * @param in input spectral coefficients
           * @param useReal flag to extract real or im part
           */
-         void input(Matrix& tmp, const MatrixZ& in, const bool useReal) const;
+         void input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const MatrixZ>& in, const bool useReal) const;
 
          /**
           * @brief Copy input real or imaginary part and shift
@@ -92,32 +92,32 @@ namespace Backend {
           * @param shift
           * @param useReal flag to extract real or im part
           */
-         void input(Matrix& tmp, const MatrixZ& in, const int shift, const bool useReal) const;
+         void input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const MatrixZ>& in, const int shift, const bool useReal) const;
 
          /**
           * @brief Set output
           */
-         void output(Matrix& rOut) const;
+         void output(Eigen::Ref<Matrix> rOut) const;
 
          /**
           * @brief Set output
           */
-         void output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
+         void output(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& tmp, const bool useReal) const;
 
          /**
           * @brief Set output scaled by array
           */
-         void outputScale(Matrix& rOut) const;
+         void outputScale(Eigen::Ref<Matrix> rOut) const;
 
          /**
           * @brief Set output scaled by array
           */
-         void outputScale(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
+         void outputScale(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp, const bool useReal) const;
 
          /**
           * @brief Apply FFT spectral to physical space
           */
-         void applyFft(Matrix& phys, const Matrix& mods) const;
+         void applyFft(Eigen::Ref<Matrix> phys, const Eigen::Ref<const Matrix>& mods) const;
 
          /**
           * @brief Add new linear solver

@@ -6,16 +6,11 @@
 // System includes
 //
 #include <stdexcept>
-
-// External includes
-//
 #include "Kokkos.hpp"
-// Class include
-//
-#include "QuICC/Transform/Poly/Setup.hpp"
 
 // Project includes
 //
+#include "QuICC/Transform/Poly/Setup.hpp"
 
 namespace QuICC {
 
@@ -28,10 +23,6 @@ namespace Poly {
    {
        // Initialize fixtures
        ExternalLibrary::Kokkos::getInstance();
-   }
-
-   Setup::~Setup()
-   {
    }
 
 }

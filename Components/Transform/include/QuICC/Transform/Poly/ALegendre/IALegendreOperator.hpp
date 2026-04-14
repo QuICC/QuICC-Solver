@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_IALEGENDREOPERATOR_HPP
 #define QUICC_TRANSFORM_POLY_ALEGENDRE_IALEGENDREOPERATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -69,7 +60,7 @@ namespace ALegendre {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const override;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Compute polynomial transform
@@ -77,7 +68,7 @@ namespace ALegendre {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(Matrix& rOut, const MatrixZ& in) const;
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const;
 
          /**
           * @brief Rows of output data
@@ -112,7 +103,7 @@ namespace ALegendre {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void applyOperators(MatrixZ& rOut, const MatrixZ& in) const;
+         virtual void applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const;
    };
 
 }

@@ -7,15 +7,9 @@
 //
 #include <cmath>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/Tools.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/Tools.hpp"
 
 namespace QuICC {
 

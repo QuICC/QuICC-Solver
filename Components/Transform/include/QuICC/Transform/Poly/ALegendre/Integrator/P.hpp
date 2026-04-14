@@ -6,9 +6,6 @@
 #ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_INTEGRATOR_P_HPP
 #define QUICC_TRANSFORM_POLY_ALEGENDRE_INTEGRATOR_P_HPP
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/Transform/Poly/ALegendre/Integrator/Base/P.hpp"

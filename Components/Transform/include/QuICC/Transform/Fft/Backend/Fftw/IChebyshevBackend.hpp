@@ -42,12 +42,12 @@ namespace Fftw {
          /**
           * @brief Constructor
           */
-         IChebyshevBackend();
+         IChebyshevBackend() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IChebyshevBackend();
+         virtual ~IChebyshevBackend() = default;
 
          /**
           * @brief Initialise the FFTW transforms
@@ -60,7 +60,7 @@ namespace Fftw {
           * @param tmp temporary storage
           * @param in input spectral coefficients
           */
-         void input(Matrix& tmp, const Matrix& in) const;
+         void input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const Matrix>& in) const;
 
          /**
           * @brief Copy input real or imaginary part and shift
@@ -69,7 +69,7 @@ namespace Fftw {
           * @param in input spectral coefficients
           * @param shift
           */
-         void input(Matrix& tmp, const Matrix& in, const int shift) const;
+         void input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const Matrix>& in, const int shift) const;
 
          /**
           * @brief Copy input real or imaginary part and pad
@@ -78,7 +78,7 @@ namespace Fftw {
           * @param in input spectral coefficients
           * @param useReal flag to extract real or im part
           */
-         void input(Matrix& tmp, const MatrixZ& in, const bool useReal) const;
+         void input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const MatrixZ>& in, const bool useReal) const;
 
          /**
           * @brief Copy input real or imaginary part and shift
@@ -88,12 +88,12 @@ namespace Fftw {
           * @param shift
           * @param useReal flag to extract real or im part
           */
-         void input(Matrix& tmp, const MatrixZ& in, const int shift, const bool useReal) const;
+         void input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const MatrixZ>& in, const int shift, const bool useReal) const;
 
          /**
           * @brief Apply padding
           */
-         virtual void applyPadding(Matrix& rData, const int extraRows = 0) const;
+         virtual void applyPadding(Eigen::Ref<Matrix> rData, const int extraRows = 0) const;
 
          /**
           * @brief Get the temporary storage

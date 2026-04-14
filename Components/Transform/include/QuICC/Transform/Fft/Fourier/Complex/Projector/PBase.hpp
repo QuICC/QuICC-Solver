@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_PROJECTOR_PBASE_HPP
 #define QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_PROJECTOR_PBASE_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Pect includes
@@ -65,7 +56,7 @@ namespace Projector {
           * @param rOut Output values
           * @param in   Input values
           */
-         void applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const;
+         void applyPreOperator(MatrixZ& rOut, const Eigen::Ref<const MatrixZ>& in) const;
    };
 
 }

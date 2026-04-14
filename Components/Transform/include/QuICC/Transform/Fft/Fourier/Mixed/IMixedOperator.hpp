@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_MIXED_IMIXEDOPERATOR_HPP
 #define QUICC_TRANSFORM_FFT_FOURIER_MIXED_IMIXEDOPERATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -49,12 +40,12 @@ namespace Mixed {
          /**
           * @brief Constructor
           */
-         IMixedOperator();
+         IMixedOperator() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IMixedOperator();
+         virtual ~IMixedOperator() = default;
 
          /**
           * @brief Initialise the transform

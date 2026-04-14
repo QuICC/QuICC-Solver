@@ -51,7 +51,7 @@ namespace Reductor {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Compute reduction of complex data, anelastic case
@@ -60,7 +60,7 @@ namespace Reductor {
           * @param in   Input values
           * @param pF   Radial profile (e.g density)
           */
-         virtual void transform(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const override;
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const override;
 
          /**
           * @brief Compute reduction of real data
@@ -68,7 +68,7 @@ namespace Reductor {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const Matrix& in) const override;
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const override;
 
          /**
           * @brief Compute reduction of real data, anelastic case
@@ -77,7 +77,7 @@ namespace Reductor {
           * @param in   Input values
           * @param pF   Radial profile (e.g density)
           */
-         virtual void transform(Matrix& rOut, const Matrix& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const override;
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const override;
 
 
          /**
@@ -113,21 +113,21 @@ namespace Reductor {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void applyPreOperator(Matrix& tmp, const Matrix& in) const = 0;
+         virtual void applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const = 0;
 
          /**
           * @brief Apply post FFT operator
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(Matrix& rOut, const Matrix& tmp) const = 0;
+         virtual void applyPostOperator(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const = 0;
 
          /**
           * @brief Apply pre FFT operator for component wise operations
           *
           * @param in   Input values
           */
-         virtual void applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const = 0;
+         virtual void applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in, const bool useReal) const = 0;
 
          /**
           * @brief Compute transform R2C (disabled)
@@ -135,7 +135,7 @@ namespace Reductor {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const Matrix& in) const override;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in) const override;
 
          /**
           * @brief Compute transform C2R (disabled)
@@ -143,7 +143,7 @@ namespace Reductor {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const override;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
    };
 
 }

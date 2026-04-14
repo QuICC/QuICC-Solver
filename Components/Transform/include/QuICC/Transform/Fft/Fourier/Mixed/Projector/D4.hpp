@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_MIXED_PROJECTOR_D4_HPP
 #define QUICC_TRANSFORM_FFT_FOURIER_MIXED_PROJECTOR_D4_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -44,12 +35,12 @@ namespace Projector {
          /**
           * @brief Constructor
           */
-         D4();
+         D4() = default;
 
          /**
           * @brief Destructor
           */
-         ~D4();
+         ~D4() = default;
 
       protected:
 
@@ -60,7 +51,7 @@ namespace Projector {
           * @param in   Input values
           * @param out  Scaled input
           */
-         void applyPreOperator(MatrixZ& out, const MatrixZ& in) const final;
+         void applyPreOperator(MatrixZ& tmp, const Eigen::Ref<const MatrixZ>& in) const final;
    };
 
 }

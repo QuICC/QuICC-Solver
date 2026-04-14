@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/ComplexProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/ComplexProjector.hpp"
 #if defined QUICC_FFT_COMPLEX_FFTW
    #include "QuICC/Transform/Fft/Backend/Fftw/ComplexProjector.hpp"
    #define BACKENDIMPL Fftw
@@ -44,10 +38,6 @@ namespace Backend {
       this->mpImpl = std::make_shared<BackendImpl>();
    }
 
-   ComplexProjector::~ComplexProjector()
-   {
-   }
-
    void ComplexProjector::init(const SetupType& setup) const
    {
       this->mpImpl->init(setup);
@@ -58,7 +48,7 @@ namespace Backend {
       this->mpImpl->initMeanBlocks(idBlocks);
    }
 
-   void ComplexProjector::applyFft(MatrixZ& phys, const MatrixZ& mods) const
+   void ComplexProjector::applyFft(Eigen::Ref<MatrixZ> phys, const Eigen::Ref<const MatrixZ>& mods) const
    {
       this->mpImpl->applyFft(phys, mods);
    }

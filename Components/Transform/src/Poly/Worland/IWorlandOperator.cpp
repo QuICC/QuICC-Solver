@@ -27,10 +27,6 @@ namespace Worland {
       this->mProfileTag = "Worland::Poly";
    }
 
-   IWorlandOperator::~IWorlandOperator()
-   {
-   }
-
    void IWorlandOperator::init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       // Store the shared pointer to setup object
@@ -54,26 +50,26 @@ namespace Worland {
       throw std::logic_error("Unused interface");
    }
 
-   void IWorlandOperator::transform(MatrixZ& rOut, const MatrixZ& in) const
+   void IWorlandOperator::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       assert(this->isInitialized());
 
       this->applyOperators(rOut, in);
    }
 
-   void IWorlandOperator::transform(Matrix& rOut, const MatrixZ& in) const
+   void IWorlandOperator::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       assert(this->isInitialized());
 
       this->applyOperators(rOut, in);
    }
 
-   void IWorlandOperator::applyOperators(MatrixZ&, const MatrixZ&) const
+   void IWorlandOperator::applyOperators(Eigen::Ref<MatrixZ>, const Eigen::Ref<const MatrixZ>&) const
    {
       throw std::logic_error("Data is not compatible with Worland operator");
    }
 
-   void IWorlandOperator::applyOperators(Matrix&, const MatrixZ&) const
+   void IWorlandOperator::applyOperators(Eigen::Ref<Matrix>, const Eigen::Ref<const MatrixZ>&) const
    {
       throw std::logic_error("Data is not compatible with Worland operator");
    }
@@ -100,7 +96,7 @@ namespace Worland {
       return mem;
    }
 
-}
-}
-}
-}
+} // namespace Worland
+} // namespace Poly
+} // namespace Transform
+} // namespace QuICC

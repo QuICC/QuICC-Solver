@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_DIFFERENTIALSOLVER_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_FFTW_DIFFERENTIALSOLVER_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes

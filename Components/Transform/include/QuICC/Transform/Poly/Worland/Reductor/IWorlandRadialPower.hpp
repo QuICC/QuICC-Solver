@@ -78,7 +78,7 @@ namespace Reductor {
           * @param rOut Output physical values
           * @param in   Input spectral coefficients
           */
-         virtual void applyOperators(Matrix& rOut, const MatrixZ& in) const override;
+         virtual void applyOperators(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Compute power (integral of squared values)
@@ -86,7 +86,7 @@ namespace Reductor {
           * @param rOut Output physical values
           * @param in   Input spectral coefficients
           */
-         virtual void applyOperators(MatrixZ& rOut, const MatrixZ& in) const override;
+         virtual void applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
    };
 
 } // Reductor

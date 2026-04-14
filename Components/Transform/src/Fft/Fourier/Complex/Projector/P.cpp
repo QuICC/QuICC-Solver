@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
+// Project includes
 //
 #include "QuICC/Transform/Fft/Fourier/Complex/Projector/PBase.hpp"
-
-// Pect includes
-//
 
 namespace QuICC {
 
@@ -29,7 +23,7 @@ namespace Complex {
 
 namespace Projector {
 
-   void P<base_t>::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
+   void P<base_t>::applyPreOperator(MatrixZ& tmp, const Eigen::Ref<const MatrixZ>& in) const
    {
       this->mBackend.input(tmp, in);
    }

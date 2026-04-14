@@ -62,26 +62,26 @@ namespace Projector {
       this->mBackend.backwardWorland(isEven);
    }
 
-   void SphLapl<base_t>::applyPreOperator(const Matrix& in, const bool isEven) const
+   void SphLapl<base_t>::applyPreOperator(const Eigen::Ref<const Matrix>& in, const bool isEven) const
    {
       this->mBackend.input(in, isEven, true);
       this->computeWorlandExpansion(isEven);
       this->mBackend.io(isEven);
    }
 
-   void SphLapl<base_t>::applyPostOperator(Matrix& rOut, const bool isEven) const
+   void SphLapl<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut, const bool isEven) const
    {
       this->mBackend.output(rOut, isEven);
    }
 
-   void SphLapl<base_t>::applyPreOperator(const MatrixZ& in, const bool isEven, const bool useReal) const
+   void SphLapl<base_t>::applyPreOperator(const Eigen::Ref<const MatrixZ>& in, const bool isEven, const bool useReal) const
    {
       this->mBackend.input(in, isEven, useReal, true);
       this->computeWorlandExpansion(isEven);
       this->mBackend.io(isEven);
    }
 
-   void SphLapl<base_t>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const
+   void SphLapl<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const bool isEven, const bool useReal) const
    {
       this->mBackend.output(rOut, isEven, useReal);
    }

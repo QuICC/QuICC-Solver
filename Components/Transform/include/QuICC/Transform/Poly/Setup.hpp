@@ -6,15 +6,9 @@
 #ifndef QUICC_TRANSFORM_POLY_SETUP_HPP
 #define QUICC_TRANSFORM_POLY_SETUP_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -44,7 +38,7 @@ namespace Poly {
          /**
           * @brief Empty destructor
           */
-         virtual ~Setup();
+         virtual ~Setup() = default;
 
       protected:
 

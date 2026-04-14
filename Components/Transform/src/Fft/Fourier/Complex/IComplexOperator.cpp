@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/IComplexOperator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Complex/IComplexOperator.hpp"
 
 namespace QuICC {
 
@@ -27,14 +21,6 @@ namespace Fft {
 namespace Fourier {
 
 namespace Complex {
-
-   IComplexOperator::IComplexOperator()
-   {
-   }
-
-   IComplexOperator::~IComplexOperator()
-   {
-   }
 
    void IComplexOperator::init(SharedTransformSetup spSetup) const
    {
@@ -49,7 +35,6 @@ namespace Complex {
    {
       throw std::logic_error("Unused interface");
    }
-
 
 }
 }

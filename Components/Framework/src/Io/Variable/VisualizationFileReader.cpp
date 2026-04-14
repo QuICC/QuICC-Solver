@@ -73,7 +73,7 @@ void VisualizationFileReader::read()
             {
                this->readPhysicalVector(
                   PhysicalNames::Coordinator::tag(sit->first) + "_grad",
-                  p->rDom(0).rGrad().rData(), this->isRequired(sit->first));
+                  p->rDom(0).rGrad().rComps(), this->isRequired(sit->first));
             },
             sit->second);
       }
@@ -87,7 +87,7 @@ void VisualizationFileReader::read()
             {
                this->readPhysicalTensor(
                   PhysicalNames::Coordinator::tag(sit->first) + "_grad2",
-                  p->rDom(0).rGrad2().rData(), this->isRequired(sit->first));
+                  p->rDom(0).rGrad2().rComps(), this->isRequired(sit->first));
             },
             sit->second);
       }
@@ -110,7 +110,7 @@ void VisualizationFileReader::read()
             {
                this->readPhysicalVector(
                   PhysicalNames::Coordinator::tag(vit->first),
-                  p->rDom(0).rPhys().rData(), this->isRequired(vit->first));
+                  p->rDom(0).rPhys().rComps(), this->isRequired(vit->first));
             },
             vit->second);
       }
@@ -123,7 +123,7 @@ void VisualizationFileReader::read()
             {
                this->readPhysicalVector(
                   PhysicalNames::Coordinator::tag(vit->first) + "_curl",
-                  p->rDom(0).rCurl().rData(), this->isRequired(vit->first));
+                  p->rDom(0).rCurl().rComps(), this->isRequired(vit->first));
             },
             vit->second);
       }

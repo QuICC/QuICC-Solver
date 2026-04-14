@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/ALegendre/Projector/IALegendreProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/ALegendre/Projector/IALegendreProjector.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -53,7 +47,7 @@ namespace Projector {
       }
    }
 
-   void IALegendreProjector::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+   void IALegendreProjector::applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreProjector::applyOperators");
 

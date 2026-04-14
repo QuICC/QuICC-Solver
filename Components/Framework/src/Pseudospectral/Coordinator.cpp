@@ -467,6 +467,12 @@ void Coordinator::init(const Array& tstep, const SharedSimulationBoundary spBcs)
          "Variables not mapped to equations are currently not implemented");
    }
 
+#ifdef QUICC_USE_MLIR_GRAPH
+   // Process MLIR graph
+   this->processGraph(this->mGraphStr, this->mGraphPhysParams);
+   this->mGraphStr = "";
+#endif
+
    // Initialize Imposed fields
    this->initImposed();
 

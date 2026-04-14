@@ -35,18 +35,18 @@ void EnergyY2<base_t>::initOperator() const
       op.mat().leftCols(2 * this->mspSetup->specSize()));
 }
 
-void EnergyY2<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+void EnergyY2<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
 {
    this->mBackend.input(tmp, in);
 }
 
-void EnergyY2<base_t>::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
+void EnergyY2<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const
 {
    assert(rOut.cols() == 1);
    this->mBackend.outputSpectral(rOut, tmp);
 }
 
-void EnergyY2<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void EnergyY2<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, useReal);

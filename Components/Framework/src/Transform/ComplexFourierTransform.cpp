@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/ComplexFourierTransform.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/ComplexFourierTransform.hpp"
 
 #include "QuICC/Transform/Fft/Fourier/Complex/Projector/D2.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/Projector/D3.hpp"
@@ -59,14 +53,6 @@
 namespace QuICC {
 
 namespace Transform {
-
-   ComplexFourierTransform::ComplexFourierTransform()
-   {
-   }
-
-   ComplexFourierTransform::~ComplexFourierTransform()
-   {
-   }
 
    void ComplexFourierTransform::requiredOptions(std::set<std::size_t>& list, const Dimensions::Transform::Id dimId) const
    {
@@ -128,68 +114,14 @@ namespace Transform {
          this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::Mean<backend_t>>(Forward::P0::id());
    }
 
-   void ComplexFourierTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void ComplexFourierTransform::forward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
-   void ComplexFourierTransform::backward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void ComplexFourierTransform::backward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
-   }
-
-   //
-   // Disabled transforms
-   //
-
-   void ComplexFourierTransform::forward(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ComplexFourierTransform::forward(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ComplexFourierTransform::forward(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ComplexFourierTransform::backward(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ComplexFourierTransform::backward(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ComplexFourierTransform::backward(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ComplexFourierTransform::reduce(MatrixZ&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ComplexFourierTransform::reduce(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ComplexFourierTransform::reduce(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ComplexFourierTransform::reduce(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
    }
 
    MHDFloat ComplexFourierTransform::requiredStorage() const

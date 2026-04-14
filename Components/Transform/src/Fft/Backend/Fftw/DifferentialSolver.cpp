@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/Selector/SparseTriangularSolver.hpp"
 
 namespace QuICC {

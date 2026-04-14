@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/IMixedIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/IMixedIntegrator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -32,20 +26,12 @@ namespace Mixed {
 
 namespace Integrator {
 
-   IMixedIntegrator::IMixedIntegrator()
-   {
-   }
-
-   IMixedIntegrator::~IMixedIntegrator()
-   {
-   }
-
    void IMixedIntegrator::initBackend() const
    {
       this->mBackend.init(*this->mspSetup);
    }
 
-   void IMixedIntegrator::transform(MatrixZ& rOut, const Matrix& in) const
+   void IMixedIntegrator::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in) const
    {
       Profiler::RegionFixture<2> fix("IMixedIntegrator::transform");
 
@@ -59,17 +45,17 @@ namespace Integrator {
       this->applyPostOperator(rOut);
    }
 
-   void IMixedIntegrator::transform(Matrix&, const Matrix&) const
+   void IMixedIntegrator::transform(Eigen::Ref<Matrix>, const Eigen::Ref<const Matrix>&) const
    {
       throw std::logic_error("Data is not compatible with Mixed FFT integrator");
    }
 
-   void IMixedIntegrator::transform(Matrix&, const MatrixZ&) const
+   void IMixedIntegrator::transform(Eigen::Ref<Matrix>, const Eigen::Ref<const MatrixZ>&) const
    {
       throw std::logic_error("Data is not compatible with Mixed FFT integrator");
    }
 
-   void IMixedIntegrator::transform(MatrixZ&, const MatrixZ&) const
+   void IMixedIntegrator::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const MatrixZ>&) const
    {
       throw std::logic_error("Data is not compatible with Mixed FFT integrator");
    }
@@ -95,7 +81,7 @@ namespace Integrator {
       return mem;
    }
 
-   void IMixedIntegrator::dealias(MatrixZ& deAliased, const MatrixZ& aliased)const
+   void IMixedIntegrator::dealias(Eigen::Ref<MatrixZ> deAliased, const Eigen::Ref<const MatrixZ>& aliased)const
    {
       int specSize = this->mspSetup->specSize();
       assert(deAliased.rows() == specSize);

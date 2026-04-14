@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland D of horizontal cylindrical laplacian projector but 0 mode is zeroed
  */
 
-// External includes
+// System includes
 //
 #include <cassert>
 

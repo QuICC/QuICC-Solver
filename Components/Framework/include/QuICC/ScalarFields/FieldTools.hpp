@@ -134,7 +134,7 @@ namespace Datatypes {
    template <typename T, template <typename> class TField> void FieldTools::negative(TField<T>& rRhs)
    {
       Profiler::RegionFixture<3> fix("FieldTools::negative");
-      rRhs.rData() = -rRhs.data();
+      rRhs.setNegData(rRhs.data());
    }
 
 }

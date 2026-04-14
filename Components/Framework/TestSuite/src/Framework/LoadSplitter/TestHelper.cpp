@@ -15,6 +15,9 @@
 //
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/TestSuite/Framework/LoadSplitter/TestHelper.hpp"
+#include "QuICC/ScalarFields/ScalarFieldSetup.hpp"
+#include "Memory/MemoryResource.hpp"
+#include "Memory/Cpu/NewDelete.hpp"
 
 namespace QuICC {
 
@@ -156,6 +159,11 @@ namespace LoadSplitter {
       // Check reference data exists
       CHECK( ref.size() > 0 );
 
+      auto metaFwd = tRes.viewMeta(QuICC::Dimensions::Data::DATF1D);
+      auto metaBwd = tRes.viewMeta(QuICC::Dimensions::Data::DATB1D);
+      auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+      Datatypes::ScalarFieldSetup bwdSetup(metaBwd, mem);
+
       if(ref.size() > 0)
       {
          // Check 1D sizes
@@ -178,6 +186,29 @@ namespace LoadSplitter {
          {
             INFO( "Checking number of 3D modes" );
             CHECK( ref.at(2) == tRes.dim<QuICC::Dimensions::Data::DAT3D>() );
+
+            // Count meta layers
+            std::size_t szeFwd = 0;
+            for(std::size_t i = 0; i < metaFwd->ptr2D.size()-1; i++)
+            {
+               if(metaFwd->ptr2D.at(i+1) > metaFwd->ptr2D.at(i))
+               {
+                  szeFwd++;
+               }
+            }
+            CHECK( static_cast<uint32_t>(ref.at(2)) == szeFwd );
+            std::size_t szeBwd = 0;
+            for(std::size_t i = 0; i < metaBwd->ptr2D.size()-1; i++)
+            {
+               if(metaBwd->ptr2D.at(i+1) > metaBwd->ptr2D.at(i))
+               {
+                  szeBwd++;
+               }
+            }
+            CHECK( static_cast<uint32_t>(ref.at(2)) == szeBwd );
+
+            // Check ScalarFieldSetup
+            CHECK( ref.at(2) == bwdSetup.nBlock() );
          }
 
          // Check number of 2D modes per 3D mode
@@ -196,6 +227,19 @@ namespace LoadSplitter {
                INFO( "ref nJ = " << ref_nJ );
                INFO( "nJ = " << nJ );
                CHECK( ref_nJ == nJ );
+
+               // Check metadata
+               auto meta_nJ = metaFwd->ptr2D.at(k_ + 1) - metaFwd->ptr2D.at(k_);
+               INFO( "ref nJ = " << ref_nJ );
+               INFO( "meta_nJ = " << meta_nJ );
+               CHECK( static_cast<uint32_t>(ref_nJ) == meta_nJ );
+               meta_nJ = metaBwd->ptr2D.at(k_ + 1) - metaBwd->ptr2D.at(k_);
+               INFO( "ref nJ = " << ref_nJ );
+               INFO( "meta_nJ = " << meta_nJ );
+               CHECK( static_cast<uint32_t>(ref_nJ) == meta_nJ );
+
+               // Check ScalarFieldSetup
+               CHECK( ref_nJ == bwdSetup.blockCols(k) );
             }
          }
 
@@ -203,10 +247,14 @@ namespace LoadSplitter {
          auto h = 2 + 2*tRes.dim<QuICC::Dimensions::Data::DAT3D>() + 1;
          for(int k = 0; k < tRes.dim<QuICC::Dimensions::Data::DAT3D>(); k++)
          {
+            auto k_ = tRes.idx<QuICC::Dimensions::Data::DAT3D>(k);
+            std::cerr << " THIS IS K = " << k << std::endl;
             for(int j = 0; j < tRes.dim<QuICC::Dimensions::Data::DAT2D>(k); j++)
             {
                auto j_ = tRes.idx<QuICC::Dimensions::Data::DAT2D>(j, k);
                auto nI = tRes.dim<QuICC::Dimensions::Data::DATB1D>(j, k);
+               auto meta_j_ = metaBwd->idx2D.at(metaFwd->ptr2D.at(k_) + j);
+               auto meta_nI = metaBwd->dim1D.at(metaBwd->ptr2D.at(k_) + j);
                if(static_cast<std::size_t>(h) < ref.size())
                {
                   auto ref_j_ = ref.at(h);
@@ -217,6 +265,19 @@ namespace LoadSplitter {
                   INFO( "ref nI = " << ref_nI );
                   INFO( "nI = " << nI );
                   CHECK( ref_nI == nI );
+
+                  // Check metadata
+                  INFO( "ref j = " << ref_j_ );
+                  INFO( "meta_j = " << meta_j_ );
+                  CHECK( static_cast<uint32_t>(ref_j_) == meta_j_ );
+                  INFO( "ref nI = " << ref_nI );
+                  INFO( "meta_nI = " << meta_nI );
+                  CHECK( static_cast<uint32_t>(ref_nI) == meta_nI );
+
+                  // Check ScalarFieldSetup
+                  INFO( "k = " << k );
+                  INFO( "k_ = " << k_ );
+                  CHECK( ref_nI <= bwdSetup.blockRows(k) );
                }
                else
                {

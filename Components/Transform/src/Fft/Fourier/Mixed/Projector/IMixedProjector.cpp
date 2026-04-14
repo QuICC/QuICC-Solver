@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Mixed/Projector/IMixedProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Mixed/Projector/IMixedProjector.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -32,20 +26,12 @@ namespace Mixed {
 
 namespace Projector {
 
-   IMixedProjector::IMixedProjector()
-   {
-   }
-
-   IMixedProjector::~IMixedProjector()
-   {
-   }
-
    void IMixedProjector::initBackend() const
    {
       this->mBackend.init(*this->mspSetup);
    }
 
-   void IMixedProjector::transform(Matrix& rOut, const MatrixZ& in) const
+   void IMixedProjector::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<2> fix("IMixedProjector::transform");
 
@@ -59,17 +45,17 @@ namespace Projector {
       this->mBackend.applyFft(rOut, tmp);
    }
 
-   void IMixedProjector::transform(Matrix&, const Matrix&) const
+   void IMixedProjector::transform(Eigen::Ref<Matrix>, const Eigen::Ref<const Matrix>&) const
    {
       throw std::logic_error("Data is not compatible with Mixed FFT projector");
    }
 
-   void IMixedProjector::transform(MatrixZ&, const MatrixZ&) const
+   void IMixedProjector::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const MatrixZ>&) const
    {
       throw std::logic_error("Data is not compatible with Mixed FFT projector");
    }
 
-   void IMixedProjector::transform(MatrixZ&, const Matrix&) const
+   void IMixedProjector::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const Matrix>&) const
    {
       throw std::logic_error("Data is not compatible with Mixed FFT projector");
    }

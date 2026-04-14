@@ -53,26 +53,26 @@ void DivY1D1<base_t>::initBackend() const
    this->mBackend.addSolver();
 }
 
-void DivY1D1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+void DivY1D1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
 {
    this->mBackend.input(tmp, in, 1);
 
    this->mBackend.getSolution(tmp, 1);
 }
 
-void DivY1D1<base_t>::applyPostOperator(Matrix& rOut) const 
+void DivY1D1<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut) const 
 {
    this->mBackend.outputScale(rOut);
 }
 
-void DivY1D1<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void DivY1D1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, 1, useReal);
    this->mBackend.getSolution(tmp, 1);
 }
 
-void DivY1D1<base_t>::applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+void DivY1D1<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp,
    const bool useReal) const
 {
    this->mBackend.outputScale(rOut, tmp, useReal);

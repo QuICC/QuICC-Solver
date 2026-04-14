@@ -49,23 +49,23 @@ namespace Transform {
       }
    }                                                 
 
-   void ShellChebyshevTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void ShellChebyshevTransform::forward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
-   void ShellChebyshevTransform::backward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void ShellChebyshevTransform::backward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
-   void ShellChebyshevTransform::reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id)
+   void ShellChebyshevTransform::reduce(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
    // overload for the anelastic case
-   void ShellChebyshevTransform::reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF)
+   void ShellChebyshevTransform::reduce(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF)
    {
       // Cast the generic profile to the specific type needed
       auto specificProfile = std::dynamic_pointer_cast<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>(pF);
@@ -73,55 +73,6 @@ namespace Transform {
          throw std::runtime_error("Invalid profile type passed to reduce");
       }
       this->mImpl.transform(rOut, in, id, specificProfile);
-   }
-
-   //
-   // Disabled transforms
-   //
-
-   void ShellChebyshevTransform::forward(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ShellChebyshevTransform::forward(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ShellChebyshevTransform::forward(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ShellChebyshevTransform::backward(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ShellChebyshevTransform::backward(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ShellChebyshevTransform::backward(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ShellChebyshevTransform::reduce(MatrixZ&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ShellChebyshevTransform::reduce(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void ShellChebyshevTransform::reduce(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
    }
 
    MHDFloat ShellChebyshevTransform::requiredStorage() const

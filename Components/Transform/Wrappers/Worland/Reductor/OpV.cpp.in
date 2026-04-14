@@ -144,7 +144,7 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal
     @SetRadialView@
 }
 
-void @Op@<@Tag@>::applyOperators(Matrix& rOut, const MatrixZ& in) const
+void @Op@<@Tag@>::applyOperators(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
 {
     Profiler::RegionFixture<2> fix("@Op@<@Tag@>::applyOperators");
 
@@ -197,7 +197,7 @@ void @Op@<@Tag@>::makeOperator(Matrix& op, Matrix& eop, const Internal::Array& i
     throw std::logic_error("view Worland operator should never call this");
 }
 
-void @Op@<@Tag@>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+void @Op@<@Tag@>::applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
 {
     throw std::logic_error("view Worland operator should never call this");
 }

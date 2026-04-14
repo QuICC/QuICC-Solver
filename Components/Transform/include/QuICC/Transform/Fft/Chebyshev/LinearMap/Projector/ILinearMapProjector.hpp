@@ -49,7 +49,7 @@ public:
     * @param rOut Output values
     * @param in   Input values
     */
-   virtual void transform(MatrixZ& rOut, const MatrixZ& in) const override;
+   virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
    /**
     * @brief Compute transform R2R
@@ -57,7 +57,7 @@ public:
     * @param rOut Output values
     * @param in   Input values
     */
-   virtual void transform(Matrix& rOut, const Matrix& in) const override;
+   virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const override;
 
    /**
     * @brief Rows of output data
@@ -92,14 +92,14 @@ private:
     * @param tmp  Temporary padded modal values
     * @param in   Input values
     */
-   virtual void applyPreOperator(Matrix& tmp, const Matrix& in) const = 0;
+   virtual void applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const = 0;
 
    /**
     * @brief Apply post FFT operator
     *
     * @param rOut Output values
     */
-   virtual void applyPostOperator(Matrix& rOut) const = 0;
+   virtual void applyPostOperator(Eigen::Ref<Matrix> rOut) const = 0;
 
    /**
     * @brief Apply pre FFT operator for component wise operations
@@ -108,7 +108,7 @@ private:
     * @param in Input values
     * @param useReal 1 -> extract real part, 0 -> extract im part
     */
-   virtual void applyPreOperator(Matrix& tmp, const MatrixZ& in,
+   virtual void applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
       const bool useReal) const = 0;
 
    /**
@@ -116,7 +116,7 @@ private:
     *
     * @param rOut Output values
     */
-   virtual void applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+   virtual void applyPostOperator(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp,
       const bool useReal) const = 0;
 
    /**
@@ -125,7 +125,7 @@ private:
     * @param rOut Output values
     * @param in   Input values
     */
-   virtual void transform(MatrixZ& rOut, const Matrix& in) const override;
+   virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in) const override;
 
    /**
     * @brief Compute transform C2R (disabled)
@@ -133,7 +133,7 @@ private:
     * @param rOut Output values
     * @param in   Input values
     */
-   virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
+   virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 };
 
 } // namespace Projector

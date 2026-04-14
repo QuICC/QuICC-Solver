@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_COMPLEXPROJECTOR_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_COMPLEXPROJECTOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -51,7 +42,7 @@ namespace Backend {
          /**
           * @brief Destructor
           */
-         ~ComplexProjector();
+         ~ComplexProjector() = default;
 
          /**
           * @brief Initialise the FFT transforms
@@ -86,7 +77,7 @@ namespace Backend {
          /**
           * @brief Apply FFT
           */
-         void applyFft(MatrixZ& phys, const MatrixZ& mods) const;
+         void applyFft(Eigen::Ref<MatrixZ> phys, const Eigen::Ref<const MatrixZ>& mods) const;
 
          /**
           * @brief Get the memory requirements
