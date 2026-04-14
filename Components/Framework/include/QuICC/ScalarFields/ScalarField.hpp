@@ -26,10 +26,13 @@ namespace Selector {
       using ScalarField = QuICC::Datatypes::ViewScalarField<TData>;
 #else
    /// Template typedef for scalar field implementation
+   #ifdef QUICC_USE_VIEW_SCALARFIELD
    template <typename TData>
       using ScalarField = QuICC::Datatypes::ViewScalarField<TData>;
-   //template <typename TData>
-   //   using ScalarField = QuICC::Datatypes::FlatScalarField<TData>;
+   #else
+   template <typename TData>
+      using ScalarField = QuICC::Datatypes::FlatScalarField<TData>;
+   #endif //QUICC_USE_VIEW_SCALARFIELD
 #endif
 
    /// Template typedef for shared scalar field implementation
