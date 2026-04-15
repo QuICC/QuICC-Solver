@@ -231,34 +231,33 @@ void implPerm120(View::View<Tout, View::S1CLCSC3D>& out,
 /// @tparam Tin
 /// @param out
 /// @param in
-template <class Tout, class Tin>
+   template <class Tout, class Tin>
 void implPerm021(View::View<Tout, View::DCCSC3D>& out,
-   const View::View<Tin, View::DCCSC3D>& in)
+      const View::View<Tin, View::DCCSC3D>& in)
 {
    // dense transpose
    assert(out.size() == in.size()); // data should match
-   // perm = [0, 2, 1]
+                                    // perm = [0, 2, 1]
    assert(in.dims()[0] == out.dims()[0]);
    assert(in.dims()[1] == out.dims()[2]);
    assert(in.dims()[2] == out.dims()[1]);
    auto I = in.dims()[0];
    auto J = in.dims()[1];
    auto K = in.dims()[2];
-   std::size_t modes = in.size()/I;
-   std::vector<std::size_t> locKJ(modes, 0);
 
+   auto pointers = in.pointers()[1];
+   auto indices = in.indices()[1];
 
-   for (std::size_t kk = 0; kk < modes; ++kk)
+   std::size_t itCoo = 0;
+   for (std::size_t ptr = 0; ptr < pointers.size() - 1; ++ptr)
    {
-      std::size_t jk = kk*I;
-      std::size_t kj = locKJ.at(kk)*I;
-      for (std::size_t i = 0; i < I; ++i)
+      for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1]; ++idx)
       {
-         std::size_t ijk = i + jk;
-         std::size_t ikj = i + kj;
-         assert(ijk < in.size());
-         assert(ikj < out.size());
-         out[ikj] = in[ijk];
+         for (std::size_t i = 0; i < in.lds(); ++i)
+         {
+            out(i, ptr, indices[idx]) = in[itCoo];
+            itCoo++;
+         }
       }
    }
 }

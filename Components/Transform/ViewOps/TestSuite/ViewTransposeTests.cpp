@@ -2,6 +2,7 @@
 #include <catch2/catch.hpp>
 
 #include "ViewOps/Transpose/OpGrouped.hpp"
+#include "ViewOps/ViewIndexUtils.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 
 using namespace QuICC::Memory;
@@ -260,7 +261,7 @@ TEST_CASE("Serial DCCSC3D to S1CLCSC3D 120", "SerialDCCSC3DtoS1CLCSC3D120")
    }
 }
 
-TEST_CASE("Serial DCCSC3D to DCCSC3D 021", "[SerialDCCSC3DtoDCCSC3D021]")
+TEST_CASE("Serial DCCSC3D l-ordering to DCCSC3D m-ordering", "[SerialDCCSC3DltoDCCSC3Dm]")
 {
    // JW out -> JW out m-ordering
    // Full data and type
@@ -283,6 +284,9 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 021", "[SerialDCCSC3DtoDCCSC3D021]")
       /*m3*/ 11, 14,
       /*m3*/ 16, 18
    };
+   ptrAndIdx metaIn;
+   metaIn.ptr = {0, 1, 3, 6, 9};
+   metaIn.idx = {0, 0, 1, 0, 1, 2, 0, 1, 2};
 
    // perm = [0 2 1] -> N M K
    std::array<double, S> dataRef = {
@@ -296,6 +300,9 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 021", "[SerialDCCSC3DtoDCCSC3D021]")
       /*k2*/ 15, 17,
       /*k2*/ 16, 18,
    };
+   ptrAndIdx metaOut;
+   metaOut.ptr = {0, 4, 7, 9};
+   metaOut.idx = {0, 1, 2, 3, 1, 2, 3, 2, 3};
    // clang-format on
 
    std::array<double, S> dataOut;
@@ -304,16 +311,16 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 021", "[SerialDCCSC3DtoDCCSC3D021]")
    constexpr std::uint32_t rank = 3;
    std::array<std::uint32_t, rank> dimensionsIn{N, K, M};
    std::array<std::uint32_t, rank> dimensionsOut{N, M, K};
-   // skip setting up pointers and indices
-   // they are not used in the serial aka dense tranpose
-   std::array<std::vector<std::uint32_t>, rank> pointers = {{{}, {}, {}}};
-   std::array<std::vector<std::uint32_t>, rank> indices = {{{}, {}, {}}};
+   std::array<std::vector<std::uint32_t>, rank> pointersIn = {{{}, metaIn.ptr, {}}};
+   std::array<std::vector<std::uint32_t>, rank> indicesIn = {{{}, metaIn.idx, {}}};
+   std::array<std::vector<std::uint32_t>, rank> pointersOut = {{{}, metaOut.ptr, {}}};
+   std::array<std::vector<std::uint32_t>, rank> indicesOut = {{{}, metaOut.idx, {}}};
    using inTy = DCCSC3D;
    using outTy = DCCSC3D;
    using VinTy = View<double, inTy>;
    using VoutTy = View<double, outTy>;
-   VinTy viewIn(dataIn, dimensionsIn, pointers, indices);
-   VoutTy viewOut(dataOut, dimensionsOut, pointers, indices);
+   VinTy viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
+   VoutTy viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
    // Transpose op
    using namespace QuICC::Transpose::Cpu;
    using namespace QuICC::Transpose;
@@ -327,6 +334,85 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 021", "[SerialDCCSC3DtoDCCSC3D021]")
    // check
    for (std::uint64_t s = 0; s < S; ++s)
    {
+      INFO( "s = " << s );
+      CHECK(dataRef[s] == viewOut[s]);
+   }
+}
+
+TEST_CASE("Serial DCCSC3D m-ordering to DCCSC3D l-ordering", "[SerialDCCSC3DmtoDCCSC3Dl]")
+{
+   // JW out m-ordering -> JW out
+   // Full data and type
+   constexpr size_t M = 4;
+   constexpr size_t N = 2;
+   constexpr size_t K = 3;
+
+   constexpr size_t S = (M + (M - 1) + (M - 2)) * N;
+
+   // clang-format off
+   // N M K
+   std::array<double, S> dataIn = {
+      /*k0*/ 1, 5,
+      /*k0*/ 2, 6,
+      /*k0*/ 3, 7,
+      /*k0*/ 4, 8,
+      /*k1*/ 9, 12,
+      /*k1*/ 10, 13,
+      /*k1*/ 11, 14,
+      /*k2*/ 15, 17,
+      /*k2*/ 16, 18,
+   };
+   ptrAndIdx metaIn;
+   metaIn.ptr = {0, 4, 7, 9};
+   metaIn.idx = {0, 1, 2, 3, 1, 2, 3, 2, 3};
+
+   // perm = [0 2 1] -> N K M
+   std::array<double, S> dataRef = {
+      /*m0*/ 1, 5,
+      /*m1*/ 2, 6,
+      /*m1*/ 9, 12,
+      /*m2*/ 3, 7,
+      /*m2*/ 10, 13,
+      /*m2*/ 15, 17,
+      /*m3*/ 4, 8,
+      /*m3*/ 11, 14,
+      /*m3*/ 16, 18
+   };
+   ptrAndIdx metaOut;
+   metaOut.ptr = {0, 1, 3, 6, 9};
+   metaOut.idx = {0, 0, 1, 0, 1, 2, 0, 1, 2};
+   // clang-format on
+
+   std::array<double, S> dataOut;
+
+   // view
+   constexpr std::uint32_t rank = 3;
+   std::array<std::uint32_t, rank> dimensionsIn{N, M, K};
+   std::array<std::uint32_t, rank> dimensionsOut{N, K, M};
+   std::array<std::vector<std::uint32_t>, rank> pointersIn = {{{}, metaIn.ptr, {}}};
+   std::array<std::vector<std::uint32_t>, rank> indicesIn = {{{}, metaIn.idx, {}}};
+   std::array<std::vector<std::uint32_t>, rank> pointersOut = {{{}, metaOut.ptr, {}}};
+   std::array<std::vector<std::uint32_t>, rank> indicesOut = {{{}, metaOut.idx, {}}};
+   using inTy = DCCSC3D;
+   using outTy = DCCSC3D;
+   using VinTy = View<double, inTy>;
+   using VoutTy = View<double, outTy>;
+   VinTy viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
+   VoutTy viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
+   // Transpose op
+   using namespace QuICC::Transpose::Cpu;
+   using namespace QuICC::Transpose;
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p021_t>>();
+   // Pack views
+   std::vector<VoutTy> viewsOut = {viewOut};
+   std::vector<VinTy> viewsIn = {viewIn};
+   // Apply transpose
+   transposeOp->apply(viewsOut, viewsIn);
+   // check
+   for (std::uint64_t s = 0; s < S; ++s)
+   {
+      INFO( "s = " << s );
       CHECK(dataRef[s] == viewOut[s]);
    }
 }
