@@ -1186,3 +1186,146 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120",
       CHECK(dataOut[s] == dataOutRef[s]);
    }
 }
+
+TEST_CASE("Mpi DCCSC3D l-ordering to DCCSC3D m-ordering", "MpiDCCSC3DltoDCCSC3Dm")
+{
+   int rank, ranks;
+   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+   MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+
+   assert(ranks == 1 || ranks == 4);
+
+   // JW l-ordering -> JW m-ordering
+   // Full data and type
+   constexpr size_t M = 4;
+   constexpr size_t N = 2;
+   constexpr size_t K = 2;
+
+   // view
+   constexpr std::uint32_t vRank = 3;
+   std::array<std::uint32_t, vRank> dimensionsIn{M, N, K};
+   std::array<std::uint32_t, vRank> dimensionsOut{K, M, N};
+
+   std::vector<double> dataIn;
+   std::vector<double> dataOut;
+   std::vector<double> dataOutRef;
+   ptrAndIdx metaIn;
+   ptrAndIdx metaOut;
+
+   using inTy = DCCSC3D;
+   using outTy = DCCSC3D;
+
+   // Setup ref data and input data
+   using namespace QuICC::Transpose::Mpi;
+   using namespace QuICC::Transpose;
+   if (rank == 0 && ranks == 1)
+   {
+      constexpr size_t S = M * N * K;
+      // clang-format off
+      dataIn = {
+         /*k0*/ 1, 2, 3, 4,
+         /*k0*/ 5, 6, 7, 8,
+         /*k1*/ 9, 10, 11, 12,
+         /*k1*/ 13, 14, 15, 16};
+      // clang-format on
+
+      // perm = [1 2 0] -> K M N
+      dataOut.resize(S);
+
+      // Populate meta for fully populated tensor
+      // AL space (Stage::PPM and Stage::MPM)
+      metaIn = Index::densePtrAndIdx<inTy>(dimensionsIn);
+      // Populate meta for fully populated tensor
+      // Physical space (Stage::PPP and Stage::MPP)
+      metaOut = Index::densePtrAndIdx<outTy>(dimensionsOut);
+   }
+   else if (ranks == 4)
+   {
+      std::string path = "_refdata/Framework/LoadSplitter/WLFl/";
+      std::string dist = "Tubular";
+      std::string id = "103";
+      auto setup = readDimsAndMeta(path, dist, id);
+
+      dimensionsIn = {setup.physDims[1], setup.physDims[0], setup.modsDims[2]};
+      dimensionsOut = {setup.modsDims[2], setup.physDims[1], setup.physDims[0]};
+
+      metaIn.ptr = setup.metaAL.ptr;
+      metaIn.idx = setup.metaAL.idx;
+      auto sizeIn = getDataSize<inTy>(dimensionsIn, metaIn);
+      dataIn.resize(sizeIn);
+      // perm = [1 2 0] LNM -> MLN
+      metaOut.ptr = setup.metaFT.ptr;
+      metaOut.idx = setup.metaFT.idx;
+      auto sizeOut = getDataSize<outTy>(dimensionsOut, metaOut);
+      dataOut.resize(sizeOut);
+      dataOutRef.resize(sizeOut);
+   }
+
+   // Set meta
+   std::array<std::vector<std::uint32_t>, vRank> pointersIn = {
+      {{}, metaIn.ptr, {}}};
+   std::array<std::vector<std::uint32_t>, vRank> indicesIn = {
+      {{}, metaIn.idx, {}}};
+   std::array<std::vector<std::uint32_t>, vRank> pointersOut = {
+      {{}, metaOut.ptr, {}}};
+   std::array<std::vector<std::uint32_t>, vRank> indicesOut = {
+      {{}, metaOut.idx, {}}};
+
+   using VinTy = View<double, inTy>;
+   using VoutTy = View<double, outTy>;
+   VinTy viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
+   VoutTy viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
+
+   // Setup ref data and input data
+   using namespace QuICC::Transpose::Mpi;
+   using namespace QuICC::Transpose;
+   if (ranks > 1)
+   {
+      auto cooOld = ::QuICC::View::getCoo<VinTy, p012_t>(viewIn);
+      double shift = 2048;
+      for (std::size_t i = 0; i < cooOld.size(); ++i)
+      {
+         dataIn[i] = cooOld[i][0] + cooOld[i][1] * shift + cooOld[i][2] / shift;
+      }
+      auto cooNew = ::QuICC::View::getCoo<VoutTy, p120_t>(viewOut);
+      for (std::size_t i = 0; i < cooNew.size(); ++i)
+      {
+         dataOutRef[i] =
+            cooNew[i][0] + cooNew[i][1] * shift + cooNew[i][2] / shift;
+      }
+   }
+
+   // Transpose op
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>(mem);
+   // Pack views
+   std::vector<VoutTy> viewsOut = {viewOut};
+   std::vector<VinTy> viewsIn = {viewIn};
+   // Apply transpose
+   transposeOp->apply(viewsOut, viewsIn);
+
+   // check
+   if (ranks == 1)
+   {
+      for (std::uint64_t k = 0; k < K; ++k)
+      {
+         for (std::uint64_t n = 0; n < N; ++n)
+         {
+            for (std::uint64_t m = 0; m < M; ++m)
+            {
+               auto mnk = m + n * M + k * M * N;
+               auto kmn = k + m * K + n * K * M;
+               CHECK(viewIn[mnk] == viewOut[kmn]);
+            }
+         }
+      }
+   }
+   else
+   {
+      for (std::size_t i = 0; i < dataOutRef.size(); ++i)
+      {
+         CHECK(dataOut[i] == dataOutRef[i]);
+      }
+   }
+}
