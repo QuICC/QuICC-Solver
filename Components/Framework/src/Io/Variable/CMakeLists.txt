@@ -64,6 +64,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   SphereScalarNSpectrumWriter.cpp
   SphereScalarRSpectrumWriter.cpp
   SphereTorPolEnergyWriter.cpp
+  SphereTorPolNScalarSpectrumWriter.cpp
   SphereTorPolLSpectrumWriter.cpp
   SphereTorPolMSpectrumWriter.cpp
   SphereTorPolModeSpectrumWriter.cpp

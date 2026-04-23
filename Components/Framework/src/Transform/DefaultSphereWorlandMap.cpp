@@ -54,6 +54,7 @@
 #include "QuICC/Transform/Poly/Worland/Reductor/PowerD1R1.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/PowerR2.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/PowerSLaplR2.hpp"
+#include "QuICC/Transform/Poly/Worland/Reductor/Spectrum.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/RadialPower.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/RadialPowerDivR1.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/RadialPowerDivR1D1R1.hpp"
@@ -65,6 +66,7 @@
 #include "QuICC/Transform/Reductor/PowerD1R1.hpp"
 #include "QuICC/Transform/Reductor/PowerR2.hpp"
 #include "QuICC/Transform/Reductor/PowerSlaplR2.hpp"
+#include "QuICC/Transform/Reductor/Spectrum.hpp"
 #include "QuICC/Transform/Reductor/RadialPower.hpp"
 #include "QuICC/Transform/Reductor/RadialPowerOverr1.hpp"
 #include "QuICC/Transform/Reductor/RadialPowerOverr1D1R1.hpp"
@@ -136,6 +138,8 @@ void DefaultSphereWorlandMap::operator()(MapType& m) const
       Reductor::PowerR2::id());
    this->addOperator<Poly::Worland::Reductor::Power<backend_t>>(m,
       Reductor::Power::id());
+   this->addOperator<Poly::Worland::Reductor::Spectrum<backend_t>>(m,
+      Reductor::Spectrum::id());
    this->addOperator<Poly::Worland::Reductor::RadialPower<backend_t>>(m,
       Reductor::RadialPower::id());
    this->addOperator<Poly::Worland::Reductor::RadialPowerDivR1<backend_t>>(m,

@@ -4,19 +4,22 @@ if(TARGET QuICC::Cuda)
     list(APPEND Backends "Gpu")
 endif()
 
-set(Kinds "Power;Energy;Radial")
+set(Kinds "Power;Energy;Radial;Spectrum")
 
 set(PowerOps "Power;PowerR2;PowerD1R1;PowerSLaplR2")
 set(EnergyOps "Energy;EnergyR2;EnergyD1R1;EnergySLaplR2")
 set(RadialOps "RadialPower;RadialPowerDivR1;RadialPowerDivR1D1R1")
+set(SpectrumOps "Spectrum")
 
 set(PowerOpAttribute "CSL3D")
 set(EnergyOpAttribute "CSL3D")
 set(RadialOpAttribute "CSL3D")
+set(SpectrumOpAttribute "CSL3D")
 
 set(PowerRedType "mods")
 set(EnergyRedType "mods")
 set(RadialRedType "phys")
+set(SpectrumRedType "mods")
 
 set(PowerSizeRow "this->mspSetup->fastSize(0);")
 set(PowerSizeCol "this->mspSetup->blockSize();")
@@ -24,6 +27,8 @@ set(EnergySizeRow "this->mspSetup->blockSize();")
 set(EnergySizeCol "1;")
 set(RadialSizeRow "this->mspSetup->fwdSize();")
 set(RadialSizeCol "this->mspSetup->blockSize();")
+set(SpectrumSizeRow "this->mspSetup->fastSize(0);")
+set(SpectrumSizeCol "this->mspSetup->blockSize();")
 
 # Integrator operator
 set(IntOp
@@ -139,6 +144,12 @@ set(RadialCpuSetPowerView
     mPhysAbsView = physAbs_t(mPhysAbsFlat.data(), mPhysAbsFlat.size(), physDims.data(), dataPointers, dataIndices);
 ")
 
+set(SpectrumCpuSetPowerView
+"
+    mModsAbsFlat.resize(inFlatSize);
+    mModsAbsView = modsAbs_t(mModsAbsFlat.data(), mModsAbsFlat.size(), modsDims.data(), dataPointers, dataIndices);
+")
+
 set(GpuSetDataViews
 "
     // alloc device memory
@@ -218,6 +229,17 @@ set(RadialGpuSetPowerView
     mPhysAbsView = physAbs_t(mPhysAbsFlat_d.data(), mPhysAbsFlat_d.size(), physDims.data(), dataPointers_d, dataIndices_d);
 ")
 
+set(SpectrumGpuSetPowerView
+"
+    mModsAbsFlat.resize(inFlatSize);
+
+    // alloc device mem
+    mModsAbsFlat_d = std::move(QuICC::Memory::MemBlock<double>(mModsAbsFlat.size(), mem.get()));
+
+    // set device views
+    mModsAbsView = modsAbs_t(mModsAbsFlat_d.data(), mModsAbsFlat_d.size(), modsDims.data(), dataPointers_d, dataIndices_d);
+")
+
 set(PowerCompTree
 "
     /// project to modal space
@@ -240,6 +262,14 @@ set(RadialCompTree
 "
     /// pointwise op on grid points
     mPnt->apply(mPhysAbsView, mPhysView);
+")
+
+set(SpectrumCompTree
+"
+    /// project to modal space
+    //mInt->apply(mModsView, mPhysView);
+    /// pointwise op on coefficients
+    mPnt->apply(mModsAbsView, mModsView);
 ")
 
 set(PowerViewToEigen
@@ -321,6 +351,40 @@ set(RadialViewToEigen
 "
 )
 
+set(SpectrumViewToEigen
+"
+    assert(static_cast<std::size_t>(rOut.rows()) == mModsAbsView.dims()[0]);
+    assert(static_cast<std::size_t>(rOut.cols()) == mModsAbsView.indices()[1].size());
+
+    start = 0;
+    offSet = 0;
+    for(std::uint32_t p = 0; p < nLayers; p++)
+    {
+        int cols = this->mspSetup->mult(p);
+        int outRows = this->mspSetup->fastSize(p);
+
+        Eigen::Ref<Matrix> outB = rOut.block(0, start, outRows, cols);
+
+        for (std::int64_t j = 0; j < outB.cols(); ++j)
+        {
+            for (std::int64_t i = 0; i < outB.rows(); ++i)
+            {
+            #ifdef QUICC_JW_ALL_ROW_MAJOR
+                // copy to padded from flattened column and transpose
+                outB.data()[i+j*rOut.rows()]= mModsAbsFlat[offSet + i*outB.cols()+j];
+                #else
+                // copy to padded from flattened column
+                outB.data()[i+j*rOut.rows()]= mModsAbsFlat[offSet + i+j*outB.rows()];
+                #endif
+            }
+        }
+
+        offSet += outB.size();
+        start += cols;
+    }
+"
+)
+
 set(GpuHostToDevice
 "
     cudaErrChk(cudaMemcpy(mModsFlat_d.data(), mModsFlat.data(),
@@ -349,6 +413,14 @@ set(GpuRadialDeviceToHost
     /// copy back
     cudaErrChk(cudaMemcpy(mPhysAbsFlat.data(), mPhysAbsFlat_d.data(),
         mPhysAbsFlat_d.size()*sizeof(double), cudaMemcpyDeviceToHost));
+"
+)
+
+set(GpuSpectrumDeviceToHost
+"
+    /// copy back
+    cudaErrChk(cudaMemcpy(mModsAbsFlat.data(), mModsAbsFlat_d.data(),
+        mModsAbsFlat_d.size()*sizeof(double), cudaMemcpyDeviceToHost));
 "
 )
 

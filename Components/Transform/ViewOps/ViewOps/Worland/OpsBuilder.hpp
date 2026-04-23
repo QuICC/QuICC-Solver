@@ -486,6 +486,15 @@ template <class VOP, class DIR> struct OpsBuilderMap<VOP, PowerSLaplR2_t, DIR>
    using type = OpsBuilder<VOP, EnergySLaplR2_t, DIR>;
 };
 
+/// @brief Spectrum Builder
+/// Same setup as Energy ops
+/// @tparam VOP operator view type
+/// @tparam DIR fwd_t or bwd_t
+template <class VOP, class DIR> struct OpsBuilderMap<VOP, Spectrum_t, DIR>
+{
+   using type = OpsBuilder<VOP, EnergyR2_t, DIR>;
+};
+
 /// @brief Helper for RadialPower
 /// It is needed in order to avoid having to pass
 /// extra parameters to energy integrators

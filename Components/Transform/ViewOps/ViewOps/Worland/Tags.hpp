@@ -185,6 +185,11 @@ struct PowerSLaplR2_t
 {
 };
 
+/// @brief Spectrum op type tag
+struct Spectrum_t
+{
+};
+
 /// @brief RadialPower op type tag
 struct RadialPower_t
 {
