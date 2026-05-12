@@ -17,6 +17,7 @@
 #include "TestSuite/DenseSM/Worland/DipolarS1.hpp"
 #include "TestSuite/DenseSM/Worland/QuadrupolarS2.hpp"
 #include "DenseSM/Worland/IWorlandOperator.hpp"
+#include "DenseSM/Worland/Stencil/IStencilOperator.hpp"
 #include "DenseSM/Worland/RadialTorPolFunction.hpp"
 #include "TestSuite/DenseSM/TesterBase.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
@@ -225,6 +226,27 @@ namespace Worland {
          }
 
          TOp op(nNr, nNc, q, lOut, mOut, lA, mA, lB, mB, pFa, pFb, alpha, dBeta);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_base_of_v<dsm::Stencil::IStencilOperator, TOp>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         if(meta.size() != 5)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
+         std::cerr << meta.transpose() << std::endl;
+
+         int nNr = meta(0);
+         int nNc = meta(1);
+         auto a = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         auto b = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+         auto l = static_cast<int>(meta(4));
+
+         TOp op(nNr, nNc, a, b, l);
 
          outData = op.mat();
       }

@@ -1,0 +1,50 @@
+/**
+ * @file @Operator@Test.cpp
+ * @brief Tests for the Worland @Operator@ DenseSM operator
+ */
+
+
+// System includes
+//
+#include <catch2/catch.hpp>
+#include <iostream>
+
+// Project includes
+//
+#include "TestSuite/DenseSM/Worland/TestArgs.hpp"
+#include "DenseSM/Worland/Stencil/@Operator@.hpp"
+#include "TestSuite/DenseSM/Worland/Tester.hpp"
+
+namespace currentts = ::QuICC::TestSuite::DenseSM::Worland;
+
+TEST_CASE( "Error for @Operator@ operator", "[@Operator@:@type@]" )
+{
+
+   // Set default arguments if required
+   if(currentts::args().useDefault)
+   {
+      currentts::args().params = {0,1,2,3};
+   }
+
+   Catch::StringMaker<double>::precision = 15;
+
+   // Set type
+   currentts::args().setType("@type@");
+
+   REQUIRE( currentts::args().params.size() > 0 );
+
+   typedef ::QuICC::DenseSM::Worland::Stencil::@Operator@ Operator;
+   typedef typename currentts::Tester<Operator> Tester;
+
+   Tester tester("@Operator@.dat", currentts::args().dumpData);
+   tester.setUlp(currentts::args().ulp);
+
+   Tester::ParameterType params = {-1};
+
+   for(auto id: currentts::args().params)
+   {
+      params.at(0) = id;
+      tester.validate(params, currentts::args().type, currentts::args().timeOnly);
+   
+   }
+}
