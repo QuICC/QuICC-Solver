@@ -389,3 +389,5 @@ set (_ids 301 303 305 307 309 311 313 315 317 319 321 323)
 run_iq_proj_tests("Elsasser projection, quadrupolar, fB" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
 
 list(POP_BACK CMAKE_MESSAGE_INDENT)
+
+add_subdirectory(Stencil)
