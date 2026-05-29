@@ -1,5 +1,5 @@
 /**
- * @file DivR1FD1R1.hpp.cpp
+ * @file DivR3FD2R1.cpp
  * @brief Source of the implementation of the spectral operator f/r
  */
 
@@ -12,17 +12,15 @@
 
 // Project includes
 //
-#include "DenseSM/Worland/DivR1FD1R1.hpp"
+#include "DenseSM/Worland/DivR3FD2R1.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Tags.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
+#include "QuICC/Polynomial/Worland/r_1WnlRecurrence.hpp"
+#include "QuICC/Polynomial/Worland/r_1dWnlRecurrence.hpp"
 #include "QuICC/Polynomial/Worland/r_1drWnlRecurrence.hpp"
 #include "Types/Internal/BasicTypes.hpp"
 #include "Types/Internal/Typedefs.hpp"
-//second attempt
-#include "QuICC/Polynomial/Worland/drWnl.hpp"
-#include "QuICC/Polynomial/Worland/r_1WnlRecurrence.hpp"
-
 
 namespace QuICC {
 
@@ -30,7 +28,7 @@ namespace DenseSM {
 
 namespace Worland {
 
-DivR1FD1R1::DivR1FD1R1(const int nNr, const int nNc, const int lOut,
+DivR3FD2R1::DivR3FD2R1(const int nNr, const int nNc, const int lOut,
    const int mOut, const int lF, const int mF, const int lIn, const int mIn,
    std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t alpha,
    const Scalar_t dBeta) :
@@ -38,7 +36,7 @@ DivR1FD1R1::DivR1FD1R1(const int nNr, const int nNc, const int lOut,
        dBeta)
 {}
 
-void DivR1FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
+void DivR3FD2R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
    namespace ev = Polynomial::Worland::Evaluator;
@@ -48,13 +46,31 @@ void DivR1FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    Internal::Array igrid, iweights;
    this->computeQuadrature(igrid, iweights, nR);
 
+   int lFm;
+   if(this->mLf==0)
+   {
+      lFm = 1;
+   }
+   else
+   {
+      lFm = this->mLf-1;
+   }
+
    Polynomial::Worland::Wnl W;
    Polynomial::Worland::r_1Wnl<Polynomial::Worland::recurrence_t> r_1W;
-   //Polynomial::Worland::r_1drWnl<Polynomial::Worland::recurrence_t> r_1drW;
-   Polynomial::Worland::drWnl drWnl;
+   Polynomial::Worland::r_1drWnl<Polynomial::Worland::recurrence_t> r_1drW;
+   Polynomial::Worland::r_1dWnl<Polynomial::Worland::recurrence_t> r_1dW;
 
    Internal::Matrix opBwd(igrid.size(), this->cols());
-   drWnl.compute<Internal::MHDFloat>(opBwd, this->cols(), this->mLin, igrid,
+   r_1drW.compute<Internal::MHDFloat>(opBwd, this->cols(), this->mLin, igrid,
+      Internal::Array(), ev::Set());
+   
+   Internal::Matrix opFwd(igrid.size(), this->cols());
+   W.compute<Internal::MHDFloat>(opFwd, this->cols(), this->mLin, igrid,
+      iweights, ev::Set());
+
+   Internal::Matrix opBwd1(igrid.size(), this->cols());
+   r_1dW.compute<Internal::MHDFloat>(opBwd1, this->cols(), this->mLin, igrid,
       Internal::Array(), ev::Set());
 
    Internal::Matrix opFFwd(igrid.size(), this->mpF->nN());
@@ -64,14 +80,24 @@ void DivR1FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    r_1W.compute<Internal::MHDFloat>(opFBwd, this->mpF->nN(), this->mLf, igrid,
       Internal::Array(), ev::Set());
 
-   Internal::Matrix opFwd(igrid.size(), this->rows());
-   W.compute<Internal::MHDFloat>(opFwd, this->rows(), this->mLout, igrid,
+   Internal::Matrix opFFwd1(igrid.size(), this->mpF->nN());
+   W.compute<Internal::MHDFloat>(opFFwd1, this->mpF->nN(), lFm, igrid,
+      iweights, ev::Set());
+   Internal::Matrix opFBwd1(igrid.size(), this->mpF->nN());
+   r_1W.compute<Internal::MHDFloat>(opFBwd1, this->mpF->nN(), lFm, igrid,
+      Internal::Array(), ev::Set());
+
+   Internal::Matrix opFwdOut(igrid.size(), this->rows());
+   W.compute<Internal::MHDFloat>(opFwdOut, this->rows(), this->mLout, igrid,
       iweights, ev::Set());
 
-   Internal::Array f = opFBwd * opFFwd.transpose() *
+   Internal::Array f = opFBwd1 * opFFwd1.transpose() *
+                       opFBwd * opFFwd.transpose() * 
                        this->mpF->evaluate(igrid, this->mLf, this->mMf);
 
-   mat = opFwd.transpose() * f.asDiagonal() * opBwd;
+   mat = opFwdOut.transpose() * f.asDiagonal() 
+            * opBwd1 
+            * (opFwd.transpose() * igrid.asDiagonal() * opBwd); 
 }
 
 } // namespace Worland

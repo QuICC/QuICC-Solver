@@ -51,6 +51,13 @@ public:
    template <typename TCondition> void addRow();
 
    /**
+    * @brief Add boundary tau row that depends on radial field (anelastic)
+    * 
+    * @param Fb   Boundary value of the radial field
+    */
+   template <typename TCondition> void addRow(const MHDFloat Fb);
+
+   /**
     * @brief Embed boundary tau row in bigger size
     *
     * @param n Truncation of BC row
@@ -94,6 +101,14 @@ private:
 template <typename TCondition> void Operator::addRow()
 {
    TCondition bc(this->mAlpha, this->mDBeta, this->mL);
+
+   auto val = bc.compute(this->cols() - 1);
+   this->mBcs.emplace_back(val);
+}
+
+template <typename TCondition> void Operator::addRow(const MHDFloat Fb)
+{
+   TCondition bc(this->mAlpha, this->mDBeta, this->mL, Fb);
 
    auto val = bc.compute(this->cols() - 1);
    this->mBcs.emplace_back(val);

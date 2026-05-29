@@ -6,5 +6,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   InsulatingSphere.cpp
   DivR1D1R1.cpp
   R1D1DivR1.cpp
+  StressFreePolAnelastic.cpp
+  StressFreeTorAnelastic.cpp
   Value.cpp
 )

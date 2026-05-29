@@ -128,6 +128,7 @@ set(_tests
   DivR2D1R1FC:dense
   DivR2FD1R1:dense
   DivR1FD1R1:dense
+  D1FD1:dense
   )
 set (_ids 0 1 2 3 4 5 6)
 set (_ulps 140 300 380 200 1900 720 290)
@@ -158,6 +159,7 @@ set(_tests
   DivR2D1R1FC:dense
   DivR2FD1R1:dense
   DivR1FD1R1:dense
+  D1FD1:dense
   )
 set (_min_qis 1 1 3 1 1 2 1 1)
 set (_ids 200 201 202 203 204 205 206 207 208 209)

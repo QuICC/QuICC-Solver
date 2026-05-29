@@ -1,5 +1,5 @@
 /**
- * @file FC.cpp
+ * @file FC2.cpp
  * @brief Source of the implementation of the spectral operator f(-lapl(*))
  */
 
@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "DenseSM/Worland/FC.hpp"
+#include "DenseSM/Worland/FC2.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Tags.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
@@ -27,7 +27,7 @@ namespace DenseSM {
 
 namespace Worland {
 
-FC::FC(const int nNr, const int nNc, const int lOut, const int mOut,
+FC2::FC2(const int nNr, const int nNc, const int lOut, const int mOut,
    const int lF, const int mF, const int lIn, const int mIn,
    std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t alpha,
    const Scalar_t dBeta) :
@@ -35,7 +35,7 @@ FC::FC(const int nNr, const int nNc, const int lOut, const int mOut,
        dBeta)
 {}
 
-void FC::buildOpImpl(Internal::Matrix& mat, const int rows,
+void FC2::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
    if (this->mpF->ls().size() != 1)
@@ -59,13 +59,17 @@ void FC::buildOpImpl(Internal::Matrix& mat, const int rows,
    opBwd = -opBwd;
 
    Polynomial::Worland::Wnl W;
-   Internal::Matrix opFwd(igrid.size(), this->rows());
-   W.compute<Internal::MHDFloat>(opFwd, opFwd.cols(), this->mLout, igrid,
+   Internal::Matrix opFwd(igrid.size(), this->cols());
+   W.compute<Internal::MHDFloat>(opFwd, opFwd.cols(), this->mLin, igrid,
+      iweights, ev::Set());
+
+   Internal::Matrix opFwdOut(igrid.size(), this->rows());
+   W.compute<Internal::MHDFloat>(opFwdOut, opFwdOut.cols(), this->mLout, igrid,
       iweights, ev::Set());
 
    auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
 
-   mat = opFwd.transpose() * f.asDiagonal() * opBwd;
+   mat = opFwdOut.transpose() * f.asDiagonal() * opBwd*  opFwd.transpose() *opBwd;
 }
 
 } // namespace Worland
