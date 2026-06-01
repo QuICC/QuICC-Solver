@@ -31,10 +31,10 @@ __global__ void pack(View::ViewBase<TDATA> buffer,
    const auto I = sendDisplsView.dims()[0];
    const auto J = sendDisplsView.dims()[1];
 
-   const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
-   const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
+   const std::size_t i = blockIdx.y * blockDim.x + threadIdx.x;
+   const std::size_t j = blockIdx.x * blockDim.y + threadIdx.y;
+   
    // const std::size_t g = blockIdx.z * blockDim.z + threadIdx.z;
-
    if (i < I)
    {
       int sendCount = sendCountsView[i] / groupSize;
@@ -62,7 +62,7 @@ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
    const auto I = sendDisplsView.dims()[0];
    const auto J = sendDisplsView.dims()[1];
    // const auto G = in.size();
-
+   
    // setup grid
    dim3 blockSize;
    dim3 numBlocks;
@@ -70,10 +70,11 @@ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
    blockSize.x = 16;
    blockSize.y = 32;
    blockSize.z = 1;
-   numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
-   numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
+   numBlocks.x = (J + blockSize.y - 1) / blockSize.y;
+   numBlocks.y = (I + blockSize.x - 1) / blockSize.x;
    numBlocks.z = 1;
 
+   
    assert(blockSize.x * blockSize.y <= QUICC_MAX_PACK_THREADS);
    __launch_bounds__(QUICC_MAX_PACK_THREADS);
    details::pack<TDATA><<<numBlocks, blockSize>>>(buffer, in, sendCountsView,
@@ -95,8 +96,8 @@ __global__ void unPack(structArray<TDATA*, SIZE> out,
    const auto I = recvDisplsView.dims()[0];
    const auto J = recvDisplsView.dims()[1];
 
-   const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
-   const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
+   const std::size_t i = blockIdx.y * blockDim.x + threadIdx.x;
+   const std::size_t j = blockIdx.x * blockDim.y + threadIdx.y;
    // const std::size_t g = blockIdx.z * blockDim.z + threadIdx.z;
 
    if (i < I)
@@ -134,8 +135,8 @@ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
    blockSize.x = 16;
    blockSize.y = 32;
    blockSize.z = 1;
-   numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
-   numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
+   numBlocks.x = (J + blockSize.y - 1) / blockSize.y;
+   numBlocks.y = (I + blockSize.x - 1) / blockSize.x;
    numBlocks.z = 1;
 
    assert(blockSize.x * blockSize.y <= QUICC_MAX_PACK_THREADS);

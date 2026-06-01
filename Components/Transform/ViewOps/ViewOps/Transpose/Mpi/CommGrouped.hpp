@@ -342,13 +342,14 @@ void CommGrouped<TDATA, TAG>::exchange(structArray<TDATA*, SIZE>& out,
       }
       else if constexpr (std::is_same_v<TAG, alltoallv_t>)
       {
-         /*details::mpiAssert(MPI_Alltoallv(_sendBufferView.data(),
+         details::mpiAssert(MPI_Alltoallv(_sendBufferView.data(),
             _sendCounts.data(), _sendBufferDispls.data(),
             Environment::MpiTypes::type<TDATA>(), _recvBufferView.data(),
             _recvCounts.data(), _recvBufferDispls.data(),
-            Environment::MpiTypes::type<TDATA>(), _subComm));*/
+            Environment::MpiTypes::type<TDATA>(), _subComm));
 
-         if (_nSubComm > 4) // need a better way to differentiate the theta-phi transpose from radial-theta
+         /* if (_nSubComm > 4) // need a better way to differentiate the
+                                 // theta-phi transpose from radial-theta
          {
             const int window = 4; 
             int rank;
@@ -490,7 +491,7 @@ void CommGrouped<TDATA, TAG>::exchange(structArray<TDATA*, SIZE>& out,
                MPI_Waitall((int)reqs.size(), reqs.data(), MPI_STATUSES_IGNORE);
             }
             cudaDeviceSynchronize();
-         }
+         }*/
          /* MPI_Request reqs[2];
          int rank;
          MPI_Comm_rank(_subComm, &rank);
