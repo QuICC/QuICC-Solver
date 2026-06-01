@@ -27,7 +27,7 @@ function(quicc_fetch_repository name)
 
   set(_path "${QFR_TYPE}s")
 
-  set(_git_branch "${QUICC_${_type}_GIT_BRANCH}}")
+  set(_git_branch "${QUICC_${_type}_GIT_BRANCH}")
   include(FetchContent)
 
   include(SubDirList)
