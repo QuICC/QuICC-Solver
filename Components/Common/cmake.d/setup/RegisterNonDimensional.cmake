@@ -4,6 +4,7 @@ set(excluded
 
 set(tags
   Alpha
+  AspectRatio
   Beta
   CflAlfvenDamping
   CflAlfvenScale

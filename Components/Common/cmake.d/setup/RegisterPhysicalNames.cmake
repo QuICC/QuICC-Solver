@@ -13,6 +13,7 @@ set(tags
   FluctVelocityX
   FluctVelocityY
   FluctVelocityZ
+  KVelocity
   Magnetic
   MagneticX
   MagneticY
