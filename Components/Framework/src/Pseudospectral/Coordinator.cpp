@@ -239,6 +239,14 @@ void Coordinator::evolveAfterPrognostic(const bool finishedStep)
 
    this->evolveEndIteration(tIt);
 
+   // Post-solve pseudospectral pass for it<0 equations (e.g. K·u(t+dt) for energy).
+   // Fires after every substep so multi-stage RK schemes get the correct intermediate state.
+   if (this->mIt.count(-1) > 0)
+   {
+      this->computeNonlinear(-1);
+      this->solveTrivialEquations(SolveTiming::After::id(), -1);
+   }
+
    // Update the equations
    for (auto j: this->it())
    {
@@ -255,6 +263,8 @@ void Coordinator::evolveUntilPrognostic(const bool finishedStep)
    // Loop over sub-steps
    for (auto j: this->it())
    {
+      if (j < 0) continue;
+
       DebuggerMacro_showValue("Equation sub-iteration ", 3, j);
 
       // Evolve before prognostic
