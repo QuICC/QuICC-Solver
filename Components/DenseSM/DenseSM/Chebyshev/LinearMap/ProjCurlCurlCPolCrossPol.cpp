@@ -39,6 +39,9 @@ ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc,
     ProjCurlCurlTorCrossPol(nNr, nNc, q, p, lOut, mOut, lA, mA, lB, mB, pPolA,
        pPolB, lower, upper)
 {
+   // Reset quasi-inverse order
+   this->mQ = q;
+
    // Radial function A is given
    if (pPolA && pPolB == nullptr)
    {
