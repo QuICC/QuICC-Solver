@@ -16,6 +16,7 @@ if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
     I2_Zero.cpp
     I2DivR1_Zero.cpp
     I2DivR1D1R1_Zero.cpp
+    I3_Zero.cpp
     I4DivR1_Zero.cpp
     I4DivR1D1R1_I2.cpp
     I4DivR1D1R1_Zero.cpp

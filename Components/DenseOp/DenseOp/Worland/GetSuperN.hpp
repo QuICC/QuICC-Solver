@@ -13,6 +13,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Worland/I2.hpp"
+#include "QuICC/SparseSM/Worland/I3.hpp"
 #include "QuICC/SparseSM/Worland/I4.hpp"
 #include "QuICC/SparseSM/Worland/I6.hpp"
 
@@ -32,6 +33,12 @@ template <class TINBuilder> constexpr std::uint32_t getSuperN()
    {
       // I2 has 3 super diagonals
       return 3;
+   }
+   else if constexpr (std::is_same_v<TINBuilder,
+                         ::QuICC::SparseSM::Worland::I3>)
+   {
+      // I3 has 5 super diagonals
+      return 5;
    }
    else if constexpr (std::is_same_v<TINBuilder,
                          ::QuICC::SparseSM::Worland::I4>)

@@ -120,6 +120,11 @@ struct I2_Zero_t
 {
 };
 
+/// @brief I3_Zero op type tag
+struct I3_Zero_t
+{
+};
+
 /// @brief I2DivR1_Zero op type tag
 struct I2DivR1_Zero_t
 {

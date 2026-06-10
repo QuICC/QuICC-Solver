@@ -248,6 +248,17 @@ template <class VOP> struct OpsBuilderMap<VOP, I2_Zero_t, fwd_t>
       fwd_t>;
 };
 
+/// @brief I3_Zero Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP> struct OpsBuilderMap<VOP, I3_Zero_t, fwd_t>
+{
+   using type = Worland::Builder<VOP,
+      QuICC::DenseOp::Worland::OperatorINWithMean<Wnl,
+         ::QuICC::SparseSM::Worland::I3>,
+      fwd_t>;
+};
+
 /// @brief I2DivR1_Zero Builder
 /// Integrator only
 /// @tparam VOP operator view type
