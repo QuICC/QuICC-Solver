@@ -13,6 +13,7 @@
 //
 #include <iomanip>
 #include <stdexcept>
+#include <iostream>
 
 // Project includes
 //
@@ -76,6 +77,7 @@ namespace Variable {
          Array bgArray = -(this->mpRhoTempKappa->evaluateLP(rbArr,0,0).array()) * (this->mpD1Sc->evaluateLP(rbArr,0,0).array());
          this->mBackground(0) = bgArray(0) * (4.0*Math::PI)*ro*ro;
          this->mBackground(1) = bgArray(1) * (4.0*Math::PI)*ri*ri;    
+         //std::cerr << "dSc = "<< (this->mpD1Sc->evaluateLP(rbArr,0,0).array()) <<  " \n";
 
          int nN = this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
          this->mBoundary.resize(nN, 2);
