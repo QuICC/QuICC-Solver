@@ -5,6 +5,7 @@ set(tags
   Empty
   I2CurlCurlNl
   I2CurlNl
+  I3CurlNl
   I2LaplhCurlNl
   I2ScalarNl
   I2LaplhCurlCurlNl

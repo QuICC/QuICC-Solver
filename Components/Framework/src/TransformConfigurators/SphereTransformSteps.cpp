@@ -23,6 +23,7 @@
 #include "QuICC/Transform/Path/NegCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/I2ScalarNl.hpp"
 #include "QuICC/Transform/Path/I2CurlNl.hpp"
+#include "QuICC/Transform/Path/I3CurlNl.hpp"
 #include "QuICC/Transform/Path/I2LaplhCurlNl.hpp"
 #include "QuICC/Transform/Path/I2CurlCurlNl.hpp"
 #include "QuICC/Transform/Path/I2LaplhCurlCurlNl.hpp"
@@ -46,6 +47,7 @@
 #include "QuICC/Transform/Forward/I2Q.hpp"
 #include "QuICC/Transform/Forward/I2S.hpp"
 #include "QuICC/Transform/Forward/I2T.hpp"
+#include "QuICC/Transform/Forward/I3T.hpp"
 #include "QuICC/Transform/Backward/P.hpp"
 #include "QuICC/Transform/Backward/Overr1.hpp"
 #include "QuICC/Transform/Backward/D1.hpp"
@@ -228,6 +230,20 @@ namespace Transform {
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(alPhiId);
             transform.back().addEdge(Forward::I2T::id(), curlId, Arithmetics::Sub::id());
+         }
+         // Integrate spheroid third order toroidal equation (I3 quasi-inverse)
+         else if(curlFlag == Path::I3CurlNl::id())
+         {
+            // Compute curl component
+            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
+            transform.back().addEdge(Forward::I3T::id(), curlId, Arithmetics::Add::id());
+
+            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::OverlaplhD1::id());
+            transform.back().addEdge(Forward::I3T::id(), curlId, Arithmetics::Sub::id());
          }
          // Standard second order equation without quasi-inverse
          else if(curlFlag == Path::CurlNl::id())

@@ -21,6 +21,7 @@
 #include "QuICC/Transform/Forward/I2Q.hpp"
 #include "QuICC/Transform/Forward/I2S.hpp"
 #include "QuICC/Transform/Forward/I2T.hpp"
+#include "QuICC/Transform/Forward/I3T.hpp"
 #include "QuICC/Transform/Forward/I4Q.hpp"
 #include "QuICC/Transform/Forward/I4S.hpp"
 #include "QuICC/Transform/Forward/P.hpp"
@@ -35,6 +36,7 @@
 #include "QuICC/Transform/Poly/Worland/Integrator/I2DivR1D1R1_Zero.hpp"
 #include "QuICC/Transform/Poly/Worland/Integrator/I2DivR1_Zero.hpp"
 #include "QuICC/Transform/Poly/Worland/Integrator/I2_Zero.hpp"
+#include "QuICC/Transform/Poly/Worland/Integrator/I3_Zero.hpp"
 #include "QuICC/Transform/Poly/Worland/Integrator/I4DivR1D1R1_Zero.hpp"
 #include "QuICC/Transform/Poly/Worland/Integrator/I4DivR1_Zero.hpp"
 #include "QuICC/Transform/Poly/Worland/Integrator/P.hpp"
@@ -114,6 +116,8 @@ void DefaultSphereWorlandMap::operator()(MapType& m) const
       Forward::I2S::id());
    this->addOperator<Poly::Worland::Integrator::I2_Zero<backend_t>>(m,
       Forward::I2T::id());
+   this->addOperator<Poly::Worland::Integrator::I3_Zero<backend_t>>(m,
+      Forward::I3T::id());
    this->addOperator<Poly::Worland::Integrator::I4DivR1_Zero<backend_t>>(m,
       Forward::I4Q::id());
    this->addOperator<Poly::Worland::Integrator::I4DivR1D1R1_Zero<backend_t>>(m,

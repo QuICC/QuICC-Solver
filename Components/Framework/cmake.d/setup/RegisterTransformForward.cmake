@@ -11,6 +11,7 @@ set(tags
   I2rQ
   I2rS
   I2ZI2D1
+  I3T
   I4D1
   I4D1ZI2
   I4P
