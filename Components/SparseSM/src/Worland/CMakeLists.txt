@@ -18,6 +18,8 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   I3QmDiags.cpp
   I3Qp.cpp
   I3QpDiags.cpp
+  I3D2p.cpp
+  I3D2pDiags.cpp
   I4.cpp
   I4Diags.cpp
   I4D1R1.cpp
