@@ -8,6 +8,11 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   I3QmDiags.cpp
   I3QpDiags.cpp
   I3D2pDiags.cpp
+  I3D2mDiags.cpp
+  I3D3pDiags.cpp
+  I3D3mDiags.cpp
+  I3laplDpDiags.cpp
+  I3laplDmDiags.cpp
   I4Diags.cpp
   I4D1R1Diags.cpp
   I4LaplDiags.cpp
@@ -15,6 +20,15 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   I4QmDiags.cpp
   I4QpDiags.cpp
   I4D2pDiags.cpp
+  I4D2mDiags.cpp
+  I4D3pDiags.cpp
+  I4D3mDiags.cpp
+  I4D4pDiags.cpp
+  I4D4mDiags.cpp
+  I4laplDpDiags.cpp
+  I4laplDmDiags.cpp
+  I4laplD2pDiags.cpp
+  I4laplD2mDiags.cpp
   I6Diags.cpp
   I6CylLaplhDiags.cpp
   R2Diags.cpp

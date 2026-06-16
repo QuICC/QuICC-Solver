@@ -20,6 +20,16 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   I3QpDiags.cpp
   I3D2p.cpp
   I3D2pDiags.cpp
+  I3D2m.cpp
+  I3D2mDiags.cpp
+  I3D3p.cpp
+  I3D3pDiags.cpp
+  I3D3m.cpp
+  I3D3mDiags.cpp
+  I3laplDp.cpp
+  I3laplDpDiags.cpp
+  I3laplDm.cpp
+  I3laplDmDiags.cpp
   I4.cpp
   I4Diags.cpp
   I4D1R1.cpp
@@ -34,6 +44,24 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   I4QpDiags.cpp
   I4D2p.cpp
   I4D2pDiags.cpp
+  I4D2m.cpp
+  I4D2mDiags.cpp
+  I4D3p.cpp
+  I4D3pDiags.cpp
+  I4D3m.cpp
+  I4D3mDiags.cpp
+  I4D4p.cpp
+  I4D4pDiags.cpp
+  I4D4m.cpp
+  I4D4mDiags.cpp
+  I4laplDp.cpp
+  I4laplDpDiags.cpp
+  I4laplDm.cpp
+  I4laplDmDiags.cpp
+  I4laplD2p.cpp
+  I4laplD2pDiags.cpp
+  I4laplD2m.cpp
+  I4laplD2mDiags.cpp
   I6.cpp
   I6Diags.cpp
   I6CylLaplh.cpp
