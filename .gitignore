@@ -42,3 +42,7 @@ build*/
 # vscode #
 ##########
 .vscode/
+
+# Stray in-source CMake configure artifacts (out-of-source build*/ already ignored)
+/CMakeCache.txt
+/CMakeFiles/
