@@ -95,8 +95,8 @@ void computeAMXPY(DecoupledZMatrix& y, const SparseMatrix& mat,
 /**
  * @brief Compute z = a*M*x + y + b*z
  */
-template <typename TData>
-void computeAMXPYPBZ(TData& z, const SparseMatrix& mat, const MHDFloat a,
+template <typename TOperator, typename TData>
+void computeAMXPYPBZ(TData& z, const TOperator& mat, const MHDFloat a,
    const TData& x, const TData& y, const MHDFloat b);
 
 /**
@@ -109,8 +109,8 @@ void computeAMXPYPBZ(DecoupledZMatrix& z, const SparseMatrix& mat,
 /**
  * @brief Compute z = a*M*x + b*y + z
  */
-template <typename TData>
-void computeAMXPBYPZ(TData& z, const SparseMatrix& mat, const MHDFloat a,
+template <typename TOperator, typename TData>
+void computeAMXPBYPZ(TData& z, const TOperator& mat, const MHDFloat a,
    const TData& x, const MHDFloat b, const TData& y);
 
 /**
@@ -123,8 +123,8 @@ void computeAMXPBYPZ(DecoupledZMatrix& z, const SparseMatrix& mat,
 /**
  * @brief Compute z = a*M*x + b*y + M*z
  */
-template <typename TData>
-void computeAMXPBYPMZ(TData& z, const SparseMatrix& mat, const MHDFloat a,
+template <typename TOperator, typename TData>
+void computeAMXPBYPMZ(TData& z, const TOperator& mat, const MHDFloat a,
    const TData& x, const MHDFloat b, const TData& y);
 
 /**
@@ -355,8 +355,14 @@ protected:
 
    /**
     * @brief Mass matrix operator
+    *
+    * Typed TOperator (not a hardcoded SparseMatrix) so the complex spheroid K
+    * mass matrix is preserved: the real addOperators overload asserts the
+    * imaginary part is empty (it does not silently drop it). For the complex
+    * instantiation TOperator is SparseMatrixZ (applied via the operator-generic
+    * helpers below); for real-only instantiations it is SparseMatrix (no-op).
     */
-   std::vector<SparseMatrix> mMassMatrix;
+   std::vector<TOperator> mMassMatrix;
 
    /**
     * @brief Storage for field
@@ -511,7 +517,7 @@ void ISparseTimestepper<TOperator, TData, TSolver>::initMatrices(const int n)
       for (int i = 0; i < n; ++i)
       {
          // Create storage for LHS matrices
-         this->mMassMatrix.push_back(SparseMatrix());
+         this->mMassMatrix.push_back(TOperator());
       }
    }
 }
@@ -805,8 +811,8 @@ inline void computeAMXPY(DecoupledZMatrix& y, const SparseMatrix& mat,
    }
 }
 
-template <typename TData>
-void computeAMXPYPBZ(TData& z, const SparseMatrix& mat, const MHDFloat a,
+template <typename TOperator, typename TData>
+void computeAMXPYPBZ(TData& z, const TOperator& mat, const MHDFloat a,
    const TData& x, const TData& y, const MHDFloat b)
 {
    if (a == 0.0)
@@ -837,8 +843,8 @@ inline void computeAMXPYPBZ(DecoupledZMatrix& z, const SparseMatrix& mat,
    }
 }
 
-template <typename TData>
-void computeAMXPBYPZ(TData& z, const SparseMatrix& mat, const MHDFloat a,
+template <typename TOperator, typename TData>
+void computeAMXPBYPZ(TData& z, const TOperator& mat, const MHDFloat a,
    const TData& x, const MHDFloat b, const TData& y)
 {
    if (a == 0.0)
@@ -879,8 +885,8 @@ inline void computeAMXPBYPZ(DecoupledZMatrix& z, const SparseMatrix& mat,
    }
 }
 
-template <typename TData>
-void computeAMXPBYPMZ(TData& z, const SparseMatrix& mat, const MHDFloat a,
+template <typename TOperator, typename TData>
+void computeAMXPBYPMZ(TData& z, const TOperator& mat, const MHDFloat a,
    const TData& x, const MHDFloat b, const TData& y)
 {
    if (a == 0.0)
