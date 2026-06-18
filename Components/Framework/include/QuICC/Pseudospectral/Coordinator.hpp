@@ -260,6 +260,14 @@ public:
       const Parallel::SplittingDescription& descr);
 
    /**
+    * @brief Set secondary resolution
+    *
+    * @param descr Description of parallelisation
+    */
+   void set2ndResolution(SharedResolution spRes,
+      const Parallel::SplittingDescription& descr);
+
+   /**
     * @brief Initialise the different components of the simulation
     *
     * @param tstep Configuration timestep information
@@ -574,6 +582,11 @@ protected:
     * @brief Shared resolution
     */
    SharedResolution mspRes;
+
+   /**
+    * @brief Shared secondary resolution
+    */
+   SharedResolution msp2ndRes;
 
    /**
     * @brief Shared resolution

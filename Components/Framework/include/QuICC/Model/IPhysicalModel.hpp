@@ -30,6 +30,9 @@ namespace Model {
    class IPhysicalModel
    {
       public:
+         /// Typedef for a secondary scheme
+         typedef void SecondarySchemeType;
+
          /**
           * @brief Constructor
           */

@@ -197,6 +197,11 @@ namespace QuICC {
       return this->spFwdSetup(static_cast<Dimensions::Transform::Id>(this->cpu()->nDim()-1));
    }
 
+   std::shared_ptr<Memory::memory_resource> Resolution::mem() const
+   {
+      return this->mspMem;
+   }
+
    void Resolution::buildRestriction(std::vector<int>& rSlow, std::vector<std::vector<int> >& rMiddle, const int k)
    {
       // Make sure vectors are empty

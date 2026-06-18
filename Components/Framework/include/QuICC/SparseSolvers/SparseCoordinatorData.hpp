@@ -34,6 +34,7 @@
 #include "QuICC/Equations/CorrectSolution.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolver.hpp"
 #include "QuICC/SparseSolvers/SparseTrivialSolver.hpp"
+#include "ViewOps/Transpose/OpGrouped.hpp"
 
 namespace QuICC {
 
@@ -589,33 +590,103 @@ namespace Solver {
                [&](auto& p)
                {
                   Equations::addExplicitTerm(spEq->res(), spEq->couplingInfo(id.second), *p, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), field, i);
-                  }, pOp);
+               }, pOp);
       };
 
       // Loop over explicit fields
+      std::variant<const Framework::Selector::ScalarField<MHDFloat> *, const Framework::Selector::ScalarField<MHDComplex> *>  pField;
+      std::variant<std::shared_ptr<Framework::Selector::ScalarField<MHDFloat>>, std::shared_ptr<Framework::Selector::ScalarField<MHDComplex>>>  tField;
+      SharedResolution spFieldRes;
       for(auto& fIt: r)
       {
          DebuggerMacro_msg("Add " + ModelOperator::Coordinator::tag(opId) + " term from " + PhysicalNames::Coordinator::tag(fIt.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(fIt.second)) + ")", 7);
 
-         // Get explicit input
-         for(std::size_t i = 0; i < (*solveIt)->nSystem(); i++)
+         if(fIt.second == FieldComponents::Spectral::SCALAR)
          {
-            if(fIt.second == FieldComponents::Spectral::SCALAR)
+            std::visit(
+                  [&](auto&& p)
+                  {
+                     pField = &p->dom(0).perturbation();
+                     spFieldRes = p->dom(0).spRes();
+                  }, scalVar.find(fIt.first)->second);
+         } else
+         {
+            std::visit(
+                  [&](auto&& p)
+                  {
+                     pField = &p->dom(0).perturbation().comp(fIt.second);
+                     spFieldRes = p->dom(0).spRes();
+                  }, vectVar.find(fIt.first)->second);
+         }
+         if(spEq->res().sim().ss().id() != spFieldRes->sim().ss().id())
+         {
+            #ifdef QUICC_MPI
+               using namespace QuICC::Transpose::Mpi;
+            #else
+               using namespace QuICC::Transpose::Cpu;
+            #endif
+            using namespace QuICC::Transpose;
+
+            auto spSetup = spEq->res().spSpectralSetup();
+            if(pField.index() == 0)
             {
-               std::visit(
-                     [&](auto&& p)
-                     {
-                        addExp(spEq, fIt, i, p->dom(0).perturbation());
-                     }, scalVar.find(fIt.first)->second);
-            } else
+               auto spF = std::make_shared<Framework::Selector::ScalarField<MHDFloat>>(spSetup);
+               tField = spF;
+               using VoutTy = View::View<MHDFloat, View::DCCSC3D>;
+               using VinTy = View::View<MHDFloat, View::DCCSC3D>;
+
+               // Create transpose operator
+               #ifdef QUICC_MPI
+                  auto transposeOp = std::make_unique<
+                     OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p021_t>>(spSetup->mem());
+               #else
+                  auto transposeOp = std::make_unique<
+                     OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p021_t>>();
+               #endif
+
+               // Apply transpose
+               std::vector<VoutTy> viewsOut = {spF->rGlobalView()};
+               std::vector<VinTy> viewsIn = {std::get<0>(pField)->globalView()};
+               transposeOp->apply(viewsOut, viewsIn);
+
+               // Update pointer
+               pField = spF.get();
+            }
+            else
             {
-               std::visit(
-                     [&](auto&& p)
-                     {
-                        addExp(spEq, fIt, i, p->dom(0).perturbation().comp(fIt.second));
-                     }, vectVar.find(fIt.first)->second);
+               auto spF = std::make_shared<Framework::Selector::ScalarField<MHDComplex>>(spSetup);
+               tField = spF;
+               using VoutTy = View::View<MHDComplex, View::DCCSC3D>;
+               using VinTy = View::View<MHDComplex, View::DCCSC3D>;
+
+               // Create transpose operator
+               #ifdef QUICC_MPI
+                  auto transposeOp = std::make_unique<
+                     OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p021_t>>(spSetup->mem());
+               #else
+                  auto transposeOp = std::make_unique<
+                     OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p021_t>>();
+               #endif
+
+               // Apply operator
+               std::vector<VoutTy> viewsOut = {spF->rGlobalView()};
+               std::vector<VinTy> viewsIn = {std::get<1>(pField)->globalView()};
+               transposeOp->apply(viewsOut, viewsIn);
+
+               // Update pointer
+               pField = spF.get();
             }
          }
+
+         // Get explicit input
+         std::visit(
+               [&](auto&& p)
+               {
+                  for(std::size_t i = 0; i < (*solveIt)->nSystem(); i++)
+                  {
+                     addExp(spEq, fIt, i, *p);
+                  }
+               }, pField);
       }
    }
 

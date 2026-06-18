@@ -15,17 +15,17 @@ namespace QuICC {
 namespace Equations {
 
    EquationOptions::EquationOptions()
-      : EquationOptions(0, true)
+      : EquationOptions(0, true, true)
    {
    }
 
    EquationOptions::EquationOptions(const int it)
-      : EquationOptions(it, true)
+      : EquationOptions(it, true, true)
    {
    }
 
-   EquationOptions::EquationOptions(const int it, const bool nlIsLhs)
-      : nonlinearIsLhs(nlIsLhs), mIt(it)
+   EquationOptions::EquationOptions(const int it, const bool nlIsLhs, const bool traHasQi)
+      : nonlinearIsLhs(nlIsLhs), transformHasQi(traHasQi), mIt(it)
    {
    }
 

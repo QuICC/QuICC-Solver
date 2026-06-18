@@ -137,6 +137,11 @@ namespace StateFile {
    void initVariables(Test& test);
 
    /**
+    * @brief Generate bad reference
+    */
+   MHDComplex badReference(const Test& test, const int i, const int j, const int k);
+
+   /**
     * @brief Generate tagged spectrum reference
     */
    MHDComplex tagReference(const Test& test, const int i, const int j, const int k);
@@ -154,12 +159,17 @@ namespace StateFile {
    /**
     * @brief Set variables
     */
-   void setVariables(Test& test);
+   void setVariables(Test& test, const bool isBad = false);
 
    /**
     * @brief Write StateFile
     */
    void writeStateFile(Test& test);
+
+   /**
+    * @brief Write StateFile
+    */
+   void transposeVariables(Test& testOut, Test& testIn);
 
    /**
     * @brief Write StateFile

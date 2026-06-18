@@ -49,7 +49,7 @@ set(_schemes
   )
 foreach(_scheme ${_schemes})
   foreach(_alg serial)
-    foreach(_mode read write)
+    foreach(_mode read write ordering)
       quicc_add_test(${_scheme}:${_mode}
         COMMAND ${TestExe}
         KEYWORD Scheme:Mode

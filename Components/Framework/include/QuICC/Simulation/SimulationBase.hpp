@@ -90,8 +90,8 @@ public:
    /**
     * @brief Initialise the resolution
     */
-   template <typename TScheme>
-   void initResolution(std::shared_ptr<TScheme> spScheme);
+   template <typename TScheme, typename T2ndScheme = void>
+   void initResolution(std::shared_ptr<TScheme> spScheme, std::shared_ptr<T2ndScheme> sp2ndScheme = nullptr);
 
    /**
     * @brief Create the simulation wide boundary conditions
@@ -233,6 +233,12 @@ protected:
 
 private:
    /**
+    * @brief Create the resolution
+    */
+   template <typename TScheme>
+   std::pair<SharedResolution, Parallel::SplittingDescription> makeResolution(std::shared_ptr<TScheme> spScheme, const bool tune = true);
+
+   /**
     * @brief Add addition configuration file parts
     *
     * @param spCfgFile  Configuration file
@@ -280,7 +286,7 @@ private:
 };
 
 template <typename TScheme>
-void SimulationBase::initResolution(std::shared_ptr<TScheme> spScheme)
+std::pair<SharedResolution, Parallel::SplittingDescription> SimulationBase::makeResolution(std::shared_ptr<TScheme> spScheme, const bool tune)
 {
    StageTimer stage;
    stage.start("optimizing load distribution");
@@ -307,11 +313,11 @@ void SimulationBase::initResolution(std::shared_ptr<TScheme> spScheme)
    std::pair<SharedResolution, Parallel::SplittingDescription> best =
       splitter.bestSplitting();
 
-   // Store the shared resolution object
-   this->mspRes = best.first;
-
    // Set additional options on final resolution object
-   spBuilder->tuneResolution(this->mspRes, best.second);
+   if(tune)
+   {
+      spBuilder->tuneResolution(best.first, best.second);
+   }
 
    stage.done();
 
@@ -319,12 +325,29 @@ void SimulationBase::initResolution(std::shared_ptr<TScheme> spScheme)
    Array box = this->mSimIoCtrl.config().boxScale();
 
    // Set the box scale
-   this->mspRes->setBoxScale(box);
+   best.first->setBoxScale(box);
    // Set spatial scheme
-   this->mspRes->setSpatialScheme(spScheme);
+   best.first->setSpatialScheme(spScheme);
+
+   return best;
+}
+
+template <typename TScheme, typename T2ndScheme>
+void SimulationBase::initResolution(std::shared_ptr<TScheme> spScheme, std::shared_ptr<T2ndScheme> sp2ndScheme)
+{
+   auto best = this->makeResolution<TScheme>(spScheme);
+   this->mspRes = best.first;
 
    // Initialize parallelisation setup for pseudospectral part
    this->mPseudospectral.initParallel(this->mspRes, best.second);
+
+   if constexpr(!std::is_same_v<void, T2ndScheme>)
+   {
+      auto best2nd = this->makeResolution<T2ndScheme>(sp2ndScheme, false);
+      auto sp2ndRes = best2nd.first;
+
+      this->mPseudospectral.set2ndResolution(sp2ndRes, best2nd.second);
+   }
 }
 
 template <typename TEquation>

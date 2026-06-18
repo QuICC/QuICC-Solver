@@ -177,7 +177,8 @@ namespace TCoord {
          }
       }
 
-      RequirementTools::initVariables(test.scalars, test.vectors, info, test.spRes);
+      std::vector<SharedResolution> spRess = {test.spRes};
+      RequirementTools::initVariables(test.scalars, test.vectors, info, spRess);
    }
 
    void initKernels(Test& test)

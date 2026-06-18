@@ -9,9 +9,6 @@
 // System includes
 //
 
-// External includes
-//
-
 // Project includes
 //
 #include "Types/Typedefs.hpp"
@@ -34,7 +31,7 @@ namespace QuICC {
          /**
           * @brief Destructor
           */
-         ~FieldRequirement();
+         ~FieldRequirement() = default;
 
          /**
           * brief Set field to scalar
@@ -102,6 +99,11 @@ namespace QuICC {
          bool needPhysicalGradient2() const;
 
          /**
+          * @brief Spatial scheme ID
+          */
+         std::size_t schemeId() const;
+
+         /**
           * @brief Get the physical field components requirements
           */
          const ArrayB& physicalComps() const;
@@ -165,6 +167,11 @@ namespace QuICC {
           * @brief Get map for 2nd order gradient components to field requirements
           */
          std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool> mapGradient2Comps(const FieldComponents::Spectral::Id id) const;
+
+         /**
+          * @brief Update spatial scheme ID
+          */
+         void updateSchemeId(const std::size_t& id);
 
          /**
           * @brief Update the physical component requirements
@@ -242,6 +249,11 @@ namespace QuICC {
          bool  mNeedGradient2;
 
          /**
+          * @brief Spatial scheme ID
+          */
+         std::size_t mSchemeId;
+
+         /**
           * @brief List of spectral field components
           */
          std::vector<FieldComponents::Spectral::Id>  mSpectralIds;
@@ -277,6 +289,6 @@ namespace QuICC {
          std::map<FieldComponents::Spectral::Id,MatrixB> mGradient2Comps;
    };
 
-}
+} // namespace QuICC
 
 #endif // QUICC_FIELDREQUIREMENT_HPP

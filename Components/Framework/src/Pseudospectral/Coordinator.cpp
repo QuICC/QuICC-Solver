@@ -378,6 +378,7 @@ void Coordinator::initParallel(SharedResolution spRes,
 
    // Store the shared resolution object
    this->mspRes = spRes;
+   this->msp2ndRes = nullptr;
 
    // Initialise the transform grouper
    Parallel::setGrouper(descr, this->mspFwdGrouper, this->mspBwdGrouper);
@@ -387,6 +388,12 @@ void Coordinator::initParallel(SharedResolution spRes,
       this->mspImposedBwdGrouper);
 
    stage.done();
+}
+
+void Coordinator::set2ndResolution(SharedResolution spRes,
+   const Parallel::SplittingDescription& descr)
+{
+   this->msp2ndRes = spRes;
 }
 
 void Coordinator::updatePhysical(const int it)
@@ -449,8 +456,13 @@ void Coordinator::init(const Array& tstep, const SharedSimulationBoundary spBcs)
       RequirementTools::mergeRequirements(varInfo, this->mScalarEquations.at(j),
          this->mVectorEquations.at(j));
    }
+   std::vector<SharedResolution> spRess = {this->mspRes};
+   if(this->msp2ndRes)
+   {
+      spRess.push_back(this->msp2ndRes);
+   }
    RequirementTools::initVariables(this->mScalarVariables,
-      this->mVectorVariables, varInfo, this->mspRes);
+      this->mVectorVariables, varInfo, spRess);
 
    // Map variables to the equations and set nonlinear requirements
    std::vector<std::size_t> unmapped;
@@ -629,8 +641,9 @@ void Coordinator::initImposed()
       RequirementTools::mergeImposedRequirements(varInfo,
          this->mScalarEquations.at(j), this->mVectorEquations.at(j));
    }
+   std::vector<SharedResolution> spRess = {this->mspRes};
    RequirementTools::initVariables(this->mImposedScalarVariables,
-      this->mImposedVectorVariables, varInfo, this->mspRes);
+      this->mImposedVectorVariables, varInfo, spRess);
 
    // Map variables to the equations and set nonlinear requirements
    std::vector<std::size_t> unmapped;

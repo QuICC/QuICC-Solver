@@ -296,8 +296,9 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
       }
 
       // Initialize variables
+      std::vector<SharedResolution> spRess = {this->mspRes};
       RequirementTools::initVariables(this->mScalars, this->mVectors, varInfo,
-         this->mspRes);
+         spRess);
 
       // Add scalars
       for (auto&& s: this->mScalars)

@@ -100,9 +100,16 @@ namespace Model {
 
       // Create and add state file to IO
       auto spState = std::make_shared<Io::Variable::StateFileWriter>(spSim->ss().tag(), spSim->ss().has(SpatialScheme::Feature::RegularSpectrum));
+
+      // Set expected field names
+      auto excluded = this->excludedFieldIds();
       for(auto it = ids.cbegin(); it != ids.cend(); ++it)
       {
-         spState->expect(*it);
+         auto foundIt = std::find(excluded.begin(), excluded.end(), *it);
+         if(excluded.size() == 0 || foundIt == excluded.end())
+         {
+            spState->expect(*it);
+         }
       }
 
       // Add extra field names

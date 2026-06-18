@@ -13,6 +13,8 @@
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/SpatialScheme/3D/@Scheme@.hpp"
+#include "QuICC/SpatialScheme/3D/WLFm.hpp"
+#include "QuICC/SpatialScheme/3D/WLFl.hpp"
 #include "QuICC/PhysicalNames/registerAll.hpp"
 #include "QuICC/Arithmetics/registerAll.hpp"
 #include "QuICC/TestSuite/Framework/StateFile/TestArgs.hpp"
@@ -69,6 +71,23 @@ TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile", "[@Scheme@:@Mode@]" ){
    }
    auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList, opt1D);
 
+   std::pair<QuICC::SharedResolution,QuICC::Parallel::SplittingDescription> bestOut;
+   if(std::string("@Mode@").compare("ordering") == 0)
+   {
+      if(std::string("@Scheme@").compare("WLFl") == 0)
+      {
+         bestOut = currentts::initResolution<QuICC::SpatialScheme::WLFm>(dim, currentts::args().algorithm, currentts::args().grouper, factorList, opt1D);
+      }
+      else if(std::string("@Scheme@").compare("WLFm") == 0)
+      {
+         bestOut = currentts::initResolution<QuICC::SpatialScheme::WLFl>(dim, currentts::args().algorithm, currentts::args().grouper, factorList, opt1D);
+      }
+      else
+      {
+         throw std::logic_error("Unknown scheme to change ordering");
+      }
+   }
+
    for(auto id: currentts::args().params)
    {
       currentts::Test test;
@@ -99,6 +118,35 @@ TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile", "[@Scheme@:@Mode@]" ){
          if(!currentts::args().timeOnly)
          {
             currentts::checkVariables(test);
+         }
+      }
+      else if(std::string("@Mode@").compare("ordering") == 0)
+      {
+         currentts::Test testOut;
+         testOut.spRes = bestOut.first;
+         testOut.configure(id);
+         testOut.maxUlp = currentts::args().ulp;
+         testOut.fileTag = fileTag;
+         testOut.refFileTag = refFileTag;
+
+         currentts::initVariables(testOut);
+
+         currentts::setVariables(testOut, true);
+
+         for(unsigned int it = 0; it <currentts::args().iter; it++)
+         {
+            currentts::readStateFile(test);
+
+            currentts::transposeVariables(testOut, test);
+
+            currentts::writeStateFile(testOut);
+         }
+
+         if(!currentts::args().timeOnly)
+         {
+            currentts::checkVariables(test);
+
+            currentts::checkVariables(testOut);
          }
       }
       else

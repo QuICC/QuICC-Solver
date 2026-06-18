@@ -77,8 +77,9 @@ namespace Solver {
       // Initialise the solvers initial state
       //
 
-      // Initialise with initial state
-      this->initSolution(scalEq, vectEq);
+      // Trivial solver is zeroed and not set to initial state
+      this->clearSolvers();
+      //this->initSolution(scalEq, vectEq);
    }
 
 } // Solver

@@ -84,9 +84,21 @@ namespace QuICC {
 
       spSim->initBase();
 
+      if constexpr(!std::is_same_v<typename TModel::SecondarySchemeType, void>)
+      {
+         // Set and tune spatial scheme
+         auto sp2ndScheme = std::make_shared<typename TModel::SecondarySchemeType>(model.SchemeFormulation(), GridPurpose::SIMULATION);
+         model.tuneScheme(sp2ndScheme);
+         sp2ndScheme->enable(features);
 
-      // Initialise resolution
-      spSim->initResolution(spScheme);
+         // Initialise resolution
+         spSim->initResolution(spScheme, sp2ndScheme);
+      }
+      else
+      {
+         // Initialise resolution
+         spSim->initResolution(spScheme);
+      }
 
       StageTimer stage;
 
