@@ -53,6 +53,7 @@ set(tags
   Pi
   Poincare
   Prandtl
+  PrecessionAngle
   Psi
   RRatio
   Rayleigh
