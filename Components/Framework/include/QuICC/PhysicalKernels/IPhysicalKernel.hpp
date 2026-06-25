@@ -6,18 +6,9 @@
 #ifndef QUICC_PHYSICAL_KERNEL_IPHYSICALKERNEL_HPP
 #define QUICC_PHYSICAL_KERNEL_IPHYSICALKERNEL_HPP
 
-// First include
-//
-
-// Configuration includes
-//
-#include <memory>
-
 // System includes
 //
-
-// External includes
-//
+#include <memory>
 
 // Project includes
 //
@@ -41,12 +32,12 @@ namespace Kernel {
          /**
           * @brief Simple constructor
           */
-         explicit IPhysicalKernel();
+         explicit IPhysicalKernel() = default;
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~IPhysicalKernel();
+         virtual ~IPhysicalKernel() = default;
 
          /**
           * @brief Set the physical mesh on which kernel is working
