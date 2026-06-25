@@ -14,6 +14,7 @@ set(tags
   FluctVelocityY
   FluctVelocityZ
   JacobianMagnetic
+  JacobianMomentum
   JacobianTemperature
   JacobianVelocity
   Magnetic

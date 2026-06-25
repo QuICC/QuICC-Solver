@@ -11,6 +11,7 @@
 
 // Project includes
 //
+#include "Arithmetics/Basic.hpp"
 #include "Arithmetics/LinearAlgebra.hpp"
 #include "Arithmetics/Utility.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
@@ -37,54 +38,27 @@ void ExplicitTermFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(
                  (std::is_same<TOperator, SparseMatrixZ>::value &&
                     std::is_same<TData, Matrix>::value))
    {}
+   else if constexpr ((std::is_same<T, MHDFloat>::value) &&
+                 (std::is_same<TOperator, SparseMatrixZ>::value))
+   {
+      throw std::logic_error("This should never be called");
+   }
    else
    {
       const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
       typename Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> tmp(op.cols(),
          1);
 #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
-      const auto& sRes = res.sim();
-      // Initialise storage to zero
-      tmp.setZero();
-      int l;
-      int j_;
-      int dimI =
-         sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int corrDim;
-      if ((sRes.ss().has(SpatialScheme::Feature::ShellGeometry) ||
-             sRes.ss().has(SpatialScheme::Feature::SphereGeometry)) &&
-          sRes.ss().has(SpatialScheme::Feature::SpectralOrdering123) &&
-          sRes.ss().has(SpatialScheme::Feature::SpectralMatrix2D))
-      {
-         corrDim = tRes.template idx<Dimensions::Data::DAT3D>(matIdx) * dimI;
-      }
-      const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
-      for (int j = 0; j < cols; j++)
-      {
-         j_ = tRes.template idx<Dimensions::Data::DAT2D>(j, matIdx) * dimI;
-         if (corrDim > 0)
-         {
-            j_ -= corrDim;
-         }
-         int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
-         for (int i = 0; i < rows; i++)
-         {
-            // Compute correct position
-            l = j_ + i;
-
-            // Copy field value into storage
-            tmp(l, 0) = explicitField.point(i, j, matIdx);
-         }
-      }
+   static_assert(false, "Parallel MPI solve is not supported anymore");
 #else
       int k = 0;
       const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
       for (int j = 0; j < cols; j++)
       {
          // Effective rows in case of non-uniform truncation
-         int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+         int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
 
-         for (int i = 0; i < usedRows; i++)
+         for (int i = 0; i < rows; i++)
          {
             // Copy slice into flat array
             tmp(k, 0) = explicitField.point(i, j, matIdx);
@@ -95,11 +69,48 @@ void ExplicitTermFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS>::apply(
       }
 #endif // defined QUICC_MPI && defined QUICC_MPISPSOLVE
 
-      // Apply operator to field
-      std::tuple<int, int, int, int> outBlk =
-         std::make_tuple(eqStart, 0, op.rows(), Arithmetics::getCols(tmp));
-      Arithmetics::computeAx<Arithmetics::Operation::Plus>(rSolverField, outBlk,
-         op, tmp);
+      if(zeroRow > 0 || shiftMaxRow > 0)
+      {
+         // Apply operator to field
+         std::tuple<int, int, int, int> outBlk =
+            std::make_tuple(0, 0, op.rows(), Arithmetics::getCols(tmp));
+         Arithmetics::computeAx<Arithmetics::Operation::Set>(tmp, outBlk,
+               op, tmp);
+
+         int k = 0;
+         int kk = eqStart;
+         // effective cols
+         const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
+         const int usedCols = cols - shiftMaxCol;
+         for (int j = 0; j < cols; j++)
+         {
+            // Effective rows
+            int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+            int usedRows = rows - shiftMaxRow;
+
+            for (int i = 0; i < rows; i++)
+            {
+               if(j >= zeroCol && i >= zeroRow && j < usedCols && i < usedRows)
+               {
+                  // Add data to solver field
+                  Arithmetics::assignScalar<Arithmetics::Operation::Plus>(rSolverField, kk,
+                        tmp(k,0));
+                  kk++;
+               }
+
+               // increase storage counter
+               k++;
+            }
+         }
+      }
+      else
+      {
+         // Apply operator to field
+         std::tuple<int, int, int, int> outBlk =
+            std::make_tuple(eqStart, 0, op.rows(), Arithmetics::getCols(tmp));
+         Arithmetics::computeAx<Arithmetics::Operation::Plus>(rSolverField, outBlk,
+               op, tmp);
+      }
    }
 }
 

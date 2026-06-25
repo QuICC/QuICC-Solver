@@ -116,8 +116,7 @@ void CopyUnknownFunctor<IndexType>::init(const bool shiftTop)
 
 template <CouplingIndexType IndexType>
 CopyUnknownFunctor<IndexType>::CopyUnknownFunctor(const Resolution& res, const Equations::CouplingInformation& cinfo,
-   const int matIdx,
-   const bool useShift, const bool shiftTop) :
+   const int matIdx, const bool useShift, const bool shiftTop) :
     res(res), cinfo(cinfo), matIdx(matIdx), zeroRow(0), zeroCol(0), shiftMaxRow(0), shiftMaxCol(0)
 {
    if (useShift)

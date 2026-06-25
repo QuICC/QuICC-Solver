@@ -81,7 +81,7 @@ namespace Model {
          /**
           * @brief Get operator information
           */
-         virtual void operatorInfo(OperatorInfo& info, const SpectralFieldId& fId, const Resolution& res, const Equations::Tools::ICoupling& coupling, const BcMap& bcs) const override;
+         virtual void operatorInfo(OperatorInfo& info, const SpectralFieldId& fId, const Resolution& res, const Equations::Tools::ICoupling& coupling, const BcMap& bcs, const bool allowGalerkin) const override;
 
          /**
           * @brief Build model matrix

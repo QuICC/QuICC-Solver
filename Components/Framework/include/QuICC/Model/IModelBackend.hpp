@@ -123,7 +123,7 @@ namespace Model {
          /**
           * @brief Get operator information
           */
-         virtual void operatorInfo(OperatorInfo& info, const SpectralFieldId& fId, const Resolution& res, const Equations::Tools::ICoupling& coupling, const BcMap& bcs) const = 0;
+         virtual void operatorInfo(OperatorInfo& info, const SpectralFieldId& fId, const Resolution& res, const Equations::Tools::ICoupling& coupling, const BcMap& bcs, const bool allowGalerkin) const = 0;
 
          /**
           * @brief Build model matrix

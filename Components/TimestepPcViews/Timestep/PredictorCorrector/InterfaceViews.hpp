@@ -449,14 +449,14 @@ void InterfaceViews<TScheme>::getExplicitInput(const std::size_t opId,
                            std::visit(
                                  [&](auto&& p, auto pOp)
                                  {
-                                 Equations::addExplicitTerm(eqIt->res(), cinfo, *pOp, tmp, 0, p->dom(0).perturbation(), i);
+                                 Equations::addExplicitTerm(eqIt->res(), cinfo, *pOp, tmp, 0, p->dom(0).perturbation(), i, false, false);
                                  }, scalVar.find(fIt.first)->second, vpOp);
                         } else
                         {
                            std::visit(
                                  [&](auto&& p, auto pOp)
                                  {
-                                 Equations::addExplicitTerm(eqIt->res(), cinfo, *pOp, tmp, 0, p->dom(0).perturbation().comp(fIt.second), i);
+                                 Equations::addExplicitTerm(eqIt->res(), cinfo, *pOp, tmp, 0, p->dom(0).perturbation().comp(fIt.second), i, false, false);
                                  }, vectVar.find(fIt.first)->second, vpOp);
                         }
                      }

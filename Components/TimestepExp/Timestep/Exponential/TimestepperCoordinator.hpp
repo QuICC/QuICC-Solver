@@ -9,6 +9,7 @@
 // System includes
 //
 #include <memory>
+#include <string>
 
 // Project includes
 //
@@ -184,7 +185,7 @@ namespace Exponential {
       // Init timestepper components
       //
 
-      DebuggerMacro_msg("Initializing " + std::to_string(infos.size()) + " timesteppers", 2);
+      DebuggerMacro_msg("Initializing " + std::to_string(infos.size()) + " timestepper components", 2);
       for(auto&& info: infos)
       {
          this->initComponent(info, this->mSteppers);
@@ -254,6 +255,8 @@ namespace Exponential {
 
    template <template <class,class,typename> class TStepper> void TimestepperCoordinator<TStepper, base_t>::initComponent(const TimestepperInfo& info, TimestepperMap& steppers)
    {
+      DebuggerMacro_msg("Processing field ID =  " + std::to_string(info.fieldIndex) + " for solver index " + std::to_string(info.solverIndex), 3);
+
       auto& stepData = steppers.at(info.solverIndex);
       auto spStepper = std::get<0>(stepData);
       auto&& startArr = std::get<1>(stepData);
@@ -268,6 +271,7 @@ namespace Exponential {
       auto spStepper = std::get<0>(stepData);
       if(!spStepper->isInitialized())
       {
+         DebuggerMacro_msg("Processing field ID =  " + std::to_string(info.fieldIndex) + " for solver index " + std::to_string(info.solverIndex), 3);
          spStepper->initPhi(pJac);
          spStepper->setInitialized();
          spStepper->initSolver();

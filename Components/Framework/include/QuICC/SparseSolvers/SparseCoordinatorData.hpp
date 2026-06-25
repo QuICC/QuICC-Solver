@@ -589,7 +589,7 @@ namespace Solver {
          std::visit(
                [&](auto& p)
                {
-                  Equations::addExplicitTerm(spEq->res(), spEq->couplingInfo(id.second), *p, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), field, i);
+                  Equations::addExplicitTerm(spEq->res(), spEq->couplingInfo(id.second), *p, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), field, i, true, false);
                }, pOp);
       };
 

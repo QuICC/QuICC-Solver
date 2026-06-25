@@ -244,7 +244,7 @@ namespace Model {
       return m;
    }
 
-   void PyModelBackend::operatorInfo(OperatorInfo& info, const SpectralFieldId& fId, const Resolution& res, const Equations::Tools::ICoupling& coupling, const BcMap& bcs) const
+   void PyModelBackend::operatorInfo(OperatorInfo& info, const SpectralFieldId& fId, const Resolution& res, const Equations::Tools::ICoupling& coupling, const BcMap& bcs, const bool allowGalerkin) const
    {
       auto&& tauN = info.tauN;
       auto&& galN = info.galN;

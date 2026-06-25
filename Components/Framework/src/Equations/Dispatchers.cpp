@@ -135,6 +135,7 @@ void dispatchCoupling(Equations::CouplingInformation& cinfo, const SpectralField
    bool hasSource = features.at(CouplingFeature::Source);
    bool hasBoundaryValue = features.at(CouplingFeature::BoundaryValue);
    bool allowExplicit = features.at(CouplingFeature::AllowExplicit);
+   bool allowGalerkin = features.at(CouplingFeature::AllowGalerkin);
 
    Model::EquationInfo eqInfo;
    backend.equationInfo(eqInfo, fieldId, res);
@@ -221,7 +222,7 @@ void dispatchCoupling(Equations::CouplingInformation& cinfo, const SpectralField
 
    // Set field coupling information
    Model::OperatorInfo opInfo(nMat);
-   backend.operatorInfo(opInfo, fieldId, res, cinfo.couplingTools(), bcIds);
+   backend.operatorInfo(opInfo, fieldId, res, cinfo.couplingTools(), bcIds, allowGalerkin);
 
    cinfo.couplingTools().setTauN(opInfo.tauN, res);
    cinfo.couplingTools().setGalerkinN(opInfo.galN, res);

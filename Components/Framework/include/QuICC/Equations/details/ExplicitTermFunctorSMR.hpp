@@ -11,6 +11,7 @@
 
 // Project includes
 //
+#include "Arithmetics/Basic.hpp"
 #include "Arithmetics/LinearAlgebra.hpp"
 #include "Arithmetics/Utility.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
@@ -37,13 +38,47 @@ void ExplicitTermFunctor<CouplingIndexType::SLOWEST_MULTI_RHS>::apply(
                  (std::is_same<TOperator, SparseMatrixZ>::value &&
                     std::is_same<TData, Matrix>::value))
    {}
+   else if constexpr ((std::is_same<T, MHDFloat>::value) &&
+                 (std::is_same<TOperator, SparseMatrixZ>::value))
+   {
+      throw std::logic_error("This should never be called");
+   }
    else
    {
-      // Apply operator to field
-      std::tuple<int, int, int, int> outBlk = std::make_tuple(eqStart, 0,
-         op.rows(), Arithmetics::getCols(explicitField.slice(matIdx)));
-      Arithmetics::computeAx<Arithmetics::Operation::Plus>(rSolverField, outBlk,
-         op, explicitField.slice(matIdx).eval());
+      if(zeroRow > 0 || shiftMaxRow > 0)
+      {
+         const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+         typename Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> tmp(op.cols(),
+            Arithmetics::getCols(explicitField.slice(matIdx)));
+
+         // Apply operator to field
+         std::tuple<int, int, int, int> outBlk =
+            std::make_tuple(0, 0, op.rows(), Arithmetics::getCols(tmp));
+         Arithmetics::computeAx<Arithmetics::Operation::Set>(tmp, outBlk,
+               op, explicitField.slice(matIdx).eval());
+
+         const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx) - shiftMaxCol;
+         for (int j = zeroCol; j < cols; j++)
+         {
+            // Effective rows in case of non-uniform truncation
+            int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx) - shiftMaxRow;
+
+            for (int i = zeroRow; i < usedRows; i++)
+            {
+               // Add data to solver field
+               Arithmetics::assignScalar<Arithmetics::Operation::Plus>(rSolverField, eqStart + i - zeroRow, j - zeroCol,
+                     tmp(i,j));
+            }
+         }
+      }
+      else
+      {
+         // Apply operator to field
+         std::tuple<int, int, int, int> outBlk = std::make_tuple(eqStart, 0,
+            op.rows(), Arithmetics::getCols(explicitField.slice(matIdx)));
+         Arithmetics::computeAx<Arithmetics::Operation::Plus>(rSolverField, outBlk,
+            op, explicitField.slice(matIdx).eval());
+      }
    }
 }
 

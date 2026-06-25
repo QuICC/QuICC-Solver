@@ -73,7 +73,7 @@ void GetLinearInputFunctor<TTsFunc>::operator()(ViewType tmpView, const Spectral
       {
          DebuggerMacro_msg("Add real " + ModelOperator::Coordinator::tag(opId) + " term from " + PhysicalNames::Coordinator::tag(exId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(exId.second)) + ")", 7);
 
-         Equations::addExplicitTerm(data.res(), cinfo, mats.at(i), tmp, 0, *data.fields.at(exId), i);
+         Equations::addExplicitTerm(data.res(), cinfo, mats.at(i), tmp, 0, *data.fields.at(exId), i, false, false);
       }
    }
 
@@ -83,7 +83,7 @@ void GetLinearInputFunctor<TTsFunc>::operator()(ViewType tmpView, const Spectral
       {
          DebuggerMacro_msg("Add complex " + ModelOperator::Coordinator::tag(opId) + " term from " + PhysicalNames::Coordinator::tag(exId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(exId.second)) + ")", 7);
 
-         Equations::addExplicitTerm(data.res(), cinfo, mats.at(i), tmp, 0, *data.fields.at(exId), i);
+         Equations::addExplicitTerm(data.res(), cinfo, mats.at(i), tmp, 0, *data.fields.at(exId), i, false, false);
       }
    }
 

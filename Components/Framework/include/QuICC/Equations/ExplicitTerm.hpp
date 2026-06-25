@@ -35,13 +35,15 @@ namespace Equations {
     * @param eqStart       Start index for the equation field
     * @param explicitField Explicit linear field values
     * @param matIdx        System index
+    * @param useShift   Use galerkin shifts
+    * @param shiftTop   shift top?
     */
    template <typename T, typename TOperator, typename TData>
-      void addExplicitTerm(const Resolution& res, const CouplingInformation& cinfo, const TOperator& op, TData& rSolverField, const int eqStart, const typename Framework::Selector::ScalarField<T>& explicitField, const int matIdx);
+      void addExplicitTerm(const Resolution& res, const CouplingInformation& cinfo, const TOperator& op, TData& rSolverField, const int eqStart, const typename Framework::Selector::ScalarField<T>& explicitField, const int matIdx, const bool useShift, const bool shiftTop);
 
 
    template <typename T, typename TOperator, typename TData>
-      void addExplicitTerm(const Resolution& res, const CouplingInformation& cinfo, const TOperator& op, TData& rSolverField, const int eqStart, const typename Framework::Selector::ScalarField<T>& explicitField, const int matIdx)
+      void addExplicitTerm(const Resolution& res, const CouplingInformation& cinfo, const TOperator& op, TData& rSolverField, const int eqStart, const typename Framework::Selector::ScalarField<T>& explicitField, const int matIdx, const bool useShift, const bool shiftTop)
    {
       if constexpr((std::is_same_v<T,MHDFloat> || std::is_same_v<T, MHDComplex> ) && (std::is_same_v<TOperator, SparseMatrixZ> && std::is_same_v<typename Arithmetics::GetScalarType<TData>::ScalarType, MHDFloat>))
       {
@@ -51,22 +53,22 @@ namespace Equations {
          // Create pointer to sparse operator
          if(cinfo.indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
          {
-            details::ExplicitTermFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(res, cinfo, matIdx);
+            details::ExplicitTermFunctor<CouplingIndexType::SLOWEST_SINGLE_RHS> func(res, cinfo, matIdx, useShift, shiftTop);
             func.apply(rSolverField, op, eqStart, explicitField);
          }
          else if(cinfo.indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
          {
-            details::ExplicitTermFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(res, cinfo, matIdx);
+            details::ExplicitTermFunctor<CouplingIndexType::SLOWEST_MULTI_RHS> func(res, cinfo, matIdx, useShift, shiftTop);
             func.apply(rSolverField, op, eqStart, explicitField);
          }
          else if(cinfo.indexType() == CouplingIndexType::MODE)
          {
-            details::ExplicitTermFunctor<CouplingIndexType::MODE> func(res, cinfo, matIdx);
+            details::ExplicitTermFunctor<CouplingIndexType::MODE> func(res, cinfo, matIdx, useShift, shiftTop);
             func.apply(rSolverField, op, eqStart, explicitField);
          }
          else if(cinfo.indexType() == CouplingIndexType::SINGLE)
          {
-            details::ExplicitTermFunctor<CouplingIndexType::SINGLE> func(res, cinfo, matIdx);
+            details::ExplicitTermFunctor<CouplingIndexType::SINGLE> func(res, cinfo, matIdx, useShift, shiftTop);
             func.apply(rSolverField, op, eqStart, explicitField);
          }
       }
