@@ -141,6 +141,11 @@ public:
    const std::set<int>& it() const;
 
    /**
+    * @brief Get base iteration indexes
+    */
+   const std::set<int>& baseIts() const;
+
+   /**
     * @brief Get integration time
     */
    MHDFloat time() const;
@@ -198,7 +203,7 @@ public:
     * @param spEq Equation
     * @param it   Iteration index
     */
-   void addEquation(Equations::SharedIScalarEquation spEq, const int it);
+   void addEquation(Equations::SharedIScalarEquation spEq, const int it, const bool isBase);
 
    /**
     * @brief Add scalar equation to solver
@@ -208,7 +213,7 @@ public:
     * @param it         Iteration index
     */
    void addEquation(Equations::SharedIScalarEquation spEq,
-      const std::size_t eqId, const int it);
+      const std::size_t eqId, const int it, const bool isBase);
 
    /**
     * @brief Add vector equation to solver
@@ -216,7 +221,7 @@ public:
     * @param spEq Equation
     * @param it   Iteration index
     */
-   void addEquation(Equations::SharedIVectorEquation spEq, const int it);
+   void addEquation(Equations::SharedIVectorEquation spEq, const int it, const bool isBase);
 
    /**
     * @brief Add vector equation to solver
@@ -226,7 +231,7 @@ public:
     * @param it         Iteration index
     */
    void addEquation(Equations::SharedIVectorEquation spEq,
-      const std::size_t eqId, const int it);
+      const std::size_t eqId, const int it, const bool isBase);
 
    /**
     * @brief Add CFL diagnostic
@@ -577,6 +582,11 @@ protected:
     * @brief Iteration indexes
     */
    std::set<int> mIt;
+
+   /**
+    * @brief Base iteration indexes
+    */
+   std::set<int> mBaseIts;
 
    /**
     * @brief Shared resolution

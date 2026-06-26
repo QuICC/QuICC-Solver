@@ -54,7 +54,7 @@ class AugmentedJacobianFunctor
       /**
        * @brief ctor
        */
-      AugmentedJacobianFunctor(std::shared_ptr<Functors::FunctorData> spData, const MHDFloat dt, const std::size_t regId, const std::size_t regCol, const int fixedIt,  Pseudospectral::Coordinator* pPseudo, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem);
+      AugmentedJacobianFunctor(std::shared_ptr<Functors::FunctorData> spData, const MHDFloat dt, const std::size_t regId, const std::size_t regCol, const std::set<int>& fixedIts,  Pseudospectral::Coordinator* pPseudo, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem);
 
       /**
        * @brief ctor
@@ -100,7 +100,7 @@ class AugmentedJacobianFunctor
       /**
        * @brief Iteration index
        */
-      const int mcFixedIt;
+      const std::set<int> mcFixedIts;
 
       /**
        * @brief Epsilon for complex step

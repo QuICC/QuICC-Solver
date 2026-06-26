@@ -18,6 +18,7 @@
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Equations/CouplingFeature.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
+#include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "QuICC/PhysicalNames/JacobianMagnetic.hpp"
 #include "QuICC/PhysicalNames/JacobianTemperature.hpp"
 #include "QuICC/PhysicalNames/JacobianVelocity.hpp"
@@ -203,7 +204,7 @@ template <typename TScheme>
 Interface<TScheme>::Interface(const MHDFloat time, const Matrix& cfl,
    const MHDFloat maxError, const ScalarEquation_range& scalEq,
    const VectorEquation_range& vectEq, Pseudospectral::Coordinator& pseudo) :
-    Timestep::Interface(time, cfl, maxError, scalEq, vectEq, pseudo), mBaseItIds({0})
+    Timestep::Interface(time, cfl, maxError, scalEq, vectEq, pseudo), mBaseItIds(pseudo.baseIts())
 {
    _mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
 
@@ -226,7 +227,12 @@ Interface<TScheme>::Interface(const MHDFloat time, const Matrix& cfl,
    this->translateInfo(infos);
 
    assert(this->mpFieldIdMap);
-   this->mpJac = std::make_shared<AugmentedJacobianFunctor>(this->mspData, -1.0, Register::Temporary::id(), 0, 1, this->mpPseudo, this->mpFieldIdMap, _mem);
+   std::set<int> jacItIds;
+   for(auto&& i: this->mBaseItIds)
+   {
+      jacItIds.insert(i + *this->mBaseItIds.rbegin() + 1);
+   }
+   this->mpJac = std::make_shared<AugmentedJacobianFunctor>(this->mspData, -1.0, Register::Temporary::id(), 0, jacItIds, this->mpPseudo, this->mpFieldIdMap, _mem);
 
    this->mSolverCoord.init(this->timestep(), infos, spScheme, this->mpJac);
 
@@ -260,7 +266,7 @@ void Interface<TScheme>::translateInfo(std::vector<TimestepperInfo>& infos)
    auto bFunc = std::make_shared<Functors::DoNothingFunctor>();
    auto pFunc = std::make_shared<Functors::TranslateInfoFunctor>(infos, this->mspData, this->mpFieldIdMap, this->_mem);
    auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
-   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.rbegin());
    processor(this->mspData->eqInfos);
 
    // Update system size
@@ -312,7 +318,7 @@ void Interface<TScheme>::initSolution()
    auto pvFunc = std::make_shared<OpFunctor>(this->mspData, this->mpTsFunc);
    auto pFunc = std::make_shared<Functors::InputFunctor<OpFunctor>>(this->mspData, pvFunc, this->mpFieldIdMap, this->_mem);
    auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
-   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.rbegin());
    processor(this->mspData->eqInfos);
 }
 
@@ -335,7 +341,7 @@ void Interface<TScheme>::getInput()
    auto pvFunc = std::make_shared<OpFunctor>(this->mspData, this->mpTsFunc, Register::Rhs::id(), 1);
    auto pFunc = std::make_shared<Functors::InputFunctor<OpFunctor>>(this->mspData, pvFunc, this->mpFieldIdMap, this->_mem);
    auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
-   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.rbegin());
    processor(this->mspData->eqInfos);
 }
 
@@ -351,7 +357,7 @@ void Interface<TScheme>::transferOutput()
    auto cvFunc = std::make_shared<CorrFunctor>(this->mspData, this->mpTsFunc, Register::Solution::id(), 0);
    auto pFunc = std::make_shared<Functors::OutputFunctor<OpFunctor, CorrFunctor>>(this->mspData, pvFunc, cvFunc, this->mpFieldIdMap, this->_mem);
    auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
-   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.begin());
+   Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.rbegin());
    processor(this->mspData->eqInfos);
 }
 
@@ -390,7 +396,7 @@ void Interface<TScheme>::stepForward(const ScalarEquation_range& scalEq_ignore,
 {
    DebuggerMacro_msg("Time integration sub-step", 2);
 
-   auto progFunc = std::make_shared<Functors::CallExplicitPrognosticFunctor<TSFunctor>>(this->mspData, this->mpTsFunc, Register::Rhs::id(), 1, *this->mBaseItIds.begin(), this->mpFieldIdMap, this->_mem);
+   auto progFunc = std::make_shared<Functors::CallExplicitPrognosticFunctor<TSFunctor>>(this->mspData, this->mpTsFunc, Register::Rhs::id(), 1, *this->mBaseItIds.rbegin(), this->mpFieldIdMap, this->_mem);
    this->mpPseudo->evolveUntilPrognostic(this->mBaseItIds, false, progFunc);
 
    // Update the equation input to the timestepper

@@ -46,6 +46,16 @@ namespace Equations {
          EquationOptions(const int it, const bool nlIsLhs, const bool traHasQi);
 
          /**
+          * @brief Simple constructor
+          *
+          * @param it         Iteration index
+          * @param nlIsLhs    Nonlinear term is LHS?
+          * @param traHasQi   Transform includes QI?
+          * @param isBase     Is base equation? (ie not Jacobian)
+          */
+         EquationOptions(const int it, const bool nlIsLhs, const bool traHasQi, const bool isBase);
+
+         /**
           * @brief Simple empty destructor
           */
          virtual ~EquationOptions() = default;
@@ -64,6 +74,11 @@ namespace Equations {
           * @brief Transform includes QI?
           */
         const bool transformHasQi;
+
+         /**
+          * @brief Is base equation? (ie not Jacobian)
+          */
+        const bool isBase;
 
       protected:
          /**

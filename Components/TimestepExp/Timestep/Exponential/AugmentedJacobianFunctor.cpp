@@ -28,8 +28,8 @@ namespace Timestep {
 
 namespace Exponential {
 
-AugmentedJacobianFunctor::AugmentedJacobianFunctor(std::shared_ptr<Functors::FunctorData> spData, const MHDFloat dt, const std::size_t regId, const std::size_t regCol, const int fixedIt, Pseudospectral::Coordinator* pPseudo, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem)
-   : mcFixedIt(fixedIt), mcEps(1e-8), mAn(0), mBn(0), mN(0), mspData(spData), mDt(dt), mRegId(regId), mRegCol(regCol), mpHandle(nullptr), mpPseudo(pPseudo), matB(0,0), mpIdMap(idMap), _mem(mem)
+AugmentedJacobianFunctor::AugmentedJacobianFunctor(std::shared_ptr<Functors::FunctorData> spData, const MHDFloat dt, const std::size_t regId, const std::size_t regCol, const std::set<int>& fixedIts, Pseudospectral::Coordinator* pPseudo, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem)
+   : mcFixedIts(fixedIts), mcEps(1e-8), mAn(0), mBn(0), mN(0), mspData(spData), mDt(dt), mRegId(regId), mRegCol(regCol), mpHandle(nullptr), mpPseudo(pPseudo), matB(0,0), mpIdMap(idMap), _mem(mem)
 {
    this->mpNFunc = std::make_shared<Functors::DoNothingFunctor>();
 
@@ -79,24 +79,24 @@ void AugmentedJacobianFunctor::updateB(const Matrix& matB)
 
 void AugmentedJacobianFunctor::applyJacobian() const
 {
-   std::set<int> itIds = {this->mcFixedIt};
+   int lastIt = *this->mcFixedIts.rbegin();
 
    DebuggerMacro_msg("Applying Jacobian to stepper handle", 3);
 
    // Transfer timestep output back to equations
-   Functors::ProcessRangeFunctor processOut(this->mpNFunc, this->mpOutFunc, this->mpNFunc, this->mcFixedIt);
+   Functors::ProcessRangeFunctor processOut(this->mpNFunc, this->mpOutFunc, this->mpNFunc, lastIt);
    processOut(this->mspData->eqInfos);
 
    // Clear RHS
    this->mpHandle->setZero();
 
-   this->mpPseudo->evolveAfterPrognostic(itIds, false);
+   this->mpPseudo->evolveAfterPrognostic(this->mcFixedIts, false);
 
-   auto progFunc = std::make_shared<Functors::CallExplicitPrognosticFunctor<TsFunctor>>(this->mspData, this->mpTsFunc, this->mRegId, this->mRegCol, this->mcFixedIt, this->mpIdMap, this->_mem);
-   this->mpPseudo->evolveUntilPrognostic(itIds, false, progFunc);
+   auto progFunc = std::make_shared<Functors::CallExplicitPrognosticFunctor<TsFunctor>>(this->mspData, this->mpTsFunc, this->mRegId, this->mRegCol, lastIt, this->mpIdMap, this->_mem);
+   this->mpPseudo->evolveUntilPrognostic(this->mcFixedIts, false, progFunc);
 
    // Update the equation input to the timestepper
-   Functors::ProcessRangeFunctor processIn(this->mpIbefFunc, this->mpInFunc, this->mpNFunc, this->mcFixedIt);
+   Functors::ProcessRangeFunctor processIn(this->mpIbefFunc, this->mpInFunc, this->mpNFunc, lastIt);
    processIn(this->mspData->eqInfos);
 }
 

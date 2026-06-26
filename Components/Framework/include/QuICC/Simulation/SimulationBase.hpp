@@ -384,7 +384,7 @@ std::shared_ptr<TEquation> SimulationBase::addEquation(
    auto spOptions = std::make_shared<Equations::EquationOptions>();
 
    // Add shared equation
-   this->mPseudospectral.addEquation(spEq, spOptions->it());
+   this->mPseudospectral.addEquation(spEq, spOptions->it(), spOptions->isBase);
 
    return spEq;
 }
@@ -400,7 +400,7 @@ std::shared_ptr<TEquation> SimulationBase::addEquation(
          this->mspRes->sim().spSpatialScheme(), spBackend, spOptions);
 
    // Add shared equation
-   this->mPseudospectral.addEquation(spEq, spOptions->it());
+   this->mPseudospectral.addEquation(spEq, spOptions->it(), spOptions->isBase);
 
    return spEq;
 }

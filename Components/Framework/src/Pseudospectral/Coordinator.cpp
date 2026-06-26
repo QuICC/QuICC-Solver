@@ -45,6 +45,11 @@ const std::set<int>& Coordinator::it() const
    return this->mIt;
 }
 
+const std::set<int>& Coordinator::baseIts() const
+{
+   return this->mBaseIts;
+}
+
 MHDFloat Coordinator::time() const
 {
    return this->mTimestepCoordinator.time();
@@ -71,13 +76,13 @@ void Coordinator::printInfo(std::ostream& stream)
 }
 
 void Coordinator::addEquation(Equations::SharedIScalarEquation spEq,
-   const int it)
+   const int it, const bool isBase)
 {
-   this->addEquation(spEq, PseudospectralTag::Uninitialized::id(), it);
+   this->addEquation(spEq, PseudospectralTag::Uninitialized::id(), it, isBase);
 }
 
 void Coordinator::addEquation(Equations::SharedIScalarEquation spEq,
-   const std::size_t eqId, const int it)
+   const std::size_t eqId, const int it, const bool isBase)
 {
    DebuggerMacro_showValue("Adding scalar equation for " +
                               PhysicalNames::Coordinator::tag(spEq->name()) +
@@ -98,6 +103,10 @@ void Coordinator::addEquation(Equations::SharedIScalarEquation spEq,
    this->mScalarEquations.at(it).push_back(spEq);
 
    this->mIt.insert(it);
+   if(isBase)
+   {
+      this->mBaseIts.insert(it);
+   }
 
    std::pair<std::size_t, int> key = std::make_pair(eqId, it);
    if (this->mScalarEqMap.count(key) == 0)
@@ -111,13 +120,13 @@ void Coordinator::addEquation(Equations::SharedIScalarEquation spEq,
 }
 
 void Coordinator::addEquation(Equations::SharedIVectorEquation spEq,
-   const int it)
+   const int it, const bool isBase)
 {
-   this->addEquation(spEq, PseudospectralTag::Uninitialized::id(), it);
+   this->addEquation(spEq, PseudospectralTag::Uninitialized::id(), it, isBase);
 }
 
 void Coordinator::addEquation(Equations::SharedIVectorEquation spEq,
-   const std::size_t eqId, const int it)
+   const std::size_t eqId, const int it, const bool isBase)
 {
    DebuggerMacro_showValue("Adding vector equation for " +
                               PhysicalNames::Coordinator::tag(spEq->name()) +
@@ -138,6 +147,10 @@ void Coordinator::addEquation(Equations::SharedIVectorEquation spEq,
    this->mVectorEquations.at(it).push_back(spEq);
 
    this->mIt.insert(it);
+   if(isBase)
+   {
+      this->mBaseIts.insert(it);
+   }
 
    std::pair<std::size_t, int> key = std::make_pair(eqId, it);
    if (this->mVectorEqMap.count(key) == 0)
