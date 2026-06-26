@@ -42,6 +42,11 @@ void AugmentedJacobianFunctor::updateTimestep(const MHDFloat dt)
 
 void AugmentedJacobianFunctor::operator()(Eigen::Ref<Matrix> out, Eigen::Ref<Matrix> in) const
 {
+   if(QuICCEnv().allowsIO())
+   {
+      std::cerr << "\t" << "- compute Jacobian" << std::endl;
+   }
+
    DebuggerMacro_msg("Applying augmented Jacobian", 2);
 
    assert(in.rows() == this->mN);

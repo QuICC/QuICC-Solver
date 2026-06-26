@@ -13,6 +13,7 @@
 // Project includes
 //
 #include "QuICC/Debug/DebuggerMacro.h"
+#include "Environment/QuICCEnv.hpp"
 #ifdef QUICC_DEBUG
 #include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "QuICC/ModelOperator/Coordinator.hpp"
@@ -620,6 +621,8 @@ namespace Solver {
          }
          if(spEq->res().sim().ss().id() != spFieldRes->sim().ss().id())
          {
+            QuICCEnv().synchronize();
+
             #ifdef QUICC_MPI
                using namespace QuICC::Transpose::Mpi;
             #else
@@ -676,6 +679,8 @@ namespace Solver {
                // Update pointer
                pField = spF.get();
             }
+
+            QuICCEnv().synchronize();
          }
 
          // Get explicit input

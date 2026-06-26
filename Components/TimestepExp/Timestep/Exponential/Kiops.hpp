@@ -250,6 +250,11 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
    matW.col(0) = matU.col(0);
    while( tNow < ts.back() )
    {
+      if(QuICCEnv().allowsIO())
+      {
+         std::cerr << "--- KIOPS iteration ---" << std::endl;
+      }
+
       // Initial vector for Krylov
       if(j == 0)
       {
