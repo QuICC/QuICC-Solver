@@ -83,6 +83,11 @@ private:
    void resetEnergy();
 
    /**
+    * @brief Maximal number of harmonic degrees used in dipolarity calculation
+    */
+   const int mcDipNl;
+
+   /**
     * @brief CMB spectrum output truncation
     */
    int mCmbNl;

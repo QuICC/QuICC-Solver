@@ -30,6 +30,7 @@ SphereDipolarityWriter::SphereDipolarityWriter(const std::string& prefix,
        Tags::Dipolarity::EXTENSION, prefix + Tags::Dipolarity::HEADER, type,
        Tags::Dipolarity::VERSION, Dimensions::Space::SPECTRAL, EXTEND),
     mHasMOrdering(false),
+    mcDipNl(13),
     mCmbNl(-1),
     mAxialDipole(0.0),
     mNonAxialDipole(0.0)
@@ -284,8 +285,9 @@ void SphereDipolarityWriter::writeContent()
    int ioPrec = 14;
 
    // Compute dipolarity
+   int dipNl = std::min(this->mcDipNl,static_cast<int>(this->mCmbSpectrum.size()));
    this->mDipolarity =
-      std::sqrt(this->mCmbSpectrum(1) / this->mCmbSpectrum.topRows(13).sum());
+      std::sqrt(this->mCmbSpectrum(1) / this->mCmbSpectrum.topRows(dipNl).sum());
 
    // Check if the workflow allows IO to be performed
    if (QuICCEnv().allowsIO())
