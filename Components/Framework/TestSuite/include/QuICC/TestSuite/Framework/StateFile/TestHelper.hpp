@@ -124,12 +124,12 @@ namespace StateFile {
     * @param factors    Imposed CPU factorization
     * @param opt1D      Truncation ID for 1D
     */
-   template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper, const std::list<int>& factors, const std::vector<std::size_t>& opt1D);
+   template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper, const std::list<int>& factors, const std::vector<std::size_t>& opt1D, const bool tune);
 
    /**
     * @brief Process command line and generate dimension array
     */
-   ArrayI processCmdLine();
+   ArrayI processCmdLine(const int id);
 
    /**
     * @brief Init variables
@@ -191,7 +191,7 @@ namespace StateFile {
     */
    ErrorType computeUlp(const MHDFloat data, const MHDFloat ref, const MHDFloat refMod, const MHDFloat tol, const MHDFloat eps);
 
-   template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper, const std::list<int>& factors, const std::vector<std::size_t>& opt1D)
+   template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper, const std::list<int>& factors, const std::vector<std::size_t>& opt1D, const bool tune)
    {
       INFO( "MPI rank: " << QuICC::QuICCEnv().id() );
       INFO( "MPI size: " << QuICC::QuICCEnv().size() );
@@ -225,7 +225,10 @@ namespace StateFile {
       // Generate resolution
       auto best = splitter.bestSplitting(true);
       auto spRes = best.first;
-      spBuilder->tuneResolution(spRes, best.second);
+      if(tune)
+      {
+         spBuilder->tuneResolution(spRes, best.second);
+      }
 
       Array box(3);
       box << 1.0,1.0,1.0;

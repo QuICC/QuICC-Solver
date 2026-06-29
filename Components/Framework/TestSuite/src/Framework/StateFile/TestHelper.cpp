@@ -78,14 +78,24 @@ namespace StateFile {
       }
    }
 
-   ArrayI processCmdLine()
+   ArrayI processCmdLine(const int id)
    {
       // Set default arguments if required
       if(args().useDefault)
       {
-         args().dim1D = 63;
-         args().dim2D = 127;
-         args().dim3D = 127;
+         switch(id)
+         {
+            case 0:
+               args().dim1D = 63;
+               args().dim2D = 127;
+               args().dim3D = 127;
+               break;
+            case 1:
+               args().dim1D = 7;
+               args().dim2D = 3;
+               args().dim3D = 3;
+               break;
+         }
 
          if(args().algorithm == "")
          {
@@ -453,7 +463,7 @@ namespace StateFile {
    {
       auto& ss = *test.spRes->sim().spSpatialScheme();
 
-      std::string postfix = "_" + ss.tag() + test.fileTag;
+      std::string postfix = "_" + ss.tag() + test.fileTag + "_";
       auto spState = std::make_shared<Io::Variable::StateFileWriter>(postfix, ss.tag(), ss.has(SpatialScheme::Feature::RegularSpectrum));
 
       // Add scalars
