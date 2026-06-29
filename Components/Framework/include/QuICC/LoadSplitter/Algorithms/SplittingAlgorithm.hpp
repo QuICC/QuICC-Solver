@@ -6,16 +6,10 @@
 #ifndef QUICC_PARALLEL_SPLITTINGALGORITHM_HPP
 #define QUICC_PARALLEL_SPLITTINGALGORITHM_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <list>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -207,7 +201,7 @@ namespace Parallel {
    /// Typedef for a shared pointer to a SplittingAlgorithm object
    typedef std::shared_ptr<SplittingAlgorithm>   SharedSplittingAlgorithm;
 
-}
-}
+} // namespace Parallel
+} // namespace QuICC
 
 #endif // QUICC_PARALLEL_SPLITTINGALGORITHM_HPP

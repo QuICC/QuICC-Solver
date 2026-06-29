@@ -31,6 +31,8 @@ using point_t = std::array<int, 3>;
 /// @return
 template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
 {
+   Profiler::RegionFixture<4> fix("Transpose::Mpi::Coordinates::getCoo");
+
    std::vector<point_t> coo(view.size());
    auto pointers = view.pointers()[1];
    auto indices = view.indices()[1];

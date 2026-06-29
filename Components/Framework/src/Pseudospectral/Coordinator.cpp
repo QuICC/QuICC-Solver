@@ -380,7 +380,7 @@ void Coordinator::initTransformCoordinator()
    // Initialise the transform coordinator
    Transform::TransformCoordinatorTools::init(this->mTransformCoordinator,
       this->mspFwdGrouper, this->mspBwdGrouper, packs, this->mspRes,
-      runOptions);
+      runOptions, this->onlySpectralLegacyConverter());
 }
 
 void Coordinator::initParallel(SharedResolution spRes,
@@ -566,6 +566,15 @@ void Coordinator::setGraphOptions(const GraphOptions& options)
 }
 #endif
 
+bool Coordinator::onlySpectralLegacyConverter() const
+{
+#ifdef QUICC_USE_MLIR_GRAPH
+      return true;
+#else
+      return false;
+#endif
+}
+
 void Coordinator::useStateTime(const MHDFloat time, const MHDFloat timestep)
 {
    this->mDiagnostics.useStateTime(time, timestep);
@@ -693,9 +702,10 @@ void Coordinator::initImposed()
    Transform::TransformCoordinatorTools::computePacks(packs,
       this->mspImposedFwdGrouper, this->mspImposedBwdGrouper,
       {{0, forwardTree}}, {{0, backwardTree}}, {0}, this->mspRes);
+
    Transform::TransformCoordinatorTools::init(
       *this->mspImposedTransformCoordinator, this->mspImposedFwdGrouper,
-      this->mspImposedBwdGrouper, packs, this->mspRes, runOptions);
+      this->mspImposedBwdGrouper, packs, this->mspRes, runOptions, this->onlySpectralLegacyConverter());
 }
 
 void Coordinator::initSolvers()
