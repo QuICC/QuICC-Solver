@@ -11,6 +11,7 @@
 #include <memory>
 #include <mpi.h>
 #include <vector>
+#include <set>
 
 // Project includes
 //
@@ -95,6 +96,15 @@ std::vector<int> getCount(const std::vector<std::vector<int>>& displs)
    }
    return count;
 }
+
+/// @brief Collect remote communication sets
+/// @param setLoc Local communication set vector
+/// @param commSet  Communication set
+/// @param setSet   Send set
+/// @param recvSet  Receive set
+/// @param comm     Communicator
+/// @return Communcation set changed?
+bool collectRemoteSet(std::vector<int>& setLoc, std::set<int>& commSet, const std::set<int>& sendSet, const std::set<int>& recvSet, const MPI_Comm comm);
 
 } // namespace Mpi
 } // namespace Transpose

@@ -112,9 +112,27 @@ std::vector<int> getReducedRanksSet(
    MPI_Comm_size(comm, &ranks);
 
    //
-   // Check exchanges
+   // Check exchanges (iterate to catch multiple hop connections)
    //
 
+   int commSet_changed = 1;
+   while(commSet_changed)
+   {
+      // Traverse graph (catches nodes which only send)
+      commSet_changed = collectRemoteSet(setLoc, commSet, sendSet, recvSet, comm);
+
+      // Traverse graph in reverse direction (catches nodes which only receive)
+      commSet_changed += collectRemoteSet(setLoc, commSet, recvSet, sendSet, comm);
+
+      // Global changes
+      MPI_Allreduce(MPI_IN_PLACE, &commSet_changed, 1, MPI_INT, MPI_SUM, comm);
+   }
+
+   return setLoc;
+}
+
+bool collectRemoteSet(std::vector<int>& setLoc, std::set<int>& commSet, const std::set<int>& sendSet, const std::set<int>& recvSet, const MPI_Comm comm)
+{
    // Recv remote set size
    std::vector<MPI_Request> req(sendSet.size() + recvSet.size());
    int count = 0;
@@ -145,7 +163,7 @@ std::vector<int> getReducedRanksSet(
       int sr = *it;
       remSet[count].resize(remSetSize[count]);
       MPI_Irecv(remSet[count].data(), remSet[count].size(), MPI_INT, sr, 1,
-         comm, &req[count]);
+            comm, &req[count]);
       count++;
    }
    // Send local set
@@ -153,7 +171,7 @@ std::vector<int> getReducedRanksSet(
    {
       int rr = *it;
       MPI_Isend(setLoc.data(), setLoc.size(), MPI_INT, rr, 1, comm,
-         &req[count]);
+            &req[count]);
       count++;
    }
    // Wait for comm to be done
@@ -173,8 +191,11 @@ std::vector<int> getReducedRanksSet(
    }
 
    // If local set was modified, update
+   bool changedSet = false;
    if (commSet.size() > setLoc.size())
    {
+      changedSet = true;
+
       setLoc.resize(commSet.size());
       std::size_t i = 0;
       for (auto it = commSet.begin(); it != commSet.end(); ++it)
@@ -183,7 +204,7 @@ std::vector<int> getReducedRanksSet(
       }
    }
 
-   return setLoc;
+   return changedSet;
 }
 
 void redDisplsFromSet(std::vector<std::vector<int>>& sendDispls,

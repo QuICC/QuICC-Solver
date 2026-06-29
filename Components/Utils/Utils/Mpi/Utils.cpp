@@ -123,7 +123,7 @@ void distributeSplitIdx(const std::vector<point_t>& sendIdx,
    std::vector<int> sendDispl_(sendDispl);
    std::vector<int> recvSizes_(recvSizes);
    std::vector<int> recvDispl_(recvDispl);
-   for (int i = 0; i < sendDispl.size(); i++)
+   for (std::size_t i = 0; i < sendDispl.size(); i++)
    {
       sendSizes_.at(i) *= dimSize;
       sendDispl_.at(i) *= dimSize;

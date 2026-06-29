@@ -28,7 +28,7 @@ void getSplitIdx(std::vector<int>& splitIdx, const std::vector<point_t>& coos)
    for (std::size_t i = 0; i < coos.size(); ++i)
    {
       auto&& p = coos[i];
-      for (int i = 0; i < filters.size(); i++)
+      for (std::size_t i = 0; i < filters.size(); i++)
       {
          filters.at(i).insert(p[i]);
       }
@@ -54,7 +54,7 @@ void getSplitIdx(std::vector<int>& splitIdx, const std::vector<point_t>& coos)
    {
       std::copy(s.begin(), s.end(), std::back_inserter(splitIdx));
    }
-   assert(splitIdx.size() == splitIdx.at(3));
+   assert(splitIdx.size() == static_cast<std::size_t>(splitIdx.at(3)));
 }
 
 void matchSplitIdx(std::vector<int>& remNeededIdx,
@@ -66,7 +66,7 @@ void matchSplitIdx(std::vector<int>& remNeededIdx,
    const auto dimSize = std::tuple_size<point_t>{};
    // loop over loc coo to find match
    std::vector<int> remSplitIdxNeeded(dimSize + 1, 0);
-   for (int i = 0; i < dimSize; i++)
+   for (std::size_t i = 0; i < dimSize; i++)
    {
       remSplitIdxNeeded.at(i) = remSplitIdxNeeded.size();
       if (locSplitIdx.size() > dimSize + 1 && remSplitIdx.size() > dimSize + 1)
@@ -91,7 +91,7 @@ void filterIdx(std::vector<point_t>& cooFiltered, std::vector<int>& cooSizes,
    Profiler::RegionFixture<4> fix("Utils::filterIdx");
 
    cooFiltered.reserve(cooNew.size());
-   for (int r = 0; r < locDispl.size(); ++r)
+   for (std::size_t r = 0; r < locDispl.size(); ++r)
    {
       int istart = cooFiltered.size();
       int count = 0;
@@ -135,7 +135,7 @@ void matchSendDispl(std::vector<std::vector<int>>& sendDispl,
 
    // Reserve memory
    sendDispl.resize(remDispl.size());
-   for (int r = 0; r < remDispl.size(); ++r)
+   for (std::size_t r = 0; r < remDispl.size(); ++r)
    {
       sendDispl[r].reserve(
          std::min(locIdx.size(), static_cast<std::size_t>(remSizes.at(r))));
@@ -146,7 +146,7 @@ void matchSendDispl(std::vector<std::vector<int>>& sendDispl,
    {
       auto&& p = locIdx[i];
 
-      for (int r = 0; r < remDispl.size(); ++r)
+      for (std::size_t r = 0; r < remDispl.size(); ++r)
       {
          // get new coo from other rank and check if it is here
          auto remBegin = remIdx.begin() + remDispl.at(r);
