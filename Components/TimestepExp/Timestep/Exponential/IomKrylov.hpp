@@ -15,6 +15,7 @@
 #include "Types/Typedefs.hpp"
 #include "Timestep/Exponential/details/TimesteppperTools.hpp"
 
+#include <iostream>
 namespace QuICC {
 
 namespace Timestep {
@@ -115,6 +116,11 @@ int IomKrylov<TAfunc>::compute(Matrix& matV, Matrix& matH,
    int j = jIn;
    for(; j < m; j++)
    {
+      if(QuICCEnv().allowsIO())
+      {
+         std::cerr << "\t" << "- compute Jacobian" << std::endl;
+      }
+
       // Build next vector
       A(matV.col(j+1), matV.col(j));
 
