@@ -118,7 +118,7 @@ int IomKrylov<TAfunc>::compute(Matrix& matV, Matrix& matH,
    {
       if(QuICCEnv().allowsIO())
       {
-         std::cerr << "\t" << "- compute Jacobian" << std::endl;
+         std::cerr << "      - compute Jacobian" << std::endl;
       }
 
       // Build next vector

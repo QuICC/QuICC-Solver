@@ -252,7 +252,7 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
    {
       if(QuICCEnv().allowsIO())
       {
-         std::cerr << "--- KIOPS iteration ---" << std::endl;
+         std::cerr << "   --- KIOPS iteration j = " << j << ", m = " << m << std::endl;
       }
 
       // Initial vector for Krylov
