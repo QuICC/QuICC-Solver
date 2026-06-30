@@ -13,7 +13,6 @@
 // Project includes
 //
 #include "QuICC/Debug/DebuggerMacro.h"
-#include "Environment/QuICCEnv.hpp"
 #ifdef QUICC_DEBUG
 #include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "QuICC/ModelOperator/Coordinator.hpp"
@@ -35,7 +34,7 @@
 #include "QuICC/Equations/CorrectSolution.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolver.hpp"
 #include "QuICC/SparseSolvers/SparseTrivialSolver.hpp"
-#include "ViewOps/Transpose/OpGrouped.hpp"
+#include "QuICC/SparseSolvers/TransposeCoordinator.hpp"
 
 namespace QuICC {
 
@@ -160,6 +159,11 @@ namespace Solver {
          std::vector<SharedComplexSolverType> mComplexSolvers;
 
          /**
+          * @brief Transpose coordinator
+          */
+         std::shared_ptr<TransposeCoordinator> mTransCoord;
+
+         /**
           * @brief Storage for the current solve time
           */
          std::size_t   mSolveTime;
@@ -205,7 +209,7 @@ namespace Solver {
    /**
     * @brief Generic implementation to get the explicit linear input
     */
-   template <template <class,class,template <class> class> class TSol,typename TSolverIt,typename TEq> void getExplicitSolverInput(SparseCoordinatorData<TSol>& coord, TEq spEq, const int idx, SpectralFieldId id, const std::size_t opId, const typename SparseCoordinatorData<TSol>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSol>::VectorVariable_map& vectVar);
+   template <template <class,class,template <class> class> class TSol,typename TSolverIt,typename TEq> void getExplicitSolverInput(SparseCoordinatorData<TSol>& coord, TEq spEq, const int idx, SpectralFieldId id, const std::size_t opId, const typename SparseCoordinatorData<TSol>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSol>::VectorVariable_map& vectVar, std::shared_ptr<TransposeCoordinator> dataOp);
 
    /**
     * @brief Generic implementation to get the solver input
@@ -215,7 +219,7 @@ namespace Solver {
    /**
     * @brief Compute the explicit linear input independently of solver type
     */
-   template <typename TSolverIt,typename TEq> void computeExplicitSolverInput(const TEq spEq, const SpectralFieldId id, const TSolverIt solveIt, const std::size_t opId, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalVar, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectVar);
+   template <typename TSolverIt,typename TEq> void computeExplicitSolverInput(const TEq spEq, const SpectralFieldId id, const TSolverIt solveIt, const std::size_t opId, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalVar, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectVar, std::shared_ptr<TransposeCoordinator> dataOp);
 
    /**
     * @brief Compute the solver input independently of solver type
@@ -289,6 +293,11 @@ namespace Solver {
       for(auto zIt = this->mComplexSolvers.begin(); zIt != this->mComplexSolvers.end(); ++zIt)
       {
          (*zIt)->initStartRow();
+      }
+
+      if(this->mRealSolvers.size() + this->mComplexSolvers.size() > 0)
+      {
+         this->mTransCoord = std::make_shared<TransposeCoordinator>();
       }
    }
 
@@ -524,7 +533,7 @@ namespace Solver {
       (*solIt)->initSolutions();
    }
 
-   template <template <class,class,template <class> class> class TSolver,typename TSolverIt,typename TEq> void getExplicitSolverInput(SparseCoordinatorData<TSolver>& coord, TEq spEq, const int idx, SpectralFieldId id, const std::size_t opId, const typename SparseCoordinatorData<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSolver>::VectorVariable_map& vectVar)
+   template <template <class,class,template <class> class> class TSolver,typename TSolverIt,typename TEq> void getExplicitSolverInput(SparseCoordinatorData<TSolver>& coord, TEq spEq, const int idx, SpectralFieldId id, const std::size_t opId, const typename SparseCoordinatorData<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSolver>::VectorVariable_map& vectVar, std::shared_ptr<TransposeCoordinator> dataOp)
    {
       // Create iterator to current complex field solver
       TSolverIt solIt;
@@ -533,7 +542,7 @@ namespace Solver {
       DebuggerMacro_msg("Get explicit solver input for " + PhysicalNames::Coordinator::tag(id.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(id.second)) + ")", 6);
 
       // Get solver input
-      computeExplicitSolverInput<TSolverIt,TEq>(spEq, id, solIt, opId, scalVar, vectVar);
+      computeExplicitSolverInput<TSolverIt,TEq>(spEq, id, solIt, opId, scalVar, vectVar, dataOp);
    }
 
    template <template <class,class,template <class> class> class TSolver,typename TSolverIt,typename TEq> void getSolverInput(SparseCoordinatorData<TSolver>& coord, TEq spEq, const int idx, SpectralFieldId id, const typename SparseCoordinatorData<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSolver>::VectorVariable_map& vectVar)
@@ -555,7 +564,7 @@ namespace Solver {
    //
    //
 
-   template <typename TSolverIt,typename TEq> void computeExplicitSolverInput(const TEq spEq, const SpectralFieldId id, const TSolverIt solveIt, const std::size_t opId, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalVar, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectVar)
+   template <typename TSolverIt,typename TEq> void computeExplicitSolverInput(const TEq spEq, const SpectralFieldId id, const TSolverIt solveIt, const std::size_t opId, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalVar, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectVar, std::shared_ptr<TransposeCoordinator> dataOp)
    {
       // Build range of operator
       auto r = make_range(spEq->couplingInfo(id.second).explicitRange(opId));
@@ -596,8 +605,6 @@ namespace Solver {
 
       // Loop over explicit fields
       std::variant<const Framework::Selector::ScalarField<MHDFloat> *, const Framework::Selector::ScalarField<MHDComplex> *>  pField;
-      std::variant<std::shared_ptr<Framework::Selector::ScalarField<MHDFloat>>, std::shared_ptr<Framework::Selector::ScalarField<MHDComplex>>>  tField;
-      SharedResolution spFieldRes;
       for(auto& fIt: r)
       {
          DebuggerMacro_msg("Add " + ModelOperator::Coordinator::tag(opId) + " term from " + PhysicalNames::Coordinator::tag(fIt.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(fIt.second)) + ")", 7);
@@ -607,80 +614,15 @@ namespace Solver {
             std::visit(
                   [&](auto&& p)
                   {
-                     pField = &p->dom(0).perturbation();
-                     spFieldRes = p->dom(0).spRes();
+                     pField = dataOp->apply(p->dom(0).res(), spEq->res(), p->dom(0).perturbation());
                   }, scalVar.find(fIt.first)->second);
          } else
          {
             std::visit(
                   [&](auto&& p)
                   {
-                     pField = &p->dom(0).perturbation().comp(fIt.second);
-                     spFieldRes = p->dom(0).spRes();
+                     pField = dataOp->apply(p->dom(0).res(), spEq->res(), p->dom(0).perturbation().comp(fIt.second));
                   }, vectVar.find(fIt.first)->second);
-         }
-         if(spEq->res().sim().ss().id() != spFieldRes->sim().ss().id())
-         {
-            QuICCEnv().synchronize();
-
-            #ifdef QUICC_MPI
-               using namespace QuICC::Transpose::Mpi;
-            #else
-               using namespace QuICC::Transpose::Cpu;
-            #endif
-            using namespace QuICC::Transpose;
-
-            auto spSetup = spEq->res().spSpectralSetup();
-            if(pField.index() == 0)
-            {
-               auto spF = std::make_shared<Framework::Selector::ScalarField<MHDFloat>>(spSetup);
-               tField = spF;
-               using VoutTy = View::View<MHDFloat, View::DCCSC3D>;
-               using VinTy = View::View<MHDFloat, View::DCCSC3D>;
-
-               // Create transpose operator
-               #ifdef QUICC_MPI
-                  auto transposeOp = std::make_unique<
-                     OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p021_t>>(spSetup->mem());
-               #else
-                  auto transposeOp = std::make_unique<
-                     OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p021_t>>();
-               #endif
-
-               // Apply transpose
-               std::vector<VoutTy> viewsOut = {spF->rGlobalView()};
-               std::vector<VinTy> viewsIn = {std::get<0>(pField)->globalView()};
-               transposeOp->apply(viewsOut, viewsIn);
-
-               // Update pointer
-               pField = spF.get();
-            }
-            else
-            {
-               auto spF = std::make_shared<Framework::Selector::ScalarField<MHDComplex>>(spSetup);
-               tField = spF;
-               using VoutTy = View::View<MHDComplex, View::DCCSC3D>;
-               using VinTy = View::View<MHDComplex, View::DCCSC3D>;
-
-               // Create transpose operator
-               #ifdef QUICC_MPI
-                  auto transposeOp = std::make_unique<
-                     OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p021_t>>(spSetup->mem());
-               #else
-                  auto transposeOp = std::make_unique<
-                     OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p021_t>>();
-               #endif
-
-               // Apply operator
-               std::vector<VoutTy> viewsOut = {spF->rGlobalView()};
-               std::vector<VinTy> viewsIn = {std::get<1>(pField)->globalView()};
-               transposeOp->apply(viewsOut, viewsIn);
-
-               // Update pointer
-               pField = spF.get();
-            }
-
-            QuICCEnv().synchronize();
          }
 
          // Get explicit input
