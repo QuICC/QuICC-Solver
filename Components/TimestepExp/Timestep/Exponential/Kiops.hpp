@@ -434,6 +434,10 @@ void Kiops<TKrylov, TExponential>::adaptiveKrylov(int& mNew, double& tNew, doubl
    tOpt = std::min(remainingTime, std::max(tau / 5., std::min(5. * tau, tOpt)));
 
    int mOpt = std::ceil(j + std::log(omega / this->mGamma.first) / std::log(kest));
+   if(QuICCEnv().allowsIO())
+   {
+      std::cerr << "      - Adaptive Krylovo: omega = " << omega << ", order = " << order << ", kest = " << kest << ", mOpt = " << mOpt << ", m = " << m  << std::endl;
+   }
    mOpt = std::max(this->mcMMin, std::min(this->mcMMax, std::max(static_cast<int>(std::floor(3./4. * m)), std::min(mOpt, static_cast<int>(std::ceil(4./3. * m))))));
 
    if(j == this->mcMMax)
