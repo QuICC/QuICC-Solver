@@ -318,7 +318,6 @@ std::pair<SharedResolution, Parallel::SplittingDescription> SimulationBase::make
    {
       spBuilder->tuneResolution(best.first, best.second);
    }
-
    stage.done();
 
    // Extract box scale from configuration file

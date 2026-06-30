@@ -141,6 +141,17 @@ void matchSendDispl(std::vector<std::vector<int>>& sendDispl,
          std::min(locIdx.size(), static_cast<std::size_t>(remSizes.at(r))));
    }
 
+#ifdef QUICC_DEBUG
+   // Check remote indexes are sorted
+   for (std::size_t r = 0; r < remDispl.size(); ++r)
+   {
+      // get new coo from other rank and check if it is here
+      auto remBegin = remIdx.begin() + remDispl.at(r);
+      auto remEnd = remIdx.begin() + remDispl.at(r) + remSizes.at(r);
+      assert(std::is_sorted(remBegin, remEnd));
+   }
+#endif
+
    // Extract matching list
    for (int i: argsort)
    {
@@ -151,7 +162,6 @@ void matchSendDispl(std::vector<std::vector<int>>& sendDispl,
          // get new coo from other rank and check if it is here
          auto remBegin = remIdx.begin() + remDispl.at(r);
          auto remEnd = remIdx.begin() + remDispl.at(r) + remSizes.at(r);
-         assert(std::is_sorted(remBegin, remEnd));
 
          if (std::binary_search(remBegin, remEnd, p))
          {
@@ -178,12 +188,10 @@ void matchSendDispl(std::vector<std::vector<int>>& sendDispl,
    sendDispl[0].reserve(std::min(locIdx.size(), remIdx.size()));
 
    // Extract matching list
+   assert(std::is_sorted(remIdx.begin(), remIdx.end()));
    for (int i: argsort)
    {
       auto&& p = locIdx[i];
-
-      // get new coo from other rank and check if it is here
-      assert(std::is_sorted(remIdx.begin(), remIdx.end()));
 
       if (std::binary_search(remIdx.begin(), remIdx.end(), p))
       {

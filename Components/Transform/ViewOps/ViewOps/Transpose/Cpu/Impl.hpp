@@ -241,9 +241,9 @@ void implPerm021(View::View<Tout, View::DCCSC3D>& out,
    assert(in.dims()[0] == out.dims()[0]);
    assert(in.dims()[1] == out.dims()[2]);
    assert(in.dims()[2] == out.dims()[1]);
-   auto I = in.dims()[0];
-   auto J = in.dims()[1];
-   auto K = in.dims()[2];
+   //auto I = in.dims()[0];
+   //auto J = in.dims()[1];
+   //auto K = in.dims()[2];
 
    auto pointers = in.pointers()[1];
    auto indices = in.indices()[1];

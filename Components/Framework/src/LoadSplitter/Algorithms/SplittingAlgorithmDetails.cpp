@@ -7,6 +7,7 @@
 // System includes
 //
 #include <algorithm>
+#include <limits>
 #include <map>
 #include <set>
 #include <stdexcept>
@@ -42,7 +43,6 @@ void buildCommunicationStructure2D(const int localId, SharedResolution spRes,
    Dimensions::Transform::Id dimId;
    int i_;
    int j_;
-   int k_;
 
    // Simplify syntax
    typedef std::pair<int, int> Coordinate;
@@ -242,9 +242,6 @@ void buildCommunicationStructure3D(const int localId, SharedResolution spRes,
                                   ":details::buildCommunicationStructure3D");
 
    Dimensions::Transform::Id dimId;
-   int i_;
-   int j_;
-   int k_;
 
    // Simplify syntax
    typedef std::array<int, 3> point_t;
@@ -326,7 +323,8 @@ void buildCommunicationStructure3D(const int localId, SharedResolution spRes,
       int toMatch = absCooOld.size();
       int matched = 0;
       std::set<std::pair<int, int>> filter;
-      for (int r = 0; r < sendDispls.size(); r++)
+      assert(sendDispls.size() < std::numeric_limits<int>::max());
+      for (int r = 0; r < static_cast<int>(sendDispls.size()); r++)
       {
          if (sendDispls.at(r).size() > 0)
          {
