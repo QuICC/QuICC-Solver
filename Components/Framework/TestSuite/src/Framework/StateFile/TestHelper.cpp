@@ -51,7 +51,7 @@ namespace StateFile {
 
    void Test::configure(const int id)
    {
-      switch(id)
+      switch(id/10)
       {
          case 0:
             this->fieldId = FieldId::SCALAR;
@@ -83,7 +83,7 @@ namespace StateFile {
       // Set default arguments if required
       if(args().useDefault)
       {
-         switch(id)
+         switch(id % 10)
          {
             case 0:
                args().dim1D = 63;
@@ -94,6 +94,11 @@ namespace StateFile {
                args().dim1D = 7;
                args().dim2D = 3;
                args().dim3D = 3;
+               break;
+            case 2:
+               args().dim1D = 15;
+               args().dim2D = 31;
+               args().dim3D = 31;
                break;
          }
 
