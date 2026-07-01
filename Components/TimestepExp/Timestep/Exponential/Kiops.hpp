@@ -414,6 +414,11 @@ void Kiops<TKrylov, TExponential>::adaptiveKrylov(int& mNew, double& tNew, doubl
    double oldOmega = omega;
    omega = tEnd * err / (tau * this->mcTol);
 
+   if(std::isnan(omega))
+   {
+      throw std::logic_error("Error estimate is NaN");
+   }
+
    // Estimate order: order + 1 = 1/(q + 1) in paper
    this->estimateOrder(order, orderOld, omega, oldOmega, tau, oldTau, m, oldm, j, ireject);
    // Estimate k
@@ -434,6 +439,10 @@ void Kiops<TKrylov, TExponential>::adaptiveKrylov(int& mNew, double& tNew, doubl
    tOpt = std::min(remainingTime, std::max(tau / 5., std::min(5. * tau, tOpt)));
 
    int mOpt = std::ceil(j + std::log(omega / this->mGamma.first) / std::log(kest));
+   if(mOpt < 0)
+   {
+      throw std::logic_error("Krylov size estimate is negative");
+   }
    if(QuICCEnv().allowsIO())
    {
       std::cerr << "      - Adaptive Krylovo: omega = " << omega << ", order = " << order << ", kest = " << kest << ", mOpt = " << mOpt << ", m = " << m  << std::endl;

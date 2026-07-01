@@ -136,6 +136,10 @@ int IomKrylov<TAfunc>::compute(Matrix& matV, Matrix& matH,
 
       // Norm
       double normV = details::computeAugmented2Norm(matV, j+1, n);
+      if(QuICCEnv().allowsIO())
+      {
+         std::cerr << "         normV = " << normV << std::endl;
+      }
 
       // Stop if subspace converged sufficiently
       if(normV < this->mcTol)
