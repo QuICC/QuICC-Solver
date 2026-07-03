@@ -16,7 +16,6 @@
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Tags.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
-//#include "QuICC/Polynomial/Worland/r_1WnlRecurrence.hpp"
 #include "QuICC/Polynomial/Worland/slaplWnl.hpp"
 #include "Types/Internal/BasicTypes.hpp"
 #include "Types/Internal/Typedefs.hpp"

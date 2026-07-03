@@ -54,11 +54,6 @@ void ProjPolViscD1::buildOpImpl(Internal::Matrix& mat, const int rows,
          "Operators are not implemented for forcing with multiple l");
    }
 
-   if (this->mpF->ls().size() != 1)
-   {
-      throw std::logic_error(
-         "Operators are not implemented for forcing with multiple l");
-   }
    const int lF = this->mpF->ls().at(0);
 
    int lINm1;
@@ -114,7 +109,7 @@ void ProjPolViscD1::buildOpImpl(Internal::Matrix& mat, const int rows,
 
    Internal::Array rf = igrid.asDiagonal() * f;
 
-
+   // returns an l = lin -2 + lf. I know f is actually l=2. RETURN l=lin=lin+lf
    Internal::Matrix opPhys1 = rf.asDiagonal() * // rf
                               opBwd_r_1dW* opFwdm1.transpose() * opBwd_r_1W; // (1/r)D(1/r *)
 
@@ -135,7 +130,7 @@ void ProjPolViscD1::buildOpImpl(Internal::Matrix& mat, const int rows,
       ev::Set());
 
    Internal::Matrix opFBwdr_r_1drW(igrid.size(), this->cols()+this->mpF->nN());
-   r_1drW.compute<Internal::MHDFloat>(opFBwdr_r_1drW, opFBwdr_r_1drW.cols(), this->mLin + lF, igrid,
+   r_1drW.compute<Internal::MHDFloat>(opFBwdr_r_1drW, opFBwdr_r_1drW.cols(), lINm1 + lF, igrid,
       Internal::Array(), ev::Set());
    
    Internal::Matrix opPhys2 = igrid.asDiagonal() * (igrid.asDiagonal() * // r^2

@@ -78,6 +78,7 @@ set(tags
   Upper2d
   Upper3d
   Upsilon
+  UseGapWidth
   ViscType
   VolumeHeating
   Xi
