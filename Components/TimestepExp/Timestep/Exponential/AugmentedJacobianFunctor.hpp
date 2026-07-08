@@ -103,11 +103,6 @@ class AugmentedJacobianFunctor
       const std::set<int> mcFixedIts;
 
       /**
-       * @brief Epsilon for complex step
-       */
-      double mcEps;
-
-      /**
        * @brief Size if A
        */
       int mAn;

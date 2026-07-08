@@ -29,7 +29,7 @@ namespace Timestep {
 namespace Exponential {
 
 AugmentedJacobianFunctor::AugmentedJacobianFunctor(std::shared_ptr<Functors::FunctorData> spData, const MHDFloat dt, const std::size_t regId, const std::size_t regCol, const std::set<int>& fixedIts, Pseudospectral::Coordinator* pPseudo, std::shared_ptr<IdMap> idMap, std::shared_ptr<Memory::memory_resource> mem)
-   : mcFixedIts(fixedIts), mcEps(1e-8), mAn(0), mBn(0), mN(0), mspData(spData), mDt(dt), mRegId(regId), mRegCol(regCol), mpHandle(nullptr), mpPseudo(pPseudo), matB(0,0), mpIdMap(idMap), _mem(mem)
+   : mcFixedIts(fixedIts), mAn(0), mBn(0), mN(0), mspData(spData), mDt(dt), mRegId(regId), mRegCol(regCol), mpHandle(nullptr), mpPseudo(pPseudo), matB(0,0), mpIdMap(idMap), _mem(mem)
 {
    this->mpNFunc = std::make_shared<Functors::DoNothingFunctor>();
 
@@ -56,12 +56,12 @@ void AugmentedJacobianFunctor::operator()(Eigen::Ref<Matrix> out, Eigen::Ref<Mat
    }
 
    // Copy data into handle
-   this->mpHandle->col(0) = (this->mcEps*this->mDt)*in.topRows(this->mAn);
+   this->mpHandle->col(0) = (this->mDt)*in.topRows(this->mAn);
 
    this->applyJacobian();
    
    // Copy data from handle
-   out.topRows(this->mAn) = (1./this->mcEps)*this->mpHandle->col(0);
+   out.topRows(this->mAn) = this->mpHandle->col(0);
 
    // Add part from augmented matrix
    DebuggerMacro_msg("Applying B matrix from augmented Jacobian", 3);
