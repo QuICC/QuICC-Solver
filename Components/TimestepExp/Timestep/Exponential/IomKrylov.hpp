@@ -13,9 +13,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Timestep/Exponential/details/TimesteppperTools.hpp"
 
-#include <iostream>
 namespace QuICC {
 
 namespace Timestep {
@@ -26,24 +24,24 @@ namespace Exponential {
 /**
  * @brief Incomplete orthogonalization method for building Krylov subspace
  */
-template <typename TAfunc> class IomKrylov
+template <typename TAfunc, typename TOfunc> class IomKrylov
 {
 public:
    /**
     * @brief ctor
     *
     * @param a    Functor for action of A matrix
-    * @param p    Length of incomplete orthogonalization
+    * @param o    Functor for orthogonalization
     * @param tol  Tolerance for subspace convergence
     */
-   IomKrylov(std::shared_ptr<TAfunc>& a, const int p, const double tol);
+   IomKrylov(std::shared_ptr<TAfunc>& a, std::shared_ptr<TOfunc>& o, const double tol);
 
    /**
     * @brief ctor
     *
     * @param a Functor for action of A matrix
     */
-   IomKrylov(std::shared_ptr<TAfunc>& a);
+   IomKrylov(std::shared_ptr<TAfunc>& a, std::shared_ptr<TOfunc>& o);
 
    /**
     * @brief dtor
@@ -68,6 +66,11 @@ public:
    TAfunc& aFunc();
 
    /**
+    * @brief Access action of A functor
+    */
+   TOfunc& oFunc();
+
+   /**
     * @brief Tolerance
     */
    double tol() const;
@@ -79,11 +82,6 @@ public:
 
 private:
    /**
-    * @brief Length of incomplete orthogonalization
-    */
-   const int mcP;
-
-   /**
     * @brief Convergence tolerance
     */
    const double mcTol;
@@ -92,19 +90,24 @@ private:
     * @brief Functor for action of A matrix
     */
    std::shared_ptr<TAfunc> mpAfunc;
+
+   /**
+    * @brief Functor for orthogonalization
+    */
+   std::shared_ptr<TOfunc> mpOfunc;
 };
 
-template <typename TAfunc>
-IomKrylov<TAfunc>::IomKrylov(std::shared_ptr<TAfunc>& a, const int p, const double tol) :
-    mcP(p), mcTol(tol), mpAfunc(a)
+template <typename TAfunc, typename TOfunc>
+IomKrylov<TAfunc,TOfunc>::IomKrylov(std::shared_ptr<TAfunc>& a, std::shared_ptr<TOfunc>& o, const double tol) :
+    mcTol(tol), mpAfunc(a), mpOfunc(o)
 {}
 
-template <typename TAfunc>
-IomKrylov<TAfunc>::IomKrylov(std::shared_ptr<TAfunc>& a) : IomKrylov(std::move(a), 2, 1e-12)
+template <typename TAfunc, typename TOfunc>
+IomKrylov<TAfunc,TOfunc>::IomKrylov(std::shared_ptr<TAfunc>& a, std::shared_ptr<TOfunc>& o) : IomKrylov(std::move(a), std::move(o), 1e-12)
 {}
 
-template <typename TAfunc>
-int IomKrylov<TAfunc>::compute(Matrix& matV, Matrix& matH,
+template <typename TAfunc, typename TOfunc>
+int IomKrylov<TAfunc,TOfunc>::compute(Matrix& matV, Matrix& matH,
    const int jIn, const int m, const int n)
 {
    // Check H is big enough
@@ -112,34 +115,16 @@ int IomKrylov<TAfunc>::compute(Matrix& matV, Matrix& matH,
    assert(matH.rows() >= m+1);
 
    auto&& A = *this->mpAfunc;
+   auto&& ortho = *this->mpOfunc;
 
    int j = jIn;
    for(; j < m; j++)
    {
-      if(QuICCEnv().allowsIO())
-      {
-         std::cerr << "      - compute Jacobian" << std::endl;
-      }
-
       // Build next vector
       A(matV.col(j+1), matV.col(j));
 
-      // Orthogonalization
-      int i0 = std::max(0, j + 1 - this->mcP);
-      Matrix colH = details::computeAugmentedDot(matV, i0, j, matV, j+1, n);
-      for(int i = i0; i <= j; i++)
-      {
-         matH(i, j) = colH(i-i0, 0);
-
-         matV.col(j+1) -= matH(i,j)*matV.col(i);
-      }
-
-      // Norm
-      double normV = details::computeAugmented2Norm(matV, j+1, n);
-      if(QuICCEnv().allowsIO())
-      {
-         std::cerr << "         normV = " << normV << std::endl;
-      }
+      // Orthogonalize
+      double normV = ortho(matV, matH, j, n);
 
       // Stop if subspace converged sufficiently
       if(normV < this->mcTol)
@@ -155,22 +140,28 @@ int IomKrylov<TAfunc>::compute(Matrix& matV, Matrix& matH,
    return j;
 }
 
-template <typename TAfunc>
-TAfunc& IomKrylov<TAfunc>::aFunc()
+template <typename TAfunc, typename TOfunc>
+TAfunc& IomKrylov<TAfunc,TOfunc>::aFunc()
 {
    return *this->mpAfunc;
 }
 
-template <typename TAfunc>
-double IomKrylov<TAfunc>::tol() const
+template <typename TAfunc, typename TOfunc>
+TOfunc& IomKrylov<TAfunc,TOfunc>::oFunc()
+{
+   return *this->mpOfunc;
+}
+
+template <typename TAfunc, typename TOfunc>
+double IomKrylov<TAfunc,TOfunc>::tol() const
 {
    return this->mcTol;
 }
 
-template <typename TAfunc>
-int IomKrylov<TAfunc>::p() const
+template <typename TAfunc, typename TOfunc>
+int IomKrylov<TAfunc,TOfunc>::p() const
 {
-   return this->mcP;
+   return this->mpOfunc->p();
 }
 
 } // namespace Exponential

@@ -252,7 +252,7 @@ int Kiops<TKrylov, TExponential>::compute(Matrix& matW, const std::vector<double
    {
       if(QuICCEnv().allowsIO())
       {
-         std::cerr << "   --- KIOPS iteration j = " << j << ", m = " << m << std::endl;
+         std::cerr << "   --- KIOPS iteration j = " << j << ", m = " << m << ", tau = " << tau << std::endl;
       }
 
       // Initial vector for Krylov
@@ -439,10 +439,6 @@ void Kiops<TKrylov, TExponential>::adaptiveKrylov(int& mNew, double& tNew, doubl
    tOpt = std::min(remainingTime, std::max(tau / 5., std::min(5. * tau, tOpt)));
 
    int mOpt = std::ceil(j + std::log(omega / this->mGamma.first) / std::log(kest));
-   if(mOpt < 0)
-   {
-      throw std::logic_error("Krylov size estimate is negative");
-   }
    if(QuICCEnv().allowsIO())
    {
       std::cerr << "      - Adaptive Krylovo: omega = " << omega << ", order = " << order << ", kest = " << kest << ", mOpt = " << mOpt << ", m = " << m  << std::endl;

@@ -29,6 +29,7 @@
 #include "Timestep/Exponential/HighamExponential.hpp"
 #include "Timestep/Exponential/AugmentedJacobianFunctor.hpp"
 #include "Timestep/Exponential/details/TimesteppperTools.hpp"
+#include "Timestep/Exponential/Functors/OrthoCgs2Functor.hpp"
 #include "View/ViewDense.hpp"
 
 namespace QuICC {
@@ -48,11 +49,14 @@ public:
    /// Typedef for explicit exponential functor
    typedef HighamExponential ExpFunctor;
 
-   /// Typedef for action of augmented Jacobiab functor
+   /// Typedef for action of augmented Jacobian functor
    typedef AugmentedJacobianFunctor JacobianFunctor;
 
+   /// Typedef for orthogonalization functor
+   typedef Functors::OrthoCgs2Functor OrthoFunctor;
+
    /// Typedef for Krylov functor
-   typedef IomKrylov<JacobianFunctor> KrylovFunctor;
+   typedef IomKrylov<JacobianFunctor, OrthoFunctor> KrylovFunctor;
 
    /// Typedef for Phi functor
    typedef Kiops<KrylovFunctor, ExpFunctor> PhiFunctor;
@@ -359,7 +363,8 @@ template <typename TOperator,typename TData,typename TImpl> void  EpirkTimestepp
    this->mpJac = pJac;
 
    auto eFunc = std::make_unique<ExpFunctor>();
-   auto kFunc = std::make_unique<KrylovFunctor>(this->mpJac, this->mcKrylovOrder, this->mcKrylovTol);
+   auto oFunc = std::make_shared<OrthoFunctor>(this->mcKrylovOrder);
+   auto kFunc = std::make_unique<KrylovFunctor>(this->mpJac, oFunc, this->mcKrylovTol);
 
    this->mpPhi = std::make_unique<PhiFunctor>(std::move(kFunc), std::move(eFunc), this->mcPhiTol, this->mcPhiDelta, this->mcPhiMmin, this->mcPhiMmax);
 }
