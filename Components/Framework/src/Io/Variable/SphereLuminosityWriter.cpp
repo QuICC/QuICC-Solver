@@ -1,7 +1,16 @@
 /**
  * @file SphereLuminosityWriter.cpp
- * @brief Source of the implementation of the ASCII Nusselt number in a sphere
+ * @brief Source of the implementation of the ASCII Luminosity in a sphere
  */
+
+ // Format of the  .dat file produced here:
+// time,    total luminosity at ro,     nusselt at ro,
+// where:
+// total luminosity  = (backgraound luminosity) + (convective luminosity) (definition of Jones et al., 2011)
+// nusselt           = (total luminosity) / (background luminosity)
+
+// TODO: will probably need to come up with another definition
+
 
 // System includes
 //
@@ -12,8 +21,9 @@
 //
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Io/Variable/SphereLuminosityWriter.hpp"
-#include "QuICC/Io/Variable/Tags/Nusselt.hpp"
+#include "QuICC/Io/Variable/Tags/Luminosity.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
+#include "QuICC/Polynomial/Worland/dWnl.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "Types/Math.hpp"
@@ -26,14 +36,18 @@ namespace Variable {
 
 SphereLuminosityWriter::SphereLuminosityWriter(const std::string& prefix,
    const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction>> pF) :
-    IVariableAsciiWriter(prefix + Tags::Nusselt::BASENAME,
-       Tags::Nusselt::EXTENSION, prefix + Tags::Nusselt::HEADER, type,
-       Tags::Nusselt::VERSION, Dimensions::Space::SPECTRAL, EXTEND),
+    IVariableAsciiWriter(prefix + Tags::Luminosity::BASENAME,
+       Tags::Luminosity::EXTENSION, prefix + Tags::Luminosity::HEADER, type,
+       Tags::Luminosity::VERSION, Dimensions::Space::SPECTRAL, EXTEND),
     mHasMOrdering(false),
+    mLuminosity(std::numeric_limits<MHDFloat>::quiet_NaN()),
     mNusselt(std::numeric_limits<MHDFloat>::quiet_NaN()),
-    mTb(std::numeric_limits<MHDFloat>::quiet_NaN()),
-    mOrigin(0, 0)
-{}
+    mSb(std::numeric_limits<MHDFloat>::quiet_NaN()),
+    mBoundary(0, 0)
+{
+   mpRhoTempKappa = pF[0];
+   mpD1Sc = pF[1];
+}
 
 void SphereLuminosityWriter::init()
 {
@@ -73,25 +87,29 @@ void SphereLuminosityWriter::init()
    }
 
    // Background state
-   this->mTb = 0.5;
+   Array rbArr(1);
+   rbArr(0) = 1.0;
+   MHDFloat rtk = (this->mpRhoTempKappa->evaluateLP(rbArr,0,0).array())(0);
+   MHDFloat bg = -rtk*(this->mpD1Sc->evaluateLP(rbArr,0,0).array())(0);
+   this->mSb = (4.0*Math::PI) * bg;
 
    // Look for l = 0, m = 0 mode
    if (m0 == 0 && l0 == 0)
    {
-      Internal::Array grid = Internal::Array::Zero(1);
+      Internal::Array grid = Internal::Array::Ones(1);
       int nN = this->res().sim().dim(Dimensions::Simulation::SIM1D,
          Dimensions::Space::SPECTRAL);
       Matrix poly(grid.size(), nN);
       Internal::Matrix ipoly(grid.size(), nN);
       namespace ev = Polynomial::Worland::Evaluator;
-      Polynomial::Worland::Wnl wnl;
-      wnl.compute<MHDFloat>(poly, nN, 0, grid, Internal::Array(), ev::Set());
-      this->mOrigin = poly.transpose();
-      this->mOrigin /= std::sqrt(4.0 * Math::PI);
+      Polynomial::Worland::dWnl dwnl;
+      dwnl.compute<MHDFloat>(poly, nN, 0, grid, Internal::Array(), ev::Set());
+      this->mBoundary = poly.transpose();
+      this->mBoundary *= -(4.0*Math::PI)*rtk / std::sqrt(4.0 * Math::PI);
    }
    else
    {
-      this->mOrigin.resize(0, 0);
+      this->mBoundary.resize(0, 0);
    }
 
    IVariableAsciiWriter::init();
@@ -102,20 +120,31 @@ void SphereLuminosityWriter::writeContent()
    scalar_iterator_range sRange = this->scalarRange();
    assert(std::distance(sRange.first, sRange.second) == 1);
 
-   if (this->mOrigin.size() > 0)
+   if (this->mBoundary.size() > 0)
    {
-      this->mNusselt = std::visit(
+      this->mLuminosity = std::visit(
          [&](auto&& p)
          {
-            return (this->mTb / (this->mTb + (this->mOrigin.transpose() *
+            return ((this->mSb + (this->mBoundary.transpose() *
                                                 p->dom(0).total().profile(0, 0))
                                                 .array()))
+               .abs()(0, 0);
+         },
+         sRange.first->second);
+
+         this->mNusselt = std::visit(
+         [&](auto&& p)
+         {
+            return ((this->mSb + (this->mBoundary.transpose() *
+                                                p->dom(0).total().profile(0, 0))
+                                                .array())/this->mSb)
                .abs()(0, 0);
          },
          sRange.first->second);
    }
    else
    {
+      this->mLuminosity = 0.0;
       this->mNusselt = 0.0;
    }
 
@@ -124,6 +153,8 @@ void SphereLuminosityWriter::writeContent()
 
 // Get the "global" Kinetic energy from MPI code
 #ifdef QUICC_MPI
+   MPI_Allreduce(MPI_IN_PLACE, &this->mLuminosity, 1, MPI_DOUBLE, MPI_SUM,
+      MPI_COMM_WORLD);
    MPI_Allreduce(MPI_IN_PLACE, &this->mNusselt, 1, MPI_DOUBLE, MPI_SUM,
       MPI_COMM_WORLD);
 #endif // QUICC_MPI
@@ -136,14 +167,14 @@ void SphereLuminosityWriter::writeContent()
    {
       this->mFile << std::scientific;
       this->mFile << std::setprecision(ioPrec) << ioFW(ioPrec) << this->mTime
-                  << "\t" << ioFW(ioPrec) << this->mNusselt << std::endl;
+                  << "\t" << ioFW(ioPrec) << this->mLuminosity << "\t" << ioFW(ioPrec) << this->mNusselt  << std::endl;
    }
 
    // Close file
    this->postWrite();
 
    // Abort if kinetic energy is NaN
-   if (std::isnan(this->mNusselt))
+   if (std::isnan(this->mLuminosity))
    {
       QuICCEnv().abort("Sphere Nusselt is NaN!");
    }

@@ -19,6 +19,7 @@
 #include "QuICC/SpatialScheme/Feature.hpp"
 #include "QuICC/Model/IModelBackend.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
+#include "DenseSM/Worland/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -102,6 +103,15 @@ namespace Model {
                                                                                  std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF);
 
          /**
+          * @brief Interface to adding ASCII output file (anelastic case)
+          */
+         template <typename T, typename TApp> std::shared_ptr<T> enableAsciiFile(const std::string tag, 
+                                                                                 const std::string prefix, 
+                                                                                 const std::size_t id, 
+                                                                                 std::shared_ptr<TApp> spSim,
+                                                                                 std::vector<std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction>> pF);
+
+         /**
           * @brief Interface to adding a one-time ASCII output file (anelastic case)
           */
          template <typename T, typename TApp, typename TFunc> std::shared_ptr<T> enableOneTimeAsciiFile(const std::string tag, 
@@ -148,13 +158,43 @@ namespace Model {
       }
    }
 
-   // anelastic case overload:
+   // anelastic case overload, shell:
    // this version accepts a vector of pointers to DenseSM profiles
    template <typename T, typename TApp> std::shared_ptr<T> IPhysicalModel::enableAsciiFile(const std::string tag, 
                                                                                            const std::string prefix, 
                                                                                            const std::size_t id, 
                                                                                            std::shared_ptr<TApp> spSim,
                                                                                            std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
+   {
+      if(spSim->config().model(tag).at("enable"))
+      {
+         auto spFile = std::make_shared<T>(prefix, spSim->ss().tag(), pF);
+         spFile->expect(id);
+         if((spSim->config().model(tag).count("numbered") > 0) && spSim->config().model(tag).at("numbered"))
+         {
+            spFile->numberOutput();
+         }
+         if(spSim->config().model(tag).count("only_every") > 0)
+         {
+            spFile->onlyEvery(spSim->config().model(tag).at("only_every"));
+         }
+         spSim->addAsciiOutputFile(spFile);
+
+         return spFile;
+      }
+      else
+      {
+         return nullptr;
+      }
+   }
+
+   // anelastic case overload, sphere:
+   // this version accepts a vector of pointers to DenseSM profiles
+   template <typename T, typename TApp> std::shared_ptr<T> IPhysicalModel::enableAsciiFile(const std::string tag, 
+                                                                                           const std::string prefix, 
+                                                                                           const std::size_t id, 
+                                                                                           std::shared_ptr<TApp> spSim,
+                                                                                           std::vector<std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction>> pF)
    {
       if(spSim->config().model(tag).at("enable"))
       {

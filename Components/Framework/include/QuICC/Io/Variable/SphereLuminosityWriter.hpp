@@ -1,6 +1,6 @@
 /**
  * @file SphereLuminosityWriter.hpp
- * @brief Implementation of the Nusselt number in a sphere
+ * @brief Implementation of the Luminosity in a sphere
  */
 
 #ifndef QUICC_IO_VARIABLE_SPHERELUMINOSITYWRITER_HPP
@@ -63,6 +63,12 @@ protected:
    bool mHasMOrdering;
 
 private:
+
+   /**
+    * @brief Luminosity
+    */
+   MHDFloat mLuminosity;
+
    /**
     * @brief Nusselt number
     */
@@ -71,12 +77,22 @@ private:
    /*
     * @brief Spherical volume to normalize energy to energy density
     */
-   MHDFloat mTb;
+   MHDFloat mSb;
 
    /**
     * @brief Origin projector
     */
-   Matrix mOrigin;
+   Matrix mBoundary;
+
+   /**
+    * @brief shared pointers to density*Temperature*kappa profile 
+    */
+   std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> mpRhoTempKappa;
+
+   /**
+    * @brief shared pointers to D1ConductiveEntropy profile 
+    */
+   std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> mpD1Sc;
 };
 
 /// Typedef for a shared pointer of a HDF5 state file writer
