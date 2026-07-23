@@ -34,6 +34,7 @@ Wnabl::usage="Wnl[n,\[Alpha],d\[Beta],l,r]";
 Wnl::usage="Wnl[n,l,r]";
 rWnl::usage="rWnl[n,l,r]";
 dWnl::usage="dWnl[n,l,r]";
+ddivrWnl::usage="ddivrWnl[n,l,r]";
 d2Wnl::usage="d2Wnl[n,l,r]";
 slaplWnl::usage="slaplWnl[n,l,r]";
 divrWnl::usage="divrWnl[n,l,r]";
@@ -131,6 +132,9 @@ divrclaplhWorland[n_,l_,t_]=Simplify[1/t (1/t D[t D[t^l JacobiP[n,$w\[Alpha],l+$
 (*drWorland*)
 drWorland0[l_,t_]=Simplify[D[t^(l+1) JacobiP[0,$w\[Alpha],l+$wd\[Beta],2t^2-1],t]];
 drWorland[n_,l_,t_]=Simplify[D[t^(l+1) JacobiP[n,$w\[Alpha],l+$wd\[Beta],2t^2-1],t]];
+(*ddivrWorland*)
+ddivrWorland0[l_,t_]=Simplify[D[t^(l-1) JacobiP[0,$w\[Alpha],l+$wd\[Beta],2t^2-1],t]]
+ddivrWorland[n_,l_,t_]=Simplify[D[t^(l-1) JacobiP[n,$w\[Alpha],l+$wd\[Beta],2t^2-1],t]];
 (*divrdrWorland*)
 divrdrWorland0[l_,t_]=Simplify[1/t D[t^(l+1) JacobiP[0,$w\[Alpha],l+$wd\[Beta],2t^2-1],t]];
 divrdrWorland[n_,l_,t_]=Simplify[1/t D[t^(l+1) JacobiP[n,$w\[Alpha],l+$wd\[Beta],2t^2-1],t]];
@@ -155,6 +159,7 @@ d2Wnl[n_,l_,r_]:=If[n>0,If[n>1,d2Worland[n,l,r],d2Worland1[l,r]],d2Worland0[l,r]
 slaplWnl[n_,l_,r_]:=If[n>0,If[n>1,slaplWorland[n,l,r],slaplWorland1[l,r]],slaplWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
 divrWnl[n_,l_,r_]:=r^(l-1) JacobiP[n,$w\[Alpha],l+$wd\[Beta],2r^2-1]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
 drWnl[n_,l_,r_]:=If[n>0,drWorland[n,l,r],drWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
+ddivrWnl[n_,l_,r_]:=If[n>0,ddivrWorland[n,l,r],ddivrWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
 divrdrWnl[n_,l_,r_]:=If[n>0,divrdrWorland[n,l,r],divrdrWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
 rddivrWnl[n_,l_,r_]:=If[n>0,rddivrWorland[n,l,r],rddivrWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
 insulatingWnl[n_,l_,r_]:=If[n>0,insulatingWorland[n,l,r],insulatingWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];

@@ -11,11 +11,19 @@
 // Project includes
 //
 #include "QuICC/Transform/Backward/D1.hpp"
+#include "QuICC/Transform/Backward/D1Overr1.hpp"
 #include "QuICC/Transform/Backward/D1R1.hpp"
 #include "QuICC/Transform/Backward/Overr1.hpp"
+#include "QuICC/Transform/Backward/Overr1D0.hpp"
+#include "QuICC/Transform/Backward/Overr2.hpp"
+#include "QuICC/Transform/Backward/RGradRTh.hpp"
+#include "QuICC/Transform/Backward/RGradRThD0.hpp"
 #include "QuICC/Transform/Backward/Overr1D1R1.hpp"
+#include "QuICC/Transform/Backward/Overr2D1R1.hpp"
+#include "QuICC/Transform/Backward/OverrSqD1R1.hpp"
 #include "QuICC/Transform/Backward/P.hpp"
 #include "QuICC/Transform/Backward/Slapl.hpp"
+#include "QuICC/Transform/Backward/SlaplD0.hpp"
 #include "QuICC/Transform/DefaultSphereWorlandMap.hpp"
 #include "QuICC/Transform/Forward/I2P.hpp"
 #include "QuICC/Transform/Forward/I2Q.hpp"
@@ -41,9 +49,13 @@
 #include "QuICC/Transform/Poly/Worland/Integrator/P_Zero.hpp"
 #include "QuICC/Transform/Poly/Worland/Integrator/R1_Zero.hpp"
 #include "QuICC/Transform/Poly/Worland/Projector/D1.hpp"
+#include "QuICC/Transform/Poly/Worland/Projector/D1DivR1.hpp"
 #include "QuICC/Transform/Poly/Worland/Projector/D1R1.hpp"
 #include "QuICC/Transform/Poly/Worland/Projector/DivR1D1R1_Zero.hpp"
+#include "QuICC/Transform/Poly/Worland/Projector/DivR2D1R1_Zero.hpp"
 #include "QuICC/Transform/Poly/Worland/Projector/DivR1_Zero.hpp"
+#include "QuICC/Transform/Poly/Worland/Projector/DivR2_Zero.hpp"
+#include "QuICC/Transform/Poly/Worland/Projector/rGrad_r_th.hpp"
 #include "QuICC/Transform/Poly/Worland/Projector/P.hpp"
 #include "QuICC/Transform/Poly/Worland/Projector/SphLapl.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/Energy.hpp"
@@ -88,14 +100,30 @@ void DefaultSphereWorlandMap::operator()(MapType& m) const
       Backward::P::id());
    this->addOperator<Poly::Worland::Projector::DivR1_Zero<backend_t>>(m,
       Backward::Overr1::id());
+   this->addOperator<Poly::Worland::Projector::DivR1_Zero<backend_t>>(m,
+      Backward::Overr1D0::id());
+   this->addOperator<Poly::Worland::Projector::DivR2_Zero<backend_t>>(m,
+      Backward::Overr2::id());
+   this->addOperator<Poly::Worland::Projector::rGrad_r_th<backend_t>>(m,
+      Backward::RGradRTh::id());
+   this->addOperator<Poly::Worland::Projector::rGrad_r_th<backend_t>>(m,
+      Backward::RGradRThD0::id());
    this->addOperator<Poly::Worland::Projector::D1<backend_t>>(m,
       Backward::D1::id());
+   this->addOperator<Poly::Worland::Projector::D1DivR1<backend_t>>(m,
+      Backward::D1Overr1::id());
    this->addOperator<Poly::Worland::Projector::D1R1<backend_t>>(m,
       Backward::D1R1::id());
    this->addOperator<Poly::Worland::Projector::DivR1D1R1_Zero<backend_t>>(m,
       Backward::Overr1D1R1::id());
+   this->addOperator<Poly::Worland::Projector::DivR2D1R1_Zero<backend_t>>(m,
+      Backward::Overr2D1R1::id());
+   this->addOperator<Poly::Worland::Projector::DivR2D1R1_Zero<backend_t>>(m,
+      Backward::OverrSqD1R1::id());
    this->addOperator<Poly::Worland::Projector::SphLapl<backend_t>>(m,
       Backward::Slapl::id());
+   this->addOperator<Poly::Worland::Projector::SphLapl<backend_t>>(m,
+      Backward::SlaplD0::id());
 
    // Create integrators
    this->addOperator<Poly::Worland::Integrator::P<backend_t>>(m,

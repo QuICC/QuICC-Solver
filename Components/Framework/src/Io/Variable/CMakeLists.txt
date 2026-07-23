@@ -53,6 +53,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ShellTorPolEnstrophyMSpectrumWriter.cpp
   SphereAngularMomentumWriter.cpp
   SphereDipolarityWriter.cpp
+  SphereLuminosityWriter.cpp
   SphereMaxAbsoluteFieldValueWriter.cpp
   SphereNusseltWriter.cpp
   SphereRadialProfilesWriter.cpp

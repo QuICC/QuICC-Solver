@@ -211,6 +211,8 @@ namespace Physical {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int iR_;
 
+      std::cerr << "nR = "<<nR<<" \n";
+
       auto nu        = pV->evaluateLP(r, 0, 0); 
       auto T         = pT->evaluateLP(r, 0, 0); 
       auto Rho       = pF->evaluateLP(r, 0, 0); 
@@ -220,6 +222,8 @@ namespace Physical {
       {
          iR_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR);         
          int nTh = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR); 
+
+         std::cerr << "nTh = "<<nTh<<" \n";
          
          auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), T(iR_), Rho(iR_), dLogRho(iR_));
 
@@ -240,6 +244,10 @@ namespace Physical {
          }
          // Print phi values - use grid size directly since phi is typically uniform
          int nPh = phGrid.size();
+
+         std::cerr <<" \n";
+         std::cerr << "nPh = "<<nPh<<" \n";
+
          std::cerr << "\n phi = \n";
          for(int iPh = 0; iPh < nPh; ++iPh)
          {

@@ -45,6 +45,11 @@ struct D1_t
 {
 };
 
+/// @brief D1 op type tag
+struct D1DivR1_t
+{
+};
+
 /// @brief D1R1 op type tag
 struct D1R1_t
 {
@@ -65,6 +70,11 @@ struct DivR1_Zero_t
 {
 };
 
+/// @brief DivR2_Zero op type tag
+struct DivR2_Zero_t
+{
+};
+
 /// @brief DivR1D1R1 op type tag
 struct DivR1D1R1_t
 {
@@ -75,8 +85,18 @@ struct DivR1D1R1_Zero_t
 {
 };
 
+/// @brief DivR1D1R1_Zero op type tag
+struct DivR2D1R1_Zero_t
+{
+};
+
 /// @brief SphLapl op type tag
 struct SphLapl_t
+{
+};
+
+/// @brief rGrad_r_th op type tag
+struct rGrad_r_th_t
 {
 };
 

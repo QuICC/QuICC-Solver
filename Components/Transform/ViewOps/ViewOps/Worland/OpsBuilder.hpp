@@ -18,14 +18,18 @@
 #include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/claplhWnl.hpp"
 #include "QuICC/Polynomial/Worland/dWnl.hpp"
+#include "QuICC/Polynomial/Worland/dr_1Wnl.hpp"
 #include "QuICC/Polynomial/Worland/dclaplhWnl.hpp"
 #include "QuICC/Polynomial/Worland/drWnl.hpp"
 #include "QuICC/Polynomial/Worland/dr_1drWnl.hpp"
 #include "QuICC/Polynomial/Worland/rWnl.hpp"
 #include "QuICC/Polynomial/Worland/r_1Wnl.hpp"
+#include "QuICC/Polynomial/Worland/r_2Wnl.hpp"
+#include "QuICC/Polynomial/Worland/r_2drWnl.hpp"
 #include "QuICC/Polynomial/Worland/r_1claplhWnl.hpp"
 #include "QuICC/Polynomial/Worland/r_1drWnl.hpp"
 #include "QuICC/Polynomial/Worland/slaplWnl.hpp"
+#include "QuICC/Polynomial/Worland/rGradWnl_r_th.hpp"
 #include "ViewOps/Worland/Builder.hpp"
 #include "ViewOps/Worland/Tags.hpp"
 
@@ -78,6 +82,17 @@ template <class VOP, class DIR> struct OpsBuilderMap<VOP, D1_t, DIR>
       Worland::Builder<VOP, QuICC::DenseOp::Worland::Operator<dWnl>, DIR>;
 };
 
+/// @brief D1DivR1 Builder
+/// @tparam VOP operator view type
+/// Projector only
+template <class VOP> struct OpsBuilderMap<VOP, D1DivR1_t, bwd_t>
+{
+   //using type =
+   //   Worland::Builder<VOP, QuICC::DenseOp::Worland::Operator<dr_1Wnl>, bwd_t>;
+   using type = Worland::Builder<VOP,
+      QuICC::DenseOp::Worland::Operator<dr_1Wnl>, bwd_t>;
+};
+
 /// @brief D1R1 Builder
 /// Projector only
 /// @tparam VOP operator view type
@@ -125,6 +140,16 @@ template <class VOP> struct OpsBuilderMap<VOP, DivR1_Zero_t, fwd_t>
       fwd_t>;
 };
 
+/// @brief DivR2_Zero Builder
+/// Projector only
+/// @tparam VOP operator view type
+template <class VOP> struct OpsBuilderMap<VOP, DivR2_Zero_t, bwd_t>
+{
+   using type = Worland::Builder<VOP,
+      QuICC::DenseOp::Worland::OperatorWithMean<r_2Wnl<recurrence_t>, void>,
+      bwd_t>;
+};
+
 /// @brief DivR1D1R1 Builder
 /// Projector only
 /// @tparam VOP operator view type
@@ -154,6 +179,16 @@ template <class VOP> struct OpsBuilderMap<VOP, DivR1D1R1_Zero_t, fwd_t>
       fwd_t>;
 };
 
+/// @brief DivR2D1R1_Zero Builder
+/// Projector only
+/// @tparam VOP operator view type
+template <class VOP> struct OpsBuilderMap<VOP, DivR2D1R1_Zero_t, bwd_t>
+{
+   using type = Worland::Builder<VOP,
+      QuICC::DenseOp::Worland::OperatorWithMean<r_2drWnl, void>,
+      bwd_t>;
+};
+
 /// @brief SphLapl Builder
 /// Projector only
 /// @tparam VOP operator view type
@@ -161,6 +196,16 @@ template <class VOP> struct OpsBuilderMap<VOP, SphLapl_t, bwd_t>
 {
    using type =
       Worland::Builder<VOP, QuICC::DenseOp::Worland::Operator<slaplWnl>, bwd_t>;
+};
+
+/// @brief rGrad_r_th Builder
+/// Projector only
+/// @tparam VOP operator view type
+template <class VOP> struct OpsBuilderMap<VOP, rGrad_r_th_t, bwd_t>
+{
+   using type = Worland::Builder<VOP,
+      QuICC::DenseOp::Worland::OperatorWithMean<rGradWnl_r_th, void>,
+      bwd_t>;
 };
 
 /// @brief CylLaplh Builder

@@ -1,5 +1,6 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
   SphericalBuoyancy.cpp
+  SphericalBuoyancyAnelastic.cpp
   SphericalCoriolis.cpp
   SphericalCoriolisAnelastic.cpp
   SphericalSelfAdvectionAnelastic.cpp

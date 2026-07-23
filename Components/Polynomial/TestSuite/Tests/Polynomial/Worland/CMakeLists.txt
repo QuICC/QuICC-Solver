@@ -25,6 +25,7 @@ set(WorlandTests
   dWnl:Chebyshev
   slaplWnl:Chebyshev
   drWnl:Chebyshev
+  dr_1Wnl:Chebyshev
   dr_1drWnl:Chebyshev
   r_1claplhWnl:Chebyshev
   claplhWnl:Chebyshev
@@ -33,6 +34,7 @@ set(WorlandTests
   dWnl:SphEnergy
   slaplWnl:SphEnergy
   drWnl:SphEnergy
+  dr_1Wnl:SphEnergy
   dr_1drWnl:SphEnergy
   r_1claplhWnl:SphEnergy
   claplhWnl:SphEnergy

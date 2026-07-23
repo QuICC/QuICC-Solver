@@ -6,7 +6,7 @@ endif()
 
 set(Kinds "Projector;Integrator")
 
-set(ProjectorOps "P;D1;D1_P;D1R1;DivR1;DivR1_Zero;DivR1D1R1;DivR1D1R1_Zero;SphLapl;CylLaplh;CylLaplh_DivR1D1R1;D1CylLaplh;D1CylLaplh_D1DivR1D1R1;DivR1CylLaplh_Zero")
+set(ProjectorOps "P;D1;D1DivR1;D1_P;D1R1;DivR1;DivR1_Zero;DivR2_Zero;DivR1D1R1;DivR1D1R1_Zero;DivR2D1R1_Zero;SphLapl;rGrad_r_th;CylLaplh;CylLaplh_DivR1D1R1;D1CylLaplh;D1CylLaplh_D1DivR1D1R1;DivR1CylLaplh_Zero")
 set(IntegratorOps "P;P_Zero;R1_Zero;DivR1_Zero;I2;I2_Zero;I2DivR1_Zero;I4DivR1_Zero;I6DivR1_Zero;DivR1D1R1_Zero;I2DivR1D1R1_Zero;I4DivR1D1R1_Zero")
 
 set(IntegratorOpAttribute "CSL3D")

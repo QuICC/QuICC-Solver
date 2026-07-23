@@ -4,6 +4,7 @@ set(tags
   D1Laplhm1
   D1LaplhZD1Overr1D1R1
   D1R1
+  D1Overr1
   D1ZP
   D2
   D3
@@ -26,7 +27,10 @@ set(tags
   Overr2
   OverrSq
   Slapl
+  SlaplD0
   Slaplr
+  RGradRTh
+  RGradRThD0
   Oversin
   OversinD1Sin
   D1OversinDphi
