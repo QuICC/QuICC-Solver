@@ -16,6 +16,8 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Transform/ITransform.hpp"
 #include "QuICC/Transform/Poly/Worland/Transform.hpp"
+#include "DenseSM/Worland/RadialTorPolFunction.hpp"
+
 
 namespace QuICC {
 
@@ -91,6 +93,16 @@ namespace Transform {
           * @param id         Energy reductor to use
           */
          virtual void reduce(Matrix& spectrum, const MatrixZ& in, const std::size_t id) override;
+
+         /**
+          * @brief Compute reduction operation, anelastic overload
+          *
+          * @param spectrum   Output energy spectrum
+          * @param in         Input spectral coefficients
+          * @param id         Energy reductor to use
+          * @param pF         Radial profile (e.g. density)
+          */
+         virtual void reduce(Matrix& spectrum, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF) override;
 
          /**
           * @brief Get the memory requirements

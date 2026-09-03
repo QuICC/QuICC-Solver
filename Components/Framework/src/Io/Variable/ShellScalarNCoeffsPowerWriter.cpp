@@ -1,5 +1,5 @@
 /**
- * @file ShellScalarNSpectrumWriter.cpp
+ * @file ShellScalarNCoeffsPowerWriter.cpp
  * @brief Source of the implementation of the ASCII spherical harmonics N spectra calculation for a scalar field in a spherical shell
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "QuICC/Io/Variable/ShellScalarNSpectrumWriter.hpp"
+#include "QuICC/Io/Variable/ShellScalarNCoeffsPowerWriter.hpp"
 
 // Project includes
 //
@@ -32,12 +32,12 @@ namespace QuICC {
 namespace Io {
 
 namespace Variable {
-   ShellScalarNSpectrumWriter::ShellScalarNSpectrumWriter(const std::string& prefix, const std::string& type)
-      : ISphericalScalarNSpectrumWriter(prefix, type)
+   ShellScalarNCoeffsPowerWriter::ShellScalarNCoeffsPowerWriter(const std::string& prefix, const std::string& type)
+      : ISphericalScalarNCoeffsPowerWriter(prefix, type)
    {
    }
 
-   void ShellScalarNSpectrumWriter::init()
+   void ShellScalarNCoeffsPowerWriter::init()
    {
       // Spherical shell volume: 4/3*pi*(r_o^3 - r_i^3)
       MHDFloat ri = this->mPhysical.find(NonDimensional::Lower1d::id())->second->value();
@@ -47,7 +47,7 @@ namespace Variable {
       this->mHasMOrdering = this->res().sim().ss().has(
          SpatialScheme::Feature::TransformSpectralOrdering123);
 
-      ISphericalScalarNSpectrumWriter::init();
+      ISphericalScalarNCoeffsPowerWriter::init();
    }
 
 }

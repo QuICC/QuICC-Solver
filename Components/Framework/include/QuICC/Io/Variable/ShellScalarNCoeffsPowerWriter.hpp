@@ -1,10 +1,10 @@
 /** 
- * @file ShellScalarNSpectrumWriter.hpp
+ * @file ShellScalarNCoeffsPowerWriter.hpp
  * @brief Implementation of the ASCII spherical harmonics L energy spectrum calculation for a Toroidal/Poloidal field in a spherical shell
  */
 
-#ifndef QUICC_IO_VARIABLE_SHELLSCALARNSPECTRUMWRITER_HPP
-#define QUICC_IO_VARIABLE_SHELLSCALARNSPECTRUMWRITER_HPP
+#ifndef QUICC_IO_VARIABLE_SHELLSCALARNCOEFFSPOWERWRITER_HPP
+#define QUICC_IO_VARIABLE_SHELLSCALARNCOEFFSPOWERWRITER_HPP
 
 // Configuration includes
 //
@@ -20,7 +20,7 @@
 //
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
-#include "QuICC/Io/Variable/ISphericalScalarNSpectrumWriter.hpp"
+#include "QuICC/Io/Variable/ISphericalScalarNCoeffsPowerWriter.hpp"
 
 namespace QuICC {
 
@@ -29,9 +29,9 @@ namespace Io {
 namespace Variable {
 
    /**
-    * @brief Implementation of the ASCII spherical harmonics L energy spectrum calculation for a Toroidal/Poloidal field in a spherical shell
+    * @brief Implementation of the ASCII coefficient power spectrum calculation for a Toroidal/Poloidal field in a spherical shell
     */
-   class ShellScalarNSpectrumWriter: public ISphericalScalarNSpectrumWriter
+   class ShellScalarNCoeffsPowerWriter: public ISphericalScalarNCoeffsPowerWriter
    {
       public:
          /**
@@ -40,12 +40,12 @@ namespace Variable {
           * @param prefix Prefix to use for file name
           * @param type Type of the file (typically scheme name)
           */
-         ShellScalarNSpectrumWriter(const std::string& prefix, const std::string& type);
+         ShellScalarNCoeffsPowerWriter(const std::string& prefix, const std::string& type);
 
          /**
           * @brief Destructor
           */
-         virtual ~ShellScalarNSpectrumWriter() = default;
+         virtual ~ShellScalarNCoeffsPowerWriter() = default;
 
          /**
           * @brief Initialise the operator, transform and file
@@ -58,10 +58,10 @@ namespace Variable {
    };
 
    /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef std::shared_ptr<ShellScalarNSpectrumWriter> SharedShellScalarNSpectrumWriter;
+   typedef std::shared_ptr<ShellScalarNCoeffsPowerWriter> SharedShellScalarNCoeffsPowerWriter;
 
 } // namespace Variable
 } // namespace Io
 } // namespace QuICC
 
-#endif // QUICC_IO_VARIABLE_SHELLTORPOLNSPECTRUMWRITER_HPP
+#endif // QUICC_IO_VARIABLE_SHELLTORPOLNCOEFFSPOWERWRITER_HPP

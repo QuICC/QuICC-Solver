@@ -23,6 +23,7 @@
 #include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Transform/Poly/Setup.hpp"
 #include "QuICC/Transform/ITransformOperator.hpp"
+#include "DenseSM/Worland/RadialTorPolFunction.hpp"
 
 
 namespace QuICC {
@@ -61,6 +62,17 @@ namespace Worland {
           * @param spSetup   Shared setup object for the transform
           */
          void init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const override;
+         
+         /**
+          * @brief Initialise the polynomial transform
+          *
+          * @param spSetup    Shared setup object for the transform
+          * @param igrid      quadrature grid points
+          * @param iweights   quadrature weights
+          * @param pF         radial function (e.g. density)
+          */
+         void init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const;
+         
          /**
           * @brief Initialise the polynomial transform
           *
@@ -83,6 +95,15 @@ namespace Worland {
           * @param in   Input values
           */
          void transform(Matrix& rOut, const MatrixZ& in) const;
+
+         /**
+          * @brief Compute polynomial transform (anelastic overload)
+          *
+          * @param rOut Output values
+          * @param in   Input values
+          * @param pF   Radial profile (e.g. density)
+          */
+         void transform(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const;
 
          /**
           * @brief Get the memory requirements
@@ -117,6 +138,16 @@ namespace Worland {
          virtual void initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const = 0;
 
          /**
+          * @brief Initialise the operators (anelastic overload)
+          */
+         virtual void initOperators(const Internal::Array& igrid, const Internal::Array& iweights, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const;
+
+         /**
+          * @brief Initialise the operators (anelastic overload)
+          */
+         virtual void initOperatorsAnelastic(const Internal::Array& igrid, const Internal::Array& iweights, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const;
+
+         /**
           * @brief Apply operators
           *
           * @param rOut Output values
@@ -131,6 +162,14 @@ namespace Worland {
           * @param in   Input values
           */
          virtual void applyOperators(Matrix& rOut, const MatrixZ& in) const;
+
+         /**
+          * @brief Apply operators
+          *
+          * @param rOut Output values
+          * @param in   Input values
+          */
+         virtual void applyOperators(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const;
    };
 
 }

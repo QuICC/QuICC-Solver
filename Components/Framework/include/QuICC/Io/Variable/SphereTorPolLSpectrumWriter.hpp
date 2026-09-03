@@ -16,6 +16,8 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Io/Variable/ISphericalTorPolLSpectrumWriter.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
+#include "DenseSM/Worland/RadialTorPolFunction.hpp"
+
 
 namespace QuICC {
 
@@ -37,7 +39,7 @@ public:
     * @param type Type of the file (typically scheme name)
     */
    SphereTorPolLSpectrumWriter(const std::string& prefix,
-      const std::string& type);
+      const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction>> pF = {});
 
    /**
     * @brief Destructor

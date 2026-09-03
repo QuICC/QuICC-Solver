@@ -119,6 +119,17 @@ namespace Worland {
       op.transform(rOut, in);
    }
 
+   void Transform::transform(Matrix& rOut, const MatrixZ& in, const IWorlandOperator& op, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF)
+   {
+      if(!op.isInitialized() || !op.isInitializedAnelastic())
+      {
+         // TODO: CHECK IF I NEED TO CHANGE THIS!!
+         op.init(this->mspSetup, this->mIGrid, this->mIWeights, pF);
+      }
+
+      op.transform(rOut, in, pF);
+   }
+
    void Transform::transform(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
    {
       auto it = this->mOps.find(id);
@@ -139,6 +150,19 @@ namespace Worland {
       if(it != this->mOps.end())
       {
          this->transform(rOut, in, *(it->second));
+      } else
+      {
+         throw std::logic_error("Requested Worland transform operator is not avaible");
+      }
+   }
+
+   void Transform::transform(Matrix& rOut, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF)
+   {
+      auto it = this->mOps.find(id);
+
+      if(it != this->mOps.end())
+      {
+         this->transform(rOut, in, *(it->second), pF);
       } else
       {
          throw std::logic_error("Requested Worland transform operator is not avaible");

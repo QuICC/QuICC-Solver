@@ -64,6 +64,12 @@ namespace Transform {
          bool isInitialized() const;
 
          /**
+          * @brief
+          */
+         bool isInitializedAnelastic() const;
+
+
+         /**
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const;
@@ -88,6 +94,11 @@ namespace Transform {
           * @brief Need initialization?
           */
          mutable bool mIsInitialized;
+
+         /**
+          * @brief Need anelastic initialization?
+          */
+         mutable bool mIsInitializedAnelastic;
 
       private:
    };

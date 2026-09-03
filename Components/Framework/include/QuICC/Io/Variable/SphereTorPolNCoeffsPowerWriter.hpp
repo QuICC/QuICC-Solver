@@ -1,10 +1,10 @@
 /** 
- * @file SphereTorPolNScalarSpectrumWriter.hpp
+ * @file SphereTorPolNCoeffsPowerWriter.hpp
  * @brief Implementation of the ASCII spherical harmonics L energy spectrum calculation for a Toroidal/Poloidal field in a sphere
  */
 
-#ifndef QUICC_IO_VARIABLE_SPHERETORPOLNSCALARSPECTRUMWRITER_HPP
-#define QUICC_IO_VARIABLE_SPHERETORPOLNSCALARSPECTRUMWRITER_HPP
+#ifndef QUICC_IO_VARIABLE_SPHERETORPOLNCOEFFSPOWERWRITER_HPP
+#define QUICC_IO_VARIABLE_SPHERETORPOLNCOEFFSPOWERWRITER_HPP
 
 // System includes
 //
@@ -15,7 +15,7 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Variable/ISphericalTorPolNScalarSpectrumWriter.hpp"
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
+#include "DenseSM/Worland/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -26,7 +26,7 @@ namespace Variable {
    /**
     * @brief Implementation of the ASCII spherical harmonics L energy spectrum calculation for a Toroidal/Poloidal field in a sphere
     */
-   class SphereTorPolNScalarSpectrumWriter: public ISphericalTorPolNScalarSpectrumWriter
+   class SphereTorPolNCoeffsPowerWriter: public ISphericalTorPolNScalarSpectrumWriter
    {
       public:
          /**
@@ -35,12 +35,12 @@ namespace Variable {
           * @param prefix Prefix to use for file name
           * @param type Type of the file (typically scheme name)
           */
-         SphereTorPolNScalarSpectrumWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF = {});
+         SphereTorPolNCoeffsPowerWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction>> pF = {});
 
          /**
           * @brief Destructor
           */
-         virtual ~SphereTorPolNScalarSpectrumWriter();
+         virtual ~SphereTorPolNCoeffsPowerWriter();
 
          /**
           * @brief Initialise the operator, transform and file
@@ -53,10 +53,10 @@ namespace Variable {
    };
 
    /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef std::shared_ptr<SphereTorPolNScalarSpectrumWriter> SharedSphereTorPolNScalarSpectrumWriter;
+   typedef std::shared_ptr<SphereTorPolNCoeffsPowerWriter> SharedSphereTorPolNCoeffsPowerWriter;
 
 }
 }
 }
 
-#endif // QUICC_IO_VARIABLE_SPHERETORPOLNSCALARSPECTRUMWRITER_HPP
+#endif // QUICC_IO_VARIABLE_SPHERETORPOLNSCOEFFSPOWERWRITER_HPP

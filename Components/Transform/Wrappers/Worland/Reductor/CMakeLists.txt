@@ -51,6 +51,26 @@ set(IntOp
     tBuilderFwd.compute(intView, igrid, iweights);
 ")
 
+set(IntOpAnelastic
+"
+    // dim 0 - R  - radial modes
+    // dim 1 - Nr - radial points
+    // dim 2 - L  - harmonic degree
+    std::array<std::uint32_t, rank> dimensionsInt {Kanel, Manel, P};
+
+    // Make view integrator operator
+    using backendInt_t = @BackendNamespace@::ImplOp<mods_t, phys_t, op_t>;
+    using derivedInt_t = Op<mods_t, phys_t, op_t, backendInt_t>;
+
+    mIntAnelastic = std::make_unique<derivedInt_t>(mem);
+    derivedInt_t& derivedOp = dynamic_cast<derivedInt_t&>(*mIntAnelastic);
+    derivedOp.allocOp(dimensionsInt, layers);
+    auto intView = derivedOp.getOp();
+
+    OpsBuilder<op_t, @Op@_t, fwd_t> tBuilderFwd;
+    tBuilderFwd.compute(intView, igridAnelastic, iweightsAnelastic);
+")
+
 # cpu/gpu
 set(CpuMemRes "Cpu::NewDelete")
 set(GpuMemRes "Cuda::Malloc")
@@ -113,10 +133,28 @@ set(CpuSetDataViews
     mPhysView = phys_t(mPhysFlat.data(), mPhysFlat.size(), physDims.data(), dataPointers, dataIndices);"
 )
 
+set(CpuSetDataViewsAnelastic
+"// set pointers
+    ViewBase<std::uint32_t> dataPointers[rank];
+    dataPointers[1] = ViewBase<std::uint32_t>(mDataPointersAnelastic.data(), mDataPointersAnelastic.size());
+    ViewBase<std::uint32_t> dataIndices[rank];
+    dataIndices[1] = ViewBase<std::uint32_t>(mDataIndicesAnelastic.data(), mDataIndicesAnelastic.size());
+
+    // set views
+    mModsViewAnelastic = mods_t(mModsFlatAnelastic.data(), mModsFlatAnelastic.size(), modsDims.data(), dataPointers, dataIndices);
+    mPhysViewAnelastic = phys_t(mPhysFlatAnelastic.data(), mPhysFlatAnelastic.size(), physDims.data(), dataPointers, dataIndices);"
+)
+
 set(PowerCpuSetPowerView
 "
     mModsAbsFlat.resize(inFlatSize);
     mModsAbsView = modsAbs_t(mModsAbsFlat.data(), mModsAbsFlat.size(), modsDims.data(), dataPointers, dataIndices);
+")
+
+set(PowerCpuSetPowerViewAnelastic
+"
+    mModsAbsFlatAnelastic.resize(inFlatSize);
+    mModsAbsViewAnelastic = modsAbs_t(mModsAbsFlatAnelastic.data(), mModsAbsFlatAnelastic.size(), modsDims.data(), dataPointers, dataIndices);
 ")
 
 set(EnergyCpuSetReductorView
@@ -138,6 +176,25 @@ set(EnergyCpuSetReductorView
     mModsRedView = modsRed_t(mModsRedFlat.data(), mModsRedFlat.size(), modsDims.data(), dataPointers2D, dataIndices2D);"
 )
 
+set(EnergyCpuSetReductorViewAnelastic
+"
+    mModsAbsFlatAnelastic.resize(inFlatSize);
+    mModsAbsViewAnelastic = modsAbs_t(mModsAbsFlatAnelastic.data(), mModsAbsFlatAnelastic.size(), modsDims.data(), dataPointers, dataIndices);
+
+    // setup reductor
+    mRedAnelastic = std::make_unique<QuICC::Reduction::Cpu::Op<modsRed_t, modsAbs_t, 0>>();
+
+    // set pointers
+    ViewBase<std::uint32_t> dataPointers2D[rank-1];
+    dataPointers2D[0] = ViewBase<std::uint32_t>(mDataPointersAnelastic.data(), mDataPointersAnelastic.size());
+    ViewBase<std::uint32_t> dataIndices2D[rank-1];
+    dataIndices2D[0] = ViewBase<std::uint32_t>(mDataIndicesAnelastic.data(), mDataIndicesAnelastic.size());
+
+    // set views
+    mModsRedFlatAnelastic.resize(inFlatSize/Kanel);
+    mModsRedViewAnelastic = modsRed_t(mModsRedFlatAnelastic.data(), mModsRedFlatAnelastic.size(), modsDims.data(), dataPointers2D, dataIndices2D);"
+)
+
 set(RadialCpuSetPowerView
 "
     mPhysAbsFlat.resize(M * nCols);
@@ -148,6 +205,12 @@ set(SpectrumCpuSetPowerView
 "
     mModsAbsFlat.resize(inFlatSize);
     mModsAbsView = modsAbs_t(mModsAbsFlat.data(), mModsAbsFlat.size(), modsDims.data(), dataPointers, dataIndices);
+")
+
+set(SpectrumCpuSetPowerViewAnelastic
+"
+    mModsAbsFlatAnelastic.resize(inFlatSize);
+    mModsAbsViewAnelastic = modsAbs_t(mModsAbsFlatAnelastic.data(), mModsAbsFlatAnelastic.size(), modsDims.data(), dataPointers, dataIndices);
 ")
 
 set(GpuSetDataViews
@@ -242,6 +305,12 @@ set(SpectrumGpuSetPowerView
 
 set(PowerCompTree
 "
+    if (pF)
+    {
+        throw std::logic_error(\"Anelastic version of power calculation not fully set up.\");
+    }
+    /// project to physical space
+    mPrj->apply(mPhysView, mModsView);
     /// project to modal space
     mInt->apply(mModsView, mPhysView);
     /// pointwise op on coefficients
@@ -250,26 +319,97 @@ set(PowerCompTree
 
 set(EnergyCompTree
 "
-    /// project to modal space
-    mInt->apply(mModsView, mPhysView);
-    /// pointwise op on coefficients
-    mPnt->apply(mModsAbsView, mModsView);
-    /// reduction op on coefficients
-    mRed->apply(mModsRedView, mModsAbsView);
+    /// project to physical space
+    if (pF)
+    {
+        mPrjAnelastic->apply(mPhysViewAnelastic, mModsViewAnelastic);
+    }
+    else
+    {
+        mPrj->apply(mPhysView, mModsView);
+    }
+
+    if (pF) 
+    {
+        if (mDensityScale.empty())
+        {
+            throw std::logic_error(\"mDensityScale is Empty\");
+        }
+        else
+        {
+            const std::size_t nR = mPhysViewAnelastic.dims()[0];
+            for (std::size_t k = 0; k < mPhysFlatAnelastic.size(); ++k) 
+            {
+                mPhysFlatAnelastic[k] *= mDensityScale[k % nR];
+            }
+        }
+    }
+
+    if (pF)
+    {
+        /// project to modal space
+        mIntAnelastic->apply(mModsViewAnelastic, mPhysViewAnelastic);
+        /// pointwise op on coefficients
+        mPntAnelastic->apply(mModsAbsViewAnelastic, mModsViewAnelastic);
+        /// reduction op on coefficients
+        mRedAnelastic->apply(mModsRedViewAnelastic, mModsAbsViewAnelastic);
+    }
+    else
+    {
+        /// project to modal space
+        mInt->apply(mModsView, mPhysView);
+        /// pointwise op on coefficients
+        mPnt->apply(mModsAbsView, mModsView);
+        /// reduction op on coefficients
+        mRed->apply(mModsRedView, mModsAbsView);
+    }
 ")
 
 set(RadialCompTree
 "
+    if (pF)
+    {
+        throw std::logic_error(\"Anelastic version of radial calculation not fully set up.\");
+    }
+    /// project to physical space
+    mPrj->apply(mPhysView, mModsView);
     /// pointwise op on grid points
     mPnt->apply(mPhysAbsView, mPhysView);
 ")
 
 set(SpectrumCompTree
 "
-    /// project to modal space
-    //mInt->apply(mModsView, mPhysView);
-    /// pointwise op on coefficients
-    mPnt->apply(mModsAbsView, mModsView);
+    if (pF) 
+    {
+        /// project to physical space
+        mPrjAnelastic->apply(mPhysViewAnelastic, mModsViewAnelastic);
+
+        if (mDensityScale.empty())
+        {
+            throw std::logic_error(\"mDensityScale is Empty\");
+        }
+        else
+        {
+            const std::size_t nR = mPhysViewAnelastic.dims()[0];
+            for (std::size_t k = 0; k < mPhysFlatAnelastic.size(); ++k) 
+            {
+                mPhysFlatAnelastic[k] *= mDensityScale[k % nR];
+            }
+        }
+    }
+
+    if (pF)
+    {
+        /// project to modal space
+        mIntAnelastic->apply(mModsViewAnelastic, mPhysViewAnelastic);
+        /// pointwise op on coefficients
+        mPntAnelastic->apply(mModsAbsViewAnelastic, mModsViewAnelastic);
+    }
+    else
+    {
+        /// pointwise op on coefficients
+        mPnt->apply(mModsAbsView, mModsView);
+    }
 ")
 
 set(PowerViewToEigen
@@ -308,11 +448,23 @@ set(PowerViewToEigen
 
 set(EnergyViewToEigen
 "
-    assert(static_cast<std::size_t>(rOut.size()) == mModsRedFlat.size());
-
-    for(std::uint32_t i = 0; i < rOut.size(); i++)
+    if (pF)
     {
-        rOut.data()[i]= mModsRedFlat[i];
+        assert(static_cast<std::size_t>(rOut.size()) == mModsRedFlatAnelastic.size());
+
+        for (std::uint32_t i = 0; i < rOut.size(); ++i)
+        {
+            rOut.data()[i] = mModsRedFlatAnelastic[i];
+        }
+    }
+    else
+    {
+        assert(static_cast<std::size_t>(rOut.size()) == mModsRedFlat.size());
+
+        for (std::uint32_t i = 0; i < rOut.size(); ++i)
+        {
+            rOut.data()[i] = mModsRedFlat[i];
+        }
     }
 "
 )
@@ -353,8 +505,16 @@ set(RadialViewToEigen
 
 set(SpectrumViewToEigen
 "
-    assert(static_cast<std::size_t>(rOut.rows()) == mModsAbsView.dims()[0]);
-    assert(static_cast<std::size_t>(rOut.cols()) == mModsAbsView.indices()[1].size());
+    if(pF)
+    {
+        assert(static_cast<std::size_t>(rOut.rows()) <= mModsAbsViewAnelastic.dims()[0]);
+        assert(static_cast<std::size_t>(rOut.cols()) <= mModsAbsViewAnelastic.indices()[1].size());
+    }
+    else
+    {
+        assert(static_cast<std::size_t>(rOut.rows()) == mModsAbsView.dims()[0]);
+        assert(static_cast<std::size_t>(rOut.cols()) == mModsAbsView.indices()[1].size());
+    }
 
     start = 0;
     offSet = 0;
@@ -371,15 +531,36 @@ set(SpectrumViewToEigen
             {
             #ifdef QUICC_JW_ALL_ROW_MAJOR
                 // copy to padded from flattened column and transpose
-                outB.data()[i+j*rOut.rows()]= mModsAbsFlat[offSet + i*outB.cols()+j];
+                if (pF) 
+                {
+                    outB.data()[i+j*rOut.rows()]= mModsAbsFlatAnelastic[offSet + i*outB.cols()+j];
+                }
+                else
+                {
+                    outB.data()[i+j*rOut.rows()]= mModsAbsFlat[offSet + i*outB.cols()+j];
+                }
                 #else
                 // copy to padded from flattened column
-                outB.data()[i+j*rOut.rows()]= mModsAbsFlat[offSet + i+j*outB.rows()];
+                if (pF)
+                {
+                    outB.data()[i+j*rOut.rows()]= mModsAbsFlatAnelastic[offSet + i+j*(outB.rows()+nf)];
+                }
+                else
+                {
+                    outB.data()[i+j*rOut.rows()]= mModsAbsFlat[offSet + i+j*outB.rows()];
+                }
                 #endif
             }
         }
 
-        offSet += outB.size();
+        if (pF)
+        {
+            offSet += static_cast<std::int64_t>(outRows + nf) * cols;
+        }
+        else
+        {
+            offSet += outB.size();
+        }
         start += cols;
     }
 "
@@ -435,6 +616,7 @@ foreach(Backend IN LISTS Backends)
     set(BackendNamespace "${${Backend}BackendNamespace}")
     set(MemRes "${${Backend}MemRes}")
     set(SetDataViews "${${Backend}SetDataViews}")
+    set(SetDataViewsAnelastic "${${Backend}SetDataViewsAnelastic}")
     foreach(Kind IN LISTS Kinds)
         set(Ops "${${Kind}Ops}")
         set(OpAttribute "${${Kind}OpAttribute}")
@@ -448,8 +630,11 @@ foreach(Backend IN LISTS Backends)
         set(DeviceToHost "${${Backend}${Kind}DeviceToHost}")
 
         set(SetPowerView "${${Kind}${Backend}SetPowerView}")
+        set(SetPowerViewAnelastic "${${Kind}${Backend}SetPowerViewAnelastic}")
         set(SetReductorView "${${Kind}${Backend}SetReductorView}")
+        set(SetReductorViewAnelastic "${${Kind}${Backend}SetReductorViewAnelastic}")
         set(SetRadialView "${${Kind}${Backend}SetRadialView}")
+        set(SetRadialViewAnelastic "${${Kind}${Backend}SetRadialViewAnelastic}")
         set(CompTree "${${Kind}CompTree}")
 
         foreach(Op IN LISTS Ops)
@@ -458,7 +643,12 @@ foreach(Backend IN LISTS Backends)
             # manual sub
             string(REGEX REPLACE "@Op@" "${Op}" SetIntOp "${SetIntOp}")
             string(REGEX REPLACE "@BackendNamespace@" "${BackendNamespace}" SetIntOp "${SetIntOp}")
-
+            
+            set(SetIntOpAnelastic "${IntOpAnelastic}")
+            # manual sub
+            string(REGEX REPLACE "@Op@" "${Op}" SetIntOpAnelastic "${SetIntOpAnelastic}")
+            string(REGEX REPLACE "@BackendNamespace@" "${BackendNamespace}" SetIntOpAnelastic "${SetIntOpAnelastic}")
+            
             configure_file(
                 "OpV.hpp.in"
                 "${CMAKE_BINARY_DIR}/include/QuICC/Transform/Wrappers/Worland/Reductor/${Op}${Tag}.hpp.inc"

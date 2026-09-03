@@ -49,6 +49,35 @@ namespace Worland {
       this->mIsInitialized = true;
    }
 
+   void IWorlandOperator::init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const
+   {
+      // Store the shared pointer to setup object
+      if(spSetup)
+      {
+         this->mspSetup = std::dynamic_pointer_cast<IWorlandOperator::SetupType>(spSetup);
+      } else
+      {
+         throw std::logic_error("Setup object is not initialized!");
+      }
+
+      if (this->mIsInitialized == false)
+      {
+         // Initialise the operators
+         //this->initOperators(igrid, iweights, pF);
+         this->initOperators(igrid, iweights);
+         // Set initialization flag
+         this->mIsInitialized = true;
+      }
+
+      if (pF && !this->mIsInitializedAnelastic)
+      {
+         this->initOperatorsAnelastic(igrid, iweights, pF);
+         // Set initialization flag
+         this->mIsInitializedAnelastic = true;
+      }
+
+   }
+
    void IWorlandOperator::init(SharedTransformSetup spSetup) const
    {
       throw std::logic_error("Unused interface");
@@ -68,6 +97,25 @@ namespace Worland {
       this->applyOperators(rOut, in);
    }
 
+   void IWorlandOperator::transform(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const
+   {
+      assert(this->isInitialized());
+
+      this->applyOperators(rOut, in, pF);
+   }
+
+   void IWorlandOperator::initOperators(const Internal::Array& igrid, const Internal::Array& iweights, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const
+   {
+      // default implementation
+      this->initOperators(igrid, iweights);
+   }
+
+   void IWorlandOperator::initOperatorsAnelastic(const Internal::Array& igrid, const Internal::Array& iweights, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const
+   {
+      // default implementation
+      this->initOperators(igrid, iweights);
+   }
+
    void IWorlandOperator::applyOperators(MatrixZ&, const MatrixZ&) const
    {
       throw std::logic_error("Data is not compatible with Worland operator");
@@ -76,6 +124,12 @@ namespace Worland {
    void IWorlandOperator::applyOperators(Matrix&, const MatrixZ&) const
    {
       throw std::logic_error("Data is not compatible with Worland operator");
+   }
+
+   void IWorlandOperator::applyOperators(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const
+   {
+      // default implementation
+      this->applyOperators(rOut, in);
    }
 
    void IWorlandOperator::checkGridSize(const int n, const int l, const int gN) const

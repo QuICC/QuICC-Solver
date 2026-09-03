@@ -20,6 +20,8 @@
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Transform/Poly/Worland/IWorlandOperator.hpp"
 #include "QuICC/Transform/ITransformMap.hpp"
+#include "DenseSM/Worland/RadialTorPolFunction.hpp"
+
 
 namespace QuICC {
 
@@ -103,6 +105,17 @@ namespace Worland {
          void transform(Matrix& rOut, const MatrixZ& in, const IWorlandOperator& op);
 
          /**
+          * @brief Compute transform (Complex -> Real) using given operator
+          *
+          * @param rOut Output values
+          * @param in   Input values
+          * @param op   Transform operator
+          * @param pF   Radial profile (e.g. density)
+          */
+         void transform(Matrix& rOut, const MatrixZ& in, const IWorlandOperator& op, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF);
+
+
+         /**
           * @brief Compute transform (Complex -> Complex) mapped to ID
           *
           * @param rOut Output values
@@ -119,6 +132,16 @@ namespace Worland {
           * @param id   ID of transform operator
           */
          void transform(Matrix& rOut, const MatrixZ& in, const std::size_t id);
+
+         /**
+          * @brief Compute transform (Complex -> Real) mapped to ID
+          *
+          * @param rOut Output values
+          * @param in   Input values
+          * @param id   ID of transform operator
+          * @param pF   radial profile (e.g. density)
+          */
+         void transform(Matrix& rOut, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF);
 
          /**
           * @brief Get the memory requirements

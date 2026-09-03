@@ -144,16 +144,154 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal
     @SetRadialView@
 }
 
-void @Op@<@Tag@>::applyOperators(Matrix& rOut, const MatrixZ& in) const
+void @Op@<@Tag@>::initOperatorsAnelastic(const Internal::Array& icompgrid, const Internal::Array& icompweights, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const
+{
+
+    Profiler::RegionFixture<3> fix("@Op@<@Tag@>::initOperatorsAnelastic");
+
+    // Energy calculation requires a different quadrature
+    Internal::Array igridAnelastic, iweightsAnelastic;
+    using namespace QuICC::Transform::Worland;
+    OpsQuadrature<@Op@_t> quadAnelastic;
+
+    size_t nf = 0;
+    if (pF) {
+        nf = pF->nN(); // quite arbitrary
+    }
+    quadAnelastic.computeQuadrature(igridAnelastic, iweightsAnelastic, icompgrid.size()+nf);
+
+    std::uint32_t Manel = igridAnelastic.size();
+
+    if (pF) {
+        Internal::Array rhoVals = pF->evaluate(igridAnelastic, 0, 0);
+        mDensityScale.resize(Manel);
+        for (std::uint32_t i = 0; i < Manel; ++i) {
+            mDensityScale[i] = 1.0 / std::sqrt(static_cast<double>(rhoVals(i)));
+        }
+    }
+
+    std::uint32_t Kanel = static_cast<std::uint32_t>(this->mspSetup->fastSize(0)+nf);
+
+    std::uint32_t nLayers = static_cast<std::uint32_t>(this->mspSetup->slowSize());
+
+    ///\todo this should be the full matrix size
+    std::uint32_t P = static_cast<std::uint32_t>(this->mspSetup->slow(nLayers-1)) + 1;
+
+    std::vector<std::uint32_t> layers(nLayers);
+    for(std::uint32_t p = 0; p < nLayers; ++p)
+    {
+        layers[p] = this->mspSetup->slow(p);
+    }
+
+    constexpr size_t rank = 3;
+    // dim 0 - Nr - radial points
+    // dim 1 - R  - radial modes
+    // dim 2 - L  - harmonic degree
+    std::array<std::uint32_t, rank> dimensionsPrjAnelastic {Manel, Kanel, P};
+
+    // Make projector view operator
+    using namespace QuICC::Transform::Quadrature;
+    using backendPrj_t = @BackendNamespace@::ImplOp<phys_t, mods_t, op_t>;
+    using derivedPrj_t = Op<phys_t, mods_t, op_t, backendPrj_t>;
+
+    auto mem = std::make_shared<QuICC::Memory::@MemRes@>();
+    mPrjAnelastic = std::make_unique<derivedPrj_t>(mem);
+    derivedPrj_t& derivedPrjOp = dynamic_cast<derivedPrj_t&>(*mPrjAnelastic);
+    derivedPrjOp.allocOp(dimensionsPrjAnelastic, layers);
+    auto prjViewAnelastic = derivedPrjOp.getOp();
+
+    using namespace QuICC::Polynomial::Worland;
+    OpsBuilder<op_t, @Op@_t, bwd_t> tBuilderBwd;
+    tBuilderBwd.compute(prjViewAnelastic, igridAnelastic, Internal::Array());
+
+    @SetIntOpAnelastic@
+
+    // setup pointwise operator
+    mPntAnelastic = std::make_unique<QuICC::Pointwise::@BackendNamespace@::Op<QuICC::Pointwise::Abs2Functor<double>, @RedType@Abs_t, @RedType@_t>>(QuICC::Pointwise::Abs2Functor<double>());
+
+    ///\todo move view setups to init
+
+    // alloc in/out dataspace
+    // indices/pointers are the same for In/Out
+    mDataPointersAnelastic.resize(P+1);
+    mDataPointersAnelastic[0] = 0;
+
+    std::uint32_t N = 0;
+    std::uint32_t nCols = 0;
+    std::uint32_t inFlatSize = 0;
+    std::uint32_t layerCtr = 0;
+    for (std::uint32_t i = 0; i < P; ++i)
+    {
+        std::uint32_t blockWidth = 0;
+        std::uint32_t blockSize = 0;
+        if (static_cast<std::uint32_t>(this->mspSetup->slow(layerCtr)) == i )
+        {
+            int nPoly = this->mspSetup->fastSize(layerCtr) + static_cast<int>(nf);
+            blockWidth = static_cast<std::uint32_t>(this->mspSetup->mult(layerCtr));
+            blockSize = blockWidth*nPoly;
+            ++layerCtr;
+        }
+
+        nCols += blockWidth;
+        mDataPointersAnelastic[i+1] = nCols;
+        inFlatSize += blockSize;
+
+        /// make up indices, we don't know them and
+        /// the exact value is needed only for the comm stage
+        for (std::uint32_t idx = 0; idx < blockWidth; idx++)
+        {
+            mDataIndicesAnelastic.push_back(idx);
+        }
+
+        N = std::max(N, blockWidth);
+    }
+
+    // dim 0 - R  - radial modes
+    // dim 1 - M  - harmonic order
+    // dim 2 - L  - harmonic degree
+    std::array<std::uint32_t, rank> modsDims = {Kanel, N, P};
+    mModsFlatAnelastic.resize(inFlatSize);
+    mModsAbsFlatAnelastic.resize(inFlatSize);
+
+    // dim 0 - Nr - radial points
+    // dim 1 - M  - harmonic order
+    // dim 2 - L  - harmonic degree
+    std::array<std::uint32_t, rank> physDims = {Manel, N, P};
+    mPhysFlatAnelastic.resize(Manel * nCols);
+
+    using namespace QuICC::View;
+
+    @SetDataViewsAnelastic@
+    @SetPowerViewAnelastic@
+    @SetReductorViewAnelastic@
+    @SetRadialViewAnelastic@
+
+}
+
+void @Op@<@Tag@>::applyOperators(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const
 {
     Profiler::RegionFixture<2> fix("@Op@<@Tag@>::applyOperators");
 
-    assert(static_cast<std::size_t>(in.rows()) == mModsView.dims()[0]);
-    assert(static_cast<std::size_t>(in.cols()) == mModsView.indices()[1].size());
+    std::uint32_t nf = 0;
+    if (pF)
+    {
+        nf = static_cast<std::uint32_t>(pF->nN());
+        assert(static_cast<std::size_t>(in.rows()) <= mModsViewAnelastic.dims()[0]);
+        assert(static_cast<std::size_t>(in.cols()) <= mModsViewAnelastic.indices()[1].size());
+    }
+    else
+    {
+        assert(static_cast<std::size_t>(in.rows()) == mModsView.dims()[0]);
+        assert(static_cast<std::size_t>(in.cols()) == mModsView.indices()[1].size());
+    }
 
     std::uint32_t nLayers = static_cast<std::uint32_t>(this->mspSetup->slowSize());
 
     /// copy data to view
+    if (pF) 
+    {
+        std::fill(mModsFlatAnelastic.begin(), mModsFlatAnelastic.end(), std::complex<double>(0.0, 0.0));
+    }
     int start = 0;
     std::int64_t offSet = 0;
     for(std::uint32_t p = 0; p < nLayers; ++p)
@@ -169,23 +307,45 @@ void @Op@<@Tag@>::applyOperators(Matrix& rOut, const MatrixZ& in) const
             {
 #if defined QUICC_JW_ROW_MAJOR || defined QUICC_JW_ALL_ROW_MAJOR
                // copy padded to flattened and transpose
-               mModsFlat[offSet + i * inB.cols() + j] =
-                  inB.data()[i + j * in.rows()];
+               if (pF) 
+               {
+                    mModsFlatAnelastic[offSet + i * inB.cols() + j] =
+                        inB.data()[i + j * in.rows()];
+               }
+               else
+               {
+                    mModsFlat[offSet + i * inB.cols() + j] =
+                        inB.data()[i + j * in.rows()];
+               }
 #else
                // copy padded to flattened column
-               mModsFlat[offSet + i + j * inB.rows()] =
-                  inB.data()[i + j * in.rows()];
+               if (pF)
+               {
+                    mModsFlatAnelastic[offSet + i + j * (inB.rows()+nf)] =
+                            inB.data()[i + j * in.rows()];
+               }
+               else
+               {
+                    mModsFlat[offSet + i + j * inB.rows()] =
+                        inB.data()[i + j * in.rows()];
+               }
 #endif
             }
         }
-        offSet += inB.size();
+        
+        if (pF)
+        {
+            offSet += static_cast<std::int64_t>(inRows + nf) * cols;
+        }
+        else
+        {
+            offSet += inB.size();
+        }
         start += cols;
     }
 
     @HostToDevice@
 
-    /// project to physical space
-    mPrj->apply(mPhysView, mModsView);
     @CompTree@
 
     @DeviceToHost@

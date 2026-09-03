@@ -20,6 +20,8 @@
 #include "View/View.hpp"
 #include "Operator/Unary.hpp"
 #include "Operator/Nary.hpp"
+#include "DenseSM/Worland/RadialTorPolFunction.hpp"
+
 
 namespace QuICC {
 namespace Transform {
@@ -71,6 +73,11 @@ private:
     /// @param iweights
     void initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const final;
 
+    /// @brief Replace base Reductor init
+    /// @param igrid
+    /// @param iweights
+    /// @param pF
+    void initOperatorsAnelastic(const Internal::Array& igrid, const Internal::Array& iweights, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const final;
 
     /// @brief Make operator
     /// this is not used in the view implementations
@@ -84,7 +91,16 @@ private:
     /// @brief
     /// @param rOut
     /// @param in
-    void applyOperators(Matrix& rOut, const MatrixZ& in) const final;
+    void applyOperators(Matrix& rOut, const MatrixZ& in) const final
+    {
+        this->applyOperators(rOut, in, nullptr);
+    }
+
+    /// @brief
+    /// @param rOut
+    /// @param in
+    /// @param pF
+    void applyOperators(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction> pF) const final;
 
     /// @brief
     /// @param rOut
@@ -125,42 +141,78 @@ private:
     /// @brief Projector backend class pointer
     mutable std::unique_ptr<QuICC::Operator::UnaryOp<phys_t, mods_t>> mPrj;
 
+    /// @brief Projector backend class pointer
+    mutable std::unique_ptr<QuICC::Operator::UnaryOp<phys_t, mods_t>> mPrjAnelastic;
+
     /// @brief Integrator backend class pointer
     mutable std::unique_ptr<QuICC::Operator::UnaryOp<mods_t, phys_t>> mInt;
+
+    /// @brief Integrator backend class pointer
+    mutable std::unique_ptr<QuICC::Operator::UnaryOp<mods_t, phys_t>> mIntAnelastic;
 
     /// @brief Pointwise backend class pointer
     mutable std::unique_ptr<QuICC::Operator::NaryOp<@RedType@Abs_t, @RedType@_t>> mPnt;
 
+    /// @brief Pointwise backend class pointer
+    mutable std::unique_ptr<QuICC::Operator::NaryOp<@RedType@Abs_t, @RedType@_t>> mPntAnelastic;
+
     /// @brief Reduction backend class pointer
     mutable std::unique_ptr<QuICC::Operator::UnaryOp<modsRed_t, modsAbs_t>> mRed;
+
+    /// @brief Reduction backend class pointer
+    mutable std::unique_ptr<QuICC::Operator::UnaryOp<modsRed_t, modsAbs_t>> mRedAnelastic;
 
     /// @brief Input View
     mutable mods_t mModsView;
 
+    /// @brief Input View
+    mutable mods_t mModsViewAnelastic;
+
     /// @brief temp/output View
     mutable modsAbs_t mModsAbsView;
+
+    /// @brief temp/output View
+    mutable modsAbs_t mModsAbsViewAnelastic;
 
 
     /// @brief temp/output View
     mutable modsRed_t mModsRedView;
 
     /// @brief temp/output View
+    mutable modsRed_t mModsRedViewAnelastic;
+
+    /// @brief temp/output View
     mutable phys_t mPhysView;
+
+    /// @brief temp/output View
+    mutable phys_t mPhysViewAnelastic;
 
     /// @brief temp/output View
     mutable physAbs_t mPhysAbsView;
 
     /// @brief Temporary storage for flattened input
     mutable std::vector<std::complex<double>> mModsFlat;
+    
+    /// @brief Temporary storage for flattened input
+    mutable std::vector<std::complex<double>> mModsFlatAnelastic;
 
     /// @brief Temporary storage for flattened temp/output
     mutable std::vector<double> mModsAbsFlat;
 
     /// @brief Temporary storage for flattened temp/output
+    mutable std::vector<double> mModsAbsFlatAnelastic;
+
+    /// @brief Temporary storage for flattened temp/output
     mutable std::vector<double> mModsRedFlat;
 
     /// @brief Temporary storage for flattened temp/output
+    mutable std::vector<double> mModsRedFlatAnelastic;
+
+    /// @brief Temporary storage for flattened temp/output
     mutable std::vector<std::complex<double>> mPhysFlat;
+
+    /// @brief Temporary storage for flattened temp/output
+    mutable std::vector<std::complex<double>> mPhysFlatAnelastic;
 
     /// @brief Temporary storage for flattened temp/output
     mutable std::vector<double> mPhysAbsFlat;
@@ -168,8 +220,17 @@ private:
     /// @brief Data pointers
     mutable std::vector<std::uint32_t> mDataPointers;
 
+    /// @brief Data pointers
+    mutable std::vector<std::uint32_t> mDataPointersAnelastic;
+
     /// @brief Data indices
     mutable std::vector<std::uint32_t> mDataIndices;
+    
+    /// @brief Data indices
+    mutable std::vector<std::uint32_t> mDataIndicesAnelastic;
+
+    /// @brief Density scaling at quadrature points (1/sqrt(rho))
+    mutable std::vector<double> mDensityScale;
 
     @Storage@
 };

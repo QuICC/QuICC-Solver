@@ -23,8 +23,8 @@ namespace Io {
 namespace Variable {
 
 SphereTorPolLSpectrumWriter::SphereTorPolLSpectrumWriter(
-   const std::string& prefix, const std::string& type) :
-    ISphericalTorPolLSpectrumWriter(prefix, type)
+   const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Worland::RadialTorPolFunction>> pF) :
+    ISphericalTorPolLSpectrumWriter(prefix, type, std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>>(pF.begin(), pF.end()))
 {}
 
 void SphereTorPolLSpectrumWriter::init()

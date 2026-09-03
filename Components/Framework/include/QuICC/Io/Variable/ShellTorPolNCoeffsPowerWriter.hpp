@@ -1,10 +1,10 @@
 /** 
- * @file ShellTorPolNScalarSpectrumWriter.hpp
+ * @file ShellTorPolNCoeffsPowerWriter.hpp
  * @brief Implementation of the ASCII spherical harmonics L energy spectrum calculation for a Toroidal/Poloidal field in a spherical shell
  */
 
-#ifndef QUICC_IO_VARIABLE_SHELLTORPOLNSCALARSPECTRUMWRITER_HPP
-#define QUICC_IO_VARIABLE_SHELLTORPOLNSCALARSPECTRUMWRITER_HPP
+#ifndef QUICC_IO_VARIABLE_SHELLTORPOLNCOEFFSPOWERWRITER_HPP
+#define QUICC_IO_VARIABLE_SHELLTORPOLNCOEFFSPOWERWRITER_HPP
 
 // System includes
 //
@@ -26,7 +26,7 @@ namespace Variable {
    /**
     * @brief Implementation of the ASCII spherical harmonics L energy spectrum calculation for a Toroidal/Poloidal field in a spherical shell
     */
-   class ShellTorPolNScalarSpectrumWriter: public ISphericalTorPolNScalarSpectrumWriter
+   class ShellTorPolNCoeffsPowerWriter: public ISphericalTorPolNScalarSpectrumWriter
    {
       public:
          /**
@@ -35,12 +35,12 @@ namespace Variable {
           * @param prefix Prefix to use for file name
           * @param type Type of the file (typically scheme name)
           */
-         ShellTorPolNScalarSpectrumWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF = {});
+         ShellTorPolNCoeffsPowerWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF = {});
 
          /**
           * @brief Destructor
           */
-         virtual ~ShellTorPolNScalarSpectrumWriter();
+         virtual ~ShellTorPolNCoeffsPowerWriter();
 
          /**
           * @brief Initialise the operator, transform and file
@@ -53,10 +53,10 @@ namespace Variable {
    };
 
    /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef std::shared_ptr<ShellTorPolNScalarSpectrumWriter> SharedShellTorPolNScalarSpectrumWriter;
+   typedef std::shared_ptr<ShellTorPolNCoeffsPowerWriter> SharedShellTorPolNCoeffsPowerWriter;
 
 }
 }
 }
 
-#endif // QUICC_IO_VARIABLE_SHELLTORPOLNSCALARSPECTRUMWRITER_HPP
+#endif // QUICC_IO_VARIABLE_SHELLTORPOLNCOEFFSPOWERWRITER_HPP

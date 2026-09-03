@@ -495,6 +495,40 @@ template <class VOP> struct OpsBuilderMap<VOP, EnergySLaplR2_t, bwd_t>
    using type = OpsBuilder<VOP, SphLapl_t, bwd_t>;
 };
 
+/// @brief Helper for Spectrum
+/// It is needed in order to avoid having to pass
+/// extra parameters to energy integrators
+/// @tparam VOP
+template <class VOP> struct EnergyHelperMap<VOP, Spectrum_t>
+{
+   void compute(VOP opView, const Internal::Array& grid,
+      const Internal::Array& weights)
+   {
+      Wnl fWnl(Polynomial::Worland::worland_default_t::ALPHA,
+         Polynomial::Worland::worland_default_t::DBETA, 0);
+      QuICC::DenseOp::Worland::Operator<Wnl> denseBuilder(fWnl);
+      Builder<VOP, QuICC::DenseOp::Worland::Operator<Wnl>, fwd_t> tBuilderFwd(
+         denseBuilder);
+      tBuilderFwd.compute(opView, grid, weights);
+   }
+};
+
+/// @brief Spectrum Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP> struct OpsBuilderMap<VOP, Spectrum_t, fwd_t>
+{
+   using type = EnergyHelperMap<VOP, Spectrum_t>;
+};
+
+/// @brief Spectrum Builder
+/// Projector only, regular projector
+/// @tparam VOP operator view type
+template <class VOP> struct OpsBuilderMap<VOP, Spectrum_t, bwd_t>
+{
+   using type = OpsBuilder<VOP, P_t, bwd_t>;
+};
+
 /// @brief Power Builder
 /// Same setup as Energy ops
 /// @tparam VOP operator view type
@@ -535,10 +569,10 @@ template <class VOP, class DIR> struct OpsBuilderMap<VOP, PowerSLaplR2_t, DIR>
 /// Same setup as Energy ops
 /// @tparam VOP operator view type
 /// @tparam DIR fwd_t or bwd_t
-template <class VOP, class DIR> struct OpsBuilderMap<VOP, Spectrum_t, DIR>
-{
-   using type = OpsBuilder<VOP, EnergyR2_t, DIR>;
-};
+//template <class VOP, class DIR> struct OpsBuilderMap<VOP, Spectrum_t, DIR>
+//{
+//   using type = OpsBuilder<VOP, EnergyR2_t, DIR>;
+//};
 
 /// @brief Helper for RadialPower
 /// It is needed in order to avoid having to pass

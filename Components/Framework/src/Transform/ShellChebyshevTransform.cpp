@@ -68,11 +68,11 @@ namespace Transform {
    void ShellChebyshevTransform::reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF)
    {
       // Cast the generic profile to the specific type needed
-      auto specificProfile = std::dynamic_pointer_cast<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>(pF);
-      if (!specificProfile) {
+      auto radialProfile = std::dynamic_pointer_cast<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>(pF);
+      if (!radialProfile) {
          throw std::runtime_error("Invalid profile type passed to reduce");
       }
-      this->mImpl.transform(rOut, in, id, specificProfile);
+      this->mImpl.transform(rOut, in, id, radialProfile);
    }
 
    //

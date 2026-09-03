@@ -1,5 +1,5 @@
 /**
- * @file ShellTorPolNScalarSpectrumWriter.cpp
+ * @file ShellTorPolNCoeffsPowerWriter.cpp
  * @brief Source of the implementation of the ASCII spherical harmonics N spectra calculation for Tor and Pol scalar fields in a spherical shell
  */
 
@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Io/Variable/ShellTorPolNScalarSpectrumWriter.hpp"
+#include "QuICC/Io/Variable/ShellTorPolNCoeffsPowerWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
@@ -25,14 +25,14 @@ namespace QuICC {
 namespace Io {
 
 namespace Variable {
-   ShellTorPolNScalarSpectrumWriter::ShellTorPolNScalarSpectrumWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
+   ShellTorPolNCoeffsPowerWriter::ShellTorPolNCoeffsPowerWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
       : ISphericalTorPolNScalarSpectrumWriter(prefix, type, std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>>(pF.begin(), pF.end()))
    {
    }
 
-   ShellTorPolNScalarSpectrumWriter::~ShellTorPolNScalarSpectrumWriter() = default;
+   ShellTorPolNCoeffsPowerWriter::~ShellTorPolNCoeffsPowerWriter() = default;
 
-   void ShellTorPolNScalarSpectrumWriter::init()
+   void ShellTorPolNCoeffsPowerWriter::init()
    {
       // Spherical shell volume: 4/3*pi*(r_o^3 - r_i^3)
       MHDFloat ri = this->mPhysical.find(NonDimensional::Lower1d::id())->second->value();

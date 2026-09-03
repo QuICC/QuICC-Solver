@@ -11,6 +11,8 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ISphericalScalarLSpectrumWriter.cpp
   ISphericalScalarMSpectrumWriter.cpp
   ISphericalScalarModeSpectrumWriter.cpp
+  ISphericalScalarNCoeffsPowerWriter.cpp
+  ISphericalScalarNCoeffsPowerBaseWriter.cpp
   ISphericalScalarNSpectrumWriter.cpp
   ISphericalScalarRSpectrumWriter.cpp
   ISphericalScalarPowerBaseWriter.cpp
@@ -37,13 +39,13 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ShellLuminosityWriter.cpp
   ShellRadialProfilesWriter.cpp
   ShellScalarEnergyWriter.cpp
-  ShellScalarNSpectrumWriter.cpp
+  ShellScalarNCoeffsPowerWriter.cpp
   ShellScalarLSpectrumWriter.cpp
   ShellScalarMSpectrumWriter.cpp
   ShellScalarModeSpectrumWriter.cpp
   ShellScalarRSpectrumWriter.cpp
   ShellTorPolEnergyWriter.cpp
-  ShellTorPolNScalarSpectrumWriter.cpp
+  ShellTorPolNCoeffsPowerWriter.cpp
   ShellTorPolLSpectrumWriter.cpp
   ShellTorPolMSpectrumWriter.cpp
   ShellTorPolModeSpectrumWriter.cpp
@@ -62,10 +64,11 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   SphereScalarLSpectrumWriter.cpp
   SphereScalarMSpectrumWriter.cpp
   SphereScalarModeSpectrumWriter.cpp
+  SphereScalarNCoeffsPowerWriter.cpp
   SphereScalarNSpectrumWriter.cpp
   SphereScalarRSpectrumWriter.cpp
   SphereTorPolEnergyWriter.cpp
-  SphereTorPolNScalarSpectrumWriter.cpp
+  SphereTorPolNCoeffsPowerWriter.cpp
   SphereTorPolLSpectrumWriter.cpp
   SphereTorPolMSpectrumWriter.cpp
   SphereTorPolModeSpectrumWriter.cpp

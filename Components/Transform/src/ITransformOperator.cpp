@@ -19,7 +19,7 @@ namespace QuICC {
 namespace Transform {
 
    ITransformOperator::ITransformOperator()
-      : mProfileTag(""), mIsInitialized(false)
+      : mProfileTag(""), mIsInitialized(false), mIsInitializedAnelastic(false)
    {
    }
 
@@ -39,6 +39,11 @@ namespace Transform {
    bool ITransformOperator::isInitialized() const
    {
       return this->mIsInitialized;
+   }
+
+   bool ITransformOperator::isInitializedAnelastic() const
+   {
+      return this->mIsInitializedAnelastic;
    }
 
    void ITransformOperator::init(SharedTransformSetup spSetup, const Internal::Array &igrid,

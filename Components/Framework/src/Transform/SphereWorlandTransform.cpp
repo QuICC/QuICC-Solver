@@ -61,6 +61,14 @@ namespace Transform {
       this->mImpl.transform(rOut, in, id);
    }
 
+   // anelastic overload
+   void SphereWorlandTransform::reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF)
+   {
+      // Cast the generic profile to the specific type needed
+      auto radialProfile = std::dynamic_pointer_cast<QuICC::DenseSM::Worland::RadialTorPolFunction>(pF);
+      this->mImpl.transform(rOut, in, id, radialProfile);
+   }
+
    void SphereWorlandTransform::backward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
    {
       Profiler::RegionFixture<3> fix("SphereWorlandTransform::backward");
