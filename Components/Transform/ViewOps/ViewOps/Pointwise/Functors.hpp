@@ -123,6 +123,41 @@ template <class T = double> struct CrossCompFunctor
 };
 
 /// @tparam T scalar
+template <class T = double> struct ComponentDotFunctor
+{
+   /// @brief scaling
+   T _scaling;
+
+   /// @brief ctor
+   /// @param scaling
+   ComponentDotFunctor(T scaling) : _scaling(scaling){};
+
+   /// @brief deleted default constructor
+   ComponentDotFunctor() = delete;
+
+   /// @brief dtor
+   ~ComponentDotFunctor() = default;
+
+   /// @brief Component wise dot product
+   /// @param u
+   /// @param v
+   /// @return
+   QUICC_CUDA_HOSTDEV T operator()(T u, T v)
+   {
+      return _scaling * (u * v);
+   }
+
+   /// @brief Component wise dot product
+   /// @param u
+   /// @param v
+   /// @return
+   QUICC_CUDA_HOSTDEV T operator()(std::complex<double> u, std::complex<double> v)
+   {
+      return _scaling * (u.real() * v.real() + u.imag() * v.imag());
+   }
+};
+
+/// @tparam T scalar
 template <class T = double> struct DotFunctor
 {
    /// @brief non dimensional scaling for transport term

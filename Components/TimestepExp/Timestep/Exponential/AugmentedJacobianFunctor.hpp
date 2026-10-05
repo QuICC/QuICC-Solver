@@ -86,6 +86,12 @@ class AugmentedJacobianFunctor
        */
       void setStepper(std::shared_ptr<TsFunctor> pStepper);
 
+      /**
+       * @brief Configure inner product
+       */
+      template <typename TInner>
+      void configureInnerProduct(std::shared_ptr<TInner> pInner) const;
+
    private:
       using OviewFunctor = Functors::TransferOutputFunctor<TsFunctor>;
       using OcorrFunctor = Functors::TransferCorrectionFunctor<TsFunctor>;
@@ -202,6 +208,13 @@ class AugmentedJacobianFunctor
        */
       std::shared_ptr<Functors::InputFunctor<IviewFunctor>> mpInFunc;
 };
+
+template <typename TInner>
+void AugmentedJacobianFunctor::configureInnerProduct(std::shared_ptr<TInner> pInner) const
+{
+   pInner->configure(this->mspData, this->mpIdMap, this->_mem);
+   pInner->setStepper(this->mpTsFunc);
+}
 
 } // namespace Exponential
 } // namespace Timestep

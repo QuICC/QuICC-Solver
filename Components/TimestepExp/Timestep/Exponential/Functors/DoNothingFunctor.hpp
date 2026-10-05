@@ -1,6 +1,6 @@
 /**
  * @file DoNothingFunctor.hpp
- * @brief 
+ * @brief
  */
 
 #pragma once
@@ -10,7 +10,6 @@
 
 // Project includes
 //
-#include "QuICC/Enums/FieldIds.hpp"
 
 namespace QuICC {
 
@@ -28,9 +27,8 @@ class DoNothingFunctor
    public:
       DoNothingFunctor() = default;
       ~DoNothingFunctor() = default;
-      void operator()(const SpectralFieldId& id){};
-      template <typename TEq> 
-      void operator()(const SpectralFieldId& id, const TEq&){};
+      template <typename ...Args>
+      void operator()(const Args& ...){};
 };
 
 

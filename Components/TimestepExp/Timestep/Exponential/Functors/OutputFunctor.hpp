@@ -17,9 +17,14 @@
 #include "View/ViewDense.hpp"
 #include "Memory/Memory.hpp"
 #include "Memory/MemoryResource.hpp"
+#include "Timestep/Exponential/CreateInfo.hpp"
 #include "Timestep/Exponential/Functors/BaseFunctor.hpp"
 #include "Timestep/Exponential/Functors/FunctorData.hpp"
 #include "QuICC/Equations/StoreSolution.hpp"
+#ifdef QUICC_DEBUG
+#include "QuICC/PhysicalNames/Coordinator.hpp"
+#include "QuICC/Tools/IdToHuman.hpp"
+#endif
 
 namespace QuICC {
 

@@ -19,6 +19,7 @@
 #include "QuICC/Register/Rhs.hpp"
 #include "QuICC/Register/Intermediate.hpp"
 #include "QuICC/Register/Temporary.hpp"
+#include "QuICC/Register/Workspace.hpp"
 #include "QuICC/Register/Coordinator.hpp"
 #include "QuICC/Tag/Operator/Lhs.hpp"
 #include "QuICC/Tag/Operator/Qi.hpp"
@@ -30,6 +31,8 @@
 #include "Timestep/Exponential/AugmentedJacobianFunctor.hpp"
 #include "Timestep/Exponential/details/TimesteppperTools.hpp"
 #include "Timestep/Exponential/Functors/OrthoCgs2Functor.hpp"
+#include "Timestep/Exponential/Functors/StandardInnerProduct.hpp"
+#include "Timestep/Exponential/Functors/EnergyInnerProduct.hpp"
 #include "View/ViewDense.hpp"
 
 namespace QuICC {
@@ -53,7 +56,9 @@ public:
    typedef AugmentedJacobianFunctor JacobianFunctor;
 
    /// Typedef for orthogonalization functor
-   typedef Functors::OrthoCgs2Functor OrthoFunctor;
+   typedef Functors::StandardInnerProduct InnerProduct;
+   //typedef Functors::EnergyInnerProduct InnerProduct;
+   typedef Functors::OrthoCgs2Functor<InnerProduct> OrthoFunctor;
 
    /// Typedef for Krylov functor
    typedef IomKrylov<JacobianFunctor, OrthoFunctor> KrylovFunctor;
@@ -318,11 +323,16 @@ private:
     * @brief Shared Augmented Jacobian
     */
    std::shared_ptr<AugmentedJacobianFunctor> mpJac;
+
+   /**
+    * @brief Shared inner product
+    */
+   std::shared_ptr<InnerProduct> mpInProd;
 };
 
 template <typename TOperator, typename TData, typename TImpl>
 EpirkTimestepper<TOperator, TData, TImpl>::EpirkTimestepper()
-   : mIsInitialized(false), mcKrylovTol(1e-12), mcKrylovOrder(2), mcPhiTol(1e-12), mcPhiDelta(1.4), mcPhiMmin(10), mcPhiMmax(128), mDt(-1), mRhsId(Register::Rhs::id()), mRhsCol(1), mKrylovM(10)
+   : mIsInitialized(false), mcKrylovTol(1e-12), mcKrylovOrder(128), mcPhiTol(1e-12), mcPhiDelta(1.4), mcPhiMmin(10), mcPhiMmax(128), mDt(-1), mRhsId(Register::Rhs::id()), mRhsCol(1), mKrylovM(10)
 {}
 
 template <typename TOperator, typename TData, typename TImpl>
@@ -339,6 +349,13 @@ void EpirkTimestepper<TOperator, TData, TImpl>::stepForward()
    auto& matW = this->reg(Register::Intermediate::id());
    auto& matU = this->reg(Register::Rhs::id());
    this->mpJac->setMatrixHandle(this->reg(Register::Temporary::id()));
+
+   if constexpr(std::is_same_v<InnerProduct, Functors::EnergyInnerProduct>)
+   {
+      this->mpJac->configureInnerProduct(this->mpInProd);
+      this->mpInProd->setWorkspaceHandle(this->reg(Register::Workspace::id()));
+   }
+
    this->mpPhi->setup(ts, matU);
    this->mKrylovM = this->mpPhi->compute(matW, ts, matU, this->mKrylovM, PhiFunctor::Task::I);
    this->mpPhi->printInfo();
@@ -363,7 +380,15 @@ template <typename TOperator,typename TData,typename TImpl> void  EpirkTimestepp
    this->mpJac = pJac;
 
    auto eFunc = std::make_unique<ExpFunctor>();
-   auto oFunc = std::make_shared<OrthoFunctor>(this->mcKrylovOrder);
+   if constexpr(std::is_same_v<InnerProduct, Functors::EnergyInnerProduct>)
+   {
+      this->mpInProd = std::make_shared<InnerProduct>(Register::Workspace::id(), 0);
+   }
+   else
+   {
+      this->mpInProd = std::make_shared<InnerProduct>();
+   }
+   auto oFunc = std::make_shared<OrthoFunctor>(this->mpInProd, this->mcKrylovOrder);
    auto kFunc = std::make_unique<KrylovFunctor>(this->mpJac, oFunc, this->mcKrylovTol);
 
    this->mpPhi = std::make_unique<PhiFunctor>(std::move(kFunc), std::move(eFunc), this->mcPhiTol, this->mcPhiDelta, this->mcPhiMmin, this->mcPhiMmax);
@@ -394,7 +419,8 @@ void EpirkTimestepper<TOperator, TData, TImpl>::addStorage(
    this->addRegister(rows, 1, ids);
 
    ids = {
-      Register::Temporary::id()
+      Register::Temporary::id(),
+      Register::Workspace::id()
    };
    this->addRegister(rows, 1, ids);
 }
