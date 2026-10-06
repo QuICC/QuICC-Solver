@@ -11,11 +11,11 @@
 
 // Project includes
 //
-#include "TestSuite/DenseSM/Worland/TestArgs.hpp"
+#include "TestSuite/DenseSM/Worland/Stencil/TestArgs.hpp"
 #include "DenseSM/Worland/Stencil/@Operator@.hpp"
-#include "TestSuite/DenseSM/Worland/Tester.hpp"
+#include "TestSuite/DenseSM/Worland//Stencil/Tester.hpp"
 
-namespace currentts = ::QuICC::TestSuite::DenseSM::Worland;
+namespace currentts = ::QuICC::TestSuite::DenseSM::Worland::Stencil;
 
 TEST_CASE( "Error for @Operator@ operator", "[@Operator@:@type@]" )
 {

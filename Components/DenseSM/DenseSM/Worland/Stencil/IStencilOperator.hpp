@@ -8,7 +8,6 @@
 
 // System includes
 //
-#include <vector>
 
 // Project includes
 //
@@ -36,11 +35,13 @@ public:
     * @param rows    Number of rows
     * @param cols    Number of columns
     * @param alpha   Jacobi alpha parameter
-    * @param dBeta   Jacobi dBeta parameter: beta = l + dBeta
+    * @param dBeta   Jacobi dBeta parameter
     * @param l       Harmonic degree l
+    * @param nId     Normalization ID
+    * @param c       Scaling constant
     */
    IStencilOperator(const int rows, const int cols, const Scalar_t alpha,
-      const Scalar_t dBeta, const int l);
+      const Scalar_t dBeta, const int l, const std::size_t nId, const Scalar_t c = 1);
 
    /**
     * @brief Destructor
@@ -57,6 +58,16 @@ protected:
     * @brief Harmonic degree
     */
    const int mL;
+
+   /**
+    * @brief Normalization ID
+    */
+   const std::size_t mNId;
+
+   /**
+    * @brief Scaling constant
+    */
+   const Scalar_t mC;
 
 private:
 };

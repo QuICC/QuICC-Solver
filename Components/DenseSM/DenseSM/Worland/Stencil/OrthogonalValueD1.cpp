@@ -23,9 +23,19 @@ namespace Worland {
 
 namespace Stencil {
 
-OrthogonalValueD1::OrthogonalValueD1(const int rows, const int cols,
-   const Scalar_t alpha, const Scalar_t dBeta, const int l) :
-    IStencilOperator(rows, cols, alpha, dBeta, l)
+OrthogonalValueD1::Scalar_t OrthogonalValueD1::basisAlpha(const std::size_t nId)
+{
+   return Scalar_t(-0.5);
+}
+
+OrthogonalValueD1::Scalar_t OrthogonalValueD1::basisDBeta(const std::size_t nId)
+{
+   return Scalar_t(-0.5);
+}
+
+OrthogonalValueD1::OrthogonalValueD1(const int rows, const int cols, const Scalar_t alpha,
+   const Scalar_t dBeta, const int l, const std::size_t nId, const Scalar_t c) :
+    IStencilOperator(rows, cols, alpha, dBeta, l, nId, c)
 {
 }
 

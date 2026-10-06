@@ -38,11 +38,13 @@ public:
     * @param rows    Number of rows
     * @param cols    Number of columns
     * @param alpha   Jacobi alpha parameter
-    * @param dBeta   Jacobi dBeta parameter: beta = l + dBeta
+    * @param dBeta   Jacobi dBeta parameter
     * @param l       Harmonic degree l
+    * @param nId     Normalization ID
+    * @param c       Scaling constant
     */
-   OrthogonalValueD1(const int rows, const int cols, const Scalar_t alpha,
-      const Scalar_t dBeta, const int l);
+   OrthogonalValueD1(const int rows, const int cols, const Scalar_t alpha, 
+      const Scalar_t dBeta, const int l, const std::size_t nId, const Scalar_t c = 1);
 
    /**
     * @brief Destructor
@@ -56,6 +58,16 @@ protected:
     */
    virtual void buildOpImpl(Internal::Matrix& mat, const int rows,
       const int cols) const override;
+
+   /**
+    * @brief Basis base Jacobi alpha
+    */
+   static Scalar_t basisAlpha(const std::size_t nId);
+
+   /**
+    * @brief Basis base Jacobi alpha
+    */
+   static Scalar_t basisDBeta(const std::size_t nId);
 
 private:
    /**

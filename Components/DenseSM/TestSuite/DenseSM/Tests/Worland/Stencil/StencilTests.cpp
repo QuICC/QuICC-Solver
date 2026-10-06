@@ -12,10 +12,10 @@
 // Project includes
 //
 #include "Environment/QuICCEnv.hpp"
-#include "TestSuite/DenseSM/Worland/TestArgs.hpp"
+#include "TestSuite/DenseSM/Worland/Stencil/TestArgs.hpp"
 #include "Profiler/Interface.hpp"
 
-namespace test = QuICC::TestSuite::DenseSM::Worland;
+namespace test = QuICC::TestSuite::DenseSM::Worland::Stencil;
 
 int main( int argc, char* argv[] )
 {

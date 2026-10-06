@@ -38,9 +38,9 @@ include(SetUlp)
 
 # Stencil tests
 set(_tests
-  OrthogonalValue:dense
-  OrthogonalValueD1:dense
-  OrthogonalValueD2:dense
+  OrthogonalValue:densestencil
+  OrthogonalValueD1:densestencil
+  OrthogonalValueD2:densestencil
   )
 foreach(_t ${_tests})
   quicc_add_test(${_t}

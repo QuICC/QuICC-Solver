@@ -10,7 +10,6 @@
 
 // System includes
 //
-#include <vector>
 
 // Project includes
 //
@@ -38,11 +37,13 @@ public:
     * @param rows    Number of rows
     * @param cols    Number of columns
     * @param alpha   Jacobi alpha parameter
-    * @param dBeta   Jacobi dBeta parameter: beta = l + dBeta
+    * @param dBeta   Jacobi dBeta parameter
     * @param l       Harmonic degree l
+    * @param nId     Normalization ID
+    * @param c       Scaling constant
     */
    OrthogonalValue(const int rows, const int cols, const Scalar_t alpha,
-      const Scalar_t dBeta, const int l);
+      const Scalar_t dBeta, const int l, const std::size_t nId, const Scalar_t c = 1);
 
    /**
     * @brief Destructor
@@ -50,6 +51,12 @@ public:
    virtual ~OrthogonalValue() = default;
 
 protected:
+   enum class OrthoId: std::size_t {
+      TorSphEnergy = 0,
+      PolSphEnergy,
+      ScaSphEnergy
+   };
+
    /**
     * @brief Implementation of build dense matrix operator
     * @param output operator
@@ -57,36 +64,21 @@ protected:
    virtual void buildOpImpl(Internal::Matrix& mat, const int rows,
       const int cols) const override;
 
+   /**
+    * @brief Basis base Jacobi alpha
+    */
+   static Scalar_t basisAlpha(const std::size_t nId);
+
+   /**
+    * @brief Basis base Jacobi alpha
+    */
+   static Scalar_t basisDBeta(const std::size_t nId);
+
 private:
    /**
-    * @brief c1 expansion coefficient
+    * @brief Normalization factor
     */
-   Scalar_t c1(const int n, const int l) const;
-
-   /**
-    * @brief c2 expansion coefficient
-    */
-   Scalar_t c2(const int n, const int l) const;
-
-   /**
-    * @brief c3 expansion coefficient
-    */
-   Scalar_t c3(const int n, const int l) const;
-
-   /**
-    * @brief rescaled c1 expansion coefficient
-    */
-   Scalar_t d1(const int n, const int l) const;
-
-   /**
-    * @brief rescaled c2 expansion coefficient
-    */
-   Scalar_t d2(const int n, const int l) const;
-
-   /**
-    * @brief rescaled c3 expansion coefficient
-    */
-   Scalar_t d3(const int n, const int l) const;
+   Scalar_t norm(const int n, const int l) const;
 };
 
 } // namespace Stencil

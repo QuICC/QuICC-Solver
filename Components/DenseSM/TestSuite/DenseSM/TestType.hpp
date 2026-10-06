@@ -24,6 +24,8 @@ namespace DenseSM {
    enum class TestType {
       DENSE = 0,
       SPARSE,
+      DENSE_STENCIL,
+      SPARSE_STENCIL,
    };
 
 }
