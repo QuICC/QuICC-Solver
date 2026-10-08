@@ -52,6 +52,13 @@ public:
    virtual ~OrthogonalValueD1() = default;
 
 protected:
+   enum class OrthoId: std::size_t {
+      TorSphEnergy = 0,
+      PolSphEnergy,
+      ScaSphEnergy,
+      Lapl2SphEnergy
+   };
+
    /**
     * @brief Implementation of build dense matrix operator
     * @param output operator
@@ -71,34 +78,24 @@ protected:
 
 private:
    /**
-    * @brief c1 expansion coefficient
+    * @brief Diagonal normalization coefficient
+    */
+   Scalar_t norm(const OrthoId id, const int n, const int l) const;
+
+   /**
+    * @brief c1 expansion coefficient for PolSphEnergy basis
     */
    Scalar_t c1(const int n, const int l) const;
 
    /**
-    * @brief c2 expansion coefficient
+    * @brief c2 expansion coefficient for PolSphEnergy basis
     */
    Scalar_t c2(const int n, const int l) const;
 
    /**
-    * @brief c3 expansion coefficient
+    * @brief c3 expansion coefficient for PolSphEnergy basis
     */
    Scalar_t c3(const int n, const int l) const;
-
-   /**
-    * @brief rescaled c1 expansion coefficient
-    */
-   Scalar_t d1(const int n, const int l) const;
-
-   /**
-    * @brief rescaled c2 expansion coefficient
-    */
-   Scalar_t d2(const int n, const int l) const;
-
-   /**
-    * @brief rescaled c3 expansion coefficient
-    */
-   Scalar_t d3(const int n, const int l) const;
 };
 
 } // namespace Stencil

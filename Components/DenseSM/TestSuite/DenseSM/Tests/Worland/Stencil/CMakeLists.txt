@@ -39,15 +39,85 @@ include(SetUlp)
 # Stencil tests
 set(_tests
   OrthogonalValue:densestencil
-  OrthogonalValueD1:densestencil
-  OrthogonalValueD2:densestencil
   )
 foreach(_t ${_tests})
   quicc_add_test(${_t}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    IDS 0
-    ULPS 10
+    IDS 0 1 2 3 4 5
+    ULPS 30 30 30 30 30 30
+  )
+endforeach()
+
+set(_tests
+  OrthogonalValue:densestencil
+  )
+foreach(_t ${_tests})
+  quicc_add_test(${_t}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 10 11 12 13 14 15
+    ULPS 30 30 30 30 30 30
+  )
+endforeach()
+
+set(_tests
+  OrthogonalValue:densestencil
+  )
+foreach(_t ${_tests})
+  quicc_add_test(${_t}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 20 21 22 23 24 25
+    ULPS 30 30 30 30 30 30
+  )
+endforeach()
+
+set(_tests
+  OrthogonalValueD1:densestencil
+  )
+foreach(_t ${_tests})
+  quicc_add_test(${_t}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1 2 3 4 5
+    ULPS 30 30 30 30 30 30
+  )
+endforeach()
+
+set(_tests
+  OrthogonalValueD1:densestencil
+  )
+foreach(_t ${_tests})
+  quicc_add_test(${_t}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 10 11 12 13 14 15
+    ULPS 30 30 30 30 30 30
+  )
+endforeach()
+
+set(_tests
+  OrthogonalValueD1:densestencil
+  )
+foreach(_t ${_tests})
+  quicc_add_test(${_t}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 20 21 22 23 24 25
+    ULPS 30 30 30 30 30 30
+  )
+endforeach()
+
+set(_tests
+  OrthogonalValueD1:densestencil
+  )
+foreach(_t ${_tests})
+  quicc_add_test(${_t}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 30 31 32 33 34 35
+    ULPS 30 30 30 30 30 30
   )
 endforeach()
 

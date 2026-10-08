@@ -10,12 +10,14 @@
 
 // Project includes
 //
+#include "Types/Internal/Math.hpp"
 #include "DenseSM/Worland/Stencil/OrthogonalValue.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 
 #include "Eigen/Dense"
+#include "Types/Internal/Typedefs.hpp"
 #include <iostream>
 namespace QuICC {
 
@@ -49,8 +51,6 @@ OrthogonalValue::Scalar_t OrthogonalValue::basisAlpha(const std::size_t nId)
 
 OrthogonalValue::Scalar_t OrthogonalValue::basisDBeta(const std::size_t nId)
 {
-   //OrthoId id = static_cast<OrthoId>(nId);
-
    Scalar_t b(0.5);
 
    return b;
@@ -65,38 +65,44 @@ OrthogonalValue::OrthogonalValue(const int rows, const int cols, const Scalar_t 
 void OrthogonalValue::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
-   namespace ev = Polynomial::Worland::Evaluator;
-   const int nR = (2 * this->rows() + this->mL);
-
-   Internal::Array igrid, iweights;
-   this->computeQuadrature(igrid, iweights, nR);
-
-   Polynomial::Worland::Wnl bW(basisAlpha(this->mNId), basisDBeta(this->mNId));
-   Internal::Matrix opBwd(igrid.size(), this->rows()-1);
-   Internal::Array diag(opBwd.cols());
-   for(int i = 0; i < diag.size(); i++)
+   OrthoId oid = static_cast<OrthoId>(this->mNId);
+   if(this->mL == 0 && (oid == OrthoId::TorSphEnergy || oid == OrthoId::PolSphEnergy))
    {
-      diag(i) = this->norm(i, this->mL);
+      mat = Internal::Matrix::Identity(rows,this->rows()-1);
    }
-   bW.compute<Internal::MHDFloat>(opBwd, opBwd.cols(), this->mL, igrid,
-      Internal::Array(), ev::Set());
-   opBwd = (1.0 - igrid.array().pow(2)).matrix().asDiagonal()*(opBwd * diag.asDiagonal());
-
-   Polynomial::Worland::Wnl W;
-   Internal::Matrix opFwd(igrid.size(), this->rows());
-   W.compute<Internal::MHDFloat>(opFwd, opFwd.cols(), this->mL, igrid,
-      iweights, ev::Set());
-
-   mat = opFwd.transpose() * opBwd;
-
-   // Prune zeros
-   int s = 2;
-   for(int i = 0; i < mat.cols()-1; i++)
+   else
    {
-      mat.block(s+i, i, mat.rows() - (s + i), 1).setZero();
-   }
+      namespace ev = Polynomial::Worland::Evaluator;
+      const int nR = (2 * this->rows() + this->mL);
 
-   std::cerr << mat.topRows(mat.cols()).fullPivLu().solve(mat.topRows(mat.cols())) << std::endl;
+      Internal::Array igrid, iweights;
+      this->computeQuadrature(igrid, iweights, nR);
+
+      Polynomial::Worland::Wnl bW(basisAlpha(this->mNId), basisDBeta(this->mNId));
+      Internal::Matrix opBwd(igrid.size(), this->rows()-1);
+      Internal::Array diag(opBwd.cols());
+      for(int i = 0; i < diag.size(); i++)
+      {
+         diag(i) = 1./this->norm(i, this->mL);
+      }
+      bW.compute<Internal::MHDFloat>(opBwd, opBwd.cols(), this->mL, igrid,
+         Internal::Array(), ev::Set());
+      opBwd = (1.0 - igrid.array().pow(2)).matrix().asDiagonal()*(opBwd * diag.asDiagonal());
+
+      Polynomial::Worland::Wnl W;
+      Internal::Matrix opFwd(igrid.size(), this->rows());
+      W.compute<Internal::MHDFloat>(opFwd, opFwd.cols(), this->mL, igrid,
+         iweights, ev::Set());
+
+      mat = opFwd.transpose() * opBwd;
+
+      // Prune zeros
+      int s = 2;
+      for(int i = 0; i < mat.cols()-1; i++)
+      {
+         mat.block(s+i, i, mat.rows() - (s + i), 1).setZero();
+      }
+   }
 }
 
 OrthogonalValue::Scalar_t OrthogonalValue::norm(const int in, const int il) const
@@ -109,17 +115,17 @@ OrthogonalValue::Scalar_t OrthogonalValue::norm(const int in, const int il) cons
    switch(id)
    {
       case OrthoId::TorSphEnergy:
-         c = (l*(l+1)*(2*n+2)*(2*n+4))/((2*n+2*l+3)*(2*n+2*l+5)*(4*n+2*l+7));
+         c = l*(l + 1);
          break;
       case OrthoId::PolSphEnergy:
-         c = (std::pow(2*n+2,2)*l*(l+1))/(4*n+2*l + 5);
+         c = 2*l*(l + 1)*(n + 1)*(2*n + 2*l + 3);
          break;
       case OrthoId::ScaSphEnergy:
-         c = ((2*n+2)*(2*n+4))/((2*n+2*l+3)*(2*n+2*l+5)*(4*n+2*l+7));
+         c = 1;
          break;
    };
 
-   return c;
+   return Internal::Math::sqrt(c);
 }
 
 } // namespace Stencil
