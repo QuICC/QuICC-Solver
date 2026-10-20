@@ -119,6 +119,19 @@ Specifically:
     - https://code.visualstudio.com/docs/editor/debugging
 
 
+## MPI debug
+
+- compile with the MPI flag active
+
+        cmake .. -DQUICC_MODEL=AnelasticSphereRTC -DCMAKE_BUILD_TYPE=Debug -DQUICC_USE_MPI=ON
+
+- open a terminal window attached to the SAME CONTAINER and run the code
+
+        QUICC_GDB_HOOK=0 mpirun -n 4 /QuICC/QuICC-Solver-merge/build_NL_anelastic_mpi_debug/Models/AnelasticSphereRTC/Executables/AnelasticSphereRTCExplicitHydroModel
+
+- the terminal is now paused and the PID of a process popped up.
+
+
 ## Debug tricks
 
 
