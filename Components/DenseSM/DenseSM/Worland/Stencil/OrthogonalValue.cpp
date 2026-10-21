@@ -16,9 +16,6 @@
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 
-#include "Eigen/Dense"
-#include "Types/Internal/Typedefs.hpp"
-#include <iostream>
 namespace QuICC {
 
 namespace DenseSM {

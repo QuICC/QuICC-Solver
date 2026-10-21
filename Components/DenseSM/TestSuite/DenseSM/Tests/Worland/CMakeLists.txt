@@ -390,4 +390,44 @@ run_iq_proj_tests("Elsasser projection, quadrupolar, fB" TESTS ${_tests} IDS ${_
 
 list(POP_BACK CMAKE_MESSAGE_INDENT)
 
+# Tau tests
+set(TestExe DenseSMWorlandTauTests)
+
+# Add target for all tests
+add_executable(${TestExe} TauTests.cpp)
+
+target_link_libraries(${TestExe}
+  ${QUICC_CURRENT_COMPONENT_TEST_LIB}
+)
+
+set(QUICC_WORK_DIR "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite")
+
+set_target_properties(
+  ${TestExe}
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
+list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
+
+include(ConfigureTests)
+include(SetUlp)
+
+# Stencil tests
+set(_tests
+  SLapl:dense
+  SLapl2:dense
+  )
+foreach(_t ${_tests})
+  quicc_add_test(${_t}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1 2 3 4 5
+    ULPS 300 300 300 300 300 300
+  )
+endforeach()
+
+list(POP_BACK CMAKE_MESSAGE_INDENT)
+
 add_subdirectory(Stencil)

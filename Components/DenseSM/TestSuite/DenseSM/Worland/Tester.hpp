@@ -17,7 +17,7 @@
 #include "TestSuite/DenseSM/Worland/DipolarS1.hpp"
 #include "TestSuite/DenseSM/Worland/QuadrupolarS2.hpp"
 #include "DenseSM/Worland/IWorlandOperator.hpp"
-#include "DenseSM/Worland/Stencil/IStencilOperator.hpp"
+#include "DenseSM/Worland/ITauOperator.hpp"
 #include "DenseSM/Worland/RadialTorPolFunction.hpp"
 #include "TestSuite/DenseSM/TesterBase.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
@@ -229,7 +229,7 @@ namespace Worland {
 
          outData = op.mat();
       }
-      else if constexpr(std::is_base_of_v<dsm::Stencil::IStencilOperator, TOp>)
+      else if constexpr(std::is_base_of_v<dsm::ITauOperator, TOp>)
       {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
