@@ -68,6 +68,16 @@ protected:
    Position position() const;
 
    /**
+    * @brief Get upper boundary
+    */
+   Scalar_t upper() const;
+
+   /**
+    * @brief Get lower boundary
+    */
+   Scalar_t lower() const;
+
+   /**
     * @brief Get mapping a coefficient from y = ax + b
     */
    Scalar_t a() const;
@@ -95,6 +105,16 @@ private:
     * @brief Boundary position
     */
    Position mPosition;
+
+   /**
+    * @brief Upper boundary
+    */
+   Scalar_t mUpper;
+
+   /**
+    * @brief Lower boundary
+    */
+   Scalar_t mLower;
 
    /**
     * @brief a coefficienct of y = ax + b

@@ -26,6 +26,8 @@ namespace Boundary {
 ICondition::ICondition(const Scalar_t lower, const Scalar_t upper,
    const Position pos) :
     mPosition(pos),
+    mUpper(upper),
+    mLower(lower),
     mA(std::numeric_limits<Scalar_t>::max()),
     mB(std::numeric_limits<Scalar_t>::max())
 {
@@ -41,6 +43,16 @@ void ICondition::setBounds(const Scalar_t lower, const Scalar_t upper)
 ICondition::Position ICondition::position() const
 {
    return this->mPosition;
+}
+
+ICondition::Scalar_t ICondition::lower() const
+{
+   return this->mLower;
+}
+
+ICondition::Scalar_t ICondition::upper() const
+{
+   return this->mUpper;
 }
 
 ICondition::Scalar_t ICondition::a() const

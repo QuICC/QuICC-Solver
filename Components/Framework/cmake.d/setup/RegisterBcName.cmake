@@ -6,6 +6,7 @@ set(tags
   FixedEntropy
   FixedFlux
   Insulating
+  InsulatingTopPerfcondBottom
   )
 
 include(RegisterTags)
