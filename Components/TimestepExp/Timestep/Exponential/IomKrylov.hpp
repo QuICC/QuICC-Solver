@@ -23,6 +23,9 @@ namespace Exponential {
 
 /**
  * @brief Incomplete orthogonalization method for building Krylov subspace
+ *
+ * @tparam TAfunc Matrix free A functor
+ * @tparam TOfunc Orthogonalization functor
  */
 template <typename TAfunc, typename TOfunc> class IomKrylov
 {

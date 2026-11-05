@@ -69,7 +69,7 @@ void TransferOutputFunctor<TTsFunc>::operator()(ViewType tmpView, const Spectral
    pStepper->getData(tmpView, start, this->regId, this->col);
 
    DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
-   details::computeSet(tmp, tmpView, 0);
+   details::computeSet(tmp, tmpView, 0, 0, cinfo.galerkinN(i));
 
    const SparseMatrix* pOp;
    if(cinfo.isGalerkin())

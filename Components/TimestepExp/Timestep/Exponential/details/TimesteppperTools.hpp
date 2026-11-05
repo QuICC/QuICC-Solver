@@ -33,11 +33,6 @@ namespace details {
 MHDFloat compute1Norm(const Matrix& mat);
 
 /**
- * @brief Compute matrix infinity-norm
- */
-MHDFloat computeInfNorm(const Matrix& mat);
-
-/**
  * @brief Compute vector 2-norm
  */
 MHDFloat compute2Norm(const Matrix& mat, const int col, const int n);
@@ -53,56 +48,24 @@ MHDFloat computeSquared2Norm(const Matrix& mat, const int col, const int n);
 MHDFloat computeAugmented2Norm(const Matrix& mat, const int col, const int n);
 
 /**
- * @brief Compute dot products of multiple colums
- */
-Matrix computeDot(const Matrix& u, const int colU0, const int colU, const Matrix& v, const int colV, const int n);
-
-/**
- * @brief Compute dot products of multiple augmented colums
- */
-Matrix computeAugmentedDot(const Matrix& u, const int colU0, const int colU, const Matrix& v, const int colV, const int n);
-
-/**
  * @brief Compute z = y
  */
-template <typename TData> void computeSet(TData& z, const TData& y);
-
-/**
- * @brief Compute z = y
- */
-template <typename TData> void computeSet(TData& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow);
+template <typename TData> void computeSet(TData& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t out0, const std::size_t in0, const std::size_t rows);
 
 /**
  * @brief Compute y = x
  */
-template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x, const std::size_t startRow);
+template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x, const std::size_t out0, const std::size_t in0, const std::size_t rows);
 
 /**
  * @brief Compute y = x
  */
-void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const DecoupledZMatrix& x, const std::size_t startRow);
+void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const DecoupledZMatrix& x, const std::size_t out0, const std::size_t in0, const std::size_t rows);
 
 /**
  * @brief Compute y = x
  */
-template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x, const std::size_t startRow);
-
-/**
- * @brief Compute z = y
- */
-void computeSet(DecoupledZMatrix& z, const DecoupledZMatrix& y);
-
-/**
- * @brief Compute z = a*y
- */
-template <typename TData>
-void computeSet(TData& z, const MHDFloat a, const TData& y);
-
-/**
- * @brief Compute z = a*y
- */
-void computeSet(DecoupledZMatrix& z, const MHDFloat a,
-   const DecoupledZMatrix& y);
+template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x, const std::size_t out0, const std::size_t in0, const std::size_t rows);
 
 /**
  * @brief Flatten data y_2n = x_n.re, y_2n+1 = x_n.im
@@ -139,93 +102,77 @@ void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& d
 //
 //
 
-template <typename TData> inline void computeSet(TData& y, const TData& x)
-{
-   y = x;
-}
-
-inline void computeSet(DecoupledZMatrix& y, const DecoupledZMatrix& x)
-{
-   y.real() = x.real();
-
-   y.imag() = x.imag();
-}
-
-template <typename TData> void computeSet(TData& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow)
+template <typename TData> void computeSet(TData& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t out0, const std::size_t in0, const std::size_t rows)
 {
    assert(static_cast<std::size_t>(y.cols()) == x.dims()[1]);
-   assert(static_cast<std::size_t>(y.rows()) >= x.dims()[0] + startRow);
+   assert(static_cast<std::size_t>(y.rows()) >= rows + out0);
+   assert(static_cast<std::size_t>(x.dims()[0]) >= rows + in0);
 
    for(std::size_t j = 0;  j < x.dims()[1]; j++)
    {
-      for(std::size_t i = 0;  i < x.dims()[0]; i++)
+      for(std::size_t i = 0;  i < rows; i++)
       {
-         y(i + startRow,j) = x(i,j);
+         std::size_t iy_ = i + out0;
+         std::size_t ix_ = i + in0;
+         y(iy_,j) = x(ix_,j);
       }
    }
 }
 
-inline void computeSet(DecoupledZMatrix& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow)
+inline void computeSet(DecoupledZMatrix& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t out0, const std::size_t in0, const std::size_t rows)
 {
    assert(static_cast<std::size_t>(y.real().cols()) == x.dims()[1]);
    assert(static_cast<std::size_t>(y.imag().cols()) == x.dims()[1]);
-   assert(static_cast<std::size_t>(y.real().rows()) >= x.dims()[0] + startRow);
-   assert(static_cast<std::size_t>(y.imag().rows()) >= x.dims()[0] + startRow);
+   assert(static_cast<std::size_t>(x.dims()[0]) >= rows + in0);
+   assert(static_cast<std::size_t>(y.real().rows()) >= rows + out0);
+   assert(static_cast<std::size_t>(y.imag().rows()) >= rows + out0);
 
    for(std::size_t j = 0;  j < x.dims()[1]; j++)
    {
-      for(std::size_t i = 0;  i < x.dims()[0]; i++)
+      for(std::size_t i = 0;  i < rows; i++)
       {
-         std::size_t i_ = i + startRow;
-         y.real()(i_,j) = x(i,j).real();
-         y.imag()(i_,j) = x(i,j).imag();
+         std::size_t iy_ = i + out0;
+         std::size_t ix_ = i + in0;
+         y.real()(iy_,j) = x(ix_,j).real();
+         y.imag()(iy_,j) = x(ix_,j).imag();
       }
    }
 }
 
-template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x, const std::size_t startRow)
+template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x, const std::size_t out0, const std::size_t in0, const std::size_t rows)
 {
    assert(static_cast<std::size_t>(x.cols()) == y.dims()[1]);
-   assert(static_cast<std::size_t>(x.rows()) >= y.dims()[0] + startRow);
+   assert(static_cast<std::size_t>(y.dims()[0]) >= rows + out0);
+   assert(static_cast<std::size_t>(x.rows()) >= rows + in0);
 
    for(std::size_t j = 0;  j < y.dims()[1]; j++)
    {
-      for(std::size_t i = 0;  i < y.dims()[0]; i++)
+      for(std::size_t i = 0;  i < rows; i++)
       {
-         y(i,j) = x(i + startRow,j);
+         std::size_t iy_ = i + out0;
+         std::size_t ix_ = i + in0;
+         y(iy_,j) = x(ix_,j);
       }
    }
 }
 
-inline void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const DecoupledZMatrix& x, const std::size_t startRow)
+inline void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const DecoupledZMatrix& x, const std::size_t out0, const std::size_t in0, const std::size_t rows)
 {
    assert(static_cast<std::size_t>(x.real().cols()) == y.dims()[1]);
    assert(static_cast<std::size_t>(x.imag().cols()) == y.dims()[1]);
-   assert(static_cast<std::size_t>(x.real().rows()) >= y.dims()[0] + startRow);
-   assert(static_cast<std::size_t>(x.imag().rows()) >= y.dims()[0]  + startRow);
+   assert(static_cast<std::size_t>(x.real().rows()) >= rows + in0);
+   assert(static_cast<std::size_t>(x.imag().rows()) >= rows + in0);
+   assert(static_cast<std::size_t>(y.dims()[0]) >= rows + out0);
 
    for(std::size_t j = 0;  j < y.dims()[1]; j++)
    {
-      for(std::size_t i = 0;  i < y.dims()[0]; i++)
+      for(std::size_t i = 0;  i < rows; i++)
       {
-         std::size_t i_ = i + startRow;
-         y(i,j) = MHDComplex(x.real()(i_,j), x.imag()(i_,j));
+         std::size_t iy_ = i + out0;
+         std::size_t ix_ = i + in0;
+         y(iy_,j) = MHDComplex(x.real()(ix_,j), x.imag()(ix_,j));
       }
    }
-}
-
-template <typename TData>
-inline void computeSet(TData& y, const MHDFloat a, const TData& x)
-{
-   y = a * x;
-}
-
-inline void computeSet(DecoupledZMatrix& y, const MHDFloat a,
-   const DecoupledZMatrix& x)
-{
-   y.real() = a * x.real();
-
-   y.imag() = a * x.imag();
 }
 
 inline void flatten2Real(Matrix& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow, const std::size_t col)
@@ -367,18 +314,6 @@ inline MHDFloat compute1Norm(const Matrix& mat)
    return norm;
 }
 
-inline MHDFloat computeInfNorm(const Matrix& mat)
-{
-   Matrix rowSum = mat.array().abs().rowwise().sum();
-
-#ifdef QUICC_MPI
-   MPI_Allreduce(MPI_IN_PLACE, rowSum.data(), rowSum.size(), Environment::MpiTypes::type<MHDFloat>(), MPI_SUM, MPI_COMM_WORLD);
-#endif
-
-   MHDFloat norm = rowSum.maxCoeff();
-   return norm;
-}
-
 inline MHDFloat computeSquared2Norm(const Matrix& mat, const int col, const int n)
 {
    MHDFloat norm = mat.col(col).topRows(n).squaredNorm();
@@ -409,30 +344,6 @@ inline MHDFloat computeAugmented2Norm(const Matrix& mat, const int col, const in
 
    norm = std::sqrt(norm);
    return norm;
-}
-
-inline Matrix computeDot(const Matrix& u, const int colU0, const int colU, const Matrix& v, const int colV, const int n)
-{
-   int colsU = colU - colU0 + 1;
-   Matrix dot = u.block(0, colU0, n, colsU).transpose()*v.col(colV).topRows(n);
-
-#ifdef QUICC_MPI
-   MPI_Allreduce(MPI_IN_PLACE, dot.data(), dot.size(), Environment::MpiTypes::type<MHDFloat>(), MPI_SUM, MPI_COMM_WORLD);
-#endif
-
-   return dot;
-}
-
-inline Matrix computeAugmentedDot(const Matrix& u, const int colU0, const int colU, const Matrix& v, const int colV, const int n)
-{
-   Matrix dot = details::computeDot(u, colU0, colU, v, colV, n);
-
-   // Add dot product from augmented part
-   int colsU = dot.rows();
-   int p = u.rows() - n;
-   dot += u.block(n, colU0, p, colsU).transpose() * v.col(colV).bottomRows(p);
-
-   return dot;
 }
 
 } // namespace details

@@ -21,10 +21,24 @@ namespace Exponential {
 TestAFunctor::TestAFunctor(const int n, const int id)
    : mcN(n), matA(n, n)
 {
+   // Random matrix
    if(id == 0)
    {
       matA = Matrix::Random(n,n);
    }
+   // Hilbert matrix
+   else if(id == 1)
+   {
+      matA = Matrix::Zero(n,n);
+      for(int i = 0; i < n; i++)
+      {
+         for(int j = 0; j < n; j++)
+         {
+            matA(i,j) = 1./(i+j+1);
+         }
+      }
+   }
+   // Identity matrix
    else
    {
       matA = Matrix::Identity(n,n);

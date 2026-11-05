@@ -19,12 +19,26 @@ namespace Timestep {
 namespace Exponential {
 
 TestAugmentedAFunctor::TestAugmentedAFunctor(const int n, const int id)
-   : mAn(0), mBn(0), mN(n), matA(0,0), matB(0,0)
+   : mAn(n), mBn(0), mN(n), matA(n,n), matB(0,0)
 {
+   // Random matrix
    if(id == 0)
    {
       matA = Matrix::Random(n,n);
    }
+   // Hilbert matrix
+   else if(id == 1)
+   {
+      matA = Matrix::Zero(n,n);
+      for(int i = 0; i < n; i++)
+      {
+         for(int j = 0; j < n; j++)
+         {
+            matA(i,j) = 1./(i+j+1);
+         }
+      }
+   }
+   // Identity matrix
    else
    {
       matA = Matrix::Identity(n,n);
