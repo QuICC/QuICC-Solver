@@ -234,7 +234,7 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         if(meta.size() != 5)
+         if(meta.size() != 6)
          {
             throw std::logic_error("Test meta data is wrong");
          }
@@ -245,8 +245,9 @@ namespace Worland {
          auto a = static_cast<QuICC::Internal::MHDFloat>(meta(2));
          auto b = static_cast<QuICC::Internal::MHDFloat>(meta(3));
          auto l = static_cast<int>(meta(4));
+         auto bId = static_cast<int>(meta(5));
 
-         TOp op(nNr, nNc, a, b, l);
+         TOp op(nNr, nNc, a, b, l, bId);
 
          outData = op.mat();
       }

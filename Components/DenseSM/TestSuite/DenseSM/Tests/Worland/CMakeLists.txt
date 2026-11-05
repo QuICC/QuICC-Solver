@@ -416,6 +416,7 @@ include(SetUlp)
 
 # Stencil tests
 set(_tests
+  Id:dense
   SLapl:dense
   SLapl2:dense
   )

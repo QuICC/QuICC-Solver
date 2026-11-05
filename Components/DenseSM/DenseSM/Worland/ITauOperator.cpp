@@ -19,8 +19,8 @@ namespace DenseSM {
 namespace Worland {
 
 ITauOperator::ITauOperator(const int rows, const int cols,
-   const Scalar_t alpha, const Scalar_t dBeta, const int l) :
-    IWorlandOperator(rows, cols, alpha, dBeta), mL(l)
+   const Scalar_t alpha, const Scalar_t dBeta, const int l, const std::size_t bId) :
+    IWorlandOperator(rows, cols, alpha, dBeta), mL(l), mBId(bId)
 {
 }
 

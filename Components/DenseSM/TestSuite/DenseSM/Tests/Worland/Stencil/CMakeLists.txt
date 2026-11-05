@@ -74,6 +74,18 @@ foreach(_t ${_tests})
 endforeach()
 
 set(_tests
+  OrthogonalInsulating:densestencil
+  )
+foreach(_t ${_tests})
+  quicc_add_test(${_t}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1 2 3 4 5
+    ULPS 30 30 30 30 30 30
+  )
+endforeach()
+
+set(_tests
   OrthogonalValueD1:densestencil
   )
 foreach(_t ${_tests})
