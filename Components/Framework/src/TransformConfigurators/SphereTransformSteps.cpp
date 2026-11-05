@@ -21,6 +21,9 @@
 #include "QuICC/Transform/Path/CurlNl.hpp"
 #include "QuICC/Transform/Path/CurlCurlNl.hpp"
 #include "QuICC/Transform/Path/NegCurlCurlNl.hpp"
+#include "QuICC/Transform/Path/LaplhCurlNl.hpp"
+#include "QuICC/Transform/Path/LaplhCurlCurlNl.hpp"
+#include "QuICC/Transform/Path/NegLaplhCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/I2ScalarNl.hpp"
 #include "QuICC/Transform/Path/I2CurlNl.hpp"
 #include "QuICC/Transform/Path/I2LaplhCurlNl.hpp"
@@ -31,6 +34,7 @@
 #include "QuICC/Transform/Path/NegCurlCurlNl.hpp"
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/I2P.hpp"
+#include "QuICC/Transform/Forward/Laplh.hpp"
 #include "QuICC/Transform/Forward/Overlaplh.hpp"
 #include "QuICC/Transform/Forward/R1.hpp"
 #include "QuICC/Transform/Forward/D1.hpp"
@@ -243,6 +247,20 @@ namespace Transform {
             transform.back().addEdge(Forward::OverlaplhD1::id());
             transform.back().addEdge(Forward::T::id(), curlId, Arithmetics::Sub::id());
          }
+         // Standard second order equation with horizontal laplacian without quasi-inverse
+         else if(curlFlag == Path::LaplhCurlNl::id())
+         {
+            // Compute curl component
+            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::OversinDphi::id());
+            transform.back().addEdge(Forward::T::id(), curlId, Arithmetics::Add::id());
+
+            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::D1::id());
+            transform.back().addEdge(Forward::T::id(), curlId, Arithmetics::Sub::id());
+         }
          else
          {
             throw std::logic_error("Requested an unknown curl nonlinear vector forward transform (ID = " + std::to_string(curlFlag) + ")");
@@ -346,6 +364,26 @@ namespace Transform {
             transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
+            transform.back().addEdge(Forward::S::id(), curlcurlId, Arithmetics::Add::id());
+         }
+         // transform with horizontal laplacian without quasi-inverse
+         else if(curlcurlFlag == Path::NegLaplhCurlCurlNl::id())
+         {
+            // Compute curlcurl Q component
+            transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::Laplh::id());
+            transform.back().addEdge(Forward::Q::id(), curlcurlId, Arithmetics::Sub::id());
+
+            // Compute curlcurl S component
+            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::D1::id());
+            transform.back().addEdge(Forward::S::id(), curlcurlId, Arithmetics::Add::id());
+
+            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::OversinDphi::id());
             transform.back().addEdge(Forward::S::id(), curlcurlId, Arithmetics::Add::id());
          }
          else

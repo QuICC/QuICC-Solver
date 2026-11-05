@@ -2,6 +2,9 @@ set(tags
   NegCurlCurlNl
   CurlCurlNl
   CurlNl
+  NegLaplhCurlCurlNl
+  LaplhCurlCurlNl
+  LaplhCurlNl
   Empty
   I2CurlCurlNl
   I2CurlNl
