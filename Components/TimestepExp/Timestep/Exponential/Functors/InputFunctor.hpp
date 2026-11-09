@@ -36,7 +36,7 @@ namespace Functors {
 /**
  * @brief Input functor
  */
-template <typename TFunc>
+template <typename TFunc, bool UseGalerkinSize = true>
 class InputFunctor: public BaseFunctor
 {
    public:
@@ -48,8 +48,8 @@ class InputFunctor: public BaseFunctor
       std::shared_ptr<TFunc> vFunc;
 };
 
-template <typename TFunc>
-void InputFunctor<TFunc>::operator()(const SpectralFieldId& myId)
+template <typename TFunc, bool UseGalerkinSize>
+void InputFunctor<TFunc,UseGalerkinSize>::operator()(const SpectralFieldId& myId)
 {
    const auto& eqData = *spData;
    assert(eqData.cInfos.count(myId) > 0);
@@ -60,7 +60,14 @@ void InputFunctor<TFunc>::operator()(const SpectralFieldId& myId)
    std::uint32_t mem_size = 0;
    for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
    {
-      mem_size = std::max(mem_size, static_cast<std::uint32_t>(cinfo.galerkinN(i))*static_cast<std::uint32_t>(cinfo.rhsCols(i)));
+      if constexpr(UseGalerkinSize)
+      {
+         mem_size = std::max(mem_size, static_cast<std::uint32_t>(cinfo.galerkinN(i))*static_cast<std::uint32_t>(cinfo.rhsCols(i)));
+      }
+      else
+      {
+         mem_size = std::max(mem_size, static_cast<std::uint32_t>(cinfo.tauN(i))*static_cast<std::uint32_t>(cinfo.rhsCols(i)));
+      }
    }
    Memory::MemBlock<MHDComplex> data(mem_size, this->_mem.get());
 
@@ -74,7 +81,15 @@ void InputFunctor<TFunc>::operator()(const SpectralFieldId& myId)
       info.matStart = matStart;
       matStart += info.blockN;
 
-      std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
+      std::uint32_t mem_rows;
+      if constexpr(UseGalerkinSize)
+      {
+         mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
+      }
+      else
+      {
+         mem_rows = static_cast<std::uint32_t>(cinfo.tauN(i));
+      }
       std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
       using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
       std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};

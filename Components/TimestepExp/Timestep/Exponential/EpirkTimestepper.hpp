@@ -447,7 +447,7 @@ void EpirkTimestepper<TOperator, TData, TImpl>::buildOperators(
    // Update timestep
    this->mDt = dt;
 
-   auto setOps = [](const std::size_t tId, const std::size_t startRow, const auto& ops, auto& tOps)
+   auto setOps = [](const std::size_t tId, const std::size_t startRow, const auto& ops, auto& tOps, const bool isSquare)
    {
       // Set RHS Quasi-inverse
       assert(ops.count(tId) > 0);
@@ -457,14 +457,24 @@ void EpirkTimestepper<TOperator, TData, TImpl>::buildOperators(
       for(auto&& opData: opQs)
       {
          auto&& matId = opData.first;
-         auto&& size = opData.second.first;
+         auto&& rows = opData.second.first;
          auto&& mat = opData.second.second;
+         auto cols = mat.real().cols() ;
 
          auto tMatId = matId + startRow;
          assert(_Qs.count(tMatId));
          auto&& _op = _Qs.at(tMatId);
-         _op.resize(size, size);
-         details::addOperators(_op, 1.0, mat);
+         _op.resize(rows, cols);
+         if(rows == mat.real().rows())
+         {
+            details::addOperators(_op, 1.0, mat);
+         }
+         else
+         {
+            DecoupledZSparse tmat;
+            tmat.real() = mat.real().topRows(rows);
+            details::addOperators(_op, 1.0, tmat);
+         }
       }
    };
 
@@ -472,13 +482,13 @@ void EpirkTimestepper<TOperator, TData, TImpl>::buildOperators(
    setOps(Tag::Operator::Qi::id(),
          startRow,
          ops,
-         this->mOperators);
+         this->mOperators, false);
 
    // Set LHS
    setOps(Tag::Operator::Lhs::id(),
          startRow,
          ops,
-         this->mOperators);
+         this->mOperators, true);
 }
 
 template <typename TOperator, typename TData, typename TImpl>
@@ -547,7 +557,8 @@ void EpirkTimestepper<TOperator, TData, TImpl>::addQiData(const View::View<MHDCo
 
    Eigen::Map<Matrix> tmpRe(tmp.data(), rows, 2*cols);
    auto& regMat = this->reg(regId);
-   Eigen::Map<Matrix> out(regMat.data() + col*regMat.rows() + startRow, rows, 2*cols);
+   const auto outRows = this->mOperators.at(Tag::Operator::Qi::id()).at(startRow).rows();
+   Eigen::Map<Matrix> out(regMat.data() + col*regMat.rows() + startRow, outRows, 2*cols);
    out.noalias() += this->mOperators.at(Tag::Operator::Qi::id()).at(startRow)*tmpRe;
 }
 
@@ -555,7 +566,8 @@ template <typename TOperator, typename TData, typename TImpl>
 void EpirkTimestepper<TOperator, TData, TImpl>::enforceBoundaryConditions(const std::size_t rows, const std::size_t cols, const std::size_t startRow, const std::size_t regId, const std::size_t col)
 {
    auto& regMat = this->reg(regId);
-   Eigen::Map<Matrix> regMap(regMat.data() + col*regMat.rows() + startRow, rows, 2*cols);
+   const auto outRows = this->mSolver.at(Tag::Operator::Lhs::id()).at(startRow)->rows();
+   Eigen::Map<Matrix> regMap(regMat.data() + col*regMat.rows() + startRow, outRows, 2*cols);
    Matrix tmp = regMap;
 
    regMap = this->mSolver.at(Tag::Operator::Lhs::id()).at(startRow)->solve(tmp);

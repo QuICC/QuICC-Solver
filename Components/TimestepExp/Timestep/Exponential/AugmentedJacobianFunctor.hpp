@@ -104,6 +104,11 @@ class AugmentedJacobianFunctor
       void applyJacobian() const;
 
       /**
+       * @brief Write Jacobian to file
+       */
+      void writeJacobian() const;
+
+      /**
        * @brief Iteration index
        */
       const std::set<int> mcFixedIts;
@@ -206,7 +211,7 @@ class AugmentedJacobianFunctor
       /**
        * @brief Input functor
        */
-      std::shared_ptr<Functors::InputFunctor<IviewFunctor>> mpInFunc;
+      std::shared_ptr<Functors::InputFunctor<IviewFunctor, false>> mpInFunc;
 };
 
 template <typename TInner>

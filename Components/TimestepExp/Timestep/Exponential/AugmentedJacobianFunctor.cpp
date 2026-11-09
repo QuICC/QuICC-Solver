@@ -19,6 +19,7 @@
 #include "Timestep/Exponential/Functors/ApplyConstraintFunctor.hpp"
 #include "Timestep/Exponential/EpirkTimestepper.hpp"
 #include "Timestep/Exponential/Functors/CallExplicitPrognosticFunctor.hpp"
+#include "QuICC/Io/Binary/DirectBinaryWriter.hpp"
 #include "QuICC/Pseudospectral/Coordinator.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 
@@ -53,6 +54,13 @@ void AugmentedJacobianFunctor::operator()(Eigen::Ref<Matrix> out, Eigen::Ref<Mat
    if(this->mAn == 0 || this->mBn == 0)
    {
       throw std::logic_error("Operators have not been initialized");
+   }
+
+   // Write full jacobian and stop
+   if(false)
+   {
+      this->writeJacobian();
+      QuICCEnv().abort(666);
    }
 
    // Copy data into handle
@@ -113,7 +121,7 @@ void AugmentedJacobianFunctor::setStepper(std::shared_ptr<TsFunctor> pStepper)
    // Input functors
    this->mpIbefFunc = std::make_shared<Functors::ApplyConstraintFunctor>(this->mspData, SolveTiming::Before::id());
    this->mpIviewFunc = std::make_shared<IviewFunctor>(this->mspData, this->mpTsFunc, this->mRegId, this->mRegCol);
-   this->mpInFunc = std::make_shared<Functors::InputFunctor<IviewFunctor>>(this->mspData, this->mpIviewFunc, this->mpIdMap, this->_mem);
+   this->mpInFunc = std::make_shared<Functors::InputFunctor<IviewFunctor, false>>(this->mspData, this->mpIviewFunc, this->mpIdMap, this->_mem);
 }
 
 void AugmentedJacobianFunctor::setMatrixHandle(Matrix& mat)
@@ -121,6 +129,35 @@ void AugmentedJacobianFunctor::setMatrixHandle(Matrix& mat)
    this->mpHandle = &mat;
    this->mAn = mat.rows();
    this->mN = this->mAn + this->mBn;
+}
+
+void AugmentedJacobianFunctor::writeJacobian() const
+{
+   Io::Binary::DirectBinaryWriter store("/tmp/jacobian", ".dat", "Jacobian data", "", "1.0");
+   store.init();
+
+   std::size_t count = 0;
+
+   int maxRows = static_cast<int>(std::pow(1024.0, 3.0)/(8*this->mAn));
+   for(int i = 0; i < std::min(maxRows, this->mAn); i++)
+   {
+      // Set unit vector
+      this->mpHandle->col(0).setZero();
+      this->mpHandle->col(0)(i) = 1.0;
+      std::cerr << "Computing action of Jacobian on e_" << i+1 << std::endl;
+
+      this->applyJacobian();
+
+      for(int k = 0; k < this->mAn; k++)
+      {
+         MHDFloat data = this->mpHandle->col(0)(k);
+         store.file().write(reinterpret_cast<char*>(&data), sizeof data);
+      }
+
+      count += this->mAn;
+   }
+   store.finalize();
+   std::cerr << "Wrote " << count << " values. Dimensions: " << this->mAn << std::endl;
 }
 
 } // namespace Exponential

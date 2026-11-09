@@ -9,6 +9,8 @@
 // Project includes
 //
 #include "Timestep/Exponential/Functors/StandardInnerProduct.hpp"
+#include "Environment/QuICCEnv.hpp"
+#include "Environment/MpiTypes.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 
 namespace QuICC {

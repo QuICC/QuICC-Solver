@@ -56,7 +56,7 @@ void GetInputFunctor<TTsFunc>::operator()(ViewType tmpView, const SpectralFieldI
    // Copy field values into timestepper input
    if(cinfo.hasNonlinear())
    {
-      Equations::copyUnknown(data.res(), cinfo, *data.fields.at(myId), tmpView, i, 0, true, true, false);
+      Equations::copyUnknown(data.res(), cinfo, *data.fields.at(myId), tmpView, i, 0, false, true, false);
    }
 
    // Add source term

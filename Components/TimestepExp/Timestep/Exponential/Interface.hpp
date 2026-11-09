@@ -339,7 +339,7 @@ void Interface<TScheme>::getInput()
    auto bFunc = std::make_shared<Functors::ApplyConstraintFunctor>(this->mspData, SolveTiming::Before::id());
    using OpFunctor = Functors::GetInputFunctor<TSFunctor>;
    auto pvFunc = std::make_shared<OpFunctor>(this->mspData, this->mpTsFunc, Register::Rhs::id(), 1);
-   auto pFunc = std::make_shared<Functors::InputFunctor<OpFunctor>>(this->mspData, pvFunc, this->mpFieldIdMap, this->_mem);
+   auto pFunc = std::make_shared<Functors::InputFunctor<OpFunctor, false>>(this->mspData, pvFunc, this->mpFieldIdMap, this->_mem);
    auto aFunc = std::make_shared<Functors::DoNothingFunctor>();
    Functors::ProcessRangeFunctor processor(bFunc, pFunc, aFunc, *this->mBaseItIds.rbegin());
    processor(this->mspData->eqInfos);
