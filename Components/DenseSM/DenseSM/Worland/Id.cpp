@@ -81,6 +81,13 @@ Id::Id(const int rows, const int cols, const Scalar_t alpha,
 {
 }
 
+Id::Id(const int rows, const int cols, const Scalar_t alpha,
+   const Scalar_t dBeta, const int l, const OrthoId bId) :
+    ITauOperator(rows, cols, alpha, dBeta, l, static_cast<std::size_t>(bId))
+{
+}
+
+
 void Id::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {

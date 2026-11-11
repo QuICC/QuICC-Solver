@@ -27,6 +27,14 @@ namespace Worland {
 class SLapl2 : public ITauOperator
 {
 public:
+   enum class OrthoId: std::size_t {
+      Worland = 0,
+      PolNoSlipSphEnergyWorland,
+      PolInsulatingSphEnergyWorland,
+      PolNoSlipSphEnergy,
+      PolInsulatingSphEnergy
+   };
+
    /**
     * @brief Constructor
     *
@@ -41,19 +49,24 @@ public:
       const Scalar_t dBeta, const int l, const std::size_t bId);
 
    /**
+    * @brief Constructor
+    *
+    * @param rows    Number of rows
+    * @param cols    Number of columns
+    * @param alpha   Jacobi alpha parameter
+    * @param dBeta   Jacobi dBeta parameter
+    * @param l       Harmonic degree l
+    * @param bId     Basis ID
+    */
+   SLapl2(const int rows, const int cols, const Scalar_t alpha,
+      const Scalar_t dBeta, const int l, const OrthoId bId);
+
+   /**
     * @brief Destructor
     */
    virtual ~SLapl2() = default;
 
 protected:
-   enum class OrthoId: std::size_t {
-      Worland = 0,
-      PolNoSlipSphEnergyWorland,
-      PolInsulatingSphEnergyWorland,
-      PolNoSlipSphEnergy,
-      PolInsulatingSphEnergy
-   };
-
    /**
     * @brief Implementation of build dense matrix operator
     * @param output operator

@@ -80,6 +80,12 @@ SLapl::SLapl(const int rows, const int cols, const Scalar_t alpha,
 {
 }
 
+SLapl::SLapl(const int rows, const int cols, const Scalar_t alpha,
+   const Scalar_t dBeta, const int l, const OrthoId bId) :
+    ITauOperator(rows, cols, alpha, dBeta, l, static_cast<std::size_t>(bId))
+{
+}
+
 void SLapl::buildTauOp(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
