@@ -26,6 +26,7 @@ set(tags
   MeanVelocityX
   MeanVelocityY
   MeanVelocityZ
+  OhmicDissipation
   Pressure
   Streamfunction
   Temperature
@@ -34,6 +35,7 @@ set(tags
   VelocityX
   VelocityY
   VelocityZ
+  ViscousDissipation
   Vorticity
   VorticityX
   VorticityY

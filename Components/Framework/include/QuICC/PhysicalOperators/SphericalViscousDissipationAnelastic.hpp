@@ -88,24 +88,16 @@
                           std::shared_ptr<QuICC::DenseSM::IGenericProfile> pDF, 
                           const QuICC::Equations::EquationParameters &eqParams,
                           const MHDFloat c = 1.0);
- 
-       protected:
- 
-       private:
-          /**
-           * @brief Empty constructor
-           */
-          SphericalViscousDissipationAnelastic() = default;
- 
-          /**
-           * @brief Empty destructor
-           */
-          ~SphericalViscousDissipationAnelastic() = default;
 
           /**
            * @brief helper function to calculate viscous dissipation slice
+           *
+           * Returns c * 2 rho nu (E:E - div(v)^2/3) / T on the local radial
+           * slice iR (rows: phi, cols: local theta). Public so that
+           * diagnostics (e.g. volume-integrated dissipation writers) can
+           * reuse the pointwise formula on already computed physical data.
            */
-          static Eigen::Matrix<MHDFloat, 
+          static Eigen::Matrix<MHDFloat,
                                Eigen::Dynamic, 
                                Eigen::Dynamic> computeViscousSlice(const int iR,
                                                                      const int iR_,
@@ -118,6 +110,19 @@
                                                                      const MHDFloat T,
                                                                      const MHDFloat Rho,
                                                                      const MHDFloat dLogRho);
+
+       protected:
+
+       private:
+          /**
+           * @brief Empty constructor
+           */
+          SphericalViscousDissipationAnelastic() = default;
+
+          /**
+           * @brief Empty destructor
+           */
+          ~SphericalViscousDissipationAnelastic() = default;
 
     };
  }
