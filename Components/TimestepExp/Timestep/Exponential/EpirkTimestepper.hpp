@@ -447,7 +447,7 @@ void EpirkTimestepper<TOperator, TData, TImpl>::buildOperators(
    // Update timestep
    this->mDt = dt;
 
-   auto setOps = [](const std::size_t tId, const std::size_t startRow, const auto& ops, auto& tOps, const bool isSquare)
+   auto setOps = [](const std::size_t tId, const std::size_t startRow, const auto& ops, auto& tOps)
    {
       // Set RHS Quasi-inverse
       assert(ops.count(tId) > 0);
@@ -482,13 +482,13 @@ void EpirkTimestepper<TOperator, TData, TImpl>::buildOperators(
    setOps(Tag::Operator::Qi::id(),
          startRow,
          ops,
-         this->mOperators, false);
+         this->mOperators);
 
    // Set LHS
    setOps(Tag::Operator::Lhs::id(),
          startRow,
          ops,
-         this->mOperators, true);
+         this->mOperators);
 }
 
 template <typename TOperator, typename TData, typename TImpl>

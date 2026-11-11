@@ -87,7 +87,9 @@ void GetLinearInputFunctor<TTsFunc>::operator()(ViewType tmpView, const Spectral
       }
    }
 
-   details::computeSet(tmpView, tmp, 0, cinfo.galerkinShift(i,0), cinfo.galerkinN(i));
+   //int shiftTop = cinfo.galerkinShift(i,0),;
+   int shiftTop = 0;
+   details::computeSet(tmpView, tmp, 0, shiftTop, cinfo.galerkinN(i));
 
    auto tsData = (*tsFunc)(info);
    auto&& pStepper = tsData.first;
