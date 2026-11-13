@@ -47,6 +47,12 @@ public:
     */
    virtual ~ISphericalTorPolEnergyWriter() = default;
 
+   /**
+    * @brief Activate output of the zonal (axisymmetric toroidal, m = 0)
+    * energy as an additional last column
+    */
+   void showZonal();
+
 protected:
    /**
     * @brief Write content
@@ -63,6 +69,16 @@ private:
     * @brief Storage for the Poloidal energy
     */
    Array mPolEnergy;
+
+   /**
+    * @brief Write the zonal energy column?
+    */
+   bool mShowZonal;
+
+   /**
+    * @brief Storage for the zonal (toroidal m = 0) energy
+    */
+   MHDFloat mZonalEnergy;
 
    /**
     * @brief Reset energy storage

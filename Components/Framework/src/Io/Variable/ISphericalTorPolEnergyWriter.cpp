@@ -29,16 +29,24 @@ ISphericalTorPolEnergyWriter::ISphericalTorPolEnergyWriter(
        Tags::Energy::EXTENSION, prefix + Tags::Energy::HEADER, type,
        Tags::Energy::VERSION, Dimensions::Space::SPECTRAL, EXTEND, pF),
     mTorEnergy(2),
-    mPolEnergy(2)
+    mPolEnergy(2),
+    mShowZonal(false),
+    mZonalEnergy(-1)
 {
    this->mTorEnergy.setConstant(-1);
    this->mPolEnergy.setConstant(-1);
+}
+
+void ISphericalTorPolEnergyWriter::showZonal()
+{
+   this->mShowZonal = true;
 }
 
 void ISphericalTorPolEnergyWriter::resetEnergy()
 {
    this->mTorEnergy.setZero();
    this->mPolEnergy.setZero();
+   this->mZonalEnergy = 0.0;
 }
 
 void ISphericalTorPolEnergyWriter::storeQEnergy(const int l, const int m,
@@ -78,6 +86,12 @@ void ISphericalTorPolEnergyWriter::storeTEnergy(const int l, const int m,
    {
       this->mTorEnergy(1) += energy;
    }
+
+   // Zonal (axisymmetric toroidal) energy
+   if (m == 0)
+   {
+      this->mZonalEnergy += energy;
+   }
 }
 
 void ISphericalTorPolEnergyWriter::writeContent()
@@ -85,18 +99,20 @@ void ISphericalTorPolEnergyWriter::writeContent()
    // Normalize by the volume
    this->mTorEnergy /= 2.0 * this->mVolume;
    this->mPolEnergy /= 2.0 * this->mVolume;
+   this->mZonalEnergy /= 2.0 * this->mVolume;
 
    // Create file
    this->preWrite();
 
 // Get the "global" Kinetic energy from MPI code
 #ifdef QUICC_MPI
-   Array energy(4);
+   Array energy(5);
 
    energy(0) = this->mTorEnergy(0);
    energy(1) = this->mTorEnergy(1);
    energy(2) = this->mPolEnergy(0);
    energy(3) = this->mPolEnergy(1);
+   energy(4) = this->mZonalEnergy;
 
    MPI_Allreduce(MPI_IN_PLACE, energy.data(), energy.size(), MPI_DOUBLE,
       MPI_SUM, MPI_COMM_WORLD);
@@ -105,6 +121,7 @@ void ISphericalTorPolEnergyWriter::writeContent()
    this->mTorEnergy(1) = energy(1);
    this->mPolEnergy(0) = energy(2);
    this->mPolEnergy(1) = energy(3);
+   this->mZonalEnergy = energy(4);
 #endif // QUICC_MPI
 
    using Tools::Formatter::ioFW;
@@ -144,6 +161,13 @@ void ISphericalTorPolEnergyWriter::writeContent()
          this->mFile << std::setprecision(ioPrec) << "\t" << ioFW(ioPrec)
                      << this->mPolEnergy(0) << "\t" << ioFW(ioPrec)
                      << this->mPolEnergy(1);
+      }
+
+      // Zonal (toroidal m = 0), last so existing column indices are unchanged
+      if (this->mShowZonal)
+      {
+         this->mFile << std::setprecision(ioPrec) << "\t" << ioFW(ioPrec)
+                     << this->mZonalEnergy;
       }
 
       // End line
