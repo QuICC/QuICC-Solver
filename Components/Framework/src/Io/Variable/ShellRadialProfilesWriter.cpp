@@ -61,11 +61,9 @@ namespace Variable {
       // Create file
       this->preWrite();
 
-      // Get the "global" profiles from MPI code, not sure if needed
-      #ifdef QUICC_MPI
-         MPI_Allreduce(MPI_IN_PLACE, this->mGrid.data(), this->mGrid.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, this->mProfiles.data(), this->mProfiles.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      #endif //QUICC_MPI
+      // No MPI reduction: every rank builds the full grid and evaluates the
+      // (deterministic) background profiles on it, so the data are already
+      // global. Summing over ranks would multiply them by the number of ranks.
 
       Array rGrid     = this->mGrid.cast<MHDFloat>();
       Matrix rProfiles = this->mProfiles.cast<MHDFloat>();
