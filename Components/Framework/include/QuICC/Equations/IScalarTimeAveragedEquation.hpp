@@ -6,15 +6,9 @@
 #ifndef QUICC_EQUATIONS_ISCALARTIMEAVERAGEDEQUATION_HPP
 #define QUICC_EQUATIONS_ISCALARTIMEAVERAGEDEQUATION_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -59,9 +53,9 @@ namespace Equations {
 
       protected:
          /**
-          * @brief Update the stored value with the solver solution (read data)
+          * @brief Initialize solution updater:
           */
-         virtual MHDVariant updateStoredSolution(const MHDVariant newData, FieldComponents::Spectral::Id compId, const int i, const int j, const int k) override;
+         virtual void initSolutionUpdater() override;
 
       private:
          /**

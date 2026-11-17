@@ -19,7 +19,7 @@ namespace QuICC {
 namespace Equations {
 
    /**
-    * @brief Lowest building block for the implementation of an equation
+    * @brief Base class for holding special option for equation
     */
    class EquationOptions
    {
@@ -37,6 +37,25 @@ namespace Equations {
          explicit EquationOptions(const int it);
 
          /**
+          * @brief Simple constructor
+          *
+          * @param it         Iteration index
+          * @param nlIsLhs    Nonlinear term is LHS?
+          * @param traHasQi   Transform includes QI?
+          */
+         EquationOptions(const int it, const bool nlIsLhs, const bool traHasQi);
+
+         /**
+          * @brief Simple constructor
+          *
+          * @param it         Iteration index
+          * @param nlIsLhs    Nonlinear term is LHS?
+          * @param traHasQi   Transform includes QI?
+          * @param isBase     Is base equation? (ie not Jacobian)
+          */
+         EquationOptions(const int it, const bool nlIsLhs, const bool traHasQi, const bool isBase);
+
+         /**
           * @brief Simple empty destructor
           */
          virtual ~EquationOptions() = default;
@@ -46,8 +65,22 @@ namespace Equations {
           */
          int it() const;
 
-      protected:
+         /**
+          * @brief Nonlinear term is on LHS?
+          */
+        const bool nonlinearIsLhs;
 
+         /**
+          * @brief Transform includes QI?
+          */
+        const bool transformHasQi;
+
+         /**
+          * @brief Is base equation? (ie not Jacobian)
+          */
+        const bool isBase;
+
+      protected:
          /**
           * @brief Sub-iteration at which equation is active
           */

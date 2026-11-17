@@ -33,6 +33,7 @@ namespace Equations {
       features.insert(std::make_pair(CouplingFeature::Source, false));
       features.insert(std::make_pair(CouplingFeature::BoundaryValue, false));
       features.insert(std::make_pair(CouplingFeature::AllowExplicit, true));
+      features.insert(std::make_pair(CouplingFeature::AllowGalerkin, true));
 
       return features;
    }
