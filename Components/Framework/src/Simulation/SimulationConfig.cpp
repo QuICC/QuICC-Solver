@@ -7,15 +7,9 @@
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Simulation/SimulationConfig.hpp"
-
 // Project includes
 //
+#include "QuICC/Simulation/SimulationConfig.hpp"
 #include "QuICC/Bc/Name/Coordinator.hpp"
 #include "QuICC/Bc/Name/registerAll.hpp"
 #include "QuICC/Bc/Scheme/Coordinator.hpp"
