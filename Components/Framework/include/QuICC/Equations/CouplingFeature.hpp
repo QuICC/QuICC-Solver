@@ -34,7 +34,9 @@ namespace Equations {
       /// Has a boundary value
       BoundaryValue,
       /// Allows explicit terms
-      AllowExplicit
+      AllowExplicit,
+      /// Allow Galerkin scheme
+      AllowGalerkin
    };
 
    std::map<CouplingFeature,bool> defaultCouplingFeature();

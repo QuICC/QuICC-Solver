@@ -42,7 +42,7 @@ namespace Kernel {
    void MakeRandom::compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id) const
    {
       rNLComp.rData().setRandom();
-      rNLComp.rData() *= this->mScale;
+      rNLComp.rescale(this->mScale);
    }
 
 }

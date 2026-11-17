@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland R^2 energy operator
  */
 
-// External includes
+// System includes
 //
 #include <cassert>
 

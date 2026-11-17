@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/P.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/P.hpp"
 
 namespace QuICC {
 
@@ -29,7 +23,7 @@ namespace Mixed {
 
 namespace Integrator {
 
-   void P<base_t>::applyPostOperator(MatrixZ& rOut) const
+   void P<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut) const
    {
       this->mBackend.output(rOut);
    }

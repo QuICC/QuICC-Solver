@@ -5,8 +5,6 @@
 
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_R1_ZERO_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_R1_ZERO_HPP
-// External includes
-//
 
 // Project includes
 //

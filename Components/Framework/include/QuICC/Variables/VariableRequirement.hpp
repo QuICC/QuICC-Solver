@@ -10,9 +10,6 @@
 //
 #include <map>
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/Enums/FieldIds.hpp"
@@ -37,7 +34,7 @@ namespace QuICC {
          /**
           * @brief Destructor
           */
-         ~VariableRequirement();
+         ~VariableRequirement() = default;
 
          /**
           * @brief Get field requirements
@@ -85,6 +82,6 @@ namespace QuICC {
          std::map<std::size_t, FieldRequirement> mInfo;
    };
 
-}
+} // namespace QuICC
 
 #endif // QUICC_VARIABLEREQUIREMENT_HPP

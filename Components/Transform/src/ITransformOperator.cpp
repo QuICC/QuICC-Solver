@@ -52,7 +52,7 @@ namespace Transform {
       throw std::logic_error("init needs to be implemented by the derived class");
    }
 
-   void ITransformOperator::transform(MatrixZ &rOut, const MatrixZ &in) const {}
+   void ITransformOperator::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const {}
 
    MHDFloat ITransformOperator::requiredStorage() const
    {

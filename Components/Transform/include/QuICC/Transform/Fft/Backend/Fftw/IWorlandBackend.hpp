@@ -6,18 +6,9 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_IWORLANDBACKEND_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_FFTW_IWORLANDBACKEND_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <set>
-
-// External includes
-//
 
 // Project includes
 //
@@ -68,7 +59,7 @@ namespace Fftw {
          /**
           * @brief Destructor
           */
-         virtual ~IWorlandBackend();
+         virtual ~IWorlandBackend() = default;
 
          /**
           * @brief Set zero filter

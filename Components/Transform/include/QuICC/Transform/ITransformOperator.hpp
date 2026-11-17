@@ -56,7 +56,7 @@ namespace Transform {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const;
 
          /**
           * @brief

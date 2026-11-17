@@ -59,7 +59,7 @@ void SphRadLapl<base_t>::initBackend() const
    this->mBackend.addSolver(2);
 }
 
-void SphRadLapl<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+void SphRadLapl<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
 {
    this->mBackend.input(tmp, in, 1);
    this->mBackend.getSolution(tmp, 3, -1, true);
@@ -68,12 +68,12 @@ void SphRadLapl<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
    this->mBackend.getSolution(tmp, 1, 2);
 }
 
-void SphRadLapl<base_t>::applyPostOperator(Matrix& rOut) const
+void SphRadLapl<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut) const
 {
    this->mBackend.outputScale(rOut);
 }
 
-void SphRadLapl<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void SphRadLapl<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, 1, useReal);
@@ -83,7 +83,7 @@ void SphRadLapl<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
    this->mBackend.getSolution(tmp, 1, 2);
 }
 
-void SphRadLapl<base_t>::applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+void SphRadLapl<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp,
    const bool useReal) const
 {
    this->mBackend.outputScale(rOut, tmp, useReal);

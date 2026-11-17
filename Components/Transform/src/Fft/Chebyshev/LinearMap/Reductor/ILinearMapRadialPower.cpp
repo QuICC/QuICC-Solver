@@ -30,7 +30,7 @@ namespace Reductor {
       this->mBackend.init(*this->mspSetup);
    }
 
-   void ILinearMapRadialPower::transform(Matrix& rOut, const MatrixZ& in) const
+   void ILinearMapRadialPower::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       assert(this->isInitialized());
       assert(rOut.cols() == this->outCols());
@@ -48,7 +48,7 @@ namespace Reductor {
       this->applyPostOperator(rOut, tmpSquare);
    }
 
-   void ILinearMapRadialPower::transform(Matrix& rOut, const Matrix& in) const
+   void ILinearMapRadialPower::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const
    {
       assert(this->isInitialized());
       assert(rOut.cols() == this->outCols());
@@ -63,12 +63,12 @@ namespace Reductor {
       this->applyPostOperator(rOut, tmpSquare);
    }
 
-   void ILinearMapRadialPower::transform(MatrixZ&, const MatrixZ&) const
+   void ILinearMapRadialPower::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const MatrixZ>&) const
    {
       throw std::logic_error("Data is not compatible with Chebyshev FFT energy reductor");
    }
 
-   void ILinearMapRadialPower::transform(MatrixZ&, const Matrix&) const
+   void ILinearMapRadialPower::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const Matrix>&) const
    {
       throw std::logic_error("Data is not compatible with Chebyshev FFT energy reductor");
    }

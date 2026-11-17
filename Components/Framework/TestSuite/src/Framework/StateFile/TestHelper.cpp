@@ -29,6 +29,7 @@
 #include "QuICC/Io/Variable/StateFileWriter.hpp"
 #include "QuICC/SpatialScheme/Tools/SpectralTriangularSH.hpp"
 #include "QuICC/SpatialScheme/Tools/SpectralTrapezoidalSH.hpp"
+#include "ViewOps/Transpose/OpGrouped.hpp"
 
 namespace QuICC {
 
@@ -50,7 +51,7 @@ namespace StateFile {
 
    void Test::configure(const int id)
    {
-      switch(id)
+      switch(id/10)
       {
          case 0:
             this->fieldId = FieldId::SCALAR;
@@ -77,14 +78,29 @@ namespace StateFile {
       }
    }
 
-   ArrayI processCmdLine()
+   ArrayI processCmdLine(const int id)
    {
       // Set default arguments if required
       if(args().useDefault)
       {
-         args().dim1D = 63;
-         args().dim2D = 127;
-         args().dim3D = 127;
+         switch(id % 10)
+         {
+            case 0:
+               args().dim1D = 63;
+               args().dim2D = 127;
+               args().dim3D = 127;
+               break;
+            case 1:
+               args().dim1D = 7;
+               args().dim2D = 3;
+               args().dim3D = 3;
+               break;
+            case 2:
+               args().dim1D = 15;
+               args().dim2D = 31;
+               args().dim3D = 31;
+               break;
+         }
 
          if(args().algorithm == "")
          {
@@ -181,7 +197,13 @@ namespace StateFile {
          velReq.enablePhysical();
       }
 
-      RequirementTools::initVariables(test.scalars, test.vectors, info, test.spRes);
+      std::vector<SharedResolution> spRess = {test.spRes};
+      RequirementTools::initVariables(test.scalars, test.vectors, info, spRess);
+   }
+
+   MHDComplex badReference(const Test& test, const int i, const int j, const int k)
+   {
+      return -4242;
    }
 
    MHDComplex tagReference(const Test& test, const int i, const int j, const int k)
@@ -229,10 +251,14 @@ namespace StateFile {
       return ref;
    }
 
-   void setVariables(Test& test)
+   void setVariables(Test& test, const bool isBad)
    {
       MHDComplex (*refFct)(const Test& tet, int,int,int);
-      if(test.spectrumId == Test::SpectrumId::TAG)
+      if(isBad)
+      {
+         refFct = &badReference;
+      }
+      else if(test.spectrumId == Test::SpectrumId::TAG)
       {
          refFct = &tagReference;
       }
@@ -355,11 +381,98 @@ namespace StateFile {
       }
    }
 
+   void transposeVariables(Test& testOut, Test& testIn)
+   {
+#ifdef QUICC_USE_VIEW_SCALARFIELD
+      // Transpose op
+     #ifdef QUICC_MPI
+       using namespace QuICC::Transpose::Mpi;
+     #else
+       using namespace QuICC::Transpose::Cpu;
+     #endif
+     using namespace QuICC::Transpose;
+     using VoutTy = View::View<MHDComplex, View::DCCSC3D>;
+     using VinTy = View::View<MHDComplex, View::DCCSC3D>;
+     #ifdef QUICC_MPI
+        auto transposeOp = std::make_unique<
+           OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p021_t>>(testIn.spRes->mem());
+     #else
+        auto transposeOp = std::make_unique<
+           OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p021_t>>();
+     #endif
+
+     // Pack views
+     std::vector<VoutTy> viewsOut;
+     std::vector<VinTy> viewsIn;
+
+      // Set unit spectrum for scalar fields
+      for(auto&& [k,s]: testIn.scalars)
+      {
+         std::visit(
+               [&](auto&& p)
+               {
+                  using Point = decltype(p->rDom(0).rPerturbation().point(0,0,0));
+                  if constexpr (std::is_same_v<Point, MHDComplex>)
+                  {
+                     viewsIn.push_back(p->rDom(0).rPerturbation().rGlobalView());
+                  }
+               },
+            s);
+
+         std::visit(
+               [&](auto&& p)
+               {
+                  using Point = decltype(p->rDom(0).rPerturbation().point(0,0,0));
+                  if constexpr (std::is_same_v<Point, MHDComplex>)
+                  {
+                     viewsOut.push_back(p->rDom(0).rPerturbation().rGlobalView());
+                  }
+                  else
+                  {
+                  }
+               },
+            testOut.scalars.at(k));
+      }
+
+      // Set unit spectrum for vector fields
+      for(auto&& [k,v]: testIn.vectors)
+      {
+         auto comp = FieldComponents::Spectral::TOR;
+         std::visit(
+               [&](auto&& p)
+               {
+                  using Point = decltype(p->rDom(0).rPerturbation().comp(comp).point(0,0,0));
+                  if constexpr (std::is_same_v<Point, MHDComplex>)
+                  {
+                     viewsIn.push_back(p->rDom(0).rPerturbation().rComp(comp).rGlobalView());
+                  }
+               },
+            v);
+         std::visit(
+               [&](auto&& p)
+               {
+                  using Point = decltype(p->rDom(0).rPerturbation().comp(comp).point(0,0,0));
+                  if constexpr (std::is_same_v<Point, MHDComplex>)
+                  {
+                     viewsOut.push_back(p->rDom(0).rPerturbation().rComp(comp).rGlobalView());
+                  }
+               },
+            testOut.vectors.at(k));
+     }
+
+     // Apply transpose
+     transposeOp->apply(viewsOut, viewsIn);
+
+#else
+      throw std::logic_error("Ordering transpose requires QUICC_USE_VIEW_SCALARFIELD");
+#endif //QUICC_USE_VIEW_SCALARFIELD
+   }
+
    void writeStateFile(Test& test)
    {
       auto& ss = *test.spRes->sim().spSpatialScheme();
 
-      std::string postfix = "_" + ss.tag() + test.fileTag;
+      std::string postfix = "_" + ss.tag() + test.fileTag + "_";
       auto spState = std::make_shared<Io::Variable::StateFileWriter>(postfix, ss.tag(), ss.has(SpatialScheme::Feature::RegularSpectrum));
 
       // Add scalars

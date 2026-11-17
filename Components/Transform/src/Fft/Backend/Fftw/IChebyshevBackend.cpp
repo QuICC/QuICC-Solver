@@ -23,33 +23,25 @@ namespace Backend {
 
 namespace Fftw {
 
-   IChebyshevBackend::IChebyshevBackend()
-   {
-   }
-
-   IChebyshevBackend::~IChebyshevBackend()
-   {
-   }
-
    void IChebyshevBackend::init(const SetupType& setup) const
    {
       this->mSpecSize = setup.specSize();
       this->mBlockSize = setup.blockSize();
    }
 
-   void IChebyshevBackend::input(Matrix& tmp, const Matrix& in) const
+   void IChebyshevBackend::input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const Matrix>& in) const
    {
       tmp.topRows(in.rows()) = in.topRows(in.rows());
 
       this->applyPadding(tmp);
    }
 
-   void IChebyshevBackend::input(Matrix& tmp, const Matrix& in, const int shift) const
+   void IChebyshevBackend::input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const Matrix>& in, const int shift) const
    {
       tmp.topRows(this->mSpecSize - shift) = in.block(shift, 0, this->mSpecSize - shift, in.cols());
    }
 
-   void IChebyshevBackend::input(Matrix& tmp, const MatrixZ& in,
+   void IChebyshevBackend::input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const MatrixZ>& in,
       const bool useReal) const
    {
       if(useReal)
@@ -63,7 +55,7 @@ namespace Fftw {
       this->applyPadding(tmp);
    }
 
-   void IChebyshevBackend::input(Matrix& tmp, const MatrixZ& in,
+   void IChebyshevBackend::input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const MatrixZ>& in,
       const int shift, const bool useReal) const
    {
       if(useReal)
@@ -76,7 +68,7 @@ namespace Fftw {
       tmp.bottomRows(this->mSpecSize - shift).setZero();
    }
 
-   void IChebyshevBackend::applyPadding(Matrix& rData, const int extraRows) const
+   void IChebyshevBackend::applyPadding(Eigen::Ref<Matrix> rData, const int extraRows) const
    {
       if(this->mPadSize > 0)
       {

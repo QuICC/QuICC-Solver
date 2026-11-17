@@ -8,18 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// Debug includes
-//
-
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Worland/Projector/IWorlandProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Worland/Projector/IWorlandProjector.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -38,10 +29,6 @@ namespace Projector {
       this->mProfileTag += "-Projector";
    }
 
-   IWorlandProjector::~IWorlandProjector()
-   {
-   }
-
    void IWorlandProjector::initBackend() const
    {
       int lshift = 0; // operator doesn't shift l
@@ -49,7 +36,7 @@ namespace Projector {
       this->mBackend.init(*this->mspSetup, lshift, extraN);
    }
 
-   void IWorlandProjector::transformBlock(MatrixZ& rOut, const MatrixZ& in, const bool isEven, const bool useReal) const
+   void IWorlandProjector::transformBlock(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const bool isEven, const bool useReal) const
    {
       Profiler::RegionStart<5> (this->mProfileTag + "-pre");
       this->applyPreOperator(in, isEven, useReal);
@@ -64,7 +51,7 @@ namespace Projector {
       Profiler::RegionStop<5> (this->mProfileTag + "-post");
    }
 
-   void IWorlandProjector::transformBlock(Matrix& rOut, const Matrix& in, const bool isEven) const
+   void IWorlandProjector::transformBlock(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const bool isEven) const
    {
       Profiler::RegionStart<5> (this->mProfileTag + "-pre");
       this->applyPreOperator(in, isEven);
@@ -79,7 +66,7 @@ namespace Projector {
       Profiler::RegionStop<5> (this->mProfileTag + "-post");
    }
 
-   void IWorlandProjector::transform(MatrixZ& rOut, const MatrixZ& in) const
+   void IWorlandProjector::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<2> fix(this->mProfileTag + "::transform");
 
@@ -96,7 +83,7 @@ namespace Projector {
 #endif
    }
 
-   void IWorlandProjector::transform(Matrix& rOut, const Matrix& in) const
+   void IWorlandProjector::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const
    {
       Profiler::RegionFixture<2> fix(this->mProfileTag + "::transform");
 
@@ -129,12 +116,12 @@ namespace Projector {
       return mem;
    }
 
-   void IWorlandProjector::transform(Matrix& rOut, const MatrixZ& in) const
+   void IWorlandProjector::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       IWorlandOperator::transform(rOut, in);
    }
 
-   void IWorlandProjector::transform(MatrixZ& rOut, const Matrix& in) const
+   void IWorlandProjector::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in) const
    {
       IWorlandOperator::transform(rOut, in);
    }

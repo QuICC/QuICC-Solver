@@ -65,14 +65,14 @@ private:
     * @param rOut Output values
     * @param in   Input values
     */
-   virtual void applyPreOperator(Matrix& rOut, const Matrix& in) const override;
+   virtual void applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const override;
 
    /**
     * @brief Apply post FFT operator
     *
     * @param rOut Output values
     */
-   virtual void applyPostOperator(Matrix& rOut) const override;
+   virtual void applyPostOperator(Eigen::Ref<Matrix> rOut) const override;
 
    /**
     * @brief Apply pre FFT operator for component wise openerations
@@ -80,7 +80,7 @@ private:
     * @param in   Input values
     * @param useReal Real vs Imag flag
     */
-   virtual void applyPreOperator(Matrix& tmp, const MatrixZ& in,
+   virtual void applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
       const bool useReal) const override;
 
    /**
@@ -89,7 +89,7 @@ private:
     * @param rOut Output values
     * @param useReal Real vs Imag flag
     */
-   virtual void applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+   virtual void applyPostOperator(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp,
       const bool useReal) const override;
 };
 

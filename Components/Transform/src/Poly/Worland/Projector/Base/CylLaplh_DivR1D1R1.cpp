@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland cylindrical horizontal laplacian projector but 0 mode is 1/R D R projector
  */
 
-// External includes
+// System includes
 //
 #include <cassert>
 

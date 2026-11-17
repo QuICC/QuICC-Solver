@@ -92,7 +92,7 @@ namespace LinearMap {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(MatrixZ& rOut, const MatrixZ& in, const IChebyshevOperator& op);
+         void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const IChebyshevOperator& op);
 
          /**
           * @brief Compute transform
@@ -100,7 +100,7 @@ namespace LinearMap {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(Matrix& rOut, const MatrixZ& in, const IChebyshevOperator& op);
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const IChebyshevOperator& op);
 
          /**
           * @brief Compute transform (anelastic case)
@@ -109,7 +109,7 @@ namespace LinearMap {
           * @param in   Input values
           * @param pF   radial profile
           */
-         void transform(Matrix& rOut, const MatrixZ& in, const IChebyshevOperator& op, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF);
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const IChebyshevOperator& op, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF);
 
          /**
           * @brief Compute transform
@@ -117,7 +117,7 @@ namespace LinearMap {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(Matrix& rOut, const Matrix& in, const IChebyshevOperator& op);
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const IChebyshevOperator& op);
 
          /**
           * @brief Compute transform (anelastic case)
@@ -126,7 +126,7 @@ namespace LinearMap {
           * @param in   Input values
           * @param pF   radial profile
           */
-         void transform(Matrix& rOut, const Matrix& in, const IChebyshevOperator& op, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF);
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const IChebyshevOperator& op, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF);
 
 
          /**
@@ -135,7 +135,7 @@ namespace LinearMap {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(MatrixZ& rOut, const MatrixZ& in, const std::size_t id);
+         void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id);
 
          /**
           * @brief Compute transform
@@ -143,7 +143,7 @@ namespace LinearMap {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(Matrix& rOut, const MatrixZ& in, const std::size_t id);
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id);
 
          /**
           * @brief Compute transform for the anelastic case
@@ -152,7 +152,7 @@ namespace LinearMap {
           * @param in   Input values
           * @param pF   Radial profile
           */
-         void transform(Matrix& rOut, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF);
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF);
 
          /**
           * @brief Compute transform
@@ -160,7 +160,7 @@ namespace LinearMap {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(Matrix& rOut, const Matrix& in, const std::size_t id);
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id);
 
          /**
           * @brief Compute transform for the anelastic case
@@ -169,7 +169,7 @@ namespace LinearMap {
           * @param in   Input values
           * @param pF   Radial profile
           */
-         void transform(Matrix& rOut, const Matrix& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF);
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF);
 
          /**
           * @brief Get the memory requirements

@@ -6,18 +6,9 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_IFFTWBACKEND_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_FFTW_IFFTWBACKEND_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <fftw3.h>
-
-// External includes
-//
 
 // Project includes
 //
@@ -62,28 +53,28 @@ namespace Fftw {
           *
           * Real to real
           */
-         virtual void applyFft(Matrix&, const Matrix&) const; //
+         virtual void applyFft(Eigen::Ref<Matrix>, const Eigen::Ref<const Matrix>&) const;
 
          /**
           * @brief Apply FFT
           *
           * Complex to real
           */
-         virtual void applyFft(Matrix&, const MatrixZ&) const; // =0?
+         virtual void applyFft(Eigen::Ref<Matrix>, const Eigen::Ref<const MatrixZ>&) const;
 
          /**
           * @brief Apply FFT
           *
           * Real to complex
           */
-         virtual void applyFft(MatrixZ&, const Matrix&) const; // =0?
+         virtual void applyFft(Eigen::Ref<MatrixZ>, const Eigen::Ref<const Matrix>&) const;
 
          /**
           * @brief Apply FFT
           *
           * Complex to complex
           */
-         virtual void applyFft(MatrixZ&, const MatrixZ&) const; // =0?
+         virtual void applyFft(Eigen::Ref<MatrixZ>, const Eigen::Ref<const MatrixZ>&) const;
 
          /**
           * @brief Get the memory requirements

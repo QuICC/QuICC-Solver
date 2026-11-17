@@ -39,14 +39,14 @@ namespace Integrator {
       this->mBackend.addStorage(0, 1);
    }
 
-   void I4DivR1D1R1_Zero<base_t>::applyPostOperator(Matrix& rOut, const bool isEven) const
+   void I4DivR1D1R1_Zero<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut, const bool isEven) const
    {
       DivR1D1R1<base_t>::computeWorlandExpansion(isEven);
       this->mBackend.applyI4(isEven);
       this->mBackend.output(rOut, isEven);
    }
 
-   void I4DivR1D1R1_Zero<base_t>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const
+   void I4DivR1D1R1_Zero<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const bool isEven, const bool useReal) const
    {
       DivR1D1R1<base_t>::computeWorlandExpansion(isEven);
       this->mBackend.applyI4(isEven);

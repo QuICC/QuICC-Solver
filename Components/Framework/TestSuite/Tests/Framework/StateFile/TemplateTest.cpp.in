@@ -8,11 +8,14 @@
 
 // Project includes
 //
+#include <string>
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/SpatialScheme/3D/@Scheme@.hpp"
+#include "QuICC/SpatialScheme/3D/WLFm.hpp"
+#include "QuICC/SpatialScheme/3D/WLFl.hpp"
 #include "QuICC/PhysicalNames/registerAll.hpp"
 #include "QuICC/Arithmetics/registerAll.hpp"
 #include "QuICC/TestSuite/Framework/StateFile/TestArgs.hpp"
@@ -34,48 +37,66 @@ TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile", "[@Scheme@:@Mode@]" ){
 
    Catch::StringMaker<double>::precision = 15;
 
-   QuICC::ArrayI dim = currentts::processCmdLine();
-
    // convert factor vector to list
    std::list<int> factorList(currentts::args().factors.begin(), currentts::args().factors.end());
 
-   // Create LoadSplitter, SpatialScheme and generate resolution
-   std::string fileTag = "";
-   std::string refFileTag = "";
-   std::vector<std::size_t> opt1D;
-   if(currentts::args().truncation == "uniform")
-   {
-      opt1D.push_back(QuICC::Transform::Setup::Default::id());
-   }
-   else if(currentts::args().truncation == "triangular")
-   {
-      opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
-      opt1D.push_back(QuICC::Transform::Setup::Triangular::id());
-
-      fileTag = "_triangular";
-      refFileTag = "_bad";
-   }
-   else if(currentts::args().truncation == "trapezoidal")
-   {
-      opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
-      opt1D.push_back(QuICC::Transform::Setup::Trapezoidal::id());
-
-      fileTag = "_trapezoidal";
-      refFileTag = "_bad";
-   }
-   else
-   {
-      throw std::logic_error("Unknown 1D truncation scheme");
-   }
-   auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList, opt1D);
-
    for(auto id: currentts::args().params)
    {
+      QuICC::ArrayI dim = currentts::processCmdLine(id);
+
+      // Create LoadSplitter, SpatialScheme and generate resolution
+      std::string fileTag = "";
+      std::string refFileTag = "";
+      std::vector<std::size_t> opt1D;
+      if(currentts::args().truncation == "uniform")
+      {
+         opt1D.push_back(QuICC::Transform::Setup::Default::id());
+      }
+      else if(currentts::args().truncation == "triangular")
+      {
+         opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
+         opt1D.push_back(QuICC::Transform::Setup::Triangular::id());
+
+         fileTag = "_triangular";
+         refFileTag = "_bad";
+      }
+      else if(currentts::args().truncation == "trapezoidal")
+      {
+         opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
+         opt1D.push_back(QuICC::Transform::Setup::Trapezoidal::id());
+
+         fileTag = "_trapezoidal";
+         refFileTag = "_bad";
+      }
+      else
+      {
+         throw std::logic_error("Unknown 1D truncation scheme");
+      }
+
+      auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList, opt1D, true);
+
+      std::pair<QuICC::SharedResolution,QuICC::Parallel::SplittingDescription> bestOut;
+      if(std::string("@Mode@").compare("ordering") == 0)
+      {
+         if(std::string("@Scheme@").compare("WLFl") == 0)
+         {
+            bestOut = currentts::initResolution<QuICC::SpatialScheme::WLFm>(dim, currentts::args().algorithm, currentts::args().grouper, factorList, opt1D, false);
+         }
+         else if(std::string("@Scheme@").compare("WLFm") == 0)
+         {
+            bestOut = currentts::initResolution<QuICC::SpatialScheme::WLFl>(dim, currentts::args().algorithm, currentts::args().grouper, factorList, opt1D, false);
+         }
+         else
+         {
+            throw std::logic_error("Unknown scheme to change ordering");
+         }
+      }
+
       currentts::Test test;
       test.spRes = best.first;
       test.configure(id);
       test.maxUlp = currentts::args().ulp;
-      test.fileTag = fileTag;
+      test.fileTag = "_id" + std::to_string(id) + fileTag;
       test.refFileTag = refFileTag;
 
       currentts::initVariables(test);
@@ -100,6 +121,40 @@ TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile", "[@Scheme@:@Mode@]" ){
          {
             currentts::checkVariables(test);
          }
+      }
+      else if(std::string("@Mode@").compare("ordering") == 0)
+      {
+#ifdef QUICC_USE_VIEW_SCALARFIELD
+         currentts::Test testOut;
+         testOut.spRes = bestOut.first;
+         testOut.configure(id);
+         testOut.maxUlp = currentts::args().ulp;
+         testOut.fileTag = fileTag;
+         testOut.refFileTag = refFileTag;
+
+         currentts::initVariables(testOut);
+
+         currentts::setVariables(testOut, true);
+
+         for(unsigned int it = 0; it <currentts::args().iter; it++)
+         {
+            currentts::readStateFile(test);
+
+            currentts::transposeVariables(testOut, test);
+
+            currentts::writeStateFile(testOut);
+         }
+
+         if(!currentts::args().timeOnly)
+         {
+            currentts::checkVariables(test);
+
+            currentts::checkVariables(testOut);
+         }
+#else
+         throw std::logic_error("Ordering transpose requires QUICC_USE_VIEW_SCALARFIELD");
+#endif //QUICC_USE_VIEW_SCALARFIELD
+
       }
       else
       {

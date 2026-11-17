@@ -8,20 +8,14 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Variables/FieldRequirement.hpp"
-
 // Project includes
 //
+#include "QuICC/Variables/FieldRequirement.hpp"
 
 namespace QuICC {
 
    FieldRequirement::FieldRequirement(const bool isScalar, const Tools::ComponentAlias<FieldComponents::Spectral::Id> spec, const Tools::ComponentAlias<FieldComponents::Physical::Id> phys)
-      : mIsScalar(isScalar), mNeedSpectral(false), mNeedPhysical(false), mNeedGradient(false), mNeedCurl(false), mNeedGradient2(false), mPhysicalComps(3), mGradientComps(), mGradientTComps(3,3), mCurlComps(3), mGradient2Comps()
+      : mIsScalar(isScalar), mNeedSpectral(false), mNeedPhysical(false), mNeedGradient(false), mNeedCurl(false), mNeedGradient2(false), mSchemeId(0), mPhysicalComps(3), mGradientComps(), mGradientTComps(3,3), mCurlComps(3), mGradient2Comps()
    {
       // Init default physical and spectral IDs
       this->initDefaultIds(spec, phys);
@@ -52,10 +46,6 @@ namespace QuICC {
       {
          this->mGradient2Comps.insert(std::make_pair(id, mat));
       }
-   }
-
-   FieldRequirement::~FieldRequirement()
-   {
    }
 
    void FieldRequirement::initDefaultIds(const Tools::ComponentAlias<FieldComponents::Spectral::Id> spec, const Tools::ComponentAlias<FieldComponents::Physical::Id> phys)
@@ -178,6 +168,11 @@ namespace QuICC {
       return this->mNeedGradient2;
    }
 
+   std::size_t FieldRequirement::schemeId() const
+   {
+      return this->mSchemeId;
+   }
+
    const ArrayB& FieldRequirement::physicalComps() const
    {
       return this->mPhysicalComps;
@@ -285,6 +280,11 @@ namespace QuICC {
       return this->mSpectralIds;
    }
 
+   void FieldRequirement::updateSchemeId(const std::size_t& id)
+   {
+      this->mSchemeId = id;
+   }
+
    void FieldRequirement::updatePhysical(const ArrayB& comps)
    {
       this->mPhysicalComps = comps;
@@ -351,6 +351,19 @@ namespace QuICC {
 
       // Do OR operation on physical 2nd order gradient requirement
       this->mNeedGradient2 = this->mNeedGradient2 || req.needPhysicalGradient2();
+
+      // Scheme ID
+      if(req.schemeId() != 0)
+      {
+         if(this->mSchemeId == 0)
+         {
+            this->mSchemeId = req.schemeId();
+         }
+         else if(this->mSchemeId != req.schemeId())
+         {
+            throw std::logic_error("Incompatible spatial scheme field requirements");
+         }
+      }
 
       // Do OR operation of physical components requirement
       this->mPhysicalComps = this->mPhysicalComps || req.physicalComps();

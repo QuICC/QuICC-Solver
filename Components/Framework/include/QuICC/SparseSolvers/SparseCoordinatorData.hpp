@@ -25,8 +25,16 @@
 #include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/Equations/IScalarEquation.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
+#include "QuICC/Equations/StoreSolution.hpp"
+#include "QuICC/Equations/AddSource.hpp"
+#include "QuICC/Equations/SetBoundaryValue.hpp"
+#include "QuICC/Equations/ExplicitTerm.hpp"
+#include "QuICC/Equations/CopyNonlinear.hpp"
+#include "QuICC/Equations/SolveStencilUnknown.hpp"
+#include "QuICC/Equations/CorrectSolution.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolver.hpp"
 #include "QuICC/SparseSolvers/SparseTrivialSolver.hpp"
+#include "QuICC/SparseSolvers/TransposeCoordinator.hpp"
 
 namespace QuICC {
 
@@ -151,6 +159,11 @@ namespace Solver {
          std::vector<SharedComplexSolverType> mComplexSolvers;
 
          /**
+          * @brief Transpose coordinator
+          */
+         std::shared_ptr<TransposeCoordinator> mTransCoord;
+
+         /**
           * @brief Storage for the current solve time
           */
          std::size_t   mSolveTime;
@@ -196,7 +209,7 @@ namespace Solver {
    /**
     * @brief Generic implementation to get the explicit linear input
     */
-   template <template <class,class,template <class> class> class TSol,typename TSolverIt,typename TEq> void getExplicitSolverInput(SparseCoordinatorData<TSol>& coord, TEq spEq, const int idx, SpectralFieldId id, const std::size_t opId, const typename SparseCoordinatorData<TSol>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSol>::VectorVariable_map& vectVar);
+   template <template <class,class,template <class> class> class TSol,typename TSolverIt,typename TEq> void getExplicitSolverInput(SparseCoordinatorData<TSol>& coord, TEq spEq, const int idx, SpectralFieldId id, const std::size_t opId, const typename SparseCoordinatorData<TSol>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSol>::VectorVariable_map& vectVar, std::shared_ptr<TransposeCoordinator> dataOp);
 
    /**
     * @brief Generic implementation to get the solver input
@@ -206,7 +219,7 @@ namespace Solver {
    /**
     * @brief Compute the explicit linear input independently of solver type
     */
-   template <typename TSolverIt,typename TEq> void computeExplicitSolverInput(const TEq spEq, const SpectralFieldId id, const TSolverIt solveIt, const std::size_t opId, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalVar, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectVar);
+   template <typename TSolverIt,typename TEq> void computeExplicitSolverInput(const TEq spEq, const SpectralFieldId id, const TSolverIt solveIt, const std::size_t opId, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalVar, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectVar, std::shared_ptr<TransposeCoordinator> dataOp);
 
    /**
     * @brief Compute the solver input independently of solver type
@@ -280,6 +293,11 @@ namespace Solver {
       for(auto zIt = this->mComplexSolvers.begin(); zIt != this->mComplexSolvers.end(); ++zIt)
       {
          (*zIt)->initStartRow();
+      }
+
+      if(this->mRealSolvers.size() + this->mComplexSolvers.size() > 0)
+      {
+         this->mTransCoord = std::make_shared<TransposeCoordinator>();
       }
    }
 
@@ -366,9 +384,19 @@ namespace Solver {
 #ifdef QUICC_DEBUG
       spEq->corruptUnknown(id.second);
 #endif //QUICC_DEBUG
+      const auto& cinfo = spEq->couplingInfo(id.second);
+      const SparseMatrix* pOp;
       for(std::size_t i = 0; i < (*solIt)->nSystem(); i++)
       {
-         spEq->storeSolution(id.second, (*solIt)->solution(i), i, (*solIt)->startRow(id,i));
+         if(cinfo.isGalerkin())
+         {
+            pOp = &spEq->galerkinStencils(id.second).at(i);
+         }
+         std::visit(
+               [&](auto&& p)
+               {
+                  Equations::storeSolution(p->rDom(0).rPerturbation().rComp(id.second), spEq->res(), cinfo, pOp, spEq->spSolutionUpdater(id.second), (*solIt)->solution(i), i, (*solIt)->startRow(id,i));
+               }, spEq->spUnknown());
       }
 
       // Apply constraint on solution
@@ -377,13 +405,10 @@ namespace Solver {
       // Update solver solution if constraint modified it
       if(changedSolution)
       {
+         auto corr = spEq->correctionConstraint(id.second, SolveTiming::After::id());
          for(std::size_t i = 0; i < (*solIt)->nSystem(); i++)
          {
-            std::visit(
-                  [&](auto&& p)
-                  {
-                  Equations::copyUnknown(*spEq, p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true);
-                  }, spEq->spUnknown());
+            Equations::correctSolution(spEq->res(), cinfo, corr, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i));
          }
 
          (*solIt)->updateSolutions();
@@ -489,14 +514,18 @@ namespace Solver {
       {
          if(spEq->couplingInfo(id.second).isGalerkin())
          {
-            Equations::solveStencilUnknown(*spEq, id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i));
+            std::visit(
+                  [&](auto&& p)
+                  {
+                     Equations::solveStencilUnknown(spEq->res(), spEq->couplingInfo(id.second), id, p->dom(0).perturbation().comp(id.second), (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), spEq->backend(), spEq->bcIds().map(), spEq->eqParams().map());
+                  }, spEq->spUnknown());
          }
          else
          {
             std::visit(
                   [&](auto&& p)
                   {
-                     Equations::copyUnknown(*spEq, p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true);
+                     Equations::copyUnknown(spEq->res(), spEq->couplingInfo(id.second), p->dom(0).perturbation().comp(id.second), (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true, true);
                   }, spEq->spUnknown());
          }
       }
@@ -504,7 +533,7 @@ namespace Solver {
       (*solIt)->initSolutions();
    }
 
-   template <template <class,class,template <class> class> class TSolver,typename TSolverIt,typename TEq> void getExplicitSolverInput(SparseCoordinatorData<TSolver>& coord, TEq spEq, const int idx, SpectralFieldId id, const std::size_t opId, const typename SparseCoordinatorData<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSolver>::VectorVariable_map& vectVar)
+   template <template <class,class,template <class> class> class TSolver,typename TSolverIt,typename TEq> void getExplicitSolverInput(SparseCoordinatorData<TSolver>& coord, TEq spEq, const int idx, SpectralFieldId id, const std::size_t opId, const typename SparseCoordinatorData<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSolver>::VectorVariable_map& vectVar, std::shared_ptr<TransposeCoordinator> dataOp)
    {
       // Create iterator to current complex field solver
       TSolverIt solIt;
@@ -513,7 +542,7 @@ namespace Solver {
       DebuggerMacro_msg("Get explicit solver input for " + PhysicalNames::Coordinator::tag(id.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(id.second)) + ")", 6);
 
       // Get solver input
-      computeExplicitSolverInput<TSolverIt,TEq>(spEq, id, solIt, opId, scalVar, vectVar);
+      computeExplicitSolverInput<TSolverIt,TEq>(spEq, id, solIt, opId, scalVar, vectVar, dataOp);
    }
 
    template <template <class,class,template <class> class> class TSolver,typename TSolverIt,typename TEq> void getSolverInput(SparseCoordinatorData<TSolver>& coord, TEq spEq, const int idx, SpectralFieldId id, const typename SparseCoordinatorData<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSolver>::VectorVariable_map& vectVar)
@@ -535,7 +564,7 @@ namespace Solver {
    //
    //
 
-   template <typename TSolverIt,typename TEq> void computeExplicitSolverInput(const TEq spEq, const SpectralFieldId id, const TSolverIt solveIt, const std::size_t opId, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalVar, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectVar)
+   template <typename TSolverIt,typename TEq> void computeExplicitSolverInput(const TEq spEq, const SpectralFieldId id, const TSolverIt solveIt, const std::size_t opId, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalVar, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectVar, std::shared_ptr<TransposeCoordinator> dataOp)
    {
       // Build range of operator
       auto r = make_range(spEq->couplingInfo(id.second).explicitRange(opId));
@@ -547,56 +576,125 @@ namespace Solver {
       }
 #endif // QUICC_DEBUG
 
+      auto addExp = [&](auto&& spEq, auto&& fIt, auto&& i, auto&& field)
+      {
+         std::variant<const SparseMatrix*,const SparseMatrixZ*> pOp;
+
+         // Compute with complex linear operator
+         if (spEq->hasExplicitZTerm(opId, id.second, fIt))
+         {
+            // Create pointer to sparse operator
+            pOp = &spEq->template explicitOperators<SparseMatrixZ>(opId,
+                  id.second, fIt).at(i);
+         }
+
+         // Compute with real linear operator
+         if (spEq->hasExplicitDTerm(opId, id.second, fIt))
+         {
+            // Create pointer to sparse operator
+            pOp = &spEq->template explicitOperators<SparseMatrix>(opId,
+                  id.second, fIt).at(i);
+         }
+
+         std::visit(
+               [&](auto& p)
+               {
+                  Equations::addExplicitTerm(spEq->res(), spEq->couplingInfo(id.second), *p, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), field, i, true, false);
+               }, pOp);
+      };
+
       // Loop over explicit fields
+      std::variant<const Framework::Selector::ScalarField<MHDFloat> *, const Framework::Selector::ScalarField<MHDComplex> *>  pField;
       for(auto& fIt: r)
       {
          DebuggerMacro_msg("Add " + ModelOperator::Coordinator::tag(opId) + " term from " + PhysicalNames::Coordinator::tag(fIt.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(fIt.second)) + ")", 7);
 
-         // Get explicit input
-         for(std::size_t i = 0; i < (*solveIt)->nSystem(); i++)
+         if(fIt.second == FieldComponents::Spectral::SCALAR)
          {
-            if(fIt.second == FieldComponents::Spectral::SCALAR)
-            {
-               std::visit(
-                     [&](auto&& p)
-                     {
-                        Equations::addExplicitTerm(*spEq, opId, id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), fIt, p->dom(0).perturbation(), i);
-                     }, scalVar.find(fIt.first)->second);
-            } else
-            {
-               std::visit(
-                     [&](auto&& p)
-                     {
-                        Equations::addExplicitTerm(*spEq, opId, id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), fIt, p->dom(0).perturbation().comp(fIt.second), i);
-                     }, vectVar.find(fIt.first)->second);
-            }
+            std::visit(
+                  [&](auto&& p)
+                  {
+                     pField = dataOp->apply(p->dom(0).res(), spEq->res(), p->dom(0).perturbation());
+                  }, scalVar.find(fIt.first)->second);
+         } else
+         {
+            std::visit(
+                  [&](auto&& p)
+                  {
+                     pField = dataOp->apply(p->dom(0).res(), spEq->res(), p->dom(0).perturbation().comp(fIt.second));
+                  }, vectVar.find(fIt.first)->second);
          }
+
+         // Get explicit input
+         std::visit(
+               [&](auto&& p)
+               {
+                  for(std::size_t i = 0; i < (*solveIt)->nSystem(); i++)
+                  {
+                     addExp(spEq, fIt, i, *p);
+                  }
+               }, pField);
       }
    }
 
    template <typename TSolverIt,typename TEq> void computeSolverInput(const TEq spEq, const SpectralFieldId id, const TSolverIt solveIt, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>&, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>&)
    {
+      const auto& cinfo = spEq->couplingInfo(id.second);
+      const bool hasQI  = (cinfo.hasNonlinear() && cinfo.hasQuasiInverse());
+      const auto compId = id.second;
+
       // Get timestep input
       for(std::size_t i = 0; i < (*solveIt)->nSystem(); i++)
       {
-         // Copy field values into solver input
-         Equations::copyNonlinear(*spEq, id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+         if(hasQI)
+         {
+            if(spEq->hasQID(compId))
+            {
+               const SparseMatrix& op = spEq->template quasiInverse<SparseMatrix>(compId, i);
+               std::visit(
+                     [&](auto&& p)
+                     {
+                        Equations::copyNonlinear(spEq->res(), cinfo, p->dom(0).perturbation().comp(id.second), op, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+                     }, spEq->spUnknown());
+            }
+            else if(spEq->hasQIZ(compId))
+            {
+               const SparseMatrixZ& op = spEq->template quasiInverse<SparseMatrixZ>(compId, i);
+               std::visit(
+                     [&](auto&& p)
+                     {
+                        Equations::copyNonlinear(spEq->res(), cinfo, p->dom(0).perturbation().comp(id.second), op, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+                     }, spEq->spUnknown());
+            }
+         }
+         else
+         {
+            // Copy field values into solver input
+            std::visit(
+                  [&](auto&& p)
+                  {
+                     Equations::copyNonlinear(spEq->res(), cinfo, p->dom(0).perturbation().comp(id.second), (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+                  }, spEq->spUnknown());
+         }
 
          // Add source term
-         std::visit(
-               [&](auto&& p)
-               {
-                  Equations::addSource(*spEq, p->dom(0).perturbation(), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
-               }, spEq->spUnknown());
+         if(cinfo.hasSource())
+         {
+            std::visit(
+                  [&](auto&& p)
+                  {
+                     Equations::addSource(spEq->res(), cinfo, spEq->spSourceKernel(id.second), p->dom(0).perturbation().comp(id.second), (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+                  }, spEq->spUnknown());
+         }
 
          // If required set inhomogenous boundary condition value
-         if(spEq->couplingInfo(id.second).hasBoundaryValue())
+         if(cinfo.hasBoundaryValue())
          {
             // Set boundary value
             std::visit(
                   [&](auto&& p)
                   {
-                     Equations::setBoundaryValue(*spEq, p->dom(0).perturbation(), id.second, (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
+                     Equations::setBoundaryValue(spEq->res(), cinfo, spEq->spBoundaryKernel(id.second), p->dom(0).perturbation().comp(id.second), (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
                   }, spEq->spUnknown());
          }
       }

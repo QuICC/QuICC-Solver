@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/D1_NegBase.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/D1_NegBase.hpp"
 
 namespace QuICC {
 
@@ -29,7 +23,7 @@ namespace Mixed {
 
 namespace Integrator {
 
-   void D1_Neg<base_t>::applyPostOperator(MatrixZ& rOut) const
+   void D1_Neg<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut) const
    {
       std::map<int,MHDComplex> mod = { {0, -1.0} };
       this->mBackend.outputDiff(rOut, 1, this->mspSetup->boxScale(), mod);

@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CHEBYSHEVENERGY_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_CHEBYSHEVENERGY_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -55,7 +46,7 @@ namespace Backend {
          /**
           * @brief Destructor
           */
-         virtual ~ChebyshevEnergy();
+         virtual ~ChebyshevEnergy() = default;
 
          /**
           * @brief Initialise the FFT transforms
@@ -121,27 +112,27 @@ namespace Backend {
          /**
           * @brief Set output
           */
-         void output(Matrix& rOut, const Matrix& tmp) const;
+         void output(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const;
 
          /**
           * @brief Set output on grid
           */
-         void outputGrid(Matrix& rOut, const Matrix& tmp) const;
+         void outputGrid(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const;
 
          /**
           * @brief Set output mutliplied by scalar operator
           */
-         void outputSpectral(Matrix& rOut, const Matrix& tmp) const;
+         void outputSpectral(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const;
 
          /**
           * @brief Apply FFT
           */
-         void applyFft(Matrix& phys, const Matrix& mods) const;
+         void applyFft(Eigen::Ref<Matrix> phys, const Eigen::Ref<const Matrix>& mods) const;
 
          /**
           * @brief Apply forward FFT
           */
-         void applyFwdFft(Matrix& mods, const Matrix& phys) const;
+         void applyFwdFft(Eigen::Ref<Matrix> mods, const Eigen::Ref<const Matrix>& phys) const;
 
          /**
           * @brief Add new linear solver

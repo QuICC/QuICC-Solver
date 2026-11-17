@@ -43,26 +43,26 @@ namespace Projector {
       this->mBackend.backwardWorland(isEven);
    }
 
-   void DivR1_Zero<base_t>::applyPreOperator(const Matrix& in, const bool isEven) const
+   void DivR1_Zero<base_t>::applyPreOperator(const Eigen::Ref<const Matrix>& in, const bool isEven) const
    {
       this->mBackend.input(in, isEven, true);
       this->computeWorlandExpansion(isEven);
       this->mBackend.io(isEven);
    }
 
-   void DivR1_Zero<base_t>::applyPostOperator(Matrix& rOut, const bool isEven) const
+   void DivR1_Zero<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut, const bool isEven) const
    {
       this->mBackend.output(rOut, isEven);
    }
 
-   void DivR1_Zero<base_t>::applyPreOperator(const MatrixZ& in, const bool isEven, const bool useReal) const
+   void DivR1_Zero<base_t>::applyPreOperator(const Eigen::Ref<const MatrixZ>& in, const bool isEven, const bool useReal) const
    {
       this->mBackend.input(in, isEven, useReal, true);
       this->computeWorlandExpansion(isEven);
       this->mBackend.io(isEven);
    }
 
-   void DivR1_Zero<base_t>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const
+   void DivR1_Zero<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const bool isEven, const bool useReal) const
    {
       this->mBackend.output(rOut, isEven, useReal);
    }

@@ -33,14 +33,6 @@ namespace ALegendre {
       return igrid.array().acos().matrix().cast<MHDFloat>();
    }
 
-   Transform::Transform()
-   {
-   }
-
-   Transform::~Transform()
-   {
-   }
-
    void Transform::init(Transform::SharedSetupType spSetup)
    {
 
@@ -109,7 +101,7 @@ namespace ALegendre {
       this->mIWeights.array() *= 2.0*Internal::Math::PI;
    }
 
-   void Transform::transform(MatrixZ& rOut, const MatrixZ& in, const ITransformOperator& op)
+   void Transform::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const ITransformOperator& op)
    {
       if(!op.isInitialized())
       {
@@ -119,7 +111,7 @@ namespace ALegendre {
       op.transform(rOut, in);
    }
 
-   void Transform::transform(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void Transform::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       auto it = this->mOps.find(id);
 

@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland D projector but 0 mode is P projector with l = 1
  */
 
-// External includes
+// System includes
 //
 #include <cassert>
 

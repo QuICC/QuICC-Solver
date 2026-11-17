@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Chebyshev/IChebyshevOperator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Chebyshev/IChebyshevOperator.hpp"
 
 namespace QuICC {
 
@@ -25,14 +19,6 @@ namespace Transform {
 namespace Fft {
 
 namespace Chebyshev {
-
-   IChebyshevOperator::IChebyshevOperator()
-   {
-   }
-
-   IChebyshevOperator::~IChebyshevOperator()
-   {
-   }
 
    void IChebyshevOperator::init(SharedTransformSetup spSetup) const
    {

@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/ComplexIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/ComplexIntegrator.hpp"
 #if defined QUICC_FFT_COMPLEX_FFTW
    #include "QuICC/Transform/Fft/Backend/Fftw/ComplexIntegrator.hpp"
    #define BACKENDIMPL Fftw
@@ -44,10 +38,6 @@ namespace Backend {
       this->mpImpl = std::make_shared<BackendImpl>();
    }
 
-   ComplexIntegrator::~ComplexIntegrator()
-   {
-   }
-
    void ComplexIntegrator::init(const SetupType& setup) const
    {
       this->mpImpl->init(setup);
@@ -58,27 +48,27 @@ namespace Backend {
       this->mpImpl->initMeanBlocks(idBlocks);
    }
 
-   void ComplexIntegrator::output(MatrixZ& rOut) const
+   void ComplexIntegrator::output(Eigen::Ref<MatrixZ> rOut) const
    {
       this->mpImpl->output(rOut);
    }
 
-   void ComplexIntegrator::outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale) const
+   void ComplexIntegrator::outputDiff(Eigen::Ref<MatrixZ> rOut, const int order, const MHDFloat scale) const
    {
       this->mpImpl->outputDiff(rOut, order, scale);
    }
 
-   void ComplexIntegrator::zeroMean(MatrixZ& rOut) const
+   void ComplexIntegrator::zeroMean(Eigen::Ref<MatrixZ> rOut) const
    {
       this->mpImpl->zeroMean(rOut);
    }
 
-   void ComplexIntegrator::outputMean(MatrixZ& rOut) const
+   void ComplexIntegrator::outputMean(Eigen::Ref<MatrixZ> rOut) const
    {
       this->mpImpl->outputMean(rOut);
    }
 
-   void ComplexIntegrator::applyFft(MatrixZ& mods, const MatrixZ& phys) const
+   void ComplexIntegrator::applyFft(Eigen::Ref<MatrixZ> mods, const Eigen::Ref<const MatrixZ>& phys) const
    {
       this->mpImpl->applyFft(mods, phys);
    }
@@ -88,7 +78,7 @@ namespace Backend {
       this->mpImpl->extractMean(rOut);
    }
 
-   void ComplexIntegrator::setMean(MatrixZ& rOut, const MHDFloat scale) const
+   void ComplexIntegrator::setMean(Eigen::Ref<MatrixZ> rOut, const MHDFloat scale) const
    {
       this->mpImpl->setMean(rOut, scale);
    }
@@ -103,7 +93,7 @@ namespace Backend {
       return this->mpImpl->multDiff2D(idA, idB);
    }
 
-   void ComplexIntegrator::applyDiff2D(MatrixZ& rOut, const int id) const
+   void ComplexIntegrator::applyDiff2D(Eigen::Ref<MatrixZ> rOut, const int id) const
    {
       this->mpImpl->applyDiff2D(rOut, id);
    }

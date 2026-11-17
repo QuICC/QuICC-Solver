@@ -9,6 +9,7 @@
 // Project includes
 //
 #include "QuICC/Equations/IVectorEquation.hpp"
+#include "QuICC/Equations/Dispatchers.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
@@ -93,24 +94,32 @@ namespace Equations {
       }
    }
 
-   void IVectorEquation::defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const std::map<CouplingFeature,bool>& features)
+   void IVectorEquation::defineCoupling(FieldComponents::Spectral::Id compId, CouplingInformation::EquationTypeId eqType, const int iZero, const std::map<CouplingFeature,bool>& features)
    {
-      this->dispatchCoupling(comp, eqType, iZero, features, this->res());
+      auto infoIt = this->mCouplingInfos.insert(std::make_pair(compId,CouplingInformation()));
+      auto& cinfo = infoIt.first->second;
+      auto fieldId = std::make_pair(this->name(), compId);
+      dispatchCoupling(cinfo, fieldId, eqType, iZero, features, this->res(), this->backend(), this->bcIds().map());
    }
 
-   void  IVectorEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const std::size_t opId, FieldComponents::Spectral::Id comp, const int matIdx, const std::size_t bcType) const
+   void  IVectorEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const std::size_t opId, FieldComponents::Spectral::Id compId, const int matIdx, const std::size_t bcType) const
    {
-      this->dispatchModelMatrix(rModelMatrix, opId, comp, matIdx, bcType, this->res(), this->couplingInfo(comp).couplingTools().getIndexes(this->res(), matIdx));
+      const auto& cinfo = this->couplingInfo(compId);
+      dispatchModelMatrix(rModelMatrix, opId, compId, matIdx, bcType, this->res(), this->backend(), cinfo, this->bcIds().map(), this->eqParams().map());
    }
 
-   void IVectorEquation::setGalerkinStencil(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx) const
+   void IVectorEquation::setGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const
    {
-      this->dispatchGalerkinStencil(comp, mat, matIdx, this->res(), this->couplingInfo(comp).couplingTools().getIndexes(this->res(), matIdx));
+      const auto& cinfo = this->couplingInfo(compId);
+      auto fieldId = std::make_pair(this->name(), compId);
+      dispatchGalerkinStencil(fieldId, mat, matIdx, this->res(), false, this->backend(), cinfo, this->bcIds().map(), this->eqParams().map());
    }
 
-   void IVectorEquation::setExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::size_t opId, const SpectralFieldId fieldId, const int matIdx) const
+   void IVectorEquation::setExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::size_t opId, const SpectralFieldId exId, const int matIdx) const
    {
-      this->dispatchExplicitBlock(compId, mat, opId, fieldId, matIdx, this->res(), this->couplingInfo(compId).couplingTools().getIndexes(this->res(), matIdx));
+      const auto& cinfo = this->couplingInfo(compId);
+      auto fieldId = std::make_pair(this->name(), compId);
+      dispatchExplicitBlock(fieldId, mat, opId, exId, matIdx, this->res(), this->backend(), cinfo, this->bcIds().map(), this->eqParams().map());
    }
 
    std::vector<bool> IVectorEquation::disabledBackwardPaths() const
@@ -220,7 +229,7 @@ namespace Equations {
       std::visit(
             [&](auto&& p)
             {
-               p->rDom(0).rPerturbation().rComp(compId).rData().setConstant(42.42);
+               p->rDom(0).rPerturbation().rComp(compId).setConstant(42.42);
             }, this->spUnknown());
    }
 

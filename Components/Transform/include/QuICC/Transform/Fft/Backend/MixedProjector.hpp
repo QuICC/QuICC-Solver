@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_MIXEDPROJECTOR_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_MIXEDPROJECTOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -51,7 +42,7 @@ namespace Backend {
          /**
           * @brief Destructor
           */
-         ~MixedProjector();
+         ~MixedProjector() = default;
 
          /**
           * @brief Initialise the FFT transforms
@@ -71,7 +62,7 @@ namespace Backend {
          /**
           * @brief Apply FFT
           */
-         void applyFft(Matrix& phys, const MatrixZ& mods) const;
+         void applyFft(Eigen::Ref<Matrix> phys, const Eigen::Ref<const MatrixZ>& mods) const;
 
          /**
           * @brief Get the memory requirements

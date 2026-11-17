@@ -35,18 +35,18 @@ void P_Zero<base_t>::initOperator() const
    }
 }
 
-void P_Zero<base_t>::applyPostOperator(Matrix& rOut) const
+void P_Zero<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut) const
 {
    this->mBackend.output(rOut);
 }
 
-void P_Zero<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void P_Zero<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, useReal);
 }
 
-void P_Zero<base_t>::applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+void P_Zero<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp,
    const bool useReal) const
 {
    this->mBackend.output(rOut, tmp, useReal);

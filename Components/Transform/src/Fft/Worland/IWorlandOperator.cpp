@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Worland/IWorlandOperator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Worland/IWorlandOperator.hpp"
 
 namespace QuICC {
 
@@ -29,10 +23,6 @@ namespace Worland {
    IWorlandOperator::IWorlandOperator()
    {
       this->mProfileTag += "Worland::Fft";
-   }
-
-   IWorlandOperator::~IWorlandOperator()
-   {
    }
 
    void IWorlandOperator::init(SharedTransformSetup spSetup) const
@@ -49,27 +39,27 @@ namespace Worland {
       throw std::logic_error("Unused interface");
    }
 
-   void IWorlandOperator::transform(MatrixZ&, const MatrixZ&) const
+   void IWorlandOperator::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const MatrixZ>&) const
    {
       throw std::logic_error("Worland FFT operator does not define a complex to complex transform");
    }
 
-   void IWorlandOperator::transform(Matrix&, const MatrixZ&) const
+   void IWorlandOperator::transform(Eigen::Ref<Matrix>, const Eigen::Ref<const MatrixZ>&) const
    {
       throw std::logic_error("Worland FFT operator does not define a complex to real transform");
    }
 
-   void IWorlandOperator::transform(Matrix&, const Matrix&) const
+   void IWorlandOperator::transform(Eigen::Ref<Matrix>, const Eigen::Ref<const Matrix>&) const
    {
       throw std::logic_error("Worland FFT operator does not define a real to real transform");
    }
 
-   void IWorlandOperator::transform(MatrixZ&, const Matrix&) const
+   void IWorlandOperator::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const Matrix>&) const
    {
       throw std::logic_error("Worland FFT operator does not define a real to complex transform");
    }
 
-}
-}
-}
-}
+} // namespace Worland
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

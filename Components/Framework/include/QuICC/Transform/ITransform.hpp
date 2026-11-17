@@ -6,23 +6,14 @@
 #ifndef QUICC_TRANSFORM_ITRANSFORM_HPP
 #define QUICC_TRANSFORM_ITRANSFORM_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
 // System includes
 //
 #include <set>
 #include <map>
 
-// External includes
-//
-
 // Project includes
 //
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
@@ -69,7 +60,7 @@ namespace Transform {
           * @param rOut Complex output values
           * @param in   Complex input values
           */
-         virtual void forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id) = 0;
+         virtual void forward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id);
 
          /**
           * @brief Compute forward transform
@@ -77,7 +68,7 @@ namespace Transform {
           * @param rOut Complex output values
           * @param in   Real input values
           */
-         virtual void forward(MatrixZ& rOut, const Matrix& in, const std::size_t id) = 0;
+         virtual void forward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id);
 
          /**
           * @brief Compute forward transform
@@ -85,7 +76,7 @@ namespace Transform {
           * @param rOut Real output values
           * @param in   Complex input values
           */
-         virtual void forward(Matrix& rOut, const MatrixZ& in, const std::size_t id) = 0;
+         virtual void forward(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id);
 
          /**
           * @brief Compute forward transform
@@ -93,7 +84,7 @@ namespace Transform {
           * @param rOut Real output values
           * @param in   Real input values
           */
-         virtual void forward(Matrix& rOut, const Matrix& in, const std::size_t id) = 0;
+         virtual void forward(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id);
 
          /**
           * @brief Compute backward transform
@@ -101,7 +92,7 @@ namespace Transform {
           * @param rOut Complex output values
           * @param in   Complex input values
           */
-         virtual void backward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id) = 0;
+         virtual void backward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id);
 
          /**
           * @brief Compute backward transform
@@ -109,7 +100,7 @@ namespace Transform {
           * @param rOut Complex output values
           * @param in   Real input values
           */
-         virtual void backward(MatrixZ& rOut, const Matrix& in, const std::size_t id) = 0;
+         virtual void backward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id);
 
          /**
           * @brief Compute backward transform
@@ -117,7 +108,7 @@ namespace Transform {
           * @param rOut Real output values
           * @param in   Complex input values
           */
-         virtual void backward(Matrix& rOut, const MatrixZ& in, const std::size_t id) = 0;
+         virtual void backward(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id);
 
          /**
           * @brief Compute backward transform
@@ -125,7 +116,7 @@ namespace Transform {
           * @param rOut Real output values
           * @param in   Real input values
           */
-         virtual void backward(Matrix& rOut, const Matrix& in, const std::size_t id) = 0;
+         virtual void backward(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id);
 
          /**
           * @brief Compute reduction transform
@@ -133,7 +124,7 @@ namespace Transform {
           * @param rOut Complex output values
           * @param in   Complex input values
           */
-         virtual void reduce(MatrixZ& rOut, const MatrixZ& in, const std::size_t id) = 0;
+         virtual void reduce(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id);
 
          /**
           * @brief Compute reduction transform
@@ -141,7 +132,7 @@ namespace Transform {
           * @param rOut Complex output values
           * @param in   Real input values
           */
-         virtual void reduce(MatrixZ& rOut, const Matrix& in, const std::size_t id) = 0;
+         virtual void reduce(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id);
 
          /**
           * @brief Compute reduction transform
@@ -152,10 +143,18 @@ namespace Transform {
           * @param in   Complex input values
           * @param pF   Shared pointer to the profile
           */
-         virtual void reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF)
-         {
-            this->reduce(rOut, in, id);
-         }
+         virtual void reduce(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF);
+
+         /**
+          * @brief Compute reduction transform
+          * 
+          * Overloaded to accept a shared pointer to a (e.g. radial) profile, pF
+          *
+          * @param rOut Real output values
+          * @param in   Complex input values
+          * @param pF   Shared pointer to the profile
+          */
+         virtual void reduce(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF);
 
          /**
           * @brief Compute reduction transform
@@ -163,7 +162,7 @@ namespace Transform {
           * @param rOut Real output values
           * @param in   Complex input values
           */
-         virtual void reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id) = 0;
+         virtual void reduce(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id);
 
          /**
           * @brief Compute reduction transform
@@ -171,7 +170,7 @@ namespace Transform {
           * @param rOut Real output values
           * @param in   Real input values
           */
-         virtual void reduce(Matrix& rOut, const Matrix& in, const std::size_t id) = 0;
+         virtual void reduce(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id);
 
          /**
           * @brief Get the memory requirements

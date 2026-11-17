@@ -63,6 +63,13 @@ namespace Model {
       return extra;
    }
 
+   std::vector<std::size_t> IPhysicalModel::excludedFieldIds() const
+   {
+      std::vector<std::size_t> extra;
+
+      return extra;
+   }
+
    std::map<std::string, std::map<std::string,int> > IPhysicalModel::configTags() const
    {
       std::map<std::string, std::map<std::string,int> > tags;

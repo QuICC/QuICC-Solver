@@ -57,14 +57,14 @@ namespace Integrator {
           * @param rOut Output values
           * @param in   Input values
           */
-         void applyPreOperator(const Matrix& in, const bool isEven) const final;
+         void applyPreOperator(const Eigen::Ref<const Matrix>& in, const bool isEven) const final;
 
          /**
           * @brief Apply post FFT operator
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(Matrix& rOut, const bool isEven) const override;
+         virtual void applyPostOperator(Eigen::Ref<Matrix> rOut, const bool isEven) const override;
 
          /**
           * @brief Apply pre FFT operator for component wise openerations
@@ -72,7 +72,7 @@ namespace Integrator {
           * @param in   Input values
           * @param useReal Real vs Imag flag
           */
-         void applyPreOperator(const MatrixZ& in, const bool useReal, const bool isEven) const final;
+         void applyPreOperator(const Eigen::Ref<const MatrixZ>& in, const bool useReal, const bool isEven) const final;
 
          /**
           * @brief Apply post FFT operator for component wise operations
@@ -80,7 +80,7 @@ namespace Integrator {
           * @param rOut Output values
           * @param useReal Real vs Imag flag
           */
-         virtual void applyPostOperator(MatrixZ& rOut, const bool useReal, const bool isEven) const override;
+         virtual void applyPostOperator(Eigen::Ref<MatrixZ> rOut, const bool useReal, const bool isEven) const override;
    };
 
 }

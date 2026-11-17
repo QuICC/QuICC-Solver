@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/ComplexProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/Fftw/ComplexProjector.hpp"
 #include "Types/Math.hpp"
 
 namespace QuICC {
@@ -28,14 +22,6 @@ namespace Fft {
 namespace Backend {
 
 namespace Fftw {
-
-   ComplexProjector::ComplexProjector()
-   {
-   }
-
-   ComplexProjector::~ComplexProjector()
-   {
-   }
 
    void ComplexProjector::init(const SetupType& setup) const
    {
@@ -64,11 +50,6 @@ namespace Fftw {
       {
          throw  std::logic_error("FFTW plan failed!");
       }
-   }
-
-   void ComplexProjector::applyFft(MatrixZ& phys, const MatrixZ& mods) const
-   {
-      fftw_execute_dft(this->mPlan, reinterpret_cast<fftw_complex *>(const_cast<MHDComplex*>(mods.data())), reinterpret_cast<fftw_complex *>(phys.data()));
    }
 
    void ComplexProjector::input(MatrixZ& tmp, const MatrixZ& in) const

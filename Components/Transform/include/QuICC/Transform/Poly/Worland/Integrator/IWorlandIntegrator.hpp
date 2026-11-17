@@ -6,7 +6,6 @@
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_IWORLANDINTEGRATOR_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_IWORLANDINTEGRATOR_HPP
 
-
 // System includes
 //
 
@@ -102,7 +101,7 @@ namespace Integrator {
           * @param rOut Output spectral coefficients
           * @param in   Input physical values
           */
-         void applyOperators(MatrixZ& rPhysVal, const MatrixZ& specVal) const override;
+         void applyOperators(Eigen::Ref<MatrixZ> rPhysVal, const Eigen::Ref<const MatrixZ>& specVal) const override;
 
          /**
           * @brief Compute polynomial projection
@@ -110,7 +109,7 @@ namespace Integrator {
           * @param rOut Output physical values
           * @param in   Input spectral coefficients
           */
-         void applyOperators(Matrix& rOut, const MatrixZ& in) const override;
+         void applyOperators(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Apply ith operator

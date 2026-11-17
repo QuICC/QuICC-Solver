@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland cylindrical horizontal laplacian projector
  */
 
-// External includes
+// System includes
 //
 #include <cassert>
 

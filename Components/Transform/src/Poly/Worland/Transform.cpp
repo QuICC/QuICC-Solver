@@ -99,7 +99,7 @@ namespace Worland {
       }
    }
 
-   void Transform::transform(MatrixZ& rOut, const MatrixZ& in, const IWorlandOperator& op)
+   void Transform::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const IWorlandOperator& op)
    {
       if(!op.isInitialized())
       {
@@ -109,7 +109,7 @@ namespace Worland {
       op.transform(rOut, in);
    }
 
-   void Transform::transform(Matrix& rOut, const MatrixZ& in, const IWorlandOperator& op)
+   void Transform::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const IWorlandOperator& op)
    {
       if(!op.isInitialized())
       {
@@ -119,7 +119,7 @@ namespace Worland {
       op.transform(rOut, in);
    }
 
-   void Transform::transform(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void Transform::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       auto it = this->mOps.find(id);
 
@@ -132,7 +132,7 @@ namespace Worland {
       }
    }
 
-   void Transform::transform(Matrix& rOut, const MatrixZ& in, const std::size_t id)
+   void Transform::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       auto it = this->mOps.find(id);
 
@@ -165,7 +165,7 @@ namespace Worland {
       return mem;
    }
 
-} // Worland
-} // Poly
-} // Transform
-} // QuICC
+} // namespace Worland
+} // namespace Poly
+} // namespace Transform
+} // namespace QuICC

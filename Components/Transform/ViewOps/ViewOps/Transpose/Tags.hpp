@@ -35,6 +35,12 @@ struct p120_t
 {
 };
 
+/// @brief tag type for transpose permutation order.
+/// perm = [0, 2, 1]
+struct p021_t
+{
+};
+
 
 } // namespace Transpose
 } // namespace QuICC

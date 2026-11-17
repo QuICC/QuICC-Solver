@@ -40,7 +40,7 @@ void @Op@<@Tag@>::initBackend() const
     @Alloc@
 }
 
-void @Op@<@Tag@>::transform(@OutMatrixType@& rOut, const @InMatrixType@& in) const
+void @Op@<@Tag@>::transform(Eigen::Ref<@OutMatrixType@> rOut, const Eigen::Ref<const @InMatrixType@>& in) const
 {
     Profiler::RegionFixture<2> fix("@Op@<@Tag@>::transform");
 

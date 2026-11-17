@@ -7,15 +7,9 @@
 //
 #include <cmath>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Tools.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Tools.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 

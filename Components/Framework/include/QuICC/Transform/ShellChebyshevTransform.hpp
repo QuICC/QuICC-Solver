@@ -77,7 +77,7 @@ namespace Transform {
           * @param physVal    Input physical values
           * @param id         Integrator to use
           */
-         void forward(MatrixZ& rChebVal, const MatrixZ& physVal, const std::size_t id) override;
+         void forward(Eigen::Ref<MatrixZ> rChebVal, const Eigen::Ref<const MatrixZ>& physVal, const std::size_t id) override;
 
          /**
           * @brief Compute backward FFT (C2C)
@@ -88,7 +88,7 @@ namespace Transform {
           * @param chebVal    Input Chebyshev coefficients
           * @param id  Projector to use
           */
-         void backward(MatrixZ& rPhysVal, const MatrixZ& chebVal, const std::size_t id) override;
+         void backward(Eigen::Ref<MatrixZ> rPhysVal, const Eigen::Ref<const MatrixZ>& chebVal, const std::size_t id) override;
 
          /**
           * @brief Compute energy reduction operation
@@ -99,7 +99,7 @@ namespace Transform {
           * @param in         Input spectral coefficients
           * @param id         Energy reductor to use
           */
-         void reduce(Matrix& spectrum, const MatrixZ& in, const std::size_t id) override;
+         void reduce(Eigen::Ref<Matrix> spectrum, const Eigen::Ref<const MatrixZ>& in, const std::size_t id) override;
 
           /**
           * @brief Compute energy reduction operation
@@ -112,7 +112,7 @@ namespace Transform {
           * @param id         Energy reductor to use
           * @param pF         Radial profile (e.g. density)
           */
-         void reduce(Matrix& spectrum, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF) override;
+         void reduce(Eigen::Ref<Matrix> spectrum, const Eigen::Ref<const MatrixZ>& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF) override;
 
          /**
           * @brief Get the memory requirements
@@ -136,55 +136,6 @@ namespace Transform {
           * @brief Transform implementation
           */
          Fft::Chebyshev::LinearMap::Transform mImpl;
-
-         //
-         // Disabled transforms
-         //
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(Matrix& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(Matrix& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(Matrix& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(Matrix& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(MatrixZ& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(Matrix& rOut, const Matrix& in, const std::size_t id) override;
    };
 
 } // Transform

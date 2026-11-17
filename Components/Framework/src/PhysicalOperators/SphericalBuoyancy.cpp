@@ -3,21 +3,12 @@
  * @brief Source of the implementation of the spherical buoyancy term
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/PhysicalOperators/SphericalBuoyancy.hpp"
-
 // Project includes
 //
+#include "QuICC/PhysicalOperators/SphericalBuoyancy.hpp"
 
 namespace QuICC {
 

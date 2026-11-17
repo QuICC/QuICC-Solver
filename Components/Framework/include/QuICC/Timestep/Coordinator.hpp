@@ -83,10 +83,8 @@ namespace Timestep {
           * @brief Adapt the timestep used
           *
           * @param cfl     CFL conditions
-          * @param scalEq  Shared scalar equations
-          * @param vectEq  Shared vector equations
           */
-         void adaptTimestep(const Matrix& cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+         void adaptTimestep(const Matrix& cfl);
 
          /**
           * @brief Update control status
@@ -112,11 +110,6 @@ namespace Timestep {
           * @brief Get current simulation timestep
           */
          MHDFloat timestep() const;
-
-         /**
-          * @brief Timestep is finished?
-          */
-         bool finishedStep() const;
 
          /**
           * @brief Update equation explicit linear input to solver

@@ -6,12 +6,9 @@
 // System includes
 //
 
-// Class include
-//
-#include "QuICC/Transform/Poly/Worland/Integrator/IWorlandIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/Worland/Integrator/IWorlandIntegrator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -54,7 +51,7 @@ IWorlandIntegrator::IWorlandIntegrator() :
       }
    }
 
-   void IWorlandIntegrator::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+   void IWorlandIntegrator::applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<3> fix(this->mProfileTag + "::applyOperators");
 
@@ -77,7 +74,7 @@ IWorlandIntegrator::IWorlandIntegrator() :
       }
    }
 
-   void IWorlandIntegrator::applyOperators(Matrix& rOut, const MatrixZ& in) const
+   void IWorlandIntegrator::applyOperators(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       throw std::logic_error("Interface not used");
    }

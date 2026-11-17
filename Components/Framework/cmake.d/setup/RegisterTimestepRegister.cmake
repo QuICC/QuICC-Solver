@@ -7,6 +7,7 @@ set(tags
   Solution
   Temporary
   Influence
+  Workspace
   )
 
 include(RegisterTags)

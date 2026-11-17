@@ -312,12 +312,12 @@ namespace Solver {
          // System operator is complex
          if(scalEqIt->couplingInfo(myId.second).isComplex())
          {
-            getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, scalEqIt, myIdx, myId, opId, scalVar, vectVar);
+            getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, scalEqIt, myIdx, myId, opId, scalVar, vectVar, this->mTransCoord);
 
             // System operator is real
          } else
          {
-            getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, scalEqIt, myIdx, myId, opId, scalVar, vectVar);
+            getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, scalEqIt, myIdx, myId, opId, scalVar, vectVar, this->mTransCoord);
          }
       }
 
@@ -335,12 +335,12 @@ namespace Solver {
             // Linear solve matrices are complex
             if(vectEqIt->couplingInfo(myId.second).isComplex())
             {
-               getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, vectEqIt, myIdx, myId, opId, scalVar, vectVar);
+               getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, vectEqIt, myIdx, myId, opId, scalVar, vectVar, this->mTransCoord);
 
                // Linear solve matrices are real
             } else
             {
-               getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, vectEqIt, myIdx, myId, opId, scalVar, vectVar);
+               getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, vectEqIt, myIdx, myId, opId, scalVar, vectVar, this->mTransCoord);
             }
          }
       }

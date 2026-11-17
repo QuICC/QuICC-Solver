@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/D2Base.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/D2Base.hpp"
 
 namespace QuICC {
 
@@ -29,7 +23,7 @@ namespace Mixed {
 
 namespace Integrator {
 
-   void D2<base_t>::applyPostOperator(MatrixZ& rOut) const
+   void D2<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut) const
    {
       this->mBackend.outputDiff(rOut, 2, this->mspSetup->boxScale());
    }

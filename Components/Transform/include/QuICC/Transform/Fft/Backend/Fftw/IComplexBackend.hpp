@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_ICOMPLEXBACKEND_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_FFTW_ICOMPLEXBACKEND_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -49,12 +40,12 @@ namespace Fftw {
          /**
           * @brief Constructor
           */
-         IComplexBackend();
+         IComplexBackend() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IComplexBackend();
+         virtual ~IComplexBackend() = default;
 
          /**
           * @brief Initialise the FFTW transforms

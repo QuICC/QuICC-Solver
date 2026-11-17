@@ -31,6 +31,8 @@ using point_t = std::array<int, 3>;
 /// @return
 template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
 {
+   Profiler::RegionFixture<4> fix("Transpose::Mpi::Coordinates::getCoo");
+
    std::vector<point_t> coo(view.size());
    auto pointers = view.pointers()[1];
    auto indices = view.indices()[1];
@@ -239,6 +241,27 @@ template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
                   static_cast<int>(indices[idx]), // j
                   static_cast<int>(ptr),          // k
                   static_cast<int>(i)             // i
+               };
+            }
+         }
+      }
+      return coo;
+   }
+   else if constexpr (std::is_same_v<typename Tv::AttributesType, DCCSC3D> &&
+                 std::is_same_v<Perm, p021_t>)
+   {
+      std::size_t itCoo = 0;
+      for (std::size_t ptr = 0; ptr < pointers.size() - 1; ++ptr)
+      {
+         for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1]; ++idx)
+         {
+            for (std::size_t i = 0; i < view.lds(); ++i)
+            {
+               // 0 2 1 -> i k j
+               coo[itCoo++] = {
+                  static_cast<int>(i),            // i
+                  static_cast<int>(ptr),          // k
+                  static_cast<int>(indices[idx])  // j
                };
             }
          }

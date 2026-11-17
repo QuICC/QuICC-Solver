@@ -32,7 +32,7 @@ namespace SpatialScheme {
       return space;
    }
 
-   int IRegular1DBuilder::fillIndexes(Dimensions::Transform::Id transId, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, std::vector<std::vector<int> >& idx2D, std::vector<int>& idx3D, const std::vector<int>& id, const std::vector<int>& bins)
+   int IRegular1DBuilder::fillIndexes(Dimensions::Transform::Id transId, std::vector<int>& globalDims, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, std::vector<std::vector<int> >& idx2D, std::vector<int>& idx3D, const std::vector<int>& id, const std::vector<int>& bins)
    {
       // Safety assertions
       assert( id.size() > 0 );
@@ -41,6 +41,10 @@ namespace SpatialScheme {
 
       // Assert for right transform (1D case)
       assert(transId == Dimensions::Transform::TRA1D);
+
+      // Global dimensions
+      globalDims.push_back(this->dim(transId, Dimensions::Data::DATF1D));
+      globalDims.push_back(this->dim(transId, Dimensions::Data::DATB1D));
 
       // Set unused third dimension
       idx3D.clear();

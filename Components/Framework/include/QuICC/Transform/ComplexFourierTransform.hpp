@@ -6,21 +6,12 @@
 #ifndef QUICC_TRANSFORM_COMPLEXFOURIERTRANSFORM_HPP
 #define QUICC_TRANSFORM_COMPLEXFOURIERTRANSFORM_HPP
 
-// Debug includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Transform/ITransform.hpp"
@@ -45,12 +36,12 @@ namespace Transform {
          /**
           * @brief Very basic constructor
           */
-         ComplexFourierTransform();
+         ComplexFourierTransform() = default;
 
          /**
           * @brief Destroy the FFTW plans
           */
-         ~ComplexFourierTransform();
+         ~ComplexFourierTransform() = default;
 
          /**
           * @brief set list of required options
@@ -81,14 +72,14 @@ namespace Transform {
           *
           * Compute the FFT from complex physical space to complex spectral space
           */
-         void forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id) override;
+         void forward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id) override;
 
          /**
           * @brief Compute backward FFT (C2C)
           *
           * Compute the FFT from complex spectral space to complex physical space
           */
-         void backward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id) override;
+         void backward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id) override;
 
          /**
           * @brief Get the memory requirements
@@ -112,60 +103,6 @@ namespace Transform {
           * @brief Transform implementation
           */
          Fft::Fourier::Complex::Transform mImpl;
-
-         //
-         // Disabled transforms
-         //
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(Matrix& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(Matrix& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(Matrix& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(Matrix& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(MatrixZ& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(Matrix& rOut, const Matrix& in, const std::size_t id) override;
    };
 
 }

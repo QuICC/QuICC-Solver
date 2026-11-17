@@ -6,15 +6,9 @@
 #ifndef QUICC_TRANSFORM_FFT_WORLAND_SETUP_HPP
 #define QUICC_TRANSFORM_FFT_WORLAND_SETUP_HPP
 
-// Configuration includes
-//
-#include <memory>
-
 // System includes
 //
-
-// External includes
-//
+#include <memory>
 
 // Project includes
 //
@@ -45,7 +39,7 @@ namespace Worland {
          /**
           * @brief Empty destructor
           */
-         virtual ~Setup();
+         virtual ~Setup() = default;
          
       protected:
 

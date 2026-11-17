@@ -44,19 +44,19 @@ void EnergyD1<base_t>::initBackend() const
    this->mBackend.addSolver();
 }
 
-void EnergyD1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+void EnergyD1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
 {
    this->mBackend.input(tmp, in, 1);
    this->mBackend.getSolution(tmp, 1, 1);
 }
 
-void EnergyD1<base_t>::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
+void EnergyD1<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const
 {
    assert(rOut.cols() == 1);
    this->mBackend.output(rOut, tmp);
 }
 
-void EnergyD1<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void EnergyD1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, 1, useReal);

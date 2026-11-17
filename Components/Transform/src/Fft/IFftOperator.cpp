@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/IFftOperator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/IFftOperator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 
 namespace QuICC {
@@ -24,14 +18,6 @@ namespace QuICC {
 namespace Transform {
 
 namespace Fft {
-
-   IFftOperator::IFftOperator()
-   {
-   }
-
-   IFftOperator::~IFftOperator()
-   {
-   }
 
    void IFftOperator::cleanup()
    {
@@ -77,11 +63,11 @@ namespace Fft {
       return mem;
    }
 
-   void IFftOperator::dealias(MatrixZ& deAliased, const MatrixZ& aliased) const
+   void IFftOperator::dealias(Eigen::Ref<MatrixZ> deAliased, const Eigen::Ref<const MatrixZ>& aliased) const
    {
       std::logic_error("method not implemented!");
    }
 
-}
-}
-}
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

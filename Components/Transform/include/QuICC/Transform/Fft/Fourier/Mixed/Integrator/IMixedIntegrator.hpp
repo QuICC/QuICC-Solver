@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_MIXED_INTEGRATOR_IMIXEDINTEGRATOR_HPP
 #define QUICC_TRANSFORM_FFT_FOURIER_MIXED_INTEGRATOR_IMIXEDINTEGRATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -45,12 +36,12 @@ namespace Integrator {
          /**
           * @brief Constructor
           */
-         IMixedIntegrator();
+         IMixedIntegrator() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IMixedIntegrator();
+         virtual ~IMixedIntegrator() = default;
 
          /**
           * @brief Compute transform R2C
@@ -58,7 +49,7 @@ namespace Integrator {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const Matrix& in) const override;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in) const override;
 
          /**
           * @brief Rows of output data
@@ -81,7 +72,7 @@ namespace Integrator {
           * @param truncated  values
           * @param extended   values
           */
-         virtual void dealias(MatrixZ& deAliased, const MatrixZ& aliased) const override;
+         virtual void dealias(Eigen::Ref<MatrixZ> deAliased, const Eigen::Ref<const MatrixZ>& aliased) const override;
 
       protected:
          /**
@@ -95,7 +86,7 @@ namespace Integrator {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const override;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Compute transform C2R (disabled)
@@ -103,7 +94,7 @@ namespace Integrator {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Compute transform R2R (disabled)
@@ -111,7 +102,7 @@ namespace Integrator {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const Matrix& in) const override;
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const override;
 
       private:
          /**
@@ -124,7 +115,7 @@ namespace Integrator {
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(MatrixZ& rOut) const = 0;
+         virtual void applyPostOperator(Eigen::Ref<MatrixZ> rOut) const = 0;
    };
 
 }

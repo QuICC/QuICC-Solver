@@ -8,24 +8,14 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Variables/VariableRequirement.hpp"
-
 // Project includes
 //
+#include "QuICC/Variables/VariableRequirement.hpp"
 
 namespace QuICC {
 
    VariableRequirement::VariableRequirement()
       : mNoField(false, Tools::ComponentAlias<FieldComponents::Spectral::Id>(),Tools::ComponentAlias<FieldComponents::Physical::Id>())
-   {
-   }
-
-   VariableRequirement::~VariableRequirement()
    {
    }
 
@@ -80,4 +70,4 @@ namespace QuICC {
          }
       }
    }
-}
+} // namespace QuICC

@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/ChebyshevProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/ChebyshevProjector.hpp"
 #if defined QUICC_FFT_CHEBYSHEV_FFTW
    #include "QuICC/Transform/Fft/Backend/Fftw/ChebyshevProjector.hpp"
    #define BACKENDIMPL Fftw
@@ -43,10 +37,6 @@ namespace Backend {
       this->mpImpl = std::make_shared<BackendImpl>();
    }
 
-   ChebyshevProjector::~ChebyshevProjector()
-   {
-   }
-
    void ChebyshevProjector::init(const SetupType& setup) const
    {
       this->mpImpl->init(setup);
@@ -57,45 +47,45 @@ namespace Backend {
       this->mpImpl->setScaler(scaler);
    }
 
-   void ChebyshevProjector::input(Matrix& tmp, const Matrix& in) const
+   void ChebyshevProjector::input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const Matrix>& in) const
    {
       this->mpImpl->input(tmp, in);
    }
 
-   void ChebyshevProjector::input(Matrix& tmp, const Matrix& in,
+   void ChebyshevProjector::input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const Matrix>& in,
       const int shift) const
    {
       this->mpImpl->input(tmp, in, shift);
    }
 
-   void ChebyshevProjector::input(Matrix& tmp, const MatrixZ& in,
+   void ChebyshevProjector::input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const MatrixZ>& in,
       const bool useReal) const
    {
       this->mpImpl->input(tmp, in, useReal);
    }
 
-   void ChebyshevProjector::input(Matrix& tmp, const MatrixZ& in,
+   void ChebyshevProjector::input(Eigen::Ref<Matrix> tmp, const Eigen::Ref<const MatrixZ>& in,
       const int shift, const bool useReal) const
    {
       this->mpImpl->input(tmp, in, shift, useReal);
    }
 
-   void ChebyshevProjector::output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
+   void ChebyshevProjector::output(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& tmp, const bool useReal) const
    {
       this->mpImpl->output(rOut, tmp, useReal);
    }
 
-   void ChebyshevProjector::outputScale(Matrix& rOut) const
+   void ChebyshevProjector::outputScale(Eigen::Ref<Matrix> rOut) const
    {
       this->mpImpl->outputScale(rOut);
    }
 
-   void ChebyshevProjector::outputScale(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
+   void ChebyshevProjector::outputScale(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp, const bool useReal) const
    {
       this->mpImpl->outputScale(rOut, tmp, useReal);
    }
 
-   void ChebyshevProjector::applyFft(Matrix& phys, const Matrix& mods) const
+   void ChebyshevProjector::applyFft(Eigen::Ref<Matrix> phys, const Eigen::Ref<const Matrix>& mods) const
    {
       this->mpImpl->applyFft(phys, mods);
    }

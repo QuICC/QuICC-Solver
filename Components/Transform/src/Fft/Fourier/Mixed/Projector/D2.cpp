@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Mixed/Projector/D2Base.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Mixed/Projector/D2Base.hpp"
 
 namespace QuICC {
 
@@ -29,7 +23,7 @@ namespace Mixed {
 
 namespace Projector {
 
-   void D2<base_t>::applyPreOperator(MatrixZ& out, const MatrixZ& in) const
+   void D2<base_t>::applyPreOperator(MatrixZ& out, const Eigen::Ref<const MatrixZ>& in) const
    {
       this->mBackend.inputDiff(out, in, 2, this->mspSetup->boxScale());
    }

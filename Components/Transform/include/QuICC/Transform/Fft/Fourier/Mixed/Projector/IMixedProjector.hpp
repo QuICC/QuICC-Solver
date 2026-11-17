@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_MIXED_PROJECTOR_IMIXEDPROJECTOR_HPP
 #define QUICC_TRANSFORM_FFT_FOURIER_MIXED_PROJECTOR_IMIXEDPROJECTOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -45,12 +36,12 @@ namespace Projector {
          /**
           * @brief Constructor
           */
-         IMixedProjector();
+         IMixedProjector() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IMixedProjector();
+         virtual ~IMixedProjector() = default;
 
          /**
           * @brief Compute transform C2R
@@ -58,7 +49,7 @@ namespace Projector {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Rows of output data
@@ -87,7 +78,7 @@ namespace Projector {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const override;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Compute transform R2C (disabled)
@@ -95,7 +86,7 @@ namespace Projector {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const Matrix& in) const override;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in) const override;
 
          /**
           * @brief Compute transform R2R (disabled)
@@ -103,7 +94,7 @@ namespace Projector {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const Matrix& in) const override;
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const override;
 
       private:
          /**
@@ -117,7 +108,7 @@ namespace Projector {
           * @param out  Copied or scaled input
           * @param in   Input values
           */
-         virtual void applyPreOperator(MatrixZ& out, const MatrixZ& in) const = 0;
+         virtual void applyPreOperator(MatrixZ& tmp, const Eigen::Ref<const MatrixZ>& in) const = 0;
    };
 
 }

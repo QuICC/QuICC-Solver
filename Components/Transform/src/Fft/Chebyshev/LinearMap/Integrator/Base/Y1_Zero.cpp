@@ -41,18 +41,18 @@ void Y1_Zero<base_t>::initOperator() const
    }
 }
 
-void Y1_Zero<base_t>::applyPostOperator(Matrix& rOut) const
+void Y1_Zero<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut) const
 {
    this->mBackend.outputSpectral(rOut);
 }
 
-void Y1_Zero<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void Y1_Zero<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, useReal);
 }
 
-void Y1_Zero<base_t>::applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+void Y1_Zero<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp,
    const bool useReal) const
 {
    this->mBackend.outputSpectral(rOut, tmp, useReal);

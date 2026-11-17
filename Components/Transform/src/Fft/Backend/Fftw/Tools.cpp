@@ -7,15 +7,9 @@
 //
 #include <cmath>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/Tools.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/Fftw/Tools.hpp"
 
 namespace QuICC {
 

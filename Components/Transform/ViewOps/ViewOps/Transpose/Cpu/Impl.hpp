@@ -225,6 +225,43 @@ void implPerm120(View::View<Tout, View::S1CLCSC3D>& out,
    }
 }
 
+/// @brief Implementation of permutation [0, 2, 1]
+/// for view type input DCCSC3D and output DCCSC3D
+/// @tparam Tout
+/// @tparam Tin
+/// @param out
+/// @param in
+   template <class Tout, class Tin>
+void implPerm021(View::View<Tout, View::DCCSC3D>& out,
+      const View::View<Tin, View::DCCSC3D>& in)
+{
+   // dense transpose
+   assert(out.size() == in.size()); // data should match
+                                    // perm = [0, 2, 1]
+   assert(in.dims()[0] == out.dims()[0]);
+   assert(in.dims()[1] == out.dims()[2]);
+   assert(in.dims()[2] == out.dims()[1]);
+   //auto I = in.dims()[0];
+   //auto J = in.dims()[1];
+   //auto K = in.dims()[2];
+
+   auto pointers = in.pointers()[1];
+   auto indices = in.indices()[1];
+
+   std::size_t itCoo = 0;
+   for (std::size_t ptr = 0; ptr < pointers.size() - 1; ++ptr)
+   {
+      for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1]; ++idx)
+      {
+         for (std::size_t i = 0; i < in.lds(); ++i)
+         {
+            out(i, ptr, indices[idx]) = in[itCoo];
+            itCoo++;
+         }
+      }
+   }
+}
+
 } // namespace details
 
 } // namespace Cpu

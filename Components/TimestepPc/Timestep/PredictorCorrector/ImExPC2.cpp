@@ -18,7 +18,7 @@ namespace Timestep {
 
 namespace PredictorCorrector {
 
-// Scheme requires 3 substeps
+// Scheme requires 2 substeps
 int ImExPC2::steps() const
 {
    return 2;

@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/P_CleanBase.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/P_CleanBase.hpp"
 
 namespace QuICC {
 
@@ -34,7 +28,7 @@ namespace Integrator {
       this->mBackend.initMeanBlocks(this->mspSetup->idBlocks());
    }
 
-   void P_Clean<base_t>::applyPostOperator(MatrixZ& rOut) const
+   void P_Clean<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut) const
    {
       this->mBackend.zeroMean(rOut);
       this->mBackend.output(rOut);

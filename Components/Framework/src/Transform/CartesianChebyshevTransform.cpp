@@ -49,68 +49,34 @@ namespace Transform {
       }
    }                                                 
 
-   void CartesianChebyshevTransform::forward(Matrix& rOut, const Matrix& in, const std::size_t id)
+   void CartesianChebyshevTransform::forward(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
-   void CartesianChebyshevTransform::backward(Matrix& rOut, const Matrix& in, const std::size_t id)
+   void CartesianChebyshevTransform::backward(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
-   void CartesianChebyshevTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void CartesianChebyshevTransform::forward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
-   void CartesianChebyshevTransform::backward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void CartesianChebyshevTransform::backward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
-   void CartesianChebyshevTransform::reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id)
+   void CartesianChebyshevTransform::reduce(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
-   void CartesianChebyshevTransform::reduce(Matrix& rOut, const Matrix& in, const std::size_t id)
+   void CartesianChebyshevTransform::reduce(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
-   }
-
-   //
-   // Disabled transforms
-   //
-
-   void CartesianChebyshevTransform::forward(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CartesianChebyshevTransform::forward(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CartesianChebyshevTransform::backward(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CartesianChebyshevTransform::backward(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CartesianChebyshevTransform::reduce(MatrixZ&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CartesianChebyshevTransform::reduce(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
    }
 
    MHDFloat CartesianChebyshevTransform::requiredStorage() const

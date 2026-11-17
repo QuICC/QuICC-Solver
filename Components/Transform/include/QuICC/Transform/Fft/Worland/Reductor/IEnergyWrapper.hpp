@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_WORLAND_REDUCTOR_IENERGYWRAPPER_HPP
 #define QUICC_TRANSFORM_FFT_WORLAND_REDUCTOR_IENERGYWRAPPER_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -42,12 +33,12 @@ namespace Reductor {
          /**
           * @brief Constructor
           */
-         IEnergyWrapper();
+         IEnergyWrapper() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IEnergyWrapper();
+         virtual ~IEnergyWrapper() = default;
 
          /**
           * @brief Compute transform R2R componentwise
@@ -55,7 +46,7 @@ namespace Reductor {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const override;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Compute transform R2R
@@ -63,11 +54,9 @@ namespace Reductor {
           * @param rOut Output values
           * @param in   Input values
           */
- 	 virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
-
-	 virtual void transform(Matrix& rOut, const Matrix& in) const override;
-         virtual void transform(MatrixZ& rOut, const Matrix& in) const override;
-
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const override;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in) const override;
 
          /**
           * @brief Rows of output data
@@ -103,14 +92,6 @@ namespace Reductor {
       private:
    };
 
-   template <typename T> IEnergyWrapper<T>::IEnergyWrapper()
-   {
-   }
-
-   template <typename T> IEnergyWrapper<T>::~IEnergyWrapper()
-   {
-   }
-
    template <typename T> void IEnergyWrapper<T>::initBackend() const
    {
       this->mspPSetup = std::make_shared<typename T::SetupType>(this->mspSetup->fwdSize(), this->mspSetup->specSize(),this->mspSetup->purpose());
@@ -126,26 +107,26 @@ namespace Reductor {
       this->mOp.init(this->mspPSetup, igrid, iweights);
    }
 
-   template <typename T> void IEnergyWrapper<T>::transform(Matrix& rOut, const MatrixZ& in) const
+   template <typename T> void IEnergyWrapper<T>::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       assert(this->isInitialized());
 
       this->mOp.transform(rOut, in);
    }
 
-   template <typename T> void IEnergyWrapper<T>::transform(MatrixZ& rOut, const MatrixZ& in) const
+   template <typename T> void IEnergyWrapper<T>::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       assert(this->isInitialized());
 
       this->mOp.transform(rOut, in);
    }
 
-   template <typename T> void IEnergyWrapper<T>::transform(Matrix& rOut, const Matrix& in) const
+   template <typename T> void IEnergyWrapper<T>::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const
    {
       throw std::logic_error("Unused interface");
    }
 
-   template <typename T> void IEnergyWrapper<T>::transform(MatrixZ& rOut, const Matrix& in) const
+   template <typename T> void IEnergyWrapper<T>::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in) const
    {
       throw std::logic_error("Unused interface");
    }

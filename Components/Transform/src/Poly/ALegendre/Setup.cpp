@@ -25,10 +25,6 @@ namespace ALegendre {
    {
    }
 
-   Setup::~Setup()
-   {
-   }
-
    void Setup::addIndex(const int slowIdx, const int mult)
    {
       ArrayI fastIdx = ArrayI::LinSpaced(this->specSize() - slowIdx, slowIdx, this->specSize() - 1);
