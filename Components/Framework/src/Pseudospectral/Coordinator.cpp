@@ -945,18 +945,7 @@ void Coordinator::finalizeTimestep()
    this->mDiagnostics.synchronize();
 
    // Adapt timestepper time step
-   std::vector<SharedIScalarEquation> sEqs;
-   std::vector<SharedIVectorEquation> vEqs;
-   for (auto j: this->it())
-   {
-      auto sP = this->scalarRange(PseudospectralTag::Prognostic::id(), j);
-      sEqs.insert(sEqs.end(), sP.first, sP.second);
-      auto vP = this->vectorRange(PseudospectralTag::Prognostic::id(), j);
-      vEqs.insert(vEqs.end(), vP.first, vP.second);
-   }
-   auto sP = std::make_pair(sEqs.begin(), sEqs.end());
-   auto vP = std::make_pair(vEqs.begin(), vEqs.end());
-   this->mTimestepCoordinator.adaptTimestep(this->mDiagnostics.cfl(), sP, vP);
+   this->mTimestepCoordinator.adaptTimestep(this->mDiagnostics.cfl());
 }
 
 void Coordinator::setupEquations()

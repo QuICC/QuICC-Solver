@@ -4,11 +4,13 @@ set(tags
   ExplicitNextstep
   ExplicitNonlinear
   ImplicitLinear
+  QuasiInverse
   Stencil
   Time
   SplitBoundary
   SplitBoundaryValue
   SplitImplicitLinear
+  SplitQuasiInverse
 )
 
 include(RegisterTags)

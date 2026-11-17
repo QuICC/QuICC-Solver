@@ -10,18 +10,15 @@
 // System includes
 //
 #include <memory>
-#include <stdexcept>
 
 // Project includes
 //
 #include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Equations/IFieldEquation.hpp"
-#include "Types/DecoupledComplexUtils.hpp"
+#include "Arithmetics/Basic.hpp"
 #include "QuICC/Equations/CouplingFeature.hpp"
-#include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
-#include "QuICC/SparseSolvers/SparseLinearSolverTools.hpp"
 
 namespace QuICC {
 
@@ -180,28 +177,6 @@ namespace Equations {
    /// Typedef for shared IScalarEquation
    typedef std::shared_ptr<IScalarEquation> SharedIScalarEquation;
 
-   /**
-    * @brief Solve for galerkin unknown using the stencil
-    *
-    * @param eq         Equation to work on
-    * @param compId     Component ID
-    * @param storage    Storage for the equation values
-    * @param matIdx     Index of the given data
-    * @param start      Start index for the storage
-    */
-   template <typename TData> void solveStencilUnknown(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start);
-
-   /**
-    * @brief Transfer nonlinear spectral values from unknown to solver
-    *
-    * @param eq      Equation to work on
-    * @param compId  Component ID
-    * @param storage Storage for the equation values
-    * @param matIdx  Index of the given data
-    * @param start   Start index for the storage
-    */
-   template <typename TData> void copyNonlinear(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start);
-
    template <typename TData> void IScalarEquation::storeSolution(FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start)
    {
       // Assert scalar
@@ -210,84 +185,6 @@ namespace Equations {
       std::visit([&](auto&& p){this->storeSolutionImpl(p->rDom(0).rPerturbation(), compId, storage, matIdx, start);}, this->spUnknown());
    }
 
-   template <typename TData> void solveStencilUnknown(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
-   {
-      // Create temporary storage for tau data
-      TData tmp(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      std::visit(
-            [&](auto&& p)
-            {
-            Equations::copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);
-            }, eq.spUnknown());
-      TData rhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
-      {
-         Datatypes::details::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL), eq.couplingInfo(compId).galerkinShift(matIdx, 0), tmp);
-      } else
-      {
-         Datatypes::details::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), tmp);
-      }
-
-      // Get a restricted stencil matrix
-      SparseMatrix stencil(eq.couplingInfo(compId).galerkinN(matIdx),eq.couplingInfo(compId).galerkinN(matIdx));
-      eq.dispatchGalerkinStencil(compId, stencil, matIdx, eq.res(), eq.couplingInfo(compId).couplingTools().getIndexes(eq.res(), matIdx), true);
-      stencil.makeCompressed();
-
-      // Check that square stencil was generated (Python setup is wrong if matrix is not square)
-      if(stencil.rows() != stencil.cols())
-      {
-      	throw std::logic_error("Stencil setup is wrong and did not produce a square matrix");
-      }
-
-      // Create solver and factorize stencil
-      Framework::Selector::SparseSolver<SparseMatrix> solver;
-      solver.compute(stencil);
-      // Safety assert for successful factorisation
-      if(solver.info() != Eigen::Success)
-      {
-         throw std::logic_error("Stencil factorization for initial solution failed!");
-      }
-
-      // solve for galerkin expansion
-      TData lhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      Solver::details::solveWrapper(lhs, solver, rhs);
-      Datatypes::details::setTopBlock(storage, start, eq.couplingInfo(compId).galerkinN(matIdx), lhs);
-   }
-
-   template <typename TData> void copyNonlinear(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
-   {
-      // Assert scalar
-      assert(compId == FieldComponents::Spectral::SCALAR);
-      assert((!eq.couplingInfo(compId).isGalerkin() || eq.couplingInfo(compId).indexType() != CouplingIndexType::SINGLE) && "Current version does not support galerkin basis");
-
-      // Check if a nonlinear computation took place and a quasi-inverse has to be applied
-      if(eq.couplingInfo(compId).hasNonlinear() && eq.couplingInfo(compId).hasQuasiInverse())
-      {
-         // Temporary storage is required
-         TData tmp;
-         tmp = TData(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-
-         // simply copy values from unknown
-         std::visit(
-               [&](auto&& p)
-               {
-                  copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);
-               }, eq.spUnknown());
-
-         // Multiply nonlinear term by quasi-inverse
-         applyQuasiInverse(eq, compId, storage, start, matIdx, 0, tmp);
-      }
-      /// Nonlinear computation took place but no quasi-inverse is required
-      else if(eq.couplingInfo(compId).hasNonlinear())
-      {
-         // simply copy values from unknown
-         std::visit(
-               [&](auto&& p)
-               {
-                  copyUnknown(eq, p->dom(0).perturbation(), compId, storage, matIdx, start, true, false);
-               }, eq.spUnknown());
-      }
-   }
 } // Equations
 } // QuICC
 

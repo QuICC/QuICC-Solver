@@ -157,14 +157,15 @@ protected:
     * @param rowId   ID of field of equation
     * @param colId   ID of field
     * @param l       Harmonic degree
-    * @param res     Resolution object
+    * @param opts    Options
+    * @param nN      1D dimension
     * @param bcs     Boundary conditions
     * @param nds     Nondimensional parameters
     * @param isSplitOperator  Is second operator of split 4th order system?
     */
    void applyTau(SparseMatrix& mat, const SpectralFieldId& rowId,
       const SpectralFieldId& colId, const int l,
-      std::shared_ptr<QuICC::Model::details::BlockOptions> opts, const Resolution& res,
+      std::shared_ptr<QuICC::Model::details::BlockOptions> opts, const int nN,
       const BcMap& bcs, const NonDimensional::NdMap& nds,
       const bool isSplitOperator) const override {};
 
@@ -176,13 +177,14 @@ protected:
     * @param colId   ID of field
     * @param lr      Row space harmonic degree
     * @param lc      Column space harmonic degree
-    * @param res     Resolution object
+    * @param opts    Options
+    * @param nN      1D dimension
     * @param bcs     Boundary conditions
     * @param nds     Nondimensional parameters
     */
    void applyGalerkinStencil(SparseMatrix& decMat, const SpectralFieldId& rowId,
       const SpectralFieldId& colId, const int lr, const int lc,
-      std::shared_ptr<QuICC::Model::details::BlockOptions> opts, const Resolution& res,
+      std::shared_ptr<QuICC::Model::details::BlockOptions> opts, const int nNr, const int nNc,
       const BcMap& bcs, const NonDimensional::NdMap& nds) const override {};
 
 private:
@@ -192,6 +194,13 @@ private:
     * @param fId  Field ID
     */
    bool isComplex(const SpectralFieldId& fId) const final;
+
+   /**
+    * @brief Base 1D dimension
+    *
+    * @fId  Field ID
+    */
+   int baseNn(const int l, const Resolution& res) const;
 
    /**
     * @brief Get coupled fields

@@ -14,6 +14,7 @@
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "Timestep/RungeKuttaCB/Factory.hpp"
 #include "Timestep/PredictorCorrector/Factory.hpp"
+#include "Timestep/PredictorCorrector/FactoryViews.hpp"
 
 namespace QuICC {
 
@@ -54,9 +55,9 @@ namespace Timestep {
       this->mpImpl->tuneAdaptive(time);
    }
 
-   void Coordinator::adaptTimestep(const Matrix& cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   void Coordinator::adaptTimestep(const Matrix& cfl)
    {
-      this->mpImpl->adaptTimestep(cfl, scalEq, vectEq);
+      this->mpImpl->adaptTimestep(cfl);
    }
 
    void Coordinator::stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
@@ -73,6 +74,12 @@ namespace Timestep {
       }
 
       // Try Predictor-Corrector schemes
+      if(!this->mpImpl)
+      {
+         this->mpImpl = PredictorCorrector::makeInterfaceViews(schemeId, time, cfl, maxError, scalEq, vectEq, pseudo);
+      }
+
+      // Try old Predictor-Corrector schemes
       if(!this->mpImpl)
       {
          this->mpImpl = PredictorCorrector::makeInterface(schemeId, time, cfl, maxError, scalEq, vectEq, pseudo);

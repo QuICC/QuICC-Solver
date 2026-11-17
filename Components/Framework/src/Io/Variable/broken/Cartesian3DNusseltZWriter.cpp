@@ -25,7 +25,7 @@
 #include "QuICC/ScalarFields/FieldTools.hpp"
 #include "QuICC/Io/Variable/NusseltTags.hpp"
 #include "QuICC/PyQuICC/CoreWrapper.hpp"
-#include "Types/DecoupledComplexUtils.hpp"
+#include "Arithmetics/Basic.hpp"
 
 namespace QuICC {
 
@@ -107,7 +107,7 @@ namespace Variable {
                l = k_ + j_ + i;
 
                // Copy field value into field
-               Datatypes::details::setScalar(field, l, sit->second->dom(0).perturbation().point(i,j,k));
+               Arithmetics::setScalar(field, l, sit->second->dom(0).perturbation().point(i,j,k));
             }
          }
       }

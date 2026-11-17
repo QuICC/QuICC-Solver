@@ -46,6 +46,20 @@ namespace Equations {
       return changedSolution;
    }
 
+   std::vector<std::tuple<MHDVariant,int,int,int>> IFieldEquation::correctionConstraint(FieldComponents::Spectral::Id compId, const std::size_t timeId)
+   {
+      std::vector<std::tuple<MHDVariant,int,int,int>> corr;
+      // Use source kernel
+      if(this->mConstraintKernel.count(compId) > 0)
+      {
+         DebuggerMacro_msg("Correction from constraint kernel for " + PhysicalNames::Coordinator::tag(this->name()) + "(" + QuICC::Tools::IdToHuman::toString(compId) + ") at " + SolveTiming::Coordinator::tag(timeId) , 6);
+
+         corr = this->mConstraintKernel.find(compId)->second->correction(timeId);
+      }
+
+      return corr;
+   }
+
    MHDVariant IFieldEquation::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
    {
       // Use source kernel

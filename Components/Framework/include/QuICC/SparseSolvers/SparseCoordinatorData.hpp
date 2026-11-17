@@ -25,6 +25,12 @@
 #include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/Equations/IScalarEquation.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
+#include "QuICC/Equations/AddSource.hpp"
+#include "QuICC/Equations/SetBoundaryValue.hpp"
+#include "QuICC/Equations/ExplicitTerm.hpp"
+#include "QuICC/Equations/CopyNonlinear.hpp"
+#include "QuICC/Equations/SolveStencilUnknown.hpp"
+#include "QuICC/Equations/CorrectSolution.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolver.hpp"
 #include "QuICC/SparseSolvers/SparseTrivialSolver.hpp"
 
@@ -377,13 +383,10 @@ namespace Solver {
       // Update solver solution if constraint modified it
       if(changedSolution)
       {
+         auto corr = spEq->correctionConstraint(id.second, SolveTiming::After::id());
          for(std::size_t i = 0; i < (*solIt)->nSystem(); i++)
          {
-            std::visit(
-                  [&](auto&& p)
-                  {
-                  Equations::copyUnknown(*spEq, p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true);
-                  }, spEq->spUnknown());
+            Equations::correctSolution(*spEq, id.second, corr, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i));
          }
 
          (*solIt)->updateSolutions();
@@ -496,7 +499,7 @@ namespace Solver {
             std::visit(
                   [&](auto&& p)
                   {
-                     Equations::copyUnknown(*spEq, p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true);
+                     Equations::copyUnknown(*spEq, p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true, true);
                   }, spEq->spUnknown());
          }
       }

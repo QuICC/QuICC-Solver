@@ -44,6 +44,11 @@ namespace Kernel {
    {
    }
 
+   const std::vector<std::tuple<MHDVariant,int,int,int>>& ISpectralKernel::correction(const std::size_t)
+   {
+      return this->mCorr;
+   }
+
    void ISpectralKernel::setField(std::size_t name, Framework::Selector::VariantSharedScalarVariable spField)
    {
       // Safety assertion

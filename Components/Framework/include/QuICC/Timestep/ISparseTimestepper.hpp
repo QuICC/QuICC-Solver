@@ -18,6 +18,8 @@
 //
 #include "QuICC/ModelOperator/Boundary.hpp"
 #include "QuICC/ModelOperator/ImplicitLinear.hpp"
+#include "QuICC/ModelOperator/QuasiInverse.hpp"
+#include "QuICC/ModelOperator/SplitQuasiInverse.hpp"
 #include "QuICC/ModelOperator/SplitBoundary.hpp"
 #include "QuICC/ModelOperator/SplitBoundaryValue.hpp"
 #include "QuICC/ModelOperator/SplitImplicitLinear.hpp"
@@ -32,6 +34,7 @@ namespace QuICC {
 namespace Timestep {
 
 namespace details {
+
 /**
  * @brief Compute z = y
  */
@@ -64,6 +67,18 @@ void computeMV(TData& z, const TOperator& mat, const TData& y);
  * @brief Compute z = A*y
  */
 void computeMV(DecoupledZMatrix& z, const SparseMatrix& mat,
+   const DecoupledZMatrix& y);
+
+/**
+ * @brief Compute z = a*A*y
+ */
+template <typename TOperator, typename TData>
+void computeMV(TData& z, const MHDFloat a, const TOperator& mat, const TData& y);
+
+/**
+ * @brief Compute z = a*A*y
+ */
+void computeMV(DecoupledZMatrix& z, const MHDFloat a, const SparseMatrix& mat,
    const DecoupledZMatrix& y);
 
 /**
@@ -359,6 +374,16 @@ protected:
    std::vector<SparseMatrix> mMassMatrix;
 
    /**
+    * @brief Quasi-inverse operator
+    */
+   std::vector<SparseMatrix> mQi;
+
+   /**
+    * @brief Split Quasi-inverse operator
+    */
+   std::vector<SparseMatrix> mSplitQi;
+
+   /**
     * @brief Storage for field
     */
    std::map<std::size_t, std::vector<TData>> mStorage;
@@ -514,6 +539,32 @@ void ISparseTimestepper<TOperator, TData, TSolver>::initMatrices(const int n)
          this->mMassMatrix.push_back(SparseMatrix());
       }
    }
+
+   // Do not reinitialise if work already done by other field
+   if (this->mQi.size() == 0)
+   {
+      // Reserve space for the quasi-inverse matrices
+      this->mQi.reserve(n);
+
+      // Initialise storage for quasi-inverse matrices
+      for (int i = 0; i < n; ++i)
+      {
+         this->mQi.push_back(SparseMatrix());
+      }
+   }
+
+   // Do not reinitialise if work already done by other field
+   if (this->mSplitQi.size() == 0)
+   {
+      // Reserve space for the split quasi-inverse matrices
+      this->mSplitQi.reserve(n);
+
+      // Initialise storage for split quasi-inverse matrices
+      for (int i = 0; i < n; ++i)
+      {
+         this->mSplitQi.push_back(SparseMatrix());
+      }
+   }
 }
 
 template <typename TOperator, typename TData, template <typename> class TSolver>
@@ -532,6 +583,8 @@ void ISparseTimestepper<TOperator, TData, TSolver>::buildOperators(
       ops.find(ModelOperator::ImplicitLinear::id());
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpB =
       ops.find(ModelOperator::Time::id());
+   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpQ =
+      ops.find(ModelOperator::QuasiInverse::id());
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpC =
       ops.find(ModelOperator::Boundary::id());
 
@@ -541,6 +594,8 @@ void ISparseTimestepper<TOperator, TData, TSolver>::buildOperators(
       ops.find(ModelOperator::SplitBoundary::id());
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSA =
       ops.find(ModelOperator::SplitImplicitLinear::id());
+   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSQ =
+      ops.find(ModelOperator::SplitQuasiInverse::id());
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSCV =
       ops.find(ModelOperator::SplitBoundaryValue::id());
 
@@ -554,6 +609,10 @@ void ISparseTimestepper<TOperator, TData, TSolver>::buildOperators(
    // Set mass matrix
    this->mMassMatrix.at(idx).resize(size, size);
    Solver::details::addOperators(this->mMassMatrix.at(idx), 1.0, iOpB->second);
+
+   // Set quasi-inverse matrix
+   this->mQi.at(idx).resize(size, size);
+   Solver::details::addOperators(this->mQi.at(idx), 1.0, iOpQ->second);
 
    // Set implicit matrix
    for (int i = 0; i < this->steps(); ++i)
@@ -586,6 +645,10 @@ void ISparseTimestepper<TOperator, TData, TSolver>::buildOperators(
 
    if (isSplit)
    {
+      // Set quasi-inverse matrix
+      this->mSplitQi.at(idx).resize(size, size);
+      Solver::details::addOperators(this->mSplitQi.at(idx), 1.0, iOpSQ->second);
+
       // Store information for particular solution
       auto&& infRhs = this->reg(Register::Influence::id()).at(idx);
       details::initInfluence(infRhs, iOpSCV->second, iOpSC->second);
@@ -933,6 +996,20 @@ inline void computeMV(DecoupledZMatrix& y, const SparseMatrix& A,
    y.real() = A * x.real();
 
    y.imag() = A * x.imag();
+}
+
+template <typename TOperator, typename TData>
+inline void computeMV(TData& y, const MHDFloat a, const TOperator& A, const TData& x)
+{
+   y = A * (a * x);
+}
+
+inline void computeMV(DecoupledZMatrix& y, const MHDFloat a, const SparseMatrix& A,
+   const DecoupledZMatrix& x)
+{
+   y.real() = A * (a * x.real());
+
+   y.imag() = A * (a * x.imag());
 }
 
 template <typename TData>
