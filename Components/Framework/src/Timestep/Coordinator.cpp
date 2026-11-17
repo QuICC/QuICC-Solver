@@ -12,7 +12,6 @@
 #include "Timestep/RungeKuttaCB/Factory.hpp"
 #include "Timestep/PredictorCorrector/Factory.hpp"
 #include "Timestep/PredictorCorrector/FactoryViews.hpp"
-#include "Timestep/Exponential/Factory.hpp"
 
 namespace QuICC {
 

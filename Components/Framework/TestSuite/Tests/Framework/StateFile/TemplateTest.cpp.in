@@ -124,6 +124,7 @@ TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile", "[@Scheme@:@Mode@]" ){
       }
       else if(std::string("@Mode@").compare("ordering") == 0)
       {
+#ifdef QUICC_USE_VIEW_SCALARFIELD
          currentts::Test testOut;
          testOut.spRes = bestOut.first;
          testOut.configure(id);
@@ -150,6 +151,10 @@ TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile", "[@Scheme@:@Mode@]" ){
 
             currentts::checkVariables(testOut);
          }
+#else
+         throw std::logic_error("Ordering transpose requires QUICC_USE_VIEW_SCALARFIELD");
+#endif //QUICC_USE_VIEW_SCALARFIELD
+
       }
       else
       {
