@@ -66,12 +66,19 @@ template <typename T>
    auto id = eqRes.sim().ss().id();
    if(id != fieldRes.sim().ss().id())
    {
-      if(this->transOp<T>().count(id) == 0)
+      if constexpr(std::is_same_v<Framework::Selector::ScalarField<T>, Datatypes::ViewScalarField<T>>)
       {
-         this->transOp<T>().emplace(id, std::make_unique<details::TransposeFunctor<T>>());
-      }
+         if(this->transOp<T>().count(id) == 0)
+         {
+            this->transOp<T>().emplace(id, std::make_unique<details::TransposeFunctor<T>>());
+         }
 
-      return this->transOp<T>().at(id)->apply(eqRes, field);
+         return this->transOp<T>().at(id)->apply(eqRes, field);
+      }
+      else
+      {
+         throw std::logic_error("Internal transpose requires ViewScalarField. Enable QUICC_USE_VIEW_SCALARFIELD");
+      }
    }
    {
       return &field;

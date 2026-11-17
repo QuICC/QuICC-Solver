@@ -383,6 +383,7 @@ namespace StateFile {
 
    void transposeVariables(Test& testOut, Test& testIn)
    {
+#ifdef QUICC_USE_VIEW_SCALARFIELD
       // Transpose op
      #ifdef QUICC_MPI
        using namespace QuICC::Transpose::Mpi;
@@ -462,6 +463,9 @@ namespace StateFile {
      // Apply transpose
      transposeOp->apply(viewsOut, viewsIn);
 
+#else
+      throw std::logic_error("Ordering transpose requires QUICC_USE_VIEW_SCALARFIELD");
+#endif //QUICC_USE_VIEW_SCALARFIELD
    }
 
    void writeStateFile(Test& test)

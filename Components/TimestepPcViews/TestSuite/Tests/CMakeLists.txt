@@ -1,6 +1,6 @@
 message(VERBOSE "Enabling Timestep/PredictorCorrector tests:")
 
-set(TestExe TimestepPcTests)
+set(TestExe TimestepPcViewsTests)
 
 # Add target for all tests
 add_executable(${TestExe} TimestepPcTests.cpp)
