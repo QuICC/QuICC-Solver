@@ -32,6 +32,10 @@ namespace DenseSM {
       {
          this->type = TestType::SPARSE;
       }
+      else if(type == "densestencil")
+      {
+         this->type = TestType::DENSE_STENCIL;
+      }
       else
       {
          throw std::logic_error("Unsupported test type!");

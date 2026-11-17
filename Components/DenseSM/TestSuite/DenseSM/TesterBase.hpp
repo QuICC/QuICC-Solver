@@ -219,6 +219,9 @@ namespace DenseSM {
          case TestType::SPARSE:
             infoType = "sparse";
             break;
+         case TestType::DENSE_STENCIL:
+            infoType = "densestencil";
+            break;
       }
 
       outData = this->testOperator(param, type);
@@ -285,6 +288,9 @@ namespace DenseSM {
             break;
          case TestType::SPARSE:
             sub = "Sparse/";
+            break;
+         case TestType::DENSE_STENCIL:
+            sub = "Dense/Stencil/";
             break;
       }
 

@@ -77,6 +77,12 @@ namespace Timestep {
          this->mpImpl = PredictorCorrector::makeInterface(schemeId, time, cfl, maxError, scalEq, vectEq, pseudo);
       }
 
+      // Try Exponential schemes
+      if(!this->mpImpl)
+      {
+         this->mpImpl = Exponential::makeInterface(schemeId, time, cfl, maxError, scalEq, vectEq, pseudo);
+      }
+
       // No interface was created
       if(!this->mpImpl)
       {

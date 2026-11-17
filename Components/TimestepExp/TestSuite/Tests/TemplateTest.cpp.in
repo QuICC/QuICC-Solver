@@ -1,0 +1,445 @@
+/**
+ * @file @Scheme@TimestepTest.cpp
+ * @brief Tests for the @Scheme@ timestepper
+ */
+
+
+// System includes
+//
+#include <catch2/catch.hpp>
+#include <fstream>
+#include <iostream>
+#include <memory>
+
+// Project includes
+//
+#include "Environment/QuICCEnv.hpp"
+#include "TestSuite/Timestep/Exponential/TestArgs.hpp"
+#include "TestSuite/Timestep/Exponential/TestAFunctor.hpp"
+#include "TestSuite/Timestep/Exponential/TestAugmentedAFunctor.hpp"
+#include "Timestep/Exponential/@Scheme@.hpp"
+#include "Timestep/Exponential/Functors/StandardInnerProduct.hpp"
+#include "Timestep/Exponential/HighamExponential.hpp"
+#include "Timestep/Exponential/IomKrylov.hpp"
+#include "Timestep/Exponential/Kiops.hpp"
+#include "Timestep/Exponential/Functors/OrthoCgsFunctor.hpp"
+#include "Timestep/Exponential/Functors/OrthoCgs2Functor.hpp"
+#include "Timestep/Exponential/Functors/OrthoMgsFunctor.hpp"
+#include "Timestep/Exponential/Functors/OrthoMgs2Functor.hpp"
+#include "Types/Typedefs.hpp"
+
+namespace currentts = ::QuICC::TestSuite::Timestep::Exponential;
+typedef ::QuICC::Timestep::Exponential::@Scheme@ SchemeType;
+
+TEST_CASE("Exponential of small dense matrix (higham)", "[HighamExp]")
+{
+
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+
+   using namespace ::QuICC;
+   Timestep::Exponential::HighamExponential eFunc;
+
+   // Check Pade order 3
+   {
+      Matrix matA = 0.004 * Matrix::Ones(3, 3);
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(3, 3);
+      refA << 1.0040240962886926, 0.004024096288692585, 0.004024096288692585,
+         0.004024096288692585, 1.0040240962886926, 0.004024096288692585,
+         0.004024096288692585, 0.004024096288692585, 1.0040240962886926;
+      double err = (refA - expA).array().abs().maxCoeff() / refA(2, 2);
+      INFO("relative error: " << err);
+      CHECK(err < 3e-16);
+   }
+
+   // Check Pade order 5
+   {
+      Matrix matA = 0.08 * Matrix::Ones(3, 3);
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(3, 3);
+      refA << 1.0904163834404683, 0.09041638344046825, 0.09041638344046825,
+         0.09041638344046823, 1.0904163834404683, 0.09041638344046825,
+         0.09041638344046823, 0.09041638344046825, 1.0904163834404683;
+      double err = (refA - expA).array().abs().maxCoeff() / refA(2, 2);
+      INFO("relative error: " << err);
+      CHECK(err < 1e-16);
+   }
+
+   // Check Pade order 7
+   {
+      Matrix matA = 0.3 * Matrix::Ones(3, 3);
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(3, 3);
+      refA << 1.48653437038565, 0.4865343703856498, 0.4865343703856498,
+         0.4865343703856498, 1.48653437038565, 0.4865343703856497,
+         0.4865343703856498, 0.4865343703856497, 1.48653437038565;
+      double err = (refA - expA).array().abs().maxCoeff() / refA(2, 2);
+      INFO("relative error: " << err);
+      CHECK(err < 2e-16);
+   }
+
+   // Check Pade order 9
+   {
+      Matrix matA = 0.65 * Matrix::Ones(3, 3);
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(3, 3);
+      refA << 3.009562526863098, 2.0095625268630983, 2.009562526863098,
+         2.009562526863098, 3.009562526863098, 2.009562526863098,
+         2.009562526863098, 2.009562526863098, 3.0095625268630974;
+      double err = (refA - expA).array().abs().maxCoeff() / refA(2, 2);
+      INFO("relative error: " << err);
+      CHECK(err < 6e-16);
+   }
+
+   // Check Pade order 13
+   {
+      Matrix matA = 1.7 * Matrix::Ones(3, 3);
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(3, 3);
+      refA << 55.34063576663377, 54.34063576663377, 54.34063576663376,
+         54.34063576663376, 55.34063576663377, 54.34063576663376,
+         54.34063576663376, 54.34063576663377, 55.34063576663377;
+      double err = (refA - expA).array().abs().maxCoeff() / refA(2, 2);
+      INFO("relative error: " << err);
+      CHECK(err < 9e-15);
+   }
+
+   // Check Pade order 13 with scaling and squaring
+   {
+      Matrix matA = 3.0 * Matrix::Ones(3, 3);
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(3, 3);
+      refA << 2701.694642525128, 2700.694642525128, 2700.694642525128,
+         2700.694642525128, 2701.694642525128, 2700.694642525128,
+         2700.694642525128, 2700.694642525128, 2701.694642525128;
+      double err = (refA - expA).array().abs().maxCoeff() / refA(2, 2);
+      INFO("relative error: " << err);
+      CHECK(err < 7e-16);
+   }
+
+   // Check balancing
+   {
+      INFO("Balancing in scaling and squaring path");
+      int n = 4;
+      Matrix matA(n,n);
+      matA << -1.0, -1.0, 0, 0,
+              0, 0, 10., 10.,
+              0, 0, 10., 0,
+              0, 1000., 0, 0;
+      matA.array() *= std::pow(2.0,-6.0);
+
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(n,n);
+      refA << 0.9844964370054085, -0.022657307120039126, -0.0015573266883688037, -0.0014830185404339025,
+           0., 2.4901722845593506, 0.24370366477244826, 0.2280560897408253,
+           0., 0., 1.1691184461695043, 0.,
+           0., 22.805608974082524, 1.5647575031622944, 2.4901722845593506;
+      double err = (refA - expA).array().abs().maxCoeff()/refA.array().abs().maxCoeff();
+      INFO("relative error: " << err);
+      CHECK(err < 4e-16);
+   }
+
+   // Check balancing in Pade path
+   {
+      INFO("Balancing in Pade path");
+      int n = 11;
+      Matrix matA(n,n);
+      matA << 0,0,0,0,0,0,0,0,0,0,1,
+0.222024086564796,-0.00190653656781271,-0.00360487795575275,0,0,0,0,0,0,0,0,
+0,0.0113126146818278,-0.00773915158884234,0.00322537603153034,0,0,0,0,0,0,0,
+0,0,0.0206554934087938,-0.0632025212622608,0.0876090468805014,0,0,0,0,0,0,
+0,0,0,0.0925189840411389,-0.15437841013948,0.0497419742793425,0,0,0,0,0,
+0,0,0,0,0.0600569738019073,-0.086568041528751,0.0774266673896739,0,0,0,0,
+0,0,0,0,0,0.086730267365121,-0.133834608815938,0.0578963232357658,0,0,0,
+0,0,0,0,0,0,0.07211394214346,-0.0669037110964845,0.0561092720694076,0,0,
+0,0,0,0,0,0,0,0.0746315547984342,-0.0677509652653022,0.0529706959167526,0,
+0,0,0,0,0,0,0,0,0.0727062242689815,-0.116467219936696,0,
+0,0,0,0,0,0,0,0,0,0,0;
+
+      Matrix expA = eFunc.compute(matA);
+      Matrix refA(n,n);
+      refA <<
+1.,0.,0.,0.,0.,0.,0.,0.,0.,0.,1.,
+0.22181106778896037,0.998074967726141,-0.003587553996891692,-5.678334206416227e-6,-1.6054498106753462e-7,-1.9844661992007296e-9,-3.036548423142737e-11,-2.932975556145968e-13,-2.3524405152606147e-15,-1.549932289743385e-17,0.1109411509978527,
+0.0012518094596962567,0.011258249659276553,0.9923029186327603,0.0031174439698842733,0.00013124273289660435,2.1694077099216056e-6,4.1517548508999737e-8,4.824468305175169e-10,4.522467706494588e-12,3.407460659721117e-14,0.00041760486803646505,
+8.494521778686725e-6,0.00011411654070324795,0.019964290285147446,0.9424801182368859,0.07875145707826323,0.0019721371579298494,0.00005046542418346198,7.365065244351674e-7,8.309370060859798e-9,7.312436396601885e-11,2.1310622324902208e-6,
+1.912343722247952e-7,3.407267893531622e-6,0.0008875899662741711,0.08316498192907372,0.8618434186629306,0.04423635628118932,0.0017028353765955215,0.000033325858918506106,4.7132430849214597e-7,4.979593766251157e-9,3.85312437434263e-8,
+2.2812767932945497e-9,5.085031879926606e-8,0.000017714085005549796,0.0025145451712251694,0.05340965510037134,0.9214492326586118,0.06951454290589955,0.0020399293184595896,0.00003840443822784371,5.055769080781595e-7,3.8301045427880083e-10,
+3.2592961476695396e-11,8.715861160541084e-10,3.7974264008434254e-7,0.00007207694527122552,0.0023029961336640792,0.07786742081574997,0.8795919020551641,0.052509234345342014,0.0014877310949144335,0.000026074923456981217,4.692984534857993e-12,
+3.3562256616357183e-13,1.0485926005650312e-11,5.496362578372568e-9,1.3102292651291394e-6,0.00005613970795066958,0.002846187396308059,0.06540394408393367,0.9391569671594018,0.05256179355396159,0.0013682242934027439,4.225005533706806e-14,
+3.1296107347995542e-15,1.1186773647227127e-13,6.853134348481437e-11,1.966195296682096e-8,1.0560792059744093e-6,0.000071271786174266,0.002464793545340808,0.0699130149304731,0.9382241279234615,0.04837953373276861,3.49967697473752e-16,
+2.5150062010886878e-17,1.0116606068763233e-15,7.087295405574352e-13,2.374961461709831e-10,1.5314628992903925e-8,1.287832464754632e-6,0.00005929458899835598,0.002497934609310365,0.06640451232000866,0.8918025669078588,2.5309085998500605e-18,
+0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,1.;
+
+      double err = (refA - expA).array().abs().maxCoeff()/refA.array().abs().maxCoeff();
+      INFO("relative error: " << err);
+      CHECK(err < 6e-16);
+   }
+}
+
+TEST_CASE("Arnoldi iteration for Krylov subspace with CGS", "[ArnoldiKrylov]")
+{
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+
+   int n = 20;
+
+   using namespace ::QuICC;
+   typedef currentts::TestAFunctor AFunctor;
+   auto aFunc = std::make_shared<AFunctor>(n, 1);
+   typedef Timestep::Exponential::Functors::StandardInnerProduct InnerProduct;
+   auto iFunc = std::make_shared<InnerProduct>();
+
+   int m = 10;
+   Matrix matV = Matrix::Zero(n, m + 1);
+   matV.col(0).setOnes();
+   matV.col(0).normalize();
+
+   Matrix matH = Matrix::Zero(m+1, m+1);
+
+   SECTION("CGS")
+   {
+      typedef Timestep::Exponential::Functors::OrthoCgsFunctor<InnerProduct> OrthoType;
+      auto oFunc = std::make_shared<OrthoType>(iFunc, n+1);
+      Timestep::Exponential::IomKrylov<AFunctor,OrthoType> kFunc(aFunc, oFunc, 1e-10);
+
+      auto m_ = kFunc.compute(matV, matH, 0, m, n);
+
+      std::cerr << "Krylov matrix H: " << std::endl;
+      std::cerr << matH << std::endl;
+   }
+
+   SECTION("CGS2")
+   {
+      typedef Timestep::Exponential::Functors::OrthoCgs2Functor<InnerProduct> OrthoType;
+      auto oFunc = std::make_shared<OrthoType>(iFunc, n+1);
+      Timestep::Exponential::IomKrylov<AFunctor,OrthoType> kFunc(aFunc, oFunc, 1e-10);
+
+      auto m_ = kFunc.compute(matV, matH, 0, m, n);
+
+      std::cerr << "Krylov matrix H: " << std::endl;
+      std::cerr << matH << std::endl;
+   }
+
+   SECTION("MGS")
+   {
+      typedef Timestep::Exponential::Functors::OrthoMgsFunctor<InnerProduct> OrthoType;
+      auto oFunc = std::make_shared<OrthoType>(iFunc, n+1);
+      Timestep::Exponential::IomKrylov<AFunctor,OrthoType> kFunc(aFunc, oFunc, 1e-10);
+
+      auto m_ = kFunc.compute(matV, matH, 0, m, n);
+
+      std::cerr << "Krylov matrix H: " << std::endl;
+      std::cerr << matH << std::endl;
+   }
+
+   SECTION("MGS2")
+   {
+      typedef Timestep::Exponential::Functors::OrthoMgs2Functor<InnerProduct> OrthoType;
+      auto oFunc = std::make_shared<OrthoType>(iFunc, n+1);
+      Timestep::Exponential::IomKrylov<AFunctor,OrthoType> kFunc(aFunc, oFunc, 1e-10);
+
+      auto m_ = kFunc.compute(matV, matH, 0, m, n);
+
+      std::cerr << "Krylov matrix H: " << std::endl;
+      std::cerr << matH << std::endl;
+   }
+
+   // Orthogonalization error
+   double oErr = ((matV.transpose() * matV) - Matrix::Identity(m+1,m+1)).array().abs().maxCoeff();
+   INFO( "orthogonalization error: " << oErr );
+   CHECK( oErr < 3e-16 );
+}
+
+TEST_CASE("Exponential of matrix using KIOPS algorithm p = 0", "[Kiops_p0]")
+{
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+
+   using namespace ::QuICC;
+
+   int n = 20;
+
+   std::vector<double> ts = {1.0};
+   Matrix matW = Matrix::Zero(n, ts.size());
+   Matrix matU = Matrix::Ones(n, 1);
+
+   typedef currentts::TestAugmentedAFunctor AFunctor;
+   auto aFunc = std::make_shared<AFunctor>(n, 1);
+
+   typedef Timestep::Exponential::Functors::StandardInnerProduct InnerProduct;
+   typedef Timestep::Exponential::Functors::OrthoCgs2Functor<InnerProduct> OrthoType;
+   typedef Timestep::Exponential::IomKrylov<AFunctor,OrthoType> KrylovType;
+   auto iFunc = std::make_shared<InnerProduct>();
+   auto oFunc = std::make_shared<OrthoType>(iFunc, n+1);
+   auto kFunc = std::make_unique<KrylovType>(aFunc, oFunc, 1e-10);
+   typedef Timestep::Exponential::HighamExponential ExpType;
+   auto eFunc = std::make_unique<ExpType>();
+
+   typedef Timestep::Exponential::Kiops<KrylovType, ExpType> PhiFunctor;
+   PhiFunctor kiops(std::move(kFunc), std::move(eFunc));
+
+   int m = 10;
+   kiops.setup(ts, matU);
+   int m_ = kiops.compute(matW, ts, matU, m, PhiFunctor::Task::II);
+
+   std::cerr << "Output m = " << m_ << std::endl;
+   std::cerr << matW.transpose() << std::endl;
+}
+
+TEST_CASE("Exponential of matrix using KIOPS algorithm p = 1", "[Kiops_p1]")
+{
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+
+   using namespace ::QuICC;
+
+   int n = 20;
+
+   std::vector<double> ts = {1.0};
+   Matrix matW = Matrix::Zero(n, ts.size());
+   Matrix matU = Matrix::Ones(n, 2);
+   for(int i = 0; i < n; i++)
+   {
+      matU(i,1) = i + 1;
+   }
+
+   typedef currentts::TestAugmentedAFunctor AFunctor;
+   auto aFunc = std::make_shared<AFunctor>(n, 1);
+
+   typedef Timestep::Exponential::Functors::StandardInnerProduct InnerProduct;
+   typedef Timestep::Exponential::Functors::OrthoCgs2Functor<InnerProduct> OrthoType;
+   typedef Timestep::Exponential::IomKrylov<AFunctor,OrthoType> KrylovType;
+   auto iFunc = std::make_shared<InnerProduct>();
+   auto oFunc = std::make_shared<OrthoType>(iFunc, n+1);
+   auto kFunc = std::make_unique<KrylovType>(aFunc, oFunc, 1e-10);
+   typedef Timestep::Exponential::HighamExponential ExpType;
+   auto eFunc = std::make_unique<ExpType>();
+
+   typedef Timestep::Exponential::Kiops<KrylovType, ExpType> PhiFunctor;
+   PhiFunctor kiops(std::move(kFunc), std::move(eFunc));
+
+   int m = 10;
+   kiops.setup(ts, matU);
+   int m_ = kiops.compute(matW, ts, matU, m, PhiFunctor::Task::II);
+
+   std::cerr << "Output m = " << m_ << std::endl;
+   std::cerr << matW.transpose() << std::endl;
+}
+
+TEST_CASE("Exponential of matrix using KIOPS algorithm p = 1, b_0 = 0", "[Kiops_p1_zero]")
+{
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+
+   using namespace ::QuICC;
+
+   int n = 20;
+
+   std::vector<double> ts = {1.0};
+   Matrix matW = Matrix::Zero(n, ts.size());
+   Matrix matU = Matrix::Ones(n, 2);
+   matU.col(0).setZero();
+
+   typedef currentts::TestAugmentedAFunctor AFunctor;
+   auto aFunc = std::make_shared<AFunctor>(n, 1);
+
+   typedef Timestep::Exponential::Functors::StandardInnerProduct InnerProduct;
+   typedef Timestep::Exponential::Functors::OrthoCgs2Functor<InnerProduct> OrthoType;
+   typedef Timestep::Exponential::IomKrylov<AFunctor,OrthoType> KrylovType;
+   auto iFunc = std::make_shared<InnerProduct>();
+   auto oFunc = std::make_shared<OrthoType>(iFunc, n+1);
+   auto kFunc = std::make_unique<KrylovType>(aFunc, oFunc, 1e-10);
+   typedef Timestep::Exponential::HighamExponential ExpType;
+   auto eFunc = std::make_unique<ExpType>();
+
+   typedef Timestep::Exponential::Kiops<KrylovType, ExpType> PhiFunctor;
+   PhiFunctor kiops(std::move(kFunc), std::move(eFunc));
+
+   int m = 10;
+   kiops.setup(ts, matU);
+   int m_ = kiops.compute(matW, ts, matU, m, PhiFunctor::Task::II);
+
+   std::cerr << "Output m = " << m_ << std::endl;
+   std::cerr << matW.transpose() << std::endl;
+}
+
+#if 0
+TEST_CASE("Incomplete orthogonalization for Krylov subspace of length 2",
+   "[IomKrylov2]")
+{
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+
+   int n = 30;
+
+   using namespace ::QuICC;
+   auto aFunc = std::make_unique<currentts::TestAFunctor>(n, 0);
+   Timestep::Exponential::IomKrylov<currentts::TestAFunctor> kFunc(std::move(aFunc));
+
+   int m = 5;
+   Matrix matV = Matrix::Zero(n, m + 1);
+   matV.col(0).setRandom();
+   matV.col(0).normalize();
+
+   Matrix matH = Matrix::Zero(m+1, m+1);
+
+   kFunc.compute(matV, matH, 0, m);
+}
+
+TEST_CASE("Exponential of matrix using phipm algorithm", "[Phipm]")
+{
+
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+}
+
+TEST_CASE("Exponential of matrix using KIOPS algorithm, p = 0", "[Kiops_p_zero]")
+{
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+
+   using namespace ::QuICC;
+
+   int n = 20;
+
+   Matrix matA = std::pow(2, 0) * Matrix::Ones(n, n);
+
+   std::vector<double> ts = {0.1, 0.2, 0.4, 0.7};
+   Matrix matW = Matrix::Zero(n, ts.size());
+   Matrix matU = Matrix::Ones(n, 1);
+
+   typedef currentts::TestAugmentedAFunctor AFunctorType;
+   auto aFunc = std::make_unique<AFunctorType>(matA);
+   typedef Timestep::Exponential::IomKrylov<AFunctorType> KrylovType;
+   auto kFunc = std::make_unique<KrylovType>(std::move(aFunc));
+   typedef Timestep::Exponential::HighamExponential ExpType;
+   auto eFunc = std::make_unique<ExpType>();
+
+   typedef Timestep::Exponential::Kiops<KrylovType, ExpType> LinCombExpType;
+   LinCombExpType kiops(std::move(kFunc), std::move(eFunc));
+   int m = 10;
+   kiops.setup(ts, matU);
+   int m_ = kiops.compute(matW, ts, matU, m, LinCombExpType::Task::II);
+
+   std::cerr << "Output m = " << m_ << std::endl;
+   std::cerr << matW.transpose() << std::endl;
+}
+#endif

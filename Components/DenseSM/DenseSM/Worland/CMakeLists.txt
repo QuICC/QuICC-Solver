@@ -27,6 +27,10 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ProjCurlTorCrossPol.cpp
   ProjCurlTorCrossTor.cpp
   Tools.cpp
+  ITauOperator.cpp
+  Id.cpp
+  SLapl.cpp
+  SLapl2.cpp
 )
 
 set(PHS
@@ -38,3 +42,5 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
   PROPERTIES
     PUBLIC_HEADER "${PHS}"
 )
+
+add_subdirectory(Stencil)
