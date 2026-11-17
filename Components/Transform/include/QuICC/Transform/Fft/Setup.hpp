@@ -6,15 +6,9 @@
 #ifndef QUICC_TRANSFORM_FFT_SETUP_HPP
 #define QUICC_TRANSFORM_FFT_SETUP_HPP
 
-// Configuration includes
-//
-#include <memory>
-
 // System includes
 //
-
-// External includes
-//
+#include <memory>
 
 // Project includes
 //
@@ -53,7 +47,7 @@ namespace Fft {
          /**
           * @brief Empty destructor
           */
-         virtual ~Setup();
+         virtual ~Setup() = default;
 
          /**
           * @brief Lock setup to forbid adding new indexes

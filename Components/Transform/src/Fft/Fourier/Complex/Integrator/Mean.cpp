@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/MeanBase.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/MeanBase.hpp"
 
 namespace QuICC {
 
@@ -34,7 +28,7 @@ namespace Integrator {
       this->mBackend.initMeanBlocks(this->mspSetup->idBlocks());
    }
 
-   void Mean<base_t>::applyPostOperator(MatrixZ& rOut) const
+   void Mean<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut) const
    {
       this->mBackend.outputMean(rOut);
    }

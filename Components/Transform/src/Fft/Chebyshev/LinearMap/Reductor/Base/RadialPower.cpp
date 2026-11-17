@@ -24,17 +24,17 @@ namespace LinearMap {
 
 namespace Reductor {
 
-void RadialPower<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+void RadialPower<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
 {
    this->mBackend.input(tmp, in);
 }
 
-void RadialPower<base_t>::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
+void RadialPower<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const
 {
    this->mBackend.outputGrid(rOut, tmp);
 }
 
-void RadialPower<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void RadialPower<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, useReal);

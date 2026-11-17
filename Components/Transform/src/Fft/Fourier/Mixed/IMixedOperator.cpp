@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Mixed/IMixedOperator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Mixed/IMixedOperator.hpp"
 
 namespace QuICC {
 
@@ -27,14 +21,6 @@ namespace Fft {
 namespace Fourier {
 
 namespace Mixed {
-
-   IMixedOperator::IMixedOperator()
-   {
-   }
-
-   IMixedOperator::~IMixedOperator()
-   {
-   }
 
    void IMixedOperator::init(SharedTransformSetup spSetup) const
    {

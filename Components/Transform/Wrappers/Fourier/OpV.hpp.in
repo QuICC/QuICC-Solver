@@ -38,7 +38,7 @@ public:
      */
     ~@Op@() = default;
 
-    void transform(@OutMatrixType@& rOut, const @InMatrixType@& in) const final;
+    void transform(Eigen::Ref<@OutMatrixType@> rOut, const Eigen::Ref<const @InMatrixType@>& in) const final;
 
     /**
      * @brief Initialise View Op

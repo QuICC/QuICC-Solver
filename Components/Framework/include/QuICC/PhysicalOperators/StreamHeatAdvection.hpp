@@ -6,13 +6,7 @@
 #ifndef QUICC_PHYSICAL_STREAMHEATADVECTION_HPP
 #define QUICC_PHYSICAL_STREAMHEATADVECTION_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -21,6 +15,9 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/VectorFields/VectorField.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
+#include "ViewOps/Pointwise/Functors.hpp"
+#include "ViewOps/Pointwise/Pointwise.hpp"
+#include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
 
 namespace QuICC {
 
@@ -37,21 +34,24 @@ namespace Physical {
           *
           *    \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T} = -\partial_y\psi\partial_x \theta -\partial_y\psi\partial_x x + \partial_x\psi\partial_y \theta\f$
           */
-         static void set(Framework::Selector::PhysicalScalarField &rS, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
+         template <typename TFIELD>
+            static void set(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
 
          /**
           * @brief Add streamfunction advection product to S
           *
           *    \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T} = -\partial_y\psi\partial_x \theta -\partial_y\psi\partial_x x + \partial_x\psi\partial_y \theta\f$
           */
-         static void add(Framework::Selector::PhysicalScalarField &rS, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
+         template <typename TFIELD>
+            static void add(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
 
          /**
           * @brief Substract streamfunction advection product from S
           *
           *    \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T} = -\partial_y\psi\partial_x \theta -\partial_y\psi\partial_x x + \partial_x\psi\partial_y \theta\f$
           */
-         static void sub(Framework::Selector::PhysicalScalarField &rS, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
+         template <typename TFIELD>
+            static void sub(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
 
       protected:
 
@@ -65,53 +65,144 @@ namespace Physical {
           * @brief Empty destructor
           */
          ~StreamHeatAdvection() = default;
+
+      private:
+         /// @tparam T scalar
+         template <class T = double> struct StreamHeatAdvFunctor
+         {
+            /// @brief non dimensional scaling for transport term
+            T _scaling;
+
+            /// @brief ctor
+            /// @param scaling
+            StreamHeatAdvFunctor(T scaling) : _scaling(scaling){};
+
+            /// @brief deleted default constructor
+            StreamHeatAdvFunctor() = delete;
+
+            /// @brief dtor
+            ~StreamHeatAdvFunctor() = default;
+
+            /// @brief Dot product
+            /// @param ui
+            /// @param uj
+            /// @param vi
+            /// @param vj
+            /// @return
+            QUICC_CUDA_HOSTDEV T operator()(T ui, T uj, T vi, T vj)
+            {
+               return _scaling * (ui * vj - uj * vi - uj);
+            }
+         };
+
+         template <typename TFIELD>
+         static void collectViews(std::vector<typename TFIELD::ScalarFieldType::ViewStorageType>& vs, const TFIELD& f);
    };
 
-   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp> void StreamHeatAdvection<TXComp,TYComp>::set(Framework::Selector::PhysicalScalarField &rS, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, const MHDFloat c)
+   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp>
+      template <typename TFIELD>
+      void StreamHeatAdvection<TXComp,TYComp>::collectViews(std::vector<typename TFIELD::ScalarFieldType::ViewStorageType>& vs, const TFIELD &f)
+      {
+         vs.push_back(f.comp(TXComp).dataView());
+         vs.push_back(f.comp(TYComp).dataView());
+      }
+
+   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp>
+      template <typename TFIELD>
+      void StreamHeatAdvection<TXComp,TYComp>::set(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &w, const MHDFloat c)
    {
-      if(c != 1.0)
+      using scalar_t = typename TFIELD::PointType;
+      if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
-         rS.setData(c*(dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
-
-         rS.subData(c*(dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array() + dPsi.comp(TYComp).data().array()).matrix());
-      } else
+         using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+         using fct_t = StreamHeatAdvFunctor<scalar_t>;
+         fct_t f(c);
+         Pointwise::Cpu::Op<fct_t, view_t, view_t, view_t, view_t, view_t> op(f);
+         std::vector<view_t> vs;
+         collectViews(vs, dPsi);
+         collectViews(vs, w);
+         op.apply(rS.rDataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3));
+      }
+      else
       {
-         rS.setData((dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
+         if(c != 1.0)
+         {
+            rS.setData(c*(dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
 
-         rS.subData((dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array() + dPsi.comp(TYComp).data().array()).matrix());
+            rS.subData(c*(dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array() + dPsi.comp(TYComp).data().array()).matrix());
+         } else
+         {
+            rS.setData((dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
+
+            rS.subData((dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array() + dPsi.comp(TYComp).data().array()).matrix());
+         }
       }
    }
 
-   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp> void StreamHeatAdvection<TXComp,TYComp>::add(Framework::Selector::PhysicalScalarField &rS, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, const MHDFloat c)
+   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp>
+      template <typename TFIELD>
+      void StreamHeatAdvection<TXComp,TYComp>::add(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &w, const MHDFloat c)
    {
-      if(c != 1.0)
+      using scalar_t = typename TFIELD::PointType;
+      if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
-         rS.addData(c*(dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
-
-         rS.subData(c*(dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array() + dPsi.comp(TYComp).data().array()).matrix());
-      } else
+         using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+         using fct_t = details::AddTmplFunctor<scalar_t, StreamHeatAdvFunctor>;
+         fct_t f(c);
+         Pointwise::Cpu::Op<fct_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+         std::vector<view_t> vs;
+         collectViews(vs, dPsi);
+         collectViews(vs, w);
+         op.apply(rS.rDataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), rS.dataView());
+      }
+      else
       {
-         rS.addData((dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
+         if(c != 1.0)
+         {
+            rS.addData(c*(dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
 
-         rS.subData((dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array() + dPsi.comp(TYComp).data().array()).matrix());
+            rS.subData(c*(dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array() + dPsi.comp(TYComp).data().array()).matrix());
+         } else
+         {
+            rS.addData((dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
+
+            rS.subData((dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array() + dPsi.comp(TYComp).data().array()).matrix());
+         }
       }
    }
 
-   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp> void StreamHeatAdvection<TXComp,TYComp>::sub(Framework::Selector::PhysicalScalarField &rS, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, const MHDFloat c)
+   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp>
+      template <typename TFIELD>
+      void StreamHeatAdvection<TXComp,TYComp>::sub(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &w, const MHDFloat c)
    {
-      if(c != 1.0)
+      using scalar_t = typename TFIELD::PointType;
+      if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
-         rS.subData(c*(dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
-
-         rS.addData(c*(dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array() + dPsi.comp(TYComp).data().array()).matrix());
-      } else
+         using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+         using fct_t = details::SubTmplFunctor<scalar_t, StreamHeatAdvFunctor>;
+         fct_t f(c);
+         Pointwise::Cpu::Op<fct_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+         std::vector<view_t> vs;
+         collectViews(vs, dPsi);
+         collectViews(vs, w);
+         op.apply(rS.rDataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), rS.dataView());
+      }
+      else
       {
-         rS.subData((dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
+         if(c != 1.0)
+         {
+            rS.subData(c*(dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
 
-         rS.addData((dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array() + dPsi.comp(TYComp).data().array()).matrix());
+            rS.addData(c*(dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array() + dPsi.comp(TYComp).data().array()).matrix());
+         } else
+         {
+            rS.subData((dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
+
+            rS.addData((dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array() + dPsi.comp(TYComp).data().array()).matrix());
+         }
       }
    }
-}
-}
+} // namespace Physical
+} // namespace QuICC
 
 #endif // QUICC_PHYSICAL_STREAMHEATADVECTION_HPP

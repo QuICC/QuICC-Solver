@@ -8,11 +8,6 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I1.hpp"
@@ -73,7 +68,7 @@ namespace Projector {
       this->mBackend.addSolver(1);
    }
 
-   void DivY2D1Y1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+   void DivY2D1Y1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
    {
       this->mBackend.input(tmp, in);
       // Apply spectral operator (Y1)
@@ -83,14 +78,14 @@ namespace Projector {
       this->mBackend.getSolution(tmp, 1, 1);
    }
 
-   void DivY2D1Y1<base_t>::applyPostOperator(Matrix& rOut) const
+   void DivY2D1Y1<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut) const
    {
        // Apply 1/y^2 scaling in physical space
       this->mBackend.outputScale(rOut);
    }
 
    // Complex version of pre-operator
-   void DivY2D1Y1<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
+   void DivY2D1Y1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in, const bool useReal) const
    {
       this->mBackend.input(tmp, in, useReal);
       auto specOp = this->mBackend.solver().getSpectralOperator();
@@ -99,7 +94,7 @@ namespace Projector {
    }
 
    // Complex version of post-operator
-   void DivY2D1Y1<base_t>::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
+   void DivY2D1Y1<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp, const bool useReal) const
    {
       this->mBackend.outputScale(rOut, tmp, useReal);
    }

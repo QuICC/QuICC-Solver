@@ -6,15 +6,9 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/ALegendre/Integrator/IALegendreIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/ALegendre/Integrator/IALegendreIntegrator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -45,7 +39,7 @@ namespace Integrator {
       }
    }
 
-   void IALegendreIntegrator::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+   void IALegendreIntegrator::applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreIntegrator::applyOperators");
 

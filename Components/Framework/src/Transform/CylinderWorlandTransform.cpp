@@ -49,68 +49,14 @@ namespace Transform {
       }
    }
 
-   void CylinderWorlandTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void CylinderWorlandTransform::forward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
-   void CylinderWorlandTransform::backward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void CylinderWorlandTransform::backward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
-   }
-
-   //
-   // Disabled transforms
-   //
-
-   void CylinderWorlandTransform::forward(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CylinderWorlandTransform::forward(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CylinderWorlandTransform::forward(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CylinderWorlandTransform::backward(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CylinderWorlandTransform::backward(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CylinderWorlandTransform::backward(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CylinderWorlandTransform::reduce(MatrixZ&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CylinderWorlandTransform::reduce(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CylinderWorlandTransform::reduce(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void CylinderWorlandTransform::reduce(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
    }
 
    MHDFloat CylinderWorlandTransform::requiredStorage() const

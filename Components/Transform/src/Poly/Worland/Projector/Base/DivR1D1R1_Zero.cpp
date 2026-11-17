@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland 1/R D R projector and zero for l = 0
  */
 
-// External includes
+// System includes
 //
 #include <cassert>
 

@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/ChebyshevProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/Fftw/ChebyshevProjector.hpp"
 
 namespace QuICC {
 
@@ -27,14 +21,6 @@ namespace Fft {
 namespace Backend {
 
 namespace Fftw {
-
-   ChebyshevProjector::ChebyshevProjector()
-   {
-   }
-
-   ChebyshevProjector::~ChebyshevProjector()
-   {
-   }
 
    void ChebyshevProjector::init(const SetupType& setup) const
    {
@@ -73,7 +59,7 @@ namespace Fftw {
       this->mScaler = scaler;
    }
 
-   void ChebyshevProjector::output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
+   void ChebyshevProjector::output(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& tmp, const bool useReal) const
    {
       if(useReal)
       {
@@ -84,12 +70,12 @@ namespace Fftw {
       }
    }
 
-   void ChebyshevProjector::outputScale(Matrix& rOut) const
+   void ChebyshevProjector::outputScale(Eigen::Ref<Matrix> rOut) const
    {
       rOut = this->mScaler.asDiagonal()*rOut;
    }
 
-   void ChebyshevProjector::outputScale(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
+   void ChebyshevProjector::outputScale(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp, const bool useReal) const
    {
       if(useReal)
       {
@@ -100,7 +86,7 @@ namespace Fftw {
       }
    }
 
-   void ChebyshevProjector::applyPadding(Matrix& rData, const int extraRows) const
+   void ChebyshevProjector::applyPadding(Eigen::Ref<Matrix> rData, const int extraRows) const
    {
       if(extraRows >= 0)
       {

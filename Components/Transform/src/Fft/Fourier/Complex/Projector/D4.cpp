@@ -23,7 +23,7 @@ namespace Complex {
 
 namespace Projector {
 
-   void D4<base_t>::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
+   void D4<base_t>::applyPreOperator(MatrixZ& tmp, const Eigen::Ref<const MatrixZ>& in) const
    {
       this->mBackend.inputDiff(tmp, in, 4, this->mspSetup->boxScale());
    }

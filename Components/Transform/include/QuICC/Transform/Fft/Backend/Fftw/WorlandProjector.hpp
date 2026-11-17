@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_WORLANDPROJECTOR_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_FFTW_WORLANDPROJECTOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -42,12 +33,12 @@ namespace Fftw {
          /**
           * @brief Constructor
           */
-         WorlandProjector();
+         WorlandProjector() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~WorlandProjector();
+         virtual ~WorlandProjector() = default;
 
          /**
           * @brief Initialise the FFTW transforms
@@ -62,12 +53,12 @@ namespace Fftw {
          /**
           * @brief Set input
           */
-         void input(const Matrix& in, const bool isEven, const bool needPadding = false) const;
+         void input(const Eigen::Ref<const Matrix>& in, const bool isEven, const bool needPadding = false) const;
 
          /**
           * @brief Set input
           */
-         void input(const MatrixZ& in, const bool isEven, const bool useReal, const bool needPadding = false) const;
+         void input(const Eigen::Ref<const MatrixZ>& in, const bool isEven, const bool useReal, const bool needPadding = false) const;
 
          /**
           * @brief Set input and output to internal temporary storage
@@ -78,12 +69,12 @@ namespace Fftw {
          /**
           * @brief Set output
           */
-         void output(Matrix& rOut, const bool isEven) const;
+         void output(Eigen::Ref<Matrix> rOut, const bool isEven) const;
 
          /**
           * @brief Set output
           */
-         void output(MatrixZ& rOut, const bool isEven, const bool useReal) const;
+         void output(Eigen::Ref<MatrixZ> rOut, const bool isEven, const bool useReal) const;
 
          /**
           * @brief Apply FFT

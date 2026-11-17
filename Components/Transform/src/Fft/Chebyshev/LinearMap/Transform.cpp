@@ -7,15 +7,9 @@
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Transform.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Transform.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
@@ -130,7 +124,7 @@ namespace LinearMap {
       return Transform::generateGrid(this->mspSetup->fwdSize(), this->mLower, this->mUpper);
    }
 
-   void Transform::transform(MatrixZ& rOut, const MatrixZ& in, const IChebyshevOperator& op)
+   void Transform::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const IChebyshevOperator& op)
    {
       if(!op.isInitialized())
       {
@@ -140,7 +134,7 @@ namespace LinearMap {
       op.transform(rOut, in);
    }
 
-   void Transform::transform(Matrix& rOut, const MatrixZ& in, const IChebyshevOperator& op)
+   void Transform::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const IChebyshevOperator& op)
    {
       if(!op.isInitialized())
       {
@@ -151,7 +145,7 @@ namespace LinearMap {
    }
 
    // overload for the anelastic case
-   void Transform::transform(Matrix& rOut, const MatrixZ& in, const IChebyshevOperator& op, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+   void Transform::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const IChebyshevOperator& op, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
    {
       if(!op.isInitialized())
       {
@@ -161,7 +155,7 @@ namespace LinearMap {
       op.transform(rOut, in, pF);
    }
 
-   void Transform::transform(Matrix& rOut, const Matrix& in, const IChebyshevOperator& op)
+   void Transform::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const IChebyshevOperator& op)
    {
       if(!op.isInitialized())
       {
@@ -172,7 +166,7 @@ namespace LinearMap {
    }
 
    // overload for the anelastic case
-   void Transform::transform(Matrix& rOut, const Matrix& in, const IChebyshevOperator& op, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+   void Transform::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const IChebyshevOperator& op, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
    {
       if(!op.isInitialized())
       {
@@ -182,7 +176,7 @@ namespace LinearMap {
       op.transform(rOut, in, pF);
    }
 
-   void Transform::transform(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void Transform::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       auto it = this->mOps.find(id);
 
@@ -195,7 +189,7 @@ namespace LinearMap {
       }
    }
 
-   void Transform::transform(Matrix& rOut, const MatrixZ& in, const std::size_t id)
+   void Transform::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       auto it = this->mOps.find(id);
 
@@ -210,7 +204,7 @@ namespace LinearMap {
 
    // Overload for the anelastic case
 
-   void Transform::transform(Matrix& rOut, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+   void Transform::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
    {
       auto it = this->mOps.find(id);
 
@@ -223,7 +217,7 @@ namespace LinearMap {
       }
    }
 
-   void Transform::transform(Matrix& rOut, const Matrix& in, const std::size_t id)
+   void Transform::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id)
    {
       auto it = this->mOps.find(id);
 
@@ -238,7 +232,7 @@ namespace LinearMap {
 
    // Overload for the anelastic case
 
-   void Transform::transform(Matrix& rOut, const Matrix& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+   void Transform::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
    {
       auto it = this->mOps.find(id);
 

@@ -8,7 +8,6 @@
 #include <cassert>
 #include <stdexcept>
 
-
 // Project includes
 //
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
@@ -32,13 +31,13 @@ namespace Reductor {
       this->mBackend.init(*this->mspSetup);
    }
 
-   void ILinearMapSpectrum::transform(Matrix& rOut, const MatrixZ& in) const
+   void ILinearMapSpectrum::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       rOut = in.array().abs2();
    }
 
    // anelastic version:
-   void ILinearMapSpectrum::transform(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+   void ILinearMapSpectrum::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
    {      
       // Energy version
       //assert(this->isInitialized());
@@ -84,22 +83,22 @@ namespace Reductor {
    }
 
 
-   void ILinearMapSpectrum::transform(Matrix& rOut, const Matrix& in) const
+   void ILinearMapSpectrum::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const
    {
       rOut = in.array().abs2();
    }
 
-   void ILinearMapSpectrum::transform(Matrix& rOut, const Matrix& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+   void ILinearMapSpectrum::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
    {
       throw std::logic_error("Anelastic spectrum not yet implemented");
    }
    
-   void ILinearMapSpectrum::transform(MatrixZ&, const MatrixZ&) const
+   void ILinearMapSpectrum::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const MatrixZ>&) const
    {
       throw std::logic_error("Data is not compatible with Chebyshev FFT energy reductor");
    }
 
-   void ILinearMapSpectrum::transform(MatrixZ&, const Matrix&) const
+   void ILinearMapSpectrum::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const Matrix>&) const
    {
       throw std::logic_error("Data is not compatible with Chebyshev FFT energy reductor");
    }

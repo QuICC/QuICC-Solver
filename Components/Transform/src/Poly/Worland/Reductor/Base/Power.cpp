@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland power spectrum operator
  */
 
-// External includes
+// System includes
 //
 #include <cassert>
 

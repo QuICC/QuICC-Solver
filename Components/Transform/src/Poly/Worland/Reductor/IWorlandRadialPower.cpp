@@ -44,7 +44,7 @@ namespace Reductor {
       }
    }
 
-   void IWorlandRadialPower::applyOperators(Matrix& rOut, const MatrixZ& in) const
+   void IWorlandRadialPower::applyOperators(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<3> fix(this->mProfileTag);
 
@@ -67,7 +67,7 @@ namespace Reductor {
       }
    }
 
-   void IWorlandRadialPower::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+   void IWorlandRadialPower::applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       throw std::logic_error("Unused interface");
    }

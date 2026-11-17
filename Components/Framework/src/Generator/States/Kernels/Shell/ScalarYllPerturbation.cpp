@@ -36,7 +36,7 @@ namespace Shell {
    void ScalarYllPerturbation::compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id) const
    {
       // Initialize to zero
-      rNLComp.rData().setZero();
+      rNLComp.setZeros();
 
       int nR = this->spRes()->sim().dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
       int nTh = this->spRes()->sim().dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
@@ -65,7 +65,7 @@ namespace Shell {
 
       auto& tRes = *this->spRes()->cpu()->dim(Dimensions::Transform::TRA3D);
 
-      rNLComp.rData().setConstant(0);
+      rNLComp.setZeros();
       nR = tRes.dim<Dimensions::Data::DAT3D>();
       for(int iR = 0; iR < nR; ++iR)
       {

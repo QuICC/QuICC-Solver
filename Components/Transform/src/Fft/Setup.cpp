@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Setup.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Setup.hpp"
 
 namespace QuICC {
 
@@ -31,10 +25,6 @@ namespace Fft {
 
    Setup::Setup(const int size, const int blockSize, const int specSize, const GridPurpose::Id purpose)
       : TransformSetup(size, blockSize, specSize, purpose), mBwdSize(0), mBoxScale(-4242)
-   {
-   }
-
-   Setup::~Setup()
    {
    }
 

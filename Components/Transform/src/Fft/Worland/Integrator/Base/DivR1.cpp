@@ -40,25 +40,25 @@ namespace Integrator {
       this->mBackend.raiseR2Beta(-0.5, isEven);
    }
 
-   void DivR1<base_t>::applyPreOperator(const Matrix& in, const bool isEven) const
+   void DivR1<base_t>::applyPreOperator(const Eigen::Ref<const Matrix>& in, const bool isEven) const
    {
       this->mBackend.input(in, isEven);
       this->mBackend.io(isEven);
    }
 
-   void DivR1<base_t>::applyPostOperator(Matrix& rOut, const bool isEven) const
+   void DivR1<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut, const bool isEven) const
    {
       this->computeWorlandExpansion(isEven);
       this->mBackend.output(rOut, isEven);
    }
 
-   void DivR1<base_t>::applyPreOperator(const MatrixZ& in, const bool isEven, const bool useReal) const
+   void DivR1<base_t>::applyPreOperator(const Eigen::Ref<const MatrixZ>& in, const bool isEven, const bool useReal) const
    {
       this->mBackend.input(in, isEven, useReal);
       this->mBackend.io(isEven);
    }
 
-   void DivR1<base_t>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const
+   void DivR1<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const bool isEven, const bool useReal) const
    {
       this->computeWorlandExpansion(isEven);
       this->mBackend.output(rOut, isEven, useReal);

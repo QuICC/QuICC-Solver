@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/ChebyshevIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/ChebyshevIntegrator.hpp"
 #if defined QUICC_FFT_CHEBYSHEV_FFTW
    #include "QuICC/Transform/Fft/Backend/Fftw/ChebyshevIntegrator.hpp"
    #define BACKENDIMPL Fftw
@@ -43,10 +37,6 @@ namespace Backend {
       this->mpImpl = std::make_shared<BackendImpl>();
    }
 
-   ChebyshevIntegrator::~ChebyshevIntegrator()
-   {
-   }
-
    void ChebyshevIntegrator::init(const SetupType& setup) const
    {
       this->mpImpl->init(setup);
@@ -57,7 +47,7 @@ namespace Backend {
       this->mpImpl->input(tmp, in, useReal);
    }
 
-   void ChebyshevIntegrator::applyFft(Matrix& mods, const Matrix& phys) const
+   void ChebyshevIntegrator::applyFft(Eigen::Ref<Matrix> mods, const Eigen::Ref<const Matrix>& phys) const
    {
       this->mpImpl->applyFft(mods, phys);
    }
@@ -72,22 +62,22 @@ namespace Backend {
       this->mpImpl->setMeanOperator(mat);
    }
 
-   void ChebyshevIntegrator::output(Matrix& rOut) const
+   void ChebyshevIntegrator::output(Eigen::Ref<Matrix> rOut) const
    {
       this->mpImpl->output(rOut);
    }
 
-   void ChebyshevIntegrator::outputSpectral(Matrix& rOut) const
+   void ChebyshevIntegrator::outputSpectral(Eigen::Ref<Matrix> rOut) const
    {
       this->mpImpl->outputSpectral(rOut);
    }
 
-   void ChebyshevIntegrator::output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
+   void ChebyshevIntegrator::output(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp, const bool useReal) const
    {
       this->mpImpl->output(rOut, tmp, useReal);
    }
 
-   void ChebyshevIntegrator::outputSpectral(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
+   void ChebyshevIntegrator::outputSpectral(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp, const bool useReal) const
    {
       this->mpImpl->outputSpectral(rOut, tmp, useReal);
    }

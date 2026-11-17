@@ -121,7 +121,7 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Ar
     @SetDataViews@
 }
 
-void @Op@<@Tag@>::applyOperators(QuICC::MatrixZ& rOut, const QuICC::MatrixZ& in) const
+void @Op@<@Tag@>::applyOperators(Eigen::Ref<QuICC::MatrixZ> rOut, const Eigen::Ref<const QuICC::MatrixZ>& in) const
 {
     Profiler::RegionFixture<2> fix("@Op@<@Tag@>::applyOperators");
 

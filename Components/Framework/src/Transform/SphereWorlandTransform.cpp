@@ -50,70 +50,21 @@ namespace Transform {
       }
    }
 
-   void SphereWorlandTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void SphereWorlandTransform::forward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       Profiler::RegionFixture<3> fix("SphereWorlandTransform::forward");
       this->mImpl.transform(rOut, in, id);
    }
 
-   void SphereWorlandTransform::reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id)
+   void SphereWorlandTransform::reduce(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
-   void SphereWorlandTransform::backward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void SphereWorlandTransform::backward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       Profiler::RegionFixture<3> fix("SphereWorlandTransform::backward");
       this->mImpl.transform(rOut, in, id);
-   }
-
-   //
-   // Disabled transforms
-   //
-
-   void SphereWorlandTransform::forward(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void SphereWorlandTransform::forward(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void SphereWorlandTransform::forward(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void SphereWorlandTransform::backward(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void SphereWorlandTransform::backward(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void SphereWorlandTransform::backward(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void SphereWorlandTransform::reduce(MatrixZ&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void SphereWorlandTransform::reduce(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void SphereWorlandTransform::reduce(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
    }
 
    MHDFloat SphereWorlandTransform::requiredStorage() const

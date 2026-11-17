@@ -1,4 +1,4 @@
-/** 
+/**
  * @file TransformResolution.cpp
  * @brief Source of the resolution object for a transform
  */
@@ -13,8 +13,8 @@
 
 namespace QuICC {
 
-   TransformResolution::TransformResolution(const std::vector<std::vector<std::vector<int> > >& fwd, const std::vector<std::vector<std::vector<int> > >& bwd, const std::vector<std::vector<int> >& idx2D, const std::vector<int>& idx3D)
-      : mFwd(fwd), mBwd(bwd), mIdx2D(idx2D), mIdx3D(idx3D), mDimF1D(), mDimB1D(), mDim2D(), mDim3D(idx3D.size())
+   TransformResolution::TransformResolution(const std::vector<int>& globalDims, const std::vector<std::vector<std::vector<int> > >& fwd, const std::vector<std::vector<std::vector<int> > >& bwd, const std::vector<std::vector<int> >& idx2D, const std::vector<int>& idx3D)
+      : mGlobalDims(globalDims), mFwd(fwd), mBwd(bwd), mIdx2D(idx2D), mIdx3D(idx3D), mDimF1D(), mDimB1D(), mDim2D(), mDim3D(idx3D.size())
    {
       // Initialise the dimensions
       this->initDimensions();
@@ -188,6 +188,80 @@ namespace QuICC {
 
       // Clear indexes of third dimension
       this->mIdx3D.resize(0);
+   }
+
+   std::shared_ptr<CscMetadata> TransformResolution::viewMeta(const Dimensions::Data::Id id) const
+   {
+      auto spMeta = std::make_shared<CscMetadata>();
+      auto&& meta = *spMeta;
+
+      meta.global2D = this->mGlobalDims.at(2);
+      meta.global3D = this->mGlobalDims.at(3);
+
+      auto it3D = this->mIdx3D.cbegin();
+      auto itD2D = this->mDim2D.cbegin();
+      std::pair<std::vector<std::vector<int>>::const_iterator, std::vector<std::vector<int>>::const_iterator> itD1D;
+      if(id == Dimensions::Data::DATF1D)
+      {
+         meta.global1D = this->mGlobalDims.at(0);
+         itD1D.first = this->mDimF1D.cbegin();
+         itD1D.second = this->mDimF1D.cend();
+      }
+      else if(id == Dimensions::Data::DATB1D)
+      {
+         meta.global1D = this->mGlobalDims.at(1);
+         itD1D.first = this->mDimB1D.cbegin();
+         itD1D.second = this->mDimB1D.cend();
+      }
+      else
+      {
+         throw std::logic_error("Can only generate metadata for DATF1D and DATB1D");
+      }
+
+      meta.ptr2D.reserve(meta.global3D + 1);
+      meta.ptr2D.push_back(0);
+      std::uint32_t sze3D = 0;
+      std::uint32_t sze2D = 0;
+      for(std::uint32_t i = 0; i < meta.global3D; i++)
+      {
+         if(it3D != this->mIdx3D.end() && i == static_cast<uint32_t>(*it3D))
+         {
+            auto s = *itD2D;
+            meta.ptr2D.push_back(meta.ptr2D.back() + s);
+
+            it3D++;
+            itD2D++;
+            sze2D += s;
+            sze3D++;
+         }
+         else
+         {
+            meta.ptr2D.push_back(meta.ptr2D.back());
+         }
+      }
+      assert(sze3D == this->mIdx3D.size());
+
+      // Store 1D dimensions
+      meta.dim1D.reserve(sze2D);
+      for(;itD1D.first != itD1D.second; itD1D.first++)
+      {
+         for(auto&& d: *(itD1D.first))
+         {
+            meta.dim1D.push_back(d);
+         }
+      }
+
+      // Store 2D indices
+      meta.idx2D.reserve(sze2D);
+      for(auto&& d: this->mIdx2D)
+      {
+         for(auto&& i: d)
+         {
+            meta.idx2D.push_back(i);
+         }
+      }
+
+      return spMeta;
    }
 
 }

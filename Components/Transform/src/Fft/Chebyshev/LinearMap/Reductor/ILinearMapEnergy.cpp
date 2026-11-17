@@ -43,7 +43,7 @@ void ILinearMapEnergy::initBackendAnelastic(std::shared_ptr<QuICC::DenseSM::Cheb
 
 }
 
-void ILinearMapEnergy::transform(Matrix& rOut, const MatrixZ& in) const
+void ILinearMapEnergy::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
 {
    assert(this->isInitialized());
    assert(rOut.cols() == this->outCols());
@@ -63,7 +63,7 @@ void ILinearMapEnergy::transform(Matrix& rOut, const MatrixZ& in) const
 }
 
 // anelastic version:
-void ILinearMapEnergy::transform(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+void ILinearMapEnergy::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
 {
    assert(this->isInitialized());
    assert(rOut.cols() == this->outCols());
@@ -93,7 +93,7 @@ void ILinearMapEnergy::transform(Matrix& rOut, const MatrixZ& in, std::shared_pt
 
 
 
-void ILinearMapEnergy::transform(Matrix& rOut, const Matrix& in) const
+void ILinearMapEnergy::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const
 {
    assert(this->isInitialized());
    assert(rOut.cols() == this->outCols());
@@ -109,7 +109,7 @@ void ILinearMapEnergy::transform(Matrix& rOut, const Matrix& in) const
    this->applyPostOperator(rOut, tmpOut);
 }
 
-void ILinearMapEnergy::transform(Matrix& rOut, const Matrix& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+void ILinearMapEnergy::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
 {
    assert(this->isInitialized());
    assert(rOut.cols() == this->outCols());
@@ -130,13 +130,13 @@ void ILinearMapEnergy::transform(Matrix& rOut, const Matrix& in, std::shared_ptr
    this->applyPostOperator(rOut, tmpOut);
 }
 
-void ILinearMapEnergy::transform(MatrixZ&, const MatrixZ&) const
+void ILinearMapEnergy::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const MatrixZ>&) const
 {
    throw std::logic_error(
       "Data is not compatible with Chebyshev FFT energy reductor");
 }
 
-void ILinearMapEnergy::transform(MatrixZ&, const Matrix&) const
+void ILinearMapEnergy::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const Matrix>&) const
 {
    throw std::logic_error(
       "Data is not compatible with Chebyshev FFT energy reductor");

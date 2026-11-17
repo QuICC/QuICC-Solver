@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland R^2 power spectrum operator
  */
 
-// External includes
+// System includes
 //
 
 // Project includes

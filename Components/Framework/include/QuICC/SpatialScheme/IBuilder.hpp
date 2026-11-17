@@ -63,6 +63,7 @@ namespace SpatialScheme {
           * @brief Create indexes for a possibly restricted set (to simplify implementation it is defined for 3D cases)
           *
           * @param transId Transform ID
+          * @param globalDims Transform global dimensions
           * @param fwd1D   Storage for forward indexes of first dimension (the one acted on by the transform and contigous in memory)
           * @param bwd1D   Storage for backward indexes of first dimension (the one acted on by the transform and contigous in memory)
           * @param idx2D   Storage for the indexes of second dimension
@@ -70,7 +71,7 @@ namespace SpatialScheme {
           * @param id      ID of the bin (process/rank)
           * @param bins    Total number of bins (useful to build efficient pairs)
           */
-         virtual int fillIndexes(const Dimensions::Transform::Id transId, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, std::vector<std::vector<int> >& idx2D, std::vector<int>& idx3D, const std::vector<int>& id, const std::vector<int>& bins) = 0;
+         virtual int fillIndexes(const Dimensions::Transform::Id transId, std::vector<int>& globalDims, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, std::vector<std::vector<int> >& idx2D, std::vector<int>& idx3D, const std::vector<int>& id, const std::vector<int>& bins) = 0;
 
          /**
           * @brief Get total of splittable indexes

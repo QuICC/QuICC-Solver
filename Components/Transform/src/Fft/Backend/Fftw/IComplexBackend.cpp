@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/IComplexBackend.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/Fftw/IComplexBackend.hpp"
 #include "Types/Math.hpp"
 
 namespace QuICC {
@@ -28,14 +22,6 @@ namespace Fft {
 namespace Backend {
 
 namespace Fftw {
-
-   IComplexBackend::IComplexBackend()
-   {
-   }
-
-   IComplexBackend::~IComplexBackend()
-   {
-   }
 
    void IComplexBackend::init(const SetupType& setup) const
    {

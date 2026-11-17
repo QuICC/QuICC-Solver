@@ -59,7 +59,7 @@ void EnergySLaplR2<base_t>::initBackend() const
    this->mBackend.addSolver(2);
 }
 
-void EnergySLaplR2<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+void EnergySLaplR2<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
 {
    Matrix tmp2(tmp.rows(), tmp.cols());
    this->mBackend.input(tmp2, in);
@@ -83,13 +83,13 @@ void EnergySLaplR2<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) cons
    assert(col == this->mspSetup->blockSize());
 }
 
-void EnergySLaplR2<base_t>::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
+void EnergySLaplR2<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const
 {
    assert(rOut.cols() == 1);
    this->mBackend.output(rOut, tmp);
 }
 
-void EnergySLaplR2<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void EnergySLaplR2<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    Matrix tmp2(tmp.rows(), tmp.cols());

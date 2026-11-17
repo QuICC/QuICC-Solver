@@ -6,21 +6,12 @@
 #ifndef QUICC_TRANSFORM_SPHEREFFTWORLANDTRANSFORM_HPP
 #define QUICC_TRANSFORM_SPHEREFFTWORLANDTRANSFORM_HPP
 
-// Debug includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Transform/ITransform.hpp"
@@ -45,12 +36,12 @@ namespace Transform {
          /**
           * @brief Constructor
           */
-         SphereFftWorlandTransform();
+         SphereFftWorlandTransform() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~SphereFftWorlandTransform();
+         virtual ~SphereFftWorlandTransform() = default;
 
          /**
           * @brief set list of required options
@@ -81,7 +72,7 @@ namespace Transform {
           * @param in         Input physical values
           * @param id         Integrator to use
           */
-         virtual void forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id) override;
+         virtual void forward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id) override;
 
          /**
           * @brief Compute polynomial projection
@@ -90,7 +81,7 @@ namespace Transform {
           * @param in         Input spectral coefficients
           * @param id         Projector to use
           */
-         virtual void backward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id) override;
+         virtual void backward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id) override;
 
          /**
           * @brief Compute reduction operation
@@ -99,7 +90,7 @@ namespace Transform {
           * @param in         Input spectral coefficients
           * @param id         Energy reductor to use
           */
-         virtual void reduce(Matrix& spectrum, const MatrixZ& in, const std::size_t id) override;
+         virtual void reduce(Eigen::Ref<Matrix> spectrum, const Eigen::Ref<const MatrixZ>& in, const std::size_t id) override;
 
          /**
           * @brief Get the memory requirements
@@ -123,55 +114,6 @@ namespace Transform {
           * @brief Transform implementation
           */
          Fft::Worland::Transform mImpl;
-
-         //
-         // Disabled transforms
-         //
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(Matrix& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute forward transform (disabled)
-          */
-         virtual void forward(Matrix& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(Matrix& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute backward transform (disabled)
-          */
-         virtual void backward(Matrix& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(MatrixZ& rOut, const MatrixZ& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(MatrixZ& rOut, const Matrix& in, const std::size_t id) override;
-
-         /**
-          * @brief Compute reduction transform (disabled)
-          */
-         virtual void reduce(Matrix& rOut, const Matrix& in, const std::size_t id) override;
    };
 
 }

@@ -86,7 +86,7 @@ void StateFileReader::read()
          {
             this->readSpectralVector(
                PhysicalNames::Coordinator::tag(vit->first),
-               p->rDom(0).rPerturbation().rData(),
+               p->rDom(0).rPerturbation().rComps(),
                this->isRequired(vit->first));
          },
          vit->second);

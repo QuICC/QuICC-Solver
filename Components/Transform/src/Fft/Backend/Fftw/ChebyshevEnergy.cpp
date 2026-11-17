@@ -24,10 +24,6 @@ namespace Backend {
 
 namespace Fftw {
 
-ChebyshevEnergy::ChebyshevEnergy() {}
-
-ChebyshevEnergy::~ChebyshevEnergy() {}
-
 void ChebyshevEnergy::init(const SetupType& setup) const
 {
    // Initialize parent
@@ -186,13 +182,13 @@ void ChebyshevEnergy::computeEGrid(const int size, const MHDFloat lower,
    }
 }
 
-void ChebyshevEnergy::applyPadding(Matrix& rData, const int extraRows) const
+void ChebyshevEnergy::applyPadding(Eigen::Ref<Matrix> rData, const int extraRows) const
 {
    // Set the padded values to zero
    rData.bottomRows(this->mFwdSize + this->mPadSize - extraRows).setZero();
 }
 
-void ChebyshevEnergy::applyFwdFft(Matrix& mods, const Matrix& phys) const
+void ChebyshevEnergy::applyFwdFft(Eigen::Ref<Matrix> mods, const Eigen::Ref<const Matrix>& phys) const
 {
    fftw_execute_r2r(this->mFwdPlan, const_cast<MHDFloat*>(phys.data()),
       mods.data());
@@ -208,7 +204,7 @@ void ChebyshevEnergy::setSpectralOperator(const SparseMatrix& mat) const
    this->mSpecOp = mat;
 }
 
-void ChebyshevEnergy::outputSpectral(Matrix& rOut, const Matrix& tmp) const
+void ChebyshevEnergy::outputSpectral(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const
 {
    int extrasize = this->getExtraSize(); // is zero for the boussinesq case
    assert(this->mSpecOp.cols() <= tmp.rows());
@@ -219,7 +215,7 @@ void ChebyshevEnergy::outputSpectral(Matrix& rOut, const Matrix& tmp) const
       this->mSpecOp * tmp.topRows(2 * this->mSpecSize + extrasize);
 }
 
-void ChebyshevEnergy::outputGrid(Matrix& rOut, const Matrix& tmp) const
+void ChebyshevEnergy::outputGrid(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const
 {
    for (int i = 0; i < this->mFwdSize; i++)
    {
@@ -227,7 +223,7 @@ void ChebyshevEnergy::outputGrid(Matrix& rOut, const Matrix& tmp) const
    }
 }
 
-void ChebyshevEnergy::output(Matrix& rOut, const Matrix& tmp) const
+void ChebyshevEnergy::output(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const
 {
    int extrasize = this->getExtraSize(); // is zero for the boussinesq case
    int rows = 2 * this->mSpecSize + extrasize;

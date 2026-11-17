@@ -28,6 +28,13 @@ namespace Pseudospectral {
 void Coordinator::addGraph(const std::string& graphStr,
    const Graph::PhysicalParameters<MHDFloat>& physParams)
 {
+   mGraphStr = graphStr;
+   mGraphPhysParams = physParams;
+}
+
+void Coordinator::processGraph(const std::string& graphStr,
+   const Graph::PhysicalParameters<MHDFloat>& physParams)
+{
    // get Dims from mspRes
    // std::uint32_t Nr = jwRes.dim<Dimensions::Data::DATF1D>();
    std::uint32_t Nr = mspRes->sim().dim(Dimensions::Simulation::SIM1D,
@@ -92,144 +99,105 @@ void Coordinator::addGraph(const std::string& graphStr,
    std::vector<std::vector<std::int64_t>> dimRets;
    std::vector<std::string> layRets;
 
-   // Modal space (aka JW space, Stage::PMM and Stage::MMM, QuICC Stage0)
-   std::array<View::ViewBase<std::uint32_t>, dim> pointersMods;
-   pointersMods[1] =
-      View::ViewBase<std::uint32_t>(metaJW.ptr.data(), metaJW.ptr.size());
-   std::array<View::ViewBase<std::uint32_t>, dim> indicesMods;
-   indicesMods[1] =
-      View::ViewBase<std::uint32_t>(metaJW.idx.data(), metaJW.idx.size());
+   // Map view for scalar variables
+   for(auto& [fId, s]: mScalarVariables)
+   {
+      std::visit(
+         [&](auto&& p)
+         {
+            mId2View[fId] = p->rDom(0).rPerturbation().rGlobalView();
 
-   // View for outputs/inputs
-   std::size_t hVelTor = hash_combine(PhysicalNames::Velocity::id(),
-      FieldComponents::Spectral::TOR);
-   std::size_t hVelPol = hash_combine(PhysicalNames::Velocity::id(),
-      FieldComponents::Spectral::POL);
-   std::vector<size_t> fields = {PhysicalNames::Temperature::id(), hVelTor,
-      hVelPol};
+            std::array<std::uint32_t, dim> dims{modsDims[0], modsDims[2],
+            modsDims[1]};
+
+            // Return dimensions
+            // mlir has layer first
+            dimRets.push_back({dims[2], dims[0], dims[1]});
+            layRets.push_back(layOpt[2][0]);
+         }, s);
+   }
+
+   // Map view for vector variables
+   for(auto& [k, v]: mVectorVariables)
+   {
+      std::visit(
+         [&](auto&& p)
+         {
+            std::vector<FieldComponents::Spectral::Id> comps = {FieldComponents::Spectral::TOR, FieldComponents::Spectral::POL};
+            for(auto&& c: comps)
+            {
+               std::size_t hComp = hash_combine(k, c);
+               mId2View[hComp] = p->rDom(0).rPerturbation().rComp(c).rGlobalView();
+
+               std::array<std::uint32_t, dim> dims{modsDims[0], modsDims[2],
+               modsDims[1]};
+
+               // Return dimensions
+               // mlir has layer first
+               dimRets.push_back({dims[2], dims[0], dims[1]});
+               layRets.push_back(layOpt[2][0]);
+            }
+         }, v);
+   }
 
    if (mVectorEquations.at(/*it=*/0).size() == 2)
    {
       mIsMag = true;
    }
 
-   if (mIsMag)
-   {
-      std::size_t hMagTor = hash_combine(PhysicalNames::Magnetic::id(),
-         FieldComponents::Spectral::TOR);
-      fields.push_back(hMagTor);
-      std::size_t hMagPol = hash_combine(PhysicalNames::Magnetic::id(),
-         FieldComponents::Spectral::POL);
-      fields.push_back(hMagPol);
-   }
-
-   // Add Views and Storage for each component
-   auto scalarVarPtr =
-      mspRes->sim().ss().bwdPtr(Dimensions::Transform::SPECTRAL);
-
-   std::visit(
-      [&](auto&& p)
-      {
-         // Get field scalar type
-         using fld_t =
-            typename std::remove_reference_t<decltype(p->data())>::Scalar;
-
-         for (size_t f = 0; f < fields.size(); ++f)
-         {
-            // Field Id
-            auto fId = fields[f];
-
-            // mem block
-            Memory::MemBlock<fld_t> block(modsDims[0] * metaJW.idx.size(),
-               mMemRsr.get());
-
-// view
-// for now this works only for JW space
-#ifdef QUICC_HAS_CUDA_BACKEND
-            using jwLay_t = View::DCCSC3DJIK;
-#else
-            using jwLay_t = View::DCCSC3D;
-#endif
-            std::array<std::uint32_t, dim> dims{modsDims[0], modsDims[2],
-               modsDims[1]};
-            View::View<fld_t, jwLay_t> view(block.data(), block.size(),
-               dims.data(), pointersMods.data(), indicesMods.data());
-
-            // Store block
-            mBlocksData.push_back(std::move(block));
-
-            // Store view
-            mId2View[fId] = view;
-
-            // Return dimensions
-            // mlir has layer first
-            dimRets.push_back({dims[2], dims[0], dims[1]});
-            layRets.push_back(layOpt[2][0]);
-         }
-      },
-      scalarVarPtr);
-
    // Physical space (aka FT space, Stage::PPP and Stage::MPP, QuICC Stage2)
-   std::array<View::ViewBase<std::uint32_t>, dim> pointersPhys;
-   pointersPhys[1] =
-      View::ViewBase<std::uint32_t>(metaFT.ptr.data(), metaFT.ptr.size());
-   std::array<View::ViewBase<std::uint32_t>, dim> indicesPhys;
-   indicesPhys[1] =
-      View::ViewBase<std::uint32_t>(metaFT.idx.data(), metaFT.idx.size());
 
-   // Add Views for physical space
-   /// \todo move cfl computation into graph and
-   /// don't store physical space
-
-   std::size_t hVelR =
-      hash_combine(PhysicalNames::Velocity::id(), FieldComponents::Physical::R);
-   std::size_t hVelTheta = hash_combine(PhysicalNames::Velocity::id(),
-      FieldComponents::Physical::THETA);
-   std::size_t hVelPhi = hash_combine(PhysicalNames::Velocity::id(),
-      FieldComponents::Physical::PHI);
-   std::vector<size_t> physFields = {hVelR, hVelTheta, hVelPhi};
-
-   if (mIsMag)
+#if 0
+   for(auto& [hComp, s]: mScalarVariables)
    {
-      std::size_t hMagR = hash_combine(PhysicalNames::Magnetic::id(),
-         FieldComponents::Physical::R);
-      std::size_t hMagTheta = hash_combine(PhysicalNames::Magnetic::id(),
-         FieldComponents::Physical::THETA);
-      std::size_t hMagPhi = hash_combine(PhysicalNames::Magnetic::id(),
-         FieldComponents::Physical::PHI);
-      physFields.push_back(hMagR);
-      physFields.push_back(hMagTheta);
-      physFields.push_back(hMagPhi);
+      std::visit(
+         [&](auto&& p)
+         {
+               mId2View[hComp] = p->rDom(0).rPhys().rGlobalView();
+
+               if(p->rDom(0).rPhys().rGlobalView().pointers()[1].size() != metaFT.ptr.size())
+               {
+                  throw std::logic_error("SETUP IN NOT CORRECT");
+               }
+               if(p->rDom(0).rPhys().rGlobalView().indices()[1].size() != metaFT.idx.size())
+               {
+                  throw std::logic_error("SETUP IN NOT CORRECT");
+               }
+
+               // Map view for scalar variables
+               std::array<std::uint32_t, dim> dims{physDims[2], physDims[1],
+               physDims[0]};
+
+               // Return dimensions
+               // mlir has layer first
+               dimRets.push_back({dims[2], dims[0], dims[1]});
+               layRets.push_back(layOpt[0][0]);
+         }, s);
    }
+#endif
 
-   for (size_t f = 0; f < physFields.size(); ++f)
+   // Map view for vector variables
+   for(auto& [k, v]: mVectorVariables)
    {
-      using fld_t = MHDFloat;
+      std::visit(
+         [&](auto&& p)
+         {
+            std::vector<FieldComponents::Physical::Id> comps = {FieldComponents::Physical::R, FieldComponents::Physical::THETA, FieldComponents::Physical::PHI};
+            for(auto&& c: comps)
+            {
+               std::size_t hComp = hash_combine(k, c);
+               mId2View[hComp] = p->rDom(0).rPhys().rComp(c).rGlobalView();
 
-      // Field Id
-      auto fId = physFields[f];
+               // Map view for scalar variables
+               std::array<std::uint32_t, dim> dims{physDims[2], physDims[1],
+               physDims[0]};
 
-      // mem block
-      Memory::MemBlock<fld_t> block(physDims[2] * indicesPhys[1].size(),
-         mMemRsr.get());
-
-      // view
-      // for now this works only for FT space
-      std::array<std::uint32_t, dim> dims{physDims[2], physDims[1],
-         physDims[0]};
-      View::View<fld_t, View::DCCSC3D> view(block.data(), block.size(),
-         dims.data(), pointersPhys.data(), indicesPhys.data());
-
-      // Store block
-      mBlocksData.push_back(std::move(block));
-
-      // Store view
-      mId2View[fId] = view;
-
-      // Return dimensions
-      // mlir has layer first
-      dimRets.push_back({dims[2], dims[0], dims[1]});
-      layRets.push_back(layOpt[0][0]);
+               // Return dimensions
+               // mlir has layer first
+               dimRets.push_back({dims[2], dims[0], dims[1]});
+               layRets.push_back(layOpt[0][0]);
+            }
+         }, v);
    }
 
    // Store meta blocks

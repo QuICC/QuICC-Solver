@@ -8,18 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// Debug includes
-//
-
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Worland/Integrator/IWorlandIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Worland/Integrator/IWorlandIntegrator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -38,10 +29,6 @@ namespace Integrator {
       this->mProfileTag += "-Integrator";
    }
 
-   IWorlandIntegrator::~IWorlandIntegrator()
-   {
-   }
-
    void IWorlandIntegrator::initBackend() const
    {
       int lshift = 0; // operator doesn't shift l
@@ -49,7 +36,7 @@ namespace Integrator {
       this->mBackend.init(*this->mspSetup, lshift, extraN);
    }
 
-   void IWorlandIntegrator::transformBlock(MatrixZ& rOut, const MatrixZ& in, const bool isEven, const bool useReal) const
+   void IWorlandIntegrator::transformBlock(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const bool isEven, const bool useReal) const
    {
       Profiler::RegionStart<5> (this->mProfileTag + "-pre");
       this->applyPreOperator(in, isEven, useReal);
@@ -64,7 +51,7 @@ namespace Integrator {
       Profiler::RegionStop<5> (this->mProfileTag + "-post");
    }
 
-   void IWorlandIntegrator::transformBlock(Matrix& rOut, const Matrix& in, const bool isEven) const
+   void IWorlandIntegrator::transformBlock(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, const bool isEven) const
    {
       Profiler::RegionStart<5> (this->mProfileTag + "-pre");
       this->applyPreOperator(in, isEven);
@@ -79,7 +66,7 @@ namespace Integrator {
       Profiler::RegionStop<5> (this->mProfileTag + "-post");
    }
 
-   void IWorlandIntegrator::transform(MatrixZ& rOut, const MatrixZ& in) const
+   void IWorlandIntegrator::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<2> fix(this->mProfileTag + "::transform");
 
@@ -96,7 +83,7 @@ namespace Integrator {
 #endif
    }
 
-   void IWorlandIntegrator::transform(Matrix& rOut, const Matrix& in) const
+   void IWorlandIntegrator::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const
    {
       Profiler::RegionFixture<2> fix(this->mProfileTag + "::transform");
 
@@ -129,12 +116,12 @@ namespace Integrator {
       return mem;
    }
 
-   void IWorlandIntegrator::transform(Matrix& rOut, const MatrixZ& in) const
+   void IWorlandIntegrator::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       IWorlandOperator::transform(rOut, in);
    }
 
-   void IWorlandIntegrator::transform(MatrixZ& rOut, const Matrix& in) const
+   void IWorlandIntegrator::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in) const
    {
       IWorlandOperator::transform(rOut, in);
    }

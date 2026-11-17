@@ -9,16 +9,9 @@
 #include <stdexcept>
 #include <Eigen/src/misc/blas.h>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/IWorlandBackend.hpp"
-
 // Project includes
 //
-
+#include "QuICC/Transform/Fft/Backend/Fftw/IWorlandBackend.hpp"
 #define QUICC_IWORLANDBACKEND_BLAS 0
 #define QUICC_IWORLANDBACKEND_SCALAR 1
 #define QUICC_IWORLANDBACKEND_VECTOR 2
@@ -51,10 +44,6 @@ namespace Fftw {
    {
       this->mELoc.push_back(LocationVector());
       this->mOLoc.push_back(LocationVector());
-   }
-
-   IWorlandBackend::~IWorlandBackend()
-   {
    }
 
    void IWorlandBackend::initStorage(const int rows, const int cols, const int n, std::vector<Matrix>& s) const

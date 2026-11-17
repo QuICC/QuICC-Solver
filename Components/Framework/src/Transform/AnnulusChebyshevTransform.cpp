@@ -49,68 +49,19 @@ namespace Transform {
       }
    }                                                 
 
-   void AnnulusChebyshevTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void AnnulusChebyshevTransform::forward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
-   void AnnulusChebyshevTransform::backward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
+   void AnnulusChebyshevTransform::backward(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
    }
 
-   void AnnulusChebyshevTransform::reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id)
+   void AnnulusChebyshevTransform::reduce(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
-   }
-
-   //
-   // Disabled transforms
-   //
-
-   void AnnulusChebyshevTransform::forward(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void AnnulusChebyshevTransform::forward(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void AnnulusChebyshevTransform::forward(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void AnnulusChebyshevTransform::backward(Matrix&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void AnnulusChebyshevTransform::backward(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void AnnulusChebyshevTransform::backward(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void AnnulusChebyshevTransform::reduce(MatrixZ&, const MatrixZ&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void AnnulusChebyshevTransform::reduce(MatrixZ&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
-   }
-
-   void AnnulusChebyshevTransform::reduce(Matrix&, const Matrix&, const std::size_t)
-   {
-      this->unimplemented();
    }
 
    MHDFloat AnnulusChebyshevTransform::requiredStorage() const

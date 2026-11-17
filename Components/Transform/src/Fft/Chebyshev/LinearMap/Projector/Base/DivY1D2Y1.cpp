@@ -9,15 +9,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY1D2Y1.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY1D2Y1.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I1.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Y2.hpp"
 #include "QuICC/Polynomial/Quadrature/ChebyshevRule.hpp"
@@ -60,7 +54,7 @@ namespace Projector {
       this->mBackend.addSolver(2);
    }
 
-   void DivY1D2Y1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+   void DivY1D2Y1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
    {
       this->mBackend.input(tmp, in, 1);
       this->mBackend.getSolution(tmp, 3, -1, true);
@@ -69,12 +63,12 @@ namespace Projector {
       this->mBackend.getSolution(tmp, 1, 2);
    }
 
-   void DivY1D2Y1<base_t>::applyPostOperator(Matrix& rOut) const
+   void DivY1D2Y1<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut) const
    {
       this->mBackend.outputScale(rOut);
    }
 
-   void DivY1D2Y1<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
+   void DivY1D2Y1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in, const bool useReal) const
    {
       this->mBackend.input(tmp, in, 1, useReal);
       this->mBackend.getSolution(tmp, 3, -1, true);
@@ -83,7 +77,7 @@ namespace Projector {
       this->mBackend.getSolution(tmp, 1, 2);
    }
 
-   void DivY1D2Y1<base_t>::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
+   void DivY1D2Y1<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp, const bool useReal) const
    {
       this->mBackend.outputScale(rOut, tmp, useReal);
    }

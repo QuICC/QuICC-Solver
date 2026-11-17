@@ -23,7 +23,7 @@ namespace Complex {
 
 namespace Integrator {
 
-   void Lapl2D<base_t>::applyPostOperator(MatrixZ& rOut) const
+   void Lapl2D<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut) const
    {
       std::vector<std::pair<int,int> > orders = { {2,0}, {0,2} };
       int id = this->mBackend.computeDiff2D(orders, this->mspSetup->boxScale(), this->mspSetup->idBlocks());

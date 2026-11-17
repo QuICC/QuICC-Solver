@@ -57,7 +57,7 @@ void EnergyD1Y1<base_t>::initBackendAnelastic(std::shared_ptr<QuICC::DenseSM::Ch
    this->mBackend.addSolver(1);
 }
 
-void EnergyD1Y1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+void EnergyD1Y1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
 {
    this->mBackend.input(tmp, in);
    auto specOp = this->mBackend.solver().getSpectralOperator();
@@ -65,14 +65,14 @@ void EnergyD1Y1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
    this->mBackend.getSolution(tmp, 1, 1);
 }
 
-void EnergyD1Y1<base_t>::applyPostOperator(Matrix& rOut,
+void EnergyD1Y1<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut,
    const Matrix& tmp) const
 {
    assert(rOut.cols() == 1);
    this->mBackend.output(rOut, tmp);
 }
 
-void EnergyD1Y1<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void EnergyD1Y1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, useReal);

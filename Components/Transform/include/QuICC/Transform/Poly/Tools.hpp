@@ -9,9 +9,6 @@
 // System includes
 //
 
-// External includes
-//
-
 // Project includes
 //
 #include "Types/Typedefs.hpp"

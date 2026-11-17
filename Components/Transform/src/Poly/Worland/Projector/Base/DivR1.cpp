@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland 1/R projector
  */
 
-// External includes
+// System includes
 //
 #include <cassert>
 

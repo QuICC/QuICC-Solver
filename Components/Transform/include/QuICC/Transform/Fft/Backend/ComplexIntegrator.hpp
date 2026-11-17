@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_COMPLEXINTEGRATOR_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_COMPLEXINTEGRATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -51,7 +42,7 @@ namespace Backend {
          /**
           * @brief Destructor
           */
-         ~ComplexIntegrator();
+         ~ComplexIntegrator() = default;
 
          /**
           * @brief Initialise the FFT transforms
@@ -66,22 +57,22 @@ namespace Backend {
          /**
           * @brief Scale field
           */
-         void output(MatrixZ& rOut) const;
+         void output(Eigen::Ref<MatrixZ> rOut) const;
 
          /**
           * @brief Copy mean of field out of backend
           */
-         void outputMean(MatrixZ& rOut) const;
+         void outputMean(Eigen::Ref<MatrixZ> rOut) const;
 
          /**
           * @brief Zero the mean
           */
-         void zeroMean(MatrixZ& rOut) const;
+         void zeroMean(Eigen::Ref<MatrixZ> rOut) const;
 
          /**
           * @brief Scale with fast index dependent function
           */
-         void outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale) const;
+         void outputDiff(Eigen::Ref<MatrixZ> rOut, const int order, const MHDFloat scale) const;
 
          /**
           * @brief Extract the mean
@@ -91,12 +82,12 @@ namespace Backend {
          /**
           * @brief Set the mean
           */
-         void setMean(MatrixZ& rOut, const MHDFloat scale) const;
+         void setMean(Eigen::Ref<MatrixZ> rOut, const MHDFloat scale) const;
 
          /**
           * @brief Apply FFT
           */
-         void applyFft(MatrixZ& mods, const MatrixZ& phys) const;
+         void applyFft(Eigen::Ref<MatrixZ> mods, const Eigen::Ref<const MatrixZ>& phys) const;
 
          /**
           * @brief Compute 2D derivative operator
@@ -111,7 +102,7 @@ namespace Backend {
          /**
           * @brief Compute 2D derivative operator
           */
-         void applyDiff2D(MatrixZ& rOut, const int id) const;
+         void applyDiff2D(Eigen::Ref<MatrixZ> rOut, const int id) const;
 
          /**
           * @brief Destroy 2D derivative operator

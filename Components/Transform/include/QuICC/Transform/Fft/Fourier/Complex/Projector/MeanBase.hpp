@@ -55,7 +55,7 @@ namespace Projector {
           * @param rOut Output values
           * @param in   Input values
           */
-         void applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const;
+         void applyPreOperator(MatrixZ& rOut, const Eigen::Ref<const MatrixZ>& in) const;
    };
 
 }

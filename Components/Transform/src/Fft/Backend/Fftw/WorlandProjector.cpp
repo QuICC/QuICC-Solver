@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/WorlandProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/Fftw/WorlandProjector.hpp"
 #include "Types/Math.hpp"
 
 namespace QuICC {
@@ -28,14 +22,6 @@ namespace Fft {
 namespace Backend {
 
 namespace Fftw {
-
-   WorlandProjector::WorlandProjector()
-   {
-   }
-
-   WorlandProjector::~WorlandProjector()
-   {
-   }
 
    void WorlandProjector::init(const SetupType& setup, const int lshift, const int extraN, const bool lshiftOnlyParity, const bool alwaysZeroNegative) const
    {
@@ -113,7 +99,7 @@ namespace Fftw {
       this->io(this->mOutTmp.at(0).data(), this->mInTmp.at(0).data());
    }
 
-   void WorlandProjector::input(const Matrix& in, const bool isEven, const bool needPadding) const
+   void WorlandProjector::input(const Eigen::Ref<const Matrix>& in, const bool isEven, const bool needPadding) const
    {
       Matrix& inTmp = this->mInTmp.at(0);
       int start = 0;
@@ -131,7 +117,7 @@ namespace Fftw {
       }
    }
 
-   void WorlandProjector::input(const MatrixZ& in, const bool isEven, const bool useReal, const bool needPadding) const
+   void WorlandProjector::input(const Eigen::Ref<const MatrixZ>& in, const bool isEven, const bool useReal, const bool needPadding) const
    {
       Matrix& inTmp = this->mInTmp.at(0);
       int start = 0;
@@ -161,7 +147,7 @@ namespace Fftw {
       }
    }
 
-   void WorlandProjector::output(Matrix& rOut, const bool isEven) const
+   void WorlandProjector::output(Eigen::Ref<Matrix> rOut, const bool isEven) const
    {
       Matrix& outTmp = this->mOutTmp.at(0);
       int start = 0;
@@ -180,7 +166,7 @@ namespace Fftw {
       }
    }
 
-   void WorlandProjector::output(MatrixZ& rOut, const bool isEven, const bool useReal) const
+   void WorlandProjector::output(Eigen::Ref<MatrixZ> rOut, const bool isEven, const bool useReal) const
    {
       Matrix& outTmp = this->mOutTmp.at(0);
       int start = 0;

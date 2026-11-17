@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/WorlandProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/WorlandProjector.hpp"
 #if defined QUICC_FFT_WORLAND_FFTW
    #include "QuICC/Transform/Fft/Backend/Fftw/WorlandProjector.hpp"
    #define BACKENDIMPL Fftw
@@ -46,10 +40,6 @@ namespace Backend {
       this->mpImpl = std::make_shared<BackendImpl>();
    }
 
-   WorlandProjector::~WorlandProjector()
-   {
-   }
-
    void WorlandProjector::init(const SetupType& setup, const int lshift, const int extraN, const bool lshiftOnlyParity, const bool alwaysZeroNegative) const
    {
       this->mpImpl->init(setup, lshift, extraN, lshiftOnlyParity, alwaysZeroNegative);
@@ -75,22 +65,22 @@ namespace Backend {
       this->mpImpl->io(isEven);
    }
 
-   void WorlandProjector::input(const Matrix& in, const bool isEven, const bool needPadding) const
+   void WorlandProjector::input(const Eigen::Ref<const Matrix>& in, const bool isEven, const bool needPadding) const
    {
       this->mpImpl->input(in, isEven, needPadding);
    }
 
-   void WorlandProjector::input(const MatrixZ& in, const bool isEven, const bool useReal, const bool needPadding) const
+   void WorlandProjector::input(const Eigen::Ref<const MatrixZ>& in, const bool isEven, const bool useReal, const bool needPadding) const
    {
       this->mpImpl->input(in, isEven, useReal, needPadding);
    }
 
-   void WorlandProjector::output(Matrix& rOut, const bool isEven) const
+   void WorlandProjector::output(Eigen::Ref<Matrix> rOut, const bool isEven) const
    {
       this->mpImpl->output(rOut, isEven);
    }
 
-   void WorlandProjector::output(MatrixZ& rOut, const bool isEven, const bool useReal) const
+   void WorlandProjector::output(Eigen::Ref<MatrixZ> rOut, const bool isEven, const bool useReal) const
    {
       this->mpImpl->output(rOut, isEven, useReal);
    }

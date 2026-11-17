@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/ChebyshevEnergy.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/ChebyshevEnergy.hpp"
 #if defined QUICC_FFT_CHEBYSHEV_FFTW
    #include "QuICC/Transform/Fft/Backend/Fftw/ChebyshevEnergy.hpp"
    #define BACKENDIMPL Fftw
@@ -41,10 +35,6 @@ namespace Backend {
    ChebyshevEnergy::ChebyshevEnergy()
    {
       this->mpImpl = std::make_shared<BackendImpl>();
-   }
-
-   ChebyshevEnergy::~ChebyshevEnergy()
-   {
    }
 
    void ChebyshevEnergy::init(const SetupType& setup) const
@@ -96,27 +86,27 @@ namespace Backend {
       this->mpImpl->square(tmp, in, isFirst);
    }
 
-   void ChebyshevEnergy::output(Matrix& rOut, const Matrix& tmp) const
+   void ChebyshevEnergy::output(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const
    {
       this->mpImpl->output(rOut, tmp);
    }
 
-   void ChebyshevEnergy::outputGrid(Matrix& rOut, const Matrix& tmp) const
+   void ChebyshevEnergy::outputGrid(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const
    {
       this->mpImpl->outputGrid(rOut, tmp);
    }
 
-   void ChebyshevEnergy::outputSpectral(Matrix& rOut, const Matrix& tmp) const
+   void ChebyshevEnergy::outputSpectral(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const
    {
       this->mpImpl->outputSpectral(rOut, tmp);
    }
 
-   void ChebyshevEnergy::applyFft(Matrix& phys, const Matrix& mods) const
+   void ChebyshevEnergy::applyFft(Eigen::Ref<Matrix> phys, const Eigen::Ref<const Matrix>& mods) const
    {
       this->mpImpl->applyFft(phys, mods);
    }
 
-   void ChebyshevEnergy::applyFwdFft(Matrix& mods, const Matrix& phys) const
+   void ChebyshevEnergy::applyFwdFft(Eigen::Ref<Matrix> mods, const Eigen::Ref<const Matrix>& phys) const
    {
       this->mpImpl->applyFwdFft(mods, phys);
    }

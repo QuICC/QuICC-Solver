@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_INTEGRATOR_IALEGENDREINTEGRATOR_HPP
 #define QUICC_TRANSFORM_POLY_ALEGENDRE_INTEGRATOR_IALEGENDREINTEGRATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -100,7 +91,7 @@ namespace Integrator {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void applyOperators(MatrixZ &rOut, const MatrixZ &in) const override;
+         virtual void applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Apply ith operator

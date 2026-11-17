@@ -6,15 +6,9 @@
 #ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_SETUP_HPP
 #define QUICC_TRANSFORM_POLY_ALEGENDRE_SETUP_HPP
 
-// Configuration includes
-//
-#include <memory>
-
 // System includes
 //
-
-// External includes
-//
+#include <memory>
 
 // Project includes
 //
@@ -46,7 +40,7 @@ namespace ALegendre {
          /**
           * @brief Empty destructor
           */
-         virtual ~Setup();
+         virtual ~Setup() = default;
 
          /**
           * @brief Add index with multiplicity and assume full fast index list

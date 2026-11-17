@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/MixedIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/MixedIntegrator.hpp"
 #if defined QUICC_FFT_MIXED_FFTW
    #include "QuICC/Transform/Fft/Backend/Fftw/MixedIntegrator.hpp"
    #define BACKENDIMPL Fftw
@@ -44,31 +38,27 @@ namespace Backend {
       this->mpImpl = std::make_shared<BackendImpl>();
    }
 
-   MixedIntegrator::~MixedIntegrator()
-   {
-   }
-
    void MixedIntegrator::init(const SetupType& setup) const
    {
       this->mpImpl->init(setup);
    }
 
-   void MixedIntegrator::output(MatrixZ& rOut) const
+   void MixedIntegrator::output(Eigen::Ref<MatrixZ> rOut) const
    {
       this->mpImpl->output(rOut);
    }
 
-   void MixedIntegrator::outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale) const
+   void MixedIntegrator::outputDiff(Eigen::Ref<MatrixZ> rOut, const int order, const MHDFloat scale) const
    {
       this->mpImpl->outputDiff(rOut, order, scale);
    }
 
-   void MixedIntegrator::outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale, const std::map<int,MHDComplex>& mod) const
+   void MixedIntegrator::outputDiff(Eigen::Ref<MatrixZ> rOut, const int order, const MHDFloat scale, const std::map<int,MHDComplex>& mod) const
    {
       this->mpImpl->outputDiff(rOut, order, scale, mod);
    }
 
-   void MixedIntegrator::applyFft(MatrixZ& mods, const Matrix& phys) const
+   void MixedIntegrator::applyFft(Eigen::Ref<MatrixZ> mods, const Eigen::Ref<const Matrix>& phys) const
    {
       this->mpImpl->applyFft(mods, phys);
    }

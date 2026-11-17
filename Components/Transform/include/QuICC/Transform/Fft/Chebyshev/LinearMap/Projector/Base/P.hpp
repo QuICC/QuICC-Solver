@@ -55,14 +55,14 @@ private:
     * @param tmp Temporary padded modal values
     * @param in   Input values
     */
-   void applyPreOperator(Matrix& tmp, const Matrix& in) const final;
+   void applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const final;
 
    /**
     * @brief Apply post FFT operator
     *
     * @param rOut Output values
     */
-   void applyPostOperator(Matrix& rOut) const final;
+   void applyPostOperator(Eigen::Ref<Matrix> rOut) const final;
 
    /**
     * @brief Apply pre FFT operator for component wise openerations
@@ -71,7 +71,7 @@ private:
     * @param in Input values
     * @param useReal Real vs Imag flag
     */
-   void applyPreOperator(Matrix& tmp, const MatrixZ& in,
+   void applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
       const bool useReal) const final;
 
    /**
@@ -81,7 +81,7 @@ private:
     * @param tmp Real or imag coefficients
     * @param useReal Real vs Imag flag
     */
-   void applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+   void applyPostOperator(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp,
       const bool useReal) const final;
 };
 

@@ -26,20 +26,12 @@ namespace Complex {
 
 namespace Integrator {
 
-   IComplexIntegrator::IComplexIntegrator()
-   {
-   }
-
-   IComplexIntegrator::~IComplexIntegrator()
-   {
-   }
-
    void IComplexIntegrator::initBackend() const
    {
       this->mBackend.init(*this->mspSetup);
    }
 
-   void IComplexIntegrator::transform(MatrixZ& rOut, const MatrixZ& in) const
+   void IComplexIntegrator::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<2> fix("IComplexIntegrator::transform");
 
@@ -53,17 +45,17 @@ namespace Integrator {
       this->applyPostOperator(rOut);
    }
 
-   void IComplexIntegrator::transform(Matrix&, const Matrix&) const
+   void IComplexIntegrator::transform(Eigen::Ref<Matrix>, const Eigen::Ref<const Matrix>&) const
    {
       throw std::logic_error("Data is not compatible with Complex FFT integrator");
    }
 
-   void IComplexIntegrator::transform(Matrix&, const MatrixZ&) const
+   void IComplexIntegrator::transform(Eigen::Ref<Matrix>, const Eigen::Ref<const MatrixZ>&) const
    {
       throw std::logic_error("Data is not compatible with Complex FFT integrator");
    }
 
-   void IComplexIntegrator::transform(MatrixZ&, const Matrix&) const
+   void IComplexIntegrator::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const Matrix>&) const
    {
       throw std::logic_error("Data is not compatible with Complex FFT integrator");
    }
@@ -89,7 +81,7 @@ namespace Integrator {
       return mem;
    }
 
-   void IComplexIntegrator::dealias(MatrixZ& deAliased, const MatrixZ& aliased)const
+   void IComplexIntegrator::dealias(Eigen::Ref<MatrixZ> deAliased, const Eigen::Ref<const MatrixZ>& aliased)const
    {
       int specSize = this->mspSetup->specSize();
       assert(deAliased.rows() == specSize);

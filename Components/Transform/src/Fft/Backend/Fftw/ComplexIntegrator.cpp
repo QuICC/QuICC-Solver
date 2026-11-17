@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/ComplexIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/Fftw/ComplexIntegrator.hpp"
 #include "Types/Math.hpp"
 
 namespace QuICC {
@@ -28,14 +22,6 @@ namespace Fft {
 namespace Backend {
 
 namespace Fftw {
-
-   ComplexIntegrator::ComplexIntegrator()
-   {
-   }
-
-   ComplexIntegrator::~ComplexIntegrator()
-   {
-   }
 
    void ComplexIntegrator::init(const SetupType& setup) const
    {
@@ -68,12 +54,12 @@ namespace Fftw {
       }
    }
 
-   void ComplexIntegrator::output(MatrixZ& rOut) const
+   void ComplexIntegrator::output(Eigen::Ref<MatrixZ> rOut) const
    {
       rOut *= this->mFftScaling;
    }
 
-   void ComplexIntegrator::outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale) const
+   void ComplexIntegrator::outputDiff(Eigen::Ref<MatrixZ> rOut, const int order, const MHDFloat scale) const
    {
       // Odd order is complex
       if(order%2 == 1)
@@ -201,7 +187,7 @@ namespace Fftw {
       return id;
    }
 
-   void ComplexIntegrator::applyDiff2D(MatrixZ& rOut, const int id) const
+   void ComplexIntegrator::applyDiff2D(Eigen::Ref<MatrixZ> rOut, const int id) const
    {
       int negRow = rOut.rows() - this->mNegN;
       MatrixZ& opP = std::get<0>(this->mDiff2DOp.at(id));
@@ -222,7 +208,7 @@ namespace Fftw {
       this->output(rOut);
    }
 
-   void ComplexIntegrator::zeroMean(MatrixZ& rOut) const
+   void ComplexIntegrator::zeroMean(Eigen::Ref<MatrixZ> rOut) const
    {
       // Zero the mean
       for(auto it = this->mMeanBlocks.cbegin(); it != this->mMeanBlocks.cend(); ++it)
@@ -231,7 +217,7 @@ namespace Fftw {
       }
    }
 
-   void ComplexIntegrator::outputMean(MatrixZ& rOut) const
+   void ComplexIntegrator::outputMean(Eigen::Ref<MatrixZ> rOut) const
    {
       // This op could be done in place
       MatrixZ tmp = rOut;
@@ -244,11 +230,6 @@ namespace Fftw {
       }
    }
 
-   void ComplexIntegrator::applyFft(MatrixZ& mods, const MatrixZ& phys) const
-   {
-      fftw_execute_dft(this->mPlan, reinterpret_cast<fftw_complex* >(const_cast<MHDComplex*>(phys.data())), reinterpret_cast<fftw_complex* >(mods.data()));
-   }
-
    void ComplexIntegrator::extractMean(const MatrixZ& rOut) const
    {
       for(auto it = this->mMeanBlocks.cbegin(); it != this->mMeanBlocks.cend(); ++it)
@@ -257,7 +238,7 @@ namespace Fftw {
       }
    }
 
-   void ComplexIntegrator::setMean(MatrixZ& rOut, const MHDFloat scale) const
+   void ComplexIntegrator::setMean(Eigen::Ref<MatrixZ> rOut, const MHDFloat scale) const
    {
       MHDFloat f = scale*this->mFftScaling;
       for(size_t j = 0; j < this->mTmpMean.size(); ++j)

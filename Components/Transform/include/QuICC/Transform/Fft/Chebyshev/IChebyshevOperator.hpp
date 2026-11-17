@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_ICHEBYSHEVOPERATOR_HPP
 #define QUICC_TRANSFORM_FFT_CHEBYSHEV_ICHEBYSHEVOPERATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -48,12 +39,12 @@ namespace Chebyshev {
          /**
           * @brief Constructor
           */
-         IChebyshevOperator();
+         IChebyshevOperator() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IChebyshevOperator();
+         virtual ~IChebyshevOperator() = default;
 
          /**
           * @brief Initialise the transform

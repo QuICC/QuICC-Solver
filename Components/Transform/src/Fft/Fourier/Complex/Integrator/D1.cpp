@@ -23,7 +23,7 @@ namespace Complex {
 
 namespace Integrator {
 
-   void D1<base_t>::applyPostOperator(MatrixZ& rOut) const
+   void D1<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut) const
    {
       this->mBackend.outputDiff(rOut, 1, this->mspSetup->boxScale());
    }

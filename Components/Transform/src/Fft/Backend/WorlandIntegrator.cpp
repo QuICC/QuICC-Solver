@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/WorlandIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/WorlandIntegrator.hpp"
 #if defined QUICC_FFT_WORLAND_FFTW
    #include "QuICC/Transform/Fft/Backend/Fftw/WorlandIntegrator.hpp"
    #define BACKENDIMPL Fftw
@@ -46,10 +40,6 @@ namespace Backend {
       this->mpImpl = std::make_shared<BackendImpl>();
    }
 
-   WorlandIntegrator::~WorlandIntegrator()
-   {
-   }
-
    void WorlandIntegrator::init(const SetupType& setup, const int lshift, const int extraN, const bool lshiftOnlyParity, const bool alwaysZeroNegative) const
    {
       this->mpImpl->init(setup, lshift, extraN, lshiftOnlyParity, alwaysZeroNegative);
@@ -75,12 +65,12 @@ namespace Backend {
       this->mpImpl->io(isEven);
    }
 
-   void WorlandIntegrator::input(const Matrix& in, const bool isEven) const
+   void WorlandIntegrator::input(const Eigen::Ref<const Matrix>& in, const bool isEven) const
    {
       this->mpImpl->input(in, isEven);
    }
 
-   void WorlandIntegrator::input(const MatrixZ& in, const bool isEven, const bool useReal) const
+   void WorlandIntegrator::input(const Eigen::Ref<const MatrixZ>& in, const bool isEven, const bool useReal) const
    {
       this->mpImpl->input(in, isEven, useReal);
    }
@@ -135,12 +125,12 @@ namespace Backend {
       this->mpImpl->applyI4(isEven, id);
    }
 
-   void WorlandIntegrator::output(Matrix& rOut, const bool isEven) const
+   void WorlandIntegrator::output(Eigen::Ref<Matrix> rOut, const bool isEven) const
    {
       this->mpImpl->output(rOut, isEven);
    }
 
-   void WorlandIntegrator::output(MatrixZ& rOut, const bool isEven, const bool useReal) const
+   void WorlandIntegrator::output(Eigen::Ref<MatrixZ> rOut, const bool isEven, const bool useReal) const
    {
       this->mpImpl->output(rOut, isEven, useReal);
    }

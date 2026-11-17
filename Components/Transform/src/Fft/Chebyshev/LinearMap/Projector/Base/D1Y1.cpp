@@ -50,7 +50,7 @@ void D1Y1<base_t>::initBackend() const
    this->mBackend.addSolver(1);
 }
 
-void D1Y1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+void D1Y1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
 {
    this->mBackend.input(tmp, in);
    auto specOp = this->mBackend.solver().getSpectralOperator();
@@ -58,9 +58,9 @@ void D1Y1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
    this->mBackend.getSolution(tmp, 1, 1);
 }
 
-void D1Y1<base_t>::applyPostOperator(Matrix&) const {}
+void D1Y1<base_t>::applyPostOperator(Eigen::Ref<Matrix>) const {}
 
-void D1Y1<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void D1Y1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, useReal);
@@ -69,7 +69,7 @@ void D1Y1<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
    this->mBackend.getSolution(tmp, 1, 1);
 }
 
-void D1Y1<base_t>::applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+void D1Y1<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp,
    const bool useReal) const
 {
    this->mBackend.output(rOut, tmp, useReal);

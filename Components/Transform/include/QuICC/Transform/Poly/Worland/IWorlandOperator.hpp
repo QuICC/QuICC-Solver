@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_IWORLANDOPERATOR_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_IWORLANDOPERATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -53,7 +44,7 @@ namespace Worland {
          /**
           * @brief Destructor
           */
-         virtual ~IWorlandOperator();
+         virtual ~IWorlandOperator() = default;
 
          /**
           * @brief Initialise the polynomial transform
@@ -74,7 +65,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(MatrixZ& rOut, const MatrixZ& in) const override;
+         void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Compute polynomial transform
@@ -82,7 +73,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(Matrix& rOut, const MatrixZ& in) const;
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const;
 
          /**
           * @brief Get the memory requirements
@@ -122,7 +113,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void applyOperators(MatrixZ& rOut, const MatrixZ& in) const;
+         virtual void applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const;
 
          /**
           * @brief Apply operators
@@ -130,7 +121,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void applyOperators(Matrix& rOut, const MatrixZ& in) const;
+         virtual void applyOperators(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const;
    };
 
 }

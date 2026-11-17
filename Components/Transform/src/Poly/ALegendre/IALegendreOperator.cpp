@@ -7,15 +7,9 @@
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/ALegendre/IALegendreOperator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/ALegendre/IALegendreOperator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -49,21 +43,21 @@ namespace ALegendre {
       throw std::logic_error("Unused interface");
    }
 
-   void IALegendreOperator::transform(MatrixZ& rOut, const MatrixZ& in) const
+   void IALegendreOperator::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreOperator::transformZ");
       assert(this->isInitialized());
       this->applyOperators(rOut, in);
    }
 
-   void IALegendreOperator::transform(Matrix& rOut, const MatrixZ& in) const
+   void IALegendreOperator::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreOperator::transform");
       assert(this->isInitialized());
       throw std::logic_error("Data is not compatible with ALegendre operator");
    }
 
-   void IALegendreOperator::applyOperators(MatrixZ&, const MatrixZ&) const
+   void IALegendreOperator::applyOperators(Eigen::Ref<MatrixZ>, const Eigen::Ref<const MatrixZ>&) const
    {
       throw std::logic_error("Data is not compatible with ALegendre operator");
    }
@@ -80,7 +74,7 @@ namespace ALegendre {
       return mem;
    }
 
-}
-}
-}
-}
+} // namespace ALegendre
+} // namespace Poly
+} // namespace Transform
+} // namespace QuICC

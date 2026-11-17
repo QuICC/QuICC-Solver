@@ -57,7 +57,7 @@ namespace Sphere {
       Profiler::RegionFixture<2> fix("TorPolHarmonicCompute");
 
       // Initialize to zero
-      rNLComp.rData().setZero();
+      rNLComp.setZeros();
 
       int nR = this->spRes()->sim().dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
       int nTh = this->spRes()->sim().dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);

@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_IFFTOPERATOR_HPP
 #define QUICC_TRANSFORM_FFT_IFFTOPERATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -39,12 +30,12 @@ namespace Fft {
          /**
           * @brief Constructor
           */
-         IFftOperator();
+         IFftOperator() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IFftOperator();
+         virtual ~IFftOperator() = default;
 
          /**
           * @brief Compute transform C2C or R2R componentwise
@@ -52,7 +43,7 @@ namespace Fft {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const = 0;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const = 0;
 
          /**
           * @brief Compute transform R2C
@@ -60,7 +51,7 @@ namespace Fft {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const Matrix& in) const = 0;
+         virtual void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in) const = 0;
 
          /**
           * @brief Compute transform R2C, anelastic version
@@ -69,7 +60,7 @@ namespace Fft {
           * @param in   Input values
           * @param pF   radial profile
           */
-         virtual void transform(Matrix& rOut, const Matrix& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
          {
             // Default implementation just ignores pF and calls the standard transform
             this->transform(rOut, in);
@@ -81,7 +72,7 @@ namespace Fft {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const MatrixZ& in) const = 0;
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const = 0;
 
          /**
           * @brief Compute transform C2R, anelastic version
@@ -90,7 +81,7 @@ namespace Fft {
           * @param in   Input values
           * @param pF   radial profile
           */
-         virtual void transform(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
          {
             // Default implementation just ignores pF and calls the standard transform
             this->transform(rOut, in);
@@ -102,7 +93,7 @@ namespace Fft {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const Matrix& in) const = 0;
+         virtual void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const = 0;
 
          /**
           * @brief Rows of output data
@@ -130,7 +121,7 @@ namespace Fft {
           * @param truncated  values
           * @param extended   values
           */
-         virtual void dealias(MatrixZ& deAliased, const MatrixZ& aliased) const;
+         virtual void dealias(Eigen::Ref<MatrixZ> deAliased, const Eigen::Ref<const MatrixZ>& aliased) const;
 
       protected:
          /**
@@ -165,8 +156,8 @@ namespace Fft {
          }
    };
 
-}
-}
-}
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC
 
 #endif // QUICC_TRANSFORM_FFT_IFFTOPERATOR_HPP

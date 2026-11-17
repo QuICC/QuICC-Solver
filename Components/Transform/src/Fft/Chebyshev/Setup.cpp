@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
 
 namespace QuICC {
 
@@ -30,10 +24,6 @@ namespace Chebyshev {
       : ::QuICC::Transform::Fft::Setup(size, blockSize, specSize, purpose), mLower(std::numeric_limits<MHDFloat>::quiet_NaN()), mUpper(std::numeric_limits<MHDFloat>::quiet_NaN())
    {
       this->setBoxScale(1.0);
-   }
-
-   Setup::~Setup()
-   {
    }
 
    void Setup::setBounds(const MHDFloat lower, const MHDFloat upper)

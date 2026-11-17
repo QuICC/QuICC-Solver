@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/MixedProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/MixedProjector.hpp"
 #if defined QUICC_FFT_MIXED_FFTW
    #include "QuICC/Transform/Fft/Backend/Fftw/MixedProjector.hpp"
    #define BACKENDIMPL Fftw
@@ -44,10 +38,6 @@ namespace Backend {
       this->mpImpl = std::make_shared<BackendImpl>();
    }
 
-   MixedProjector::~MixedProjector()
-   {
-   }
-
    void MixedProjector::init(const SetupType& setup) const
    {
       this->mpImpl->init(setup);
@@ -63,7 +53,7 @@ namespace Backend {
       this->mpImpl->inputDiff(out, in, order, scale);
    }
 
-   void MixedProjector::applyFft(Matrix& phys, const MatrixZ& mods) const
+   void MixedProjector::applyFft(Eigen::Ref<Matrix> phys, const Eigen::Ref<const MatrixZ>& mods) const
    {
       this->mpImpl->applyFft(phys, mods);
    }
