@@ -3,35 +3,18 @@
  * @brief Source of building block for the implementation of a physical kernel
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
-
 // Project includes
 //
+#include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
 
 namespace QuICC {
 
 namespace Physical {
 
 namespace Kernel {
-
-   IPhysicalKernel::IPhysicalKernel()
-   {
-   }
-
-   IPhysicalKernel::~IPhysicalKernel()
-   {
-   }
 
    void IPhysicalKernel::setMesh(std::shared_ptr<std::vector<Array> > spMesh)
    {

@@ -35,6 +35,8 @@ namespace Physical {
           */
          template <typename TFIELD>
           static void set(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
+         template <typename TFIELD>
+          static void set(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c, const MHDFloat cBg);
 
          /**
           * @brief Add to S
@@ -43,6 +45,8 @@ namespace Physical {
           */
          template <typename TFIELD>
           static void add(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
+         template <typename TFIELD>
+          static void add(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c, const MHDFloat cBg);
 
          /**
           * @brief Substract S
@@ -51,6 +55,8 @@ namespace Physical {
           */
          template <typename TFIELD>
           static void sub(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
+         template <typename TFIELD>
+          static void sub(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c, const MHDFloat cBg);
 
          /**
           * @brief Set S
@@ -59,6 +65,8 @@ namespace Physical {
           */
          template <typename TFIELD, typename TIDXFUNC>
           static void set(TFIELD &rS, const TIDXFUNC& idxFunc, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
+         template <typename TFIELD, typename TIDXFUNC>
+          static void set(TFIELD &rS, const TIDXFUNC& idxFunc, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c, const MHDFloat cBg);
 
          /**
           * @brief Add to S
@@ -67,6 +75,8 @@ namespace Physical {
           */
          template <typename TFIELD, typename TIDXFUNC>
           static void add(TFIELD &rS, const TIDXFUNC& idxFunc, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
+         template <typename TFIELD, typename TIDXFUNC>
+          static void add(TFIELD &rS, const TIDXFUNC& idxFunc, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c, const MHDFloat cBg);
 
          /**
           * @brief Substract S
@@ -75,6 +85,8 @@ namespace Physical {
           */
          template <typename TFIELD, typename TIDXFUNC>
           static void sub(TFIELD &rS, const TIDXFUNC& idxFunc, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
+         template <typename TFIELD, typename TIDXFUNC>
+          static void sub(TFIELD &rS, const TIDXFUNC& idxFunc, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c, const MHDFloat cBg);
 
       protected:
 
@@ -120,9 +132,12 @@ namespace Physical {
             /// @brief non dimensional scaling for transport term
             T _scaling;
 
+            /// @brief non dimensional scaling for transport background term
+            T _scalingBg;
+
             /// @brief ctor
             /// @param scaling
-            SetFunctor(T scaling) : _scaling(scaling){};
+            SetFunctor(T scaling, T scalingBg) : _scaling(scaling), _scalingBg(scalingBg){};
 
             /// @brief deleted default constructor
             SetFunctor() = delete;
@@ -147,14 +162,14 @@ namespace Physical {
                }
                else
                {
-                  return _scaling * (ui * vi + uj * vj + uk * vk - g * ui);
+                  return _scaling * (ui * vi + uj * vj + uk * vk) - _scalingBg * g * ui;
                }
             }
 
             /// Grid caching function
             void cacheScaling(T g)
             {
-               std::get<0>(this->_s) = -_scaling * g;
+               std::get<0>(this->_s) = -_scalingBg * g;
             };
          };
 
@@ -176,7 +191,15 @@ namespace Physical {
    void SphericalHeatAdvection<TONE,TTWO,TTHREE>::set(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
       IdxResFunctor f(res);
-      set(rS, f, r, u, gradQ, c);
+      set(rS, f, r, u, gradQ, c, c);
+   }
+
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
+   template <typename TFIELD>
+   void SphericalHeatAdvection<TONE,TTWO,TTHREE>::set(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c, const MHDFloat cBg)
+   {
+      IdxResFunctor f(res);
+      set(rS, f, r, u, gradQ, c, cBg);
    }
 
    template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
@@ -184,7 +207,15 @@ namespace Physical {
    void SphericalHeatAdvection<TONE,TTWO,TTHREE>::add(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
       IdxResFunctor f(res);
-      add(rS, f, r, u, gradQ, c);
+      add(rS, f, r, u, gradQ, c, c);
+   }
+
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
+   template <typename TFIELD>
+   void SphericalHeatAdvection<TONE,TTWO,TTHREE>::add(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c, const MHDFloat cBg)
+   {
+      IdxResFunctor f(res);
+      add(rS, f, r, u, gradQ, c, cBg);
    }
 
    template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
@@ -192,12 +223,27 @@ namespace Physical {
    void SphericalHeatAdvection<TONE,TTWO,TTHREE>::sub(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
       IdxResFunctor f(res);
-      sub(rS, f, r, u, gradQ, c);
+      sub(rS, f, r, u, gradQ, c, c);
+   }
+
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
+   template <typename TFIELD>
+   void SphericalHeatAdvection<TONE,TTWO,TTHREE>::sub(TFIELD &rS, const Resolution& res, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c, const MHDFloat cBg)
+   {
+      IdxResFunctor f(res);
+      sub(rS, f, r, u, gradQ, c, cBg);
    }
 
    template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
    template <typename TFIELD, typename TIDXFUNC>
    void SphericalHeatAdvection<TONE,TTWO,TTHREE>::set(TFIELD &rS, const TIDXFUNC& idxFunc, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
+   {
+      set(rS, idxFunc, r, u, gradQ, c, c);
+   }
+
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
+   template <typename TFIELD, typename TIDXFUNC>
+   void SphericalHeatAdvection<TONE,TTWO,TTHREE>::set(TFIELD &rS, const TIDXFUNC& idxFunc, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c, const MHDFloat cBg)
    {
       using scalar_t = typename TFIELD::PointType;
       if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
@@ -205,7 +251,7 @@ namespace Physical {
          using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
          using grid_t = View::ViewBase<double>;
          using fct_t = SetFunctor<scalar_t>;
-         fct_t f(c);
+         fct_t f(c, cBg);
          grid_t vGrid(const_cast<scalar_t *>(r.data()), r.size());
          std::vector<view_t> vs;
          collectViews(vs, u);
@@ -218,13 +264,13 @@ namespace Physical {
          int nR = idxFunc.dim3D();
          int iR_;
 
-         if(c != 1.0)
+         if(!(c == 1.0 && cBg == 1.0))
          {
             rS.setData(c*(u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
             for(int iR = 0; iR < nR; ++iR)
             {
                iR_ = idxFunc.idx3D(iR);
-               rS.subSlice((c*r(iR_))*u.comp(TONE).slice(iR), iR);
+               rS.subSlice((cBg*r(iR_))*u.comp(TONE).slice(iR), iR);
             }
 
             rS.addData(c*(u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
@@ -250,13 +296,20 @@ namespace Physical {
    template <typename TFIELD, typename TIDXFUNC>
    void SphericalHeatAdvection<TONE,TTWO,TTHREE>::add(TFIELD &rS, const TIDXFUNC& idxFunc, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
+      add(rS, idxFunc, r, u, gradQ, c, c);
+   }
+
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
+   template <typename TFIELD, typename TIDXFUNC>
+   void SphericalHeatAdvection<TONE,TTWO,TTHREE>::add(TFIELD &rS, const TIDXFUNC& idxFunc, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c, const MHDFloat cBg)
+   {
       using scalar_t = typename TFIELD::PointType;
       if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
          using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
          using grid_t = View::ViewBase<double>;
          using fct_t = details::AddTmplFunctor<scalar_t, SetFunctor>;
-         fct_t f(c);
+         fct_t f(c, cBg);
          grid_t vGrid(const_cast<scalar_t *>(r.data()), r.size());
          std::vector<view_t> vs;
          collectViews(vs, u);
@@ -269,13 +322,13 @@ namespace Physical {
          int nR = idxFunc.dim3D();
          int iR_;
 
-         if(c != 1.0)
+         if(!(c == 1.0 && cBg == 1.0))
          {
             rS.addData(c*(u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
             for(int iR = 0; iR < nR; ++iR)
             {
                iR_ = idxFunc.idx3D(iR);
-               rS.subSlice((c*r(iR_))*u.comp(TONE).slice(iR), iR);
+               rS.subSlice((cBg*r(iR_))*u.comp(TONE).slice(iR), iR);
             }
 
             rS.addData(c*(u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
@@ -301,13 +354,20 @@ namespace Physical {
    template <typename TFIELD, typename TIDXFUNC>
    void SphericalHeatAdvection<TONE,TTWO,TTHREE>::sub(TFIELD &rS, const TIDXFUNC& idxFunc, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
+      sub(rS, idxFunc, r, u, gradQ, c, c);
+   }
+
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
+   template <typename TFIELD, typename TIDXFUNC>
+   void SphericalHeatAdvection<TONE,TTWO,TTHREE>::sub(TFIELD &rS, const TIDXFUNC& idxFunc, const Array& r, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c, const MHDFloat cBg)
+   {
       using scalar_t = typename TFIELD::PointType;
       if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
          using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
          using grid_t = View::ViewBase<double>;
          using fct_t = details::SubTmplFunctor<scalar_t, SetFunctor>;
-         fct_t f(c);
+         fct_t f(c, cBg);
          grid_t vGrid(const_cast<scalar_t *>(r.data()), r.size());
          std::vector<view_t> vs;
          collectViews(vs, u);
@@ -320,13 +380,13 @@ namespace Physical {
          int nR = idxFunc.dim3D();
          int iR_;
 
-         if(c != 1.0)
+         if(!(c == 1.0 && cBg == 1.0))
          {
             rS.subData(c*(u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
             for(int iR = 0; iR < nR; ++iR)
             {
                iR_ = idxFunc.idx3D(iR);
-               rS.addSlice((c*r(iR_))*u.comp(TONE).slice(iR), iR);
+               rS.addSlice((cBg*r(iR_))*u.comp(TONE).slice(iR), iR);
             }
 
             rS.subData(c*(u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());

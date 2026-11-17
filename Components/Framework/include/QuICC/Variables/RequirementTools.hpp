@@ -62,9 +62,9 @@ namespace QuICC {
           * @param rScalarVars   Scalar variables
           * @param rVectorVars   Vector variables
           * @param varInfo       Variable requirements
-          * @param spRes      Shared resolution
+          * @param spRess        Shared resolutions
           */
-         static void initVariables(std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& rScalarVars, std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& rVectorVars, const VariableRequirement& varInfo, SharedResolution spRes);
+         static void initVariables(std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& rScalarVars, std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& rVectorVars, const VariableRequirement& varInfo, const std::vector<SharedResolution>& spRess);
 
          /**
           * @brief Map variables to the corresponding equation

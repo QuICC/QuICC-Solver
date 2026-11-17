@@ -1,6 +1,7 @@
 set(tags
   FieldToRhs
   SolverHasBc
+  SolverNoBc
   SolverNoTau
   Stencil
 )

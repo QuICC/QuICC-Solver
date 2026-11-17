@@ -49,6 +49,22 @@ if(_BLAS_MKL)
 endif()
 
 #
+# LAPACK
+#
+
+# look for LAPACK, MKL specifically for the 64 bit version
+set(BLA_VENDOR "Intel10_64lp")
+find_package(LAPACK)
+if(LAPACK_FOUND)
+  message(VERBOSE "MKL LAPACK")
+  set(_LAPACK_MKL "True")
+else()
+  message(VERBOSE "Generic LAPACK")
+  unset(BLA_VENDOR)
+  find_package(LAPACK REQUIRED)
+endif()
+
+#
 # Eigen
 #
 include(BundleEigen)

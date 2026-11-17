@@ -12,6 +12,11 @@
 #include "QuICC/Transform/Path/Empty.hpp"
 #include "QuICC/Transform/Path/Scalar.hpp"
 #include "QuICC/Transform/Path/TorPol.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
+#ifdef QUICC_DEBUG
+#include "QuICC/Tools/IdToHuman.hpp"
+#include "QuICC/PhysicalNames/Coordinator.hpp"
+#endif
 
 namespace QuICC {
 
@@ -45,7 +50,7 @@ namespace QuICC {
       }
    }
 
-   void RequirementTools::initVariables(std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& rScalarVars, std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& rVectorVars, const VariableRequirement& varInfo, SharedResolution spRes)
+   void RequirementTools::initVariables(std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& rScalarVars, std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& rVectorVars, const VariableRequirement& varInfo, const std::vector<SharedResolution>& spRess)
    {
       //
       // Create the required variables
@@ -57,6 +62,29 @@ namespace QuICC {
          // Check if spectral variable is required
          if(infoIt->second.needSpectral())
          {
+            // Get correct resolution
+            SharedResolution spRes;
+            if(infoIt->second.schemeId() == 0)
+            {
+               spRes = spRess.at(0);
+            }
+            else
+            {
+               for(SharedResolution s: spRess)
+               {
+                  if(infoIt->second.schemeId() == s->sim().ss().id())
+                  {
+                     spRes = s;
+                     break;
+                  }
+               }
+
+               if(!spRes)
+               {
+                  throw std::logic_error("Resolution required by field is not available");
+               }
+            }
+
             // Separate scalar and vector fields
             if(infoIt->second.isScalar())
             {
@@ -238,6 +266,7 @@ namespace QuICC {
       for(auto scalEqIt = scalarEqs.begin(); scalEqIt < scalarEqs.end(); scalEqIt++)
       {
          auto eqBranches = (*scalEqIt)->backwardPaths();
+         DebuggerMacro_msg("Building backward tree for " + PhysicalNames::Coordinator::tag((*scalEqIt)->name()) + " with " + std::to_string(eqBranches.size()) + " branches", 5);
          if(eqBranches.size() > 0)
          {
             auto eqName = (*scalEqIt)->name();
@@ -250,6 +279,7 @@ namespace QuICC {
       for(auto vectEqIt = vectorEqs.begin(); vectEqIt < vectorEqs.end(); vectEqIt++)
       {
          auto eqBranches = (*vectEqIt)->backwardPaths();
+         DebuggerMacro_msg("Building backward tree for " + PhysicalNames::Coordinator::tag((*vectEqIt)->name()) + " with " + std::to_string(eqBranches.size()) + " branches", 5);
          if(eqBranches.size() > 0)
          {
             auto eqName = (*vectEqIt)->name();
@@ -270,6 +300,7 @@ namespace QuICC {
       for(auto scalEqIt = rScalarEqs.begin(); scalEqIt < rScalarEqs.end(); scalEqIt++)
       {
          auto eqBranches = (*scalEqIt)->forwardPaths();
+         DebuggerMacro_msg("Building forward tree for " + PhysicalNames::Coordinator::tag((*scalEqIt)->name()) + " with " + std::to_string(eqBranches.size()) + " branches", 5);
          if(eqBranches.size() > 0)
          {
             auto eqName = (*scalEqIt)->name();
@@ -282,6 +313,7 @@ namespace QuICC {
       for(auto vectEqIt = rVectorEqs.begin(); vectEqIt < rVectorEqs.end(); vectEqIt++)
       {
          auto eqBranches = (*vectEqIt)->forwardPaths();
+         DebuggerMacro_msg("Building forward tree for " + PhysicalNames::Coordinator::tag((*vectEqIt)->name()) + " with " + std::to_string(eqBranches.size()) + " branches", 5);
          if(eqBranches.size() > 0)
          {
             auto eqName = (*vectEqIt)->name();

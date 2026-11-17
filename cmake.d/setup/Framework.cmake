@@ -7,6 +7,14 @@
 message(STATUS "Framework setup")
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
+###################################################
+#----------- SCALARFIELD IMPLEMENTATION ----------#
+###################################################
+option(QUICC_USE_VIEW_SCALARFIELD "Enable View implementation for ScalarField" OFF)
+if(QUICC_USE_VIEW_SCALARFIELD)
+  add_definitions("-DQUICC_USE_VIEW_SCALARFIELD")
+endif()
+
 
 ###################################################
 #----------------- MEMORY USAGE ------------------#

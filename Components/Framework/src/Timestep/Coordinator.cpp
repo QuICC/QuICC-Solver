@@ -9,11 +9,10 @@
 // Project includes
 //
 #include "QuICC/Timestep/Coordinator.hpp"
-#include "QuICC/Tools/Formatter.hpp"
-#include "Profiler/Interface.hpp"
-#include "QuICC/Debug/DebuggerMacro.h"
 #include "Timestep/RungeKuttaCB/Factory.hpp"
 #include "Timestep/PredictorCorrector/Factory.hpp"
+#include "Timestep/PredictorCorrector/FactoryViews.hpp"
+#include "Timestep/Exponential/Factory.hpp"
 
 namespace QuICC {
 
@@ -39,11 +38,6 @@ namespace Timestep {
       this->mpImpl->update();
    }
 
-   bool Coordinator::finishedStep() const
-   {
-      return this->mpImpl->finishedStep();
-   }
-
    void Coordinator::getExplicitInput(const std::size_t opId, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
       this->mpImpl->getExplicitInput(opId, scalEq, vectEq, scalVar, vectVar);
@@ -54,9 +48,9 @@ namespace Timestep {
       this->mpImpl->tuneAdaptive(time);
    }
 
-   void Coordinator::adaptTimestep(const Matrix& cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   void Coordinator::adaptTimestep(const Matrix& cfl)
    {
-      this->mpImpl->adaptTimestep(cfl, scalEq, vectEq);
+      this->mpImpl->adaptTimestep(cfl);
    }
 
    void Coordinator::stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
@@ -73,6 +67,12 @@ namespace Timestep {
       }
 
       // Try Predictor-Corrector schemes
+      if(!this->mpImpl)
+      {
+         this->mpImpl = PredictorCorrector::makeInterfaceViews(schemeId, time, cfl, maxError, scalEq, vectEq, pseudo);
+      }
+
+      // Try old Predictor-Corrector schemes
       if(!this->mpImpl)
       {
          this->mpImpl = PredictorCorrector::makeInterface(schemeId, time, cfl, maxError, scalEq, vectEq, pseudo);

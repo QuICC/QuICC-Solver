@@ -13,6 +13,10 @@ set(tags
   FluctVelocityX
   FluctVelocityY
   FluctVelocityZ
+  JacobianMagnetic
+  JacobianMomentum
+  JacobianTemperature
+  JacobianVelocity
   Magnetic
   MagneticX
   MagneticY

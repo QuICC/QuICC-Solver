@@ -38,11 +38,15 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
     ${QUICC_PYQUICC_COMPONENT_LIB}
     QuICC::Io
     QuICC::Common
+    QuICC::Arithmetics
     QuICC::Framework::GitHash
     QuICC::Profiling
     QuICC::Environment
+    QuICC::Utils
     QuICC::TimestepPc
+    QuICC::TimestepPcViews
     QuICC::TimestepRkcb
+    QuICC::TimestepExp
     QuICC::DenseSM
 )
 

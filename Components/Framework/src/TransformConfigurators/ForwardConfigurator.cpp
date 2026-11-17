@@ -14,6 +14,7 @@
 #include "QuICC/Arithmetics/None.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
 #ifdef QUICC_DEBUG
+#include "QuICC/Tools/IdToHuman.hpp"
 #include "QuICC/Transform/Forward/Coordinator.hpp"
 #endif // QUICC_DEBUG
 #include "QuICC/PhysicalNames/Coordinator.hpp"
@@ -277,7 +278,7 @@ namespace Transform {
    void ForwardConfigurator::updateEquation(const TransformTreeEdge& edge, Framework::Selector::VariantSharedVectorVariable& rVector, TransformCoordinatorType& coord)
    {
       // Debugger message
-      DebuggerMacro_msg("updateEquation (vector)", 4);
+      DebuggerMacro_msg("updateEquation (vector," +  Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(edge.outId<FieldComponents::Spectral::Id>())) + ")", 4);
 
       Profiler::RegionFixture<2> fix("Transform::ForwardConfigurator::updateEquation");
 

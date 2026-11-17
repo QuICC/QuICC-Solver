@@ -9,6 +9,7 @@
 
 // Project includes
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Resolutions/TransformResolution.hpp"
 
 namespace QuICC {

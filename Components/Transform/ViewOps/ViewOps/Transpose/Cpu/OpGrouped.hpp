@@ -63,6 +63,13 @@ void OpGrouped<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
          details::implPerm120(out[i], in[i]);
       }
    }
+   else if constexpr (std::is_same_v<Perm, p021_t>)
+   {
+      for (std::size_t i = 0; i < in.size(); ++i)
+      {
+         details::implPerm021(out[i], in[i]);
+      }
+   }
    else
    {
       throw std::logic_error("transpose not implemented");

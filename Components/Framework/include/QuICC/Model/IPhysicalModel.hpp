@@ -30,6 +30,9 @@ namespace Model {
    class IPhysicalModel
    {
       public:
+         /// Typedef for a secondary scheme
+         typedef void SecondarySchemeType;
+
          /**
           * @brief Constructor
           */
@@ -71,6 +74,11 @@ namespace Model {
           * @brief Configure additional features set at run time
           */
          virtual void configure(const std::set<SpatialScheme::Feature>& f);
+
+         /**
+          * @brief List of excluded field IDs (example: recomputed fields)
+          */
+         virtual std::vector<std::size_t> excludedFieldIds() const;
 
          /**
           * @brief Add extra field IDs (example: imposed fields)

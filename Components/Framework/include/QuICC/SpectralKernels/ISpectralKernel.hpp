@@ -77,6 +77,13 @@ namespace Kernel {
           */
          virtual void apply(const std::size_t timeId);
 
+         /**
+          * @brief Get corrections
+          *
+          * @param timeId   Timing ID
+          */
+         virtual const std::vector<std::tuple<MHDVariant,int, int, int>>& correction(const std::size_t timeId);
+
       protected:
          /**
           * @brief Get scalar variable
@@ -116,6 +123,11 @@ namespace Kernel {
           * @brief Map of name and pointer for the vector variables
           */
          std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>  mVectors;
+
+         /**
+          * @brief Corrections
+          */
+         std::vector<std::tuple<MHDVariant, int, int, int>> mCorr;
 
       private:
          /**

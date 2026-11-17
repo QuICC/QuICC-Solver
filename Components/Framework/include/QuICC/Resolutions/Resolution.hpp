@@ -152,6 +152,11 @@ namespace QuICC {
           */
          void buildRestriction(std::vector<int>& rSlow, std::vector<std::vector<int> >& rMiddle, const int k);
 
+         /**
+          * @brief Memory resource
+          */
+         std::shared_ptr<Memory::memory_resource> mem() const;
+
       protected:
 
       private:

@@ -17,6 +17,14 @@
    /// Define debug message macro function
    #define DebuggerMacro_msg(M,T)  DebuggerMacro::msg(M,T)
 
+#ifdef QUICC_DEBUG_VERBOSE
+   /// Define debug message macro function
+   #define DebuggerMacro_msg_v(M,T)  DebuggerMacro::msg(M,T)
+#else
+   /// Define verbose debug message macro function
+   #define DebuggerMacro_msg_v(M,T)
+#endif
+
    /// Define debug enter macro function
    #define DebuggerMacro_enter(M,T)  DebuggerMacro::enter(M,T)
 
@@ -35,6 +43,9 @@
 #else
    /// Define empty message macro function
    #define DebuggerMacro_msg(M,T)
+
+   /// Define empty verbose message macro function
+   #define DebuggerMacro_msg_v(M,T)
 
    /// Define empty debug enter  macro function
    #define DebuggerMacro_enter(M,T)  
